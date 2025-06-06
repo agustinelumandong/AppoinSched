@@ -19,7 +19,7 @@ new class extends Component {
     {
         $this->name = Auth::user()->first_name . ' ' . Auth::user()->middle_name . ' ' . Auth::user()->last_name;
         $this->first_name = Auth::user()->first_name;
-        $this->middle_name = Auth::user()->middle_name;
+        $this->middle_name = Auth::user()->middle_name ?? '';
         $this->last_name = Auth::user()->last_name;
         $this->email = Auth::user()->email;
     }
