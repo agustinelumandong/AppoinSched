@@ -15,6 +15,7 @@ new class extends Component {
     public string $roleDescription = '';
     public array $selectedPermissions = [];
     public string $permissionName = '';
+    public mixed $role = null;
 
     // Save Permission
     public function savePermission()
@@ -62,6 +63,7 @@ new class extends Component {
     {
         $role = Role::findOrFail($id);
         if ($role) {
+            $this->role = $role;
             $this->roleName = $role->name;
             $this->selectedPermissions = $role->permissions->pluck('id')->toArray();
             $this->dispatch('open-modal-edit-role');
@@ -71,7 +73,7 @@ new class extends Component {
     public function saveEditRole()
     {
         $validated = $this->validate([
-            'roleName' => 'required|string|max:255',
+            'roleName' => 'required|string|max:255|unique:roles,name,' . $this->role->id,
         ]);
         if ($validated) {
             $role = Role::where('name', $this->roleName)->first();
