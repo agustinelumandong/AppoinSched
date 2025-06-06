@@ -21,8 +21,8 @@
             </flux:navlist.group>
 
             <flux:navlist.group :heading="__('Administration')" class="grid">
-                <flux:navlist.item icon="shield-check" :href="route('rolespermission')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('rolespermission')" wire:navigate>{{ __('Roles & Permissions') }}
+                <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')" class="text-decoration-none text-black"
+                    :current="request()->routeIs('admin.roles-permissions')" wire:navigate>{{ __('Roles & Permissions') }}
                 </flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>

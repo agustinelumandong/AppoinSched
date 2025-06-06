@@ -20,8 +20,7 @@ Route::middleware(['auth'])->group(function () {
 
 
 });
-Volt::route('roles-permissions', 'roles-permissions')->name('roles-permissions');
-Volt::route('rolespermission', 'rolespermission')->name('rolespermission');
+Volt::route('admin/roles-permissions', 'admin.roles-permissions')->name('admin.roles-permissions');
 
 
 

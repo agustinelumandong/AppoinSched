@@ -7,7 +7,7 @@
              </div>
 
              <p class="mt-3">
-                 Are you sure you want to delete the role <strong>"{{ $permissionName }}"</strong>?
+                 Are you sure you want to delete the permission <strong>"{{ $permissionName }}"</strong>?
              </p>
              <div class="form-check mt-4">
                  <input class="form-check-input" type="checkbox" id="confirmDeletion" wire:model.live="confirmDeletion">

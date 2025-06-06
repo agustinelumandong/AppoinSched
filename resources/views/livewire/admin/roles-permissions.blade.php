@@ -155,14 +155,14 @@ new class extends Component {
         }
     }
 
-    public function confirmPermissionRole()
+    public function confirmDeletePermission()
     {
         if ($this->confirmDeletion) {
-            $permission = Role::where('name', $this->permissionName)->first();
+            $permission = Permission::where('name', $this->permissionName)->first();
             if ($permission) {
                 $permission->delete();
                 session()->flash('message', 'Permission deleted successfully.');
-                $this->reset(['permissionName' . 'confirmDeletion']);
+                $this->reset(['permissionName', 'confirmDeletion']);
                 $this->dispatch('close-modal-delete-permission');
             } else {
                 session()->flash('error', 'Permission not found.');
@@ -208,36 +208,36 @@ new class extends Component {
     </div>
 
     <!-- Header Section -->
-    @include('livewire.partials.RPC.header')
+    @include('livewire.admin.components.header')
 
     <!-- Statistic -->
-    @include('livewire.partials.RPC.statistic')
+    @include('livewire.admin.components.statistic')
 
     <!-- Roles Table -->
-    @include('livewire.partials.RPC.roles-table')
+    @include('livewire.admin.components.roles-table')
 
     <!-- Permissions Table -->
-    @include('livewire.partials.RPC.permissions-table')
+    @include('livewire.admin.components.permissions-table')
 
     <!-- Modals -->
     <!-- Add Role Modal -->
-    @include('livewire.partials.RPC.modal.add-role-modal')
+    @include('livewire.admin.components.modal.add-role-modal')
 
     <!-- Edit Role Modal -->
-    @include('livewire.partials.RPC.modal.edit-role-modal')
+    @include('livewire.admin.components.modal.edit-role-modal')
 
     <!-- Delete Role Modal -->
-    @include('livewire.partials.RPC.modal.delete-role-modal')
+    @include('livewire.admin.components.modal.delete-role-modal')
 
 
     <!-- Add Permission Modal -->
-    @include('livewire.partials.RPC.modal.add-permission-modal')
+    @include('livewire.admin.components.modal.add-permission-modal')
 
     <!-- Edit Permission Modal -->
-    @include('livewire.partials.RPC.modal.edit-permission-modal')
+    @include('livewire.admin.components.modal.edit-permission-modal')
 
     <!-- Delete Permission Modal -->
-    @include('livewire.partials.RPC.modal.delete-permission-modal')
+    @include('livewire.admin.components.modal.delete-permission-modal')
 
     @push('scripts')
         <script>
