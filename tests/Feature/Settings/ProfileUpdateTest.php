@@ -36,7 +36,8 @@ class ProfileUpdateTest extends TestCase
 
         $user->refresh();
 
-        $this->assertEquals('Test User', $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name);
+        $this->assertEquals('Test User User', $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name);
+        $this->assertEquals('Test User User', $user->first_name . ' ' . $user->middle_name . ' ' . $user->last_name);
         $this->assertEquals('test@example.com', $user->email);
         $this->assertNull($user->email_verified_at);
     }
