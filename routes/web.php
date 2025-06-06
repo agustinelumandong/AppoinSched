@@ -18,9 +18,11 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
 
+    Volt::route('admin/roles-permissions', 'admin.roles-permissions')->name('admin.roles-permissions');
+
+    Volt::route('admin/users-management', 'admin.users.users-management')->name('admin.users.users-management');
 
 });
-Volt::route('admin/roles-permissions', 'admin.roles-permissions')->name('admin.roles-permissions');
 
 
 

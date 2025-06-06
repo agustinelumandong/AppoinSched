@@ -143,6 +143,10 @@
     outline: none;
 }
 
+.flux-form-control.search {
+    width: 250px;
+    padding: 0.5rem 1rem;
+}
 
 .action-buttons {
     display: flex;
