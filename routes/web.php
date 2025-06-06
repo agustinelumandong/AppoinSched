@@ -17,6 +17,12 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-});
 
-require __DIR__.'/auth.php';
+
+});
+Volt::route('roles-permissions', 'roles-permissions')->name('roles-permissions');
+Volt::route('rolespermission', 'rolespermission')->name('rolespermission');
+
+
+
+require __DIR__ . '/auth.php';
