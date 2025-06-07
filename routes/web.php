@@ -22,6 +22,7 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('admin/users-management', 'admin.users.users-management')->name('admin.users.users-management');
 
+    Volt::route('admin/offices', 'offices.offices')->name('admin.offices');
 });
 
 

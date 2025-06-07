@@ -1,0 +1,176 @@
+<?php
+
+declare(strict_types=1);
+
+use Livewire\Volt\Component;
+use App\Models\Offices;
+use Livewire\WithPagination;
+use Livewire\WithFileUploads;
+use Livewire\Attributes\Url;
+
+new class extends Component {
+    use WithPagination, WithFileUploads;
+
+    #[Url(history: true)]
+    public $page = 1;
+    public string $search = '';
+    public mixed $logo = null;
+    public string $logoUrl = '';
+    public int $officeId;
+    public string $name = '';
+    public string $slug = '';
+    public string $description = '';
+    public bool $confirmDeletion = false;
+
+    public function mount()
+    {
+        $this->resetPage();
+    }
+
+    public function searchs()
+    {
+        $this->resetPage();
+    }
+
+    public function saveOffice()
+    {
+        $this->validate([
+            'name' => 'required|string|max:255|unique:offices,name',
+            'slug' => 'required|string|max:255|unique:offices,slug',
+            'description' => 'required|string|max:255',
+            'logo' => 'required|image|max:1024',
+        ]);
+
+        // Save the file first
+        $logoName = $this->logo->hashName();
+        $this->logo->storeAs('offices', $logoName, 'public');
+
+        // Create office record
+        $office = Offices::create([
+            'name' => $this->name,
+            'slug' => $this->slug,
+            'description' => $this->description,
+            'logo' => $logoName,
+        ]);
+
+        if ($office) {
+            $this->resetPage();
+            $this->reset(['name', 'slug', 'description', 'logo']);
+            $this->dispatch('close-modal-add-office');
+            session()->flash('message', 'Office created successfully');
+        } else {
+            session()->flash('error', 'Failed to create office');
+        }
+    }
+
+    public function openEditOfficeModal($id)
+    {
+        $office = Offices::find($id);
+        if ($office) {
+            $this->officeId = $office->id;
+            $this->name = $office->name;
+            $this->slug = $office->slug;
+            $this->description = $office->description;
+            $this->dispatch('open-modal-edit-office');
+        } else {
+            session()->flash('error', 'Office not found');
+        }
+    }
+
+    public function updateOffice()
+    {
+        $validated = $this->validate([
+            'name' => 'required|string|max:255|unique:offices,name,' . $this->officeId,
+            'slug' => 'required|string|max:255|unique:offices,slug,' . $this->officeId,
+            'description' => 'required|string|max:255',
+            'logo' => 'image|max:1024',
+        ]);
+        if ($this->logo) {
+            // Save the file first
+            $logoName = $this->logo->hashName();
+            $this->logo->storeAs('offices', $logoName, 'public');
+            $validated['logo'] = $logoName;
+        }
+        if ($validated) {
+            $office = Offices::find($this->officeId);
+            $office->update($validated);
+            $this->dispatch('close-modal-edit-office');
+            session()->flash('message', 'Office updated successfully');
+            $this->resetPage();
+            $this->reset(['name', 'slug', 'description', 'logo']);
+        } else {
+            session()->flash('error', 'Office update failed');
+        }
+    }
+
+    public function openDeleteOfficeModal($id)
+    {
+        $this->officeId = $id;
+        $this->confirmDeletion = false;
+        $this->dispatch('open-modal-delete-office');
+    }
+
+    public function deleteOffice()
+    {
+        $office = Offices::find($this->officeId);
+        if ($office) {
+            if ($this->confirmDeletion) {
+                $office->delete();
+                $this->dispatch('close-modal-delete-office');
+                session()->flash('message', 'Office deleted successfully');
+                $this->resetPage();
+            } else {
+                session()->flash('error', 'Please confirm the deletion');
+            }
+        } else {
+            session()->flash('error', 'Office not found');
+        }
+    }
+
+    public function with()
+    {
+        return [
+            'offices' => Offices::where('name', 'like', '%' . $this->search . '%')
+                ->orWhere('slug', 'like', '%' . $this->search . '%')
+                ->paginate(5),
+        ];
+    }
+}; ?>
+
+<div>
+    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
+    <!-- Flash Messages -->
+    <div>
+        @if (session()->has('message'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                <i class="bi bi-check-circle me-2"></i>
+                {{ session('message') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+
+        @if (session()->has('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle me-2"></i>
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        @endif
+    </div>
+
+    {{-- Header Section --}}
+    @include('livewire.offices.components.header')
+
+    {{-- Table Section --}}
+    @include('livewire.offices.components.table')
+
+    {{-- Modals Section --}}
+    @include('livewire.offices.components.modal.add-office-modal')
+
+    {{-- Edit --}}
+    @include('livewire.offices.components.modal.edit-office-modal')
+
+    {{-- Delete --}}
+    @include('livewire.offices.components.modal.delete-office-modal')
+</div>

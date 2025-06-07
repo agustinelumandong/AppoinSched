@@ -21,11 +21,14 @@
             </flux:navlist.group>
 
             <flux:navlist.group :heading="__('Administration')" class="grid">
-                <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.roles-permissions')" wire:navigate>{{ __('Roles & Permissions') }}
+                <flux:navlist.item icon="building-office" :href="route('admin.offices')" class="text-decoration-none text-black"
+                    :current="request()->routeIs('admin.offices')" wire:navigate>{{ __('Offices') }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="user" :href="route('admin.users.users-management')" class="text-decoration-none text-black"
                     :current="request()->routeIs('admin.users.users-management')" wire:navigate>{{ __('Users Management') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')" class="text-decoration-none text-black"
+                    :current="request()->routeIs('admin.roles-permissions')" wire:navigate>{{ __('Roles & Permissions') }}
                 </flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
