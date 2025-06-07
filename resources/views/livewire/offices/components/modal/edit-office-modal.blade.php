@@ -28,7 +28,7 @@
             <div class="mb-3">
                 <label for="logo" class="form-label fw-semibold">Logo</label>
                 <input type="file" class="form-control @error('logo') is-invalid @enderror" id="logo"
-                    wire:model="logo" accept="image/*" required>
+                    wire:model="logo" accept="image/*">
                 @error('logo')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
