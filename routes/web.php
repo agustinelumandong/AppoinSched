@@ -26,6 +26,9 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('admin/offices', 'offices.offices')->name('admin.offices');
     Volt::route('admin/offices/{office:slug}', 'offices.show')->name('offices.show');
 
+    // Volt::route('/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
+
+    Volt::route('admin/services', 'services.services-management')->name('admin.services');
 
 
 });

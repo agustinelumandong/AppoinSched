@@ -120,6 +120,11 @@
     color: #065f46;
 }
 
+.flux-badge-danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
 .flux-modal {
     backdrop-filter: blur(4px);
 }

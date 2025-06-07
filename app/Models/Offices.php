@@ -25,4 +25,9 @@ class Offices extends Model
     {
         return 'slug';
     }
+
+    public function services()
+    {
+        return $this->hasMany(Services::class);
+    }
 }

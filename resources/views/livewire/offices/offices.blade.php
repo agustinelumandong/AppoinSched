@@ -179,10 +179,10 @@ new class extends Component {
 
     <!-- Flash Messages -->
     <div>
-        @if (session()->has('message'))
+        @if (session()->has('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <i class="bi bi-check-circle me-2"></i>
-                {{ session('message') }}
+                {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
             </div>
         @endif
@@ -196,18 +196,14 @@ new class extends Component {
         @endif
     </div>
 
-    {{-- Header Section --}}
+    <!-- Header -->
     @include('livewire.offices.components.header')
 
-    {{-- Table Section --}}
+    <!-- Table -->
     @include('livewire.offices.components.table')
 
-    {{-- Modals Section --}}
+    <!-- Modals -->
     @include('livewire.offices.components.modal.add-office-modal')
-
-    {{-- Edit --}}
     @include('livewire.offices.components.modal.edit-office-modal')
-
-    {{-- Delete --}}
     @include('livewire.offices.components.modal.delete-office-modal')
 </div>
