@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Offices;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 
@@ -23,7 +24,13 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('admin/users-management', 'admin.users.users-management')->name('admin.users.users-management');
 
     Volt::route('admin/offices', 'offices.offices')->name('admin.offices');
+    Volt::route('admin/offices/{office:slug}', 'offices.show')->name('offices.show');
+
+
+
 });
+
+
 
 
 

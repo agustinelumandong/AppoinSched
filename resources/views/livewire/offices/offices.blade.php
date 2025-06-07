@@ -7,7 +7,7 @@ use App\Models\Offices;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Url;
-
+use Illuminate\Support\Str;
 new class extends Component {
     use WithPagination, WithFileUploads;
 
@@ -21,10 +21,30 @@ new class extends Component {
     public string $slug = '';
     public string $description = '';
     public bool $confirmDeletion = false;
+    public Offices $office;
 
-    public function mount()
+    public function mount(Offices $office)
     {
+        $this->office = $office;
+        $this->name = $office->name ?? '';
+        $this->slug = $office->slug ?? '';
+        $this->description = $office->description ?? '';
+        $this->search = $office->search ?? '';
+        $this->logo = $office->logo ?? '';
+        // $this->logoUrl = $office->logo ?? asset('storage/offices/default.png');
+            $this->redirectTo = route('admin.offices');
         $this->resetPage();
+    }
+
+    public function with()
+    {
+        return [
+            'offices' => Offices::where('name', 'like', '%' . $this->search . '%')
+                ->orWhere('slug', 'like', '%' . $this->search . '%')
+                ->orWhere('description', 'like', '%' . $this->search . '%')
+                ->orderBy('created_at', 'DESC')
+                ->paginate(5),
+        ];
     }
 
     public function searchs()
@@ -32,13 +52,37 @@ new class extends Component {
         $this->resetPage();
     }
 
+    public function updatedName($value)
+    {
+        $this->slug = $this->generateUniqueSlug($value);
+    }
+
+    protected function generateUniqueSlug($value): string
+    {
+        $slug = Str::slug($value);
+        $original = $slug;
+        $count = 1;
+
+        while (
+            Offices::where('slug', $slug)
+                  ->when(isset($this->office), function ($query) {
+                      return $query->where('id', '!=', $this->office->id);
+                  })
+                  ->exists()
+        ) {
+            $slug = $original . '-' . $count++;
+        }
+
+        return $slug;
+    }
+
     public function saveOffice()
     {
         $this->validate([
             'name' => 'required|string|max:255|unique:offices,name',
-            'slug' => 'required|string|max:255|unique:offices,slug',
-            'description' => 'required|string|max:255',
-            'logo' => 'required|image|max:1024',
+            'slug' => 'string|max:255',
+            'description' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|max:1024',
         ]);
 
         // Save the file first
@@ -81,9 +125,9 @@ new class extends Component {
     {
         $validated = $this->validate([
             'name' => 'required|string|max:255|unique:offices,name,' . $this->officeId,
-            'slug' => 'required|string|max:255|unique:offices,slug,' . $this->officeId,
-            'description' => 'required|string|max:255',
-            'logo' => 'image|max:1024',
+            'slug' => 'string|max:255',
+            'description' => 'nullable|string|max:255',
+            'logo' => 'nullable|image|max:1024',
         ]);
         if ($this->logo) {
             // Save the file first
@@ -127,14 +171,7 @@ new class extends Component {
         }
     }
 
-    public function with()
-    {
-        return [
-            'offices' => Offices::where('name', 'like', '%' . $this->search . '%')
-                ->orWhere('slug', 'like', '%' . $this->search . '%')
-                ->paginate(5),
-        ];
-    }
+    
 }; ?>
 
 <div>

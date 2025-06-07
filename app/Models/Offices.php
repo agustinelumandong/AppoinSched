@@ -20,4 +20,9 @@ class Offices extends Model
         'description',
         'logo',
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
 }
