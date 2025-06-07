@@ -20,4 +20,14 @@ class Offices extends Model
         'description',
         'logo',
     ];
+
+    public function getRouteKeyName()
+    {
+        return 'slug';
+    }
+
+    public function services()
+    {
+        return $this->hasMany(Services::class);
+    }
 }

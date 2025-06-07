@@ -10,9 +10,8 @@
                 @enderror
             </div>
             <div class="mb-3">
-                <label for="slug" class="form-label fw-semibold">Slug</label>
                 <input type="text" class="form-control @error('slug') is-invalid @enderror" id="slug"
-                    wire:model.defer="slug" placeholder="Enter slug" required>
+                    wire:model.defer="slug"  readonly disabled hidden>
                 @error('slug')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -20,7 +19,7 @@
             <div class="mb-3">
                 <label for="description" class="form-label fw-semibold">Description</label>
                 <input type="text" class="form-control @error('description') is-invalid @enderror" id="description"
-                    wire:model.defer="description" placeholder="Enter description" required>
+                    wire:model.defer="description" placeholder="Enter description">
                 @error('description')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
@@ -28,7 +27,7 @@
             <div class="mb-3">
                 <label for="logo" class="form-label fw-semibold">Logo</label>
                 <input type="file" class="form-control @error('logo') is-invalid @enderror" id="logo"
-                    wire:model="logo" accept="image/*" required>
+                    wire:model="logo" accept="image/*">
                 @error('logo')
                     <div class="invalid-feedback">{{ $message }}</div>
                 @enderror
