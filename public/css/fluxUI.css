@@ -11,6 +11,13 @@
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.flux-select-option {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    transition: all 0.2s ease-in-out;
+    padding: 0.75rem;
+}
+
 .flux-btn {
     border-radius: 8px;
     font-weight: 500;
@@ -124,6 +131,23 @@
     background: #fee2e2;
     color: #dc2626;
 }
+
+.flux-badge-warning {
+    background: #fef3c7;
+    color: #eab308;
+}
+
+.flux-badge-info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+
+.flux-badge-light {
+    background: #f9fafb;
+    color: #6b7280;
+}
+
 
 .flux-modal {
     backdrop-filter: blur(4px);
