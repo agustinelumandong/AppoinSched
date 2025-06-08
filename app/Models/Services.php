@@ -25,7 +25,7 @@ class Services extends Model
 
     public function office()
     {
-        return $this->belongsTo(Offices::class);
+        return $this->belongsTo(Offices::class, 'office_id');
     }
 
 }
