@@ -27,6 +27,9 @@
                 <flux:navlist.item icon="building-office" :href="route('admin.services')" class="text-decoration-none text-black"
                     :current="request()->routeIs('admin.services')" wire:navigate>{{ __('Services') }}
                 </flux:navlist.item>
+                <flux:navlist.item icon="calendar" :href="route('admin.appointments-management')" class="text-decoration-none text-black"
+                    :current="request()->routeIs('admin.appointments-management')" wire:navigate>{{ __('Appointments') }}
+                </flux:navlist.item>
                 <flux:navlist.item icon="user" :href="route('admin.users.users-management')" class="text-decoration-none text-black"
                     :current="request()->routeIs('admin.users.users-management')" wire:navigate>{{ __('Users Management') }}
                 </flux:navlist.item>
