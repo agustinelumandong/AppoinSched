@@ -2,14 +2,19 @@
 
 use Livewire\Volt\Component;
 use App\Models\Offices;
+use App\Models\Services;
+use Illuminate\Support\Str;
 
 new class extends Component {
     public Offices $office;
+    public $services;
 
     public function mount(Offices $office)
     {
         $this->office = $office;
+        $this->services = $office->services()->where('is_active', 1)->get();
     }
+    
 }; ?>
 
 <div>
@@ -82,6 +87,37 @@ new class extends Component {
                                     <p class="mb-1"><strong>Created:</strong> {{ $office->created_at->format('M d, Y') }}</p>
                                     <p class="mb-0"><strong>Last Updated:</strong> {{ $office->updated_at->format('M d, Y') }}</p>
                                 </div>
+                            </div>
+                        </div>
+
+                        <!-- Services Section -->
+                        <div class="mt-4">
+                            <h4 class="mb-3">Services Offered</h4>
+                            <div class="row">
+                                    @forelse($services as $service)
+                                        <div class="col-md-6 mb-3">
+                                            <div class="flux-card p-3">
+                                                <div class="d-flex justify-content-between align-items-start">
+                                                    <div>
+                                                        <h5 class="mb-1">{{ $service->title }}</h5>
+                                                        <p class="text-muted mb-2">{{ Str::limit($service->description, 100) }}</p>
+                                                        <p class="mb-0 fw-bold">₱{{ number_format($service->price, 2) }}</p>
+                                                    </div>
+                                                         <a href="{{ route('offices.service.request', ['office' => $office->slug, 'service' => $service->slug]) }}" 
+                                                    class="flux-btn flux-btn-primary">
+                                                        Book Now
+                                                    </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                @empty
+                                    <div class="col-12">
+                                        <div class="alert alert-info">
+                                            <i class="bi bi-info-circle me-2"></i>
+                                            No services available for this office yet.
+                                        </div>
+                                    </div>
+                                @endforelse
                             </div>
                         </div>
 

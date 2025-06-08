@@ -28,6 +28,6 @@ class Offices extends Model
 
     public function services()
     {
-        return $this->hasMany(Services::class);
+        return $this->hasMany(Services::class, 'office_id');
     }
 }
