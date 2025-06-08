@@ -31,7 +31,6 @@ new class extends Component {
         $this->appointment = $appointment; 
         $this->status = $appointment->status;
         $this->resetPage();
-        $this->reset();
     }
 
     public function searchs()

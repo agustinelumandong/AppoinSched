@@ -50,7 +50,7 @@
                     <i class="bi bi-x-lg me-1"></i>Cancel
                 </button>
 
-                <button type="submit" class="btn btn-primary ml-2" wire:loading.attr="disabled" wire:click="updateAppointment">
+                <button type="button" class="btn btn-primary ml-2" wire:loading.attr="disabled" wire:click="updateAppointment">
                     <span wire:loading.remove>
                         <i class="bi bi-save me-1"></i>
                         Save

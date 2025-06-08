@@ -52,6 +52,7 @@
                                         'approved' => 'success',
                                         'cancelled' => 'danger',
                                         'completed' => 'success',
+                                        'no-show' => 'danger',
                                         default => 'light',
                                     } }}">
                                     {{ ucfirst($appointment->status) }}
