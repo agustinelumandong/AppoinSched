@@ -58,7 +58,7 @@
                 <div class="info-group">
                     <h6 class="text-muted mb-2">Booking Date</h6>
                     <div class="p-3 rounded bg-light">
-                      <p class="mb-0 text-dark">{{ $appointment->booking_date ? \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') : 'N/A' }}</p>
+                      <p class="mb-0 text-dark">{{ $appointment && $appointment->booking_date ? \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') : 'N/A' }}</p>
                     </div>
                 </div>
             </div>
@@ -67,7 +67,7 @@
                 <div class="info-group">
                     <h6 class="text-muted mb-2">Booking Time</h6>
                     <div class="p-3 rounded bg-light">
-                      <p class="mb-0 text-dark">{{ $appointment->booking_time ? \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') : 'N/A' }}</p>
+                      <p class="mb-0 text-dark">{{ $appointment && $appointment->booking_time ? \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') : 'N/A' }}</p>
                     </div>
                 </div>
             </div>

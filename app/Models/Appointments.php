@@ -7,6 +7,9 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Appointments extends Model
 {
+    /**
+     * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Appointments>
+     */
     use HasFactory;
 
     protected $fillable = [
