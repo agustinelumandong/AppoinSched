@@ -144,7 +144,7 @@
     </flux:header>
 
     {{ $slot }}
-
+@livewireScripts
     @fluxScripts
 </body>
 

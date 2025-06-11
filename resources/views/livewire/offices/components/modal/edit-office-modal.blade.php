@@ -48,7 +48,7 @@
     <x-slot name="footer">
         <div class="gap-2 ">
             <button type="button" class="btn btn-outline-secondary" x-data
-                x-on:click="$dispatch('close-modal-edit-office')">
+                x-on:click="$dispatch('close-modal-edit-office')" wire:click="resetForm">
                 <i class="bi bi-x-lg me-1"></i>Cancel
             </button>
 
