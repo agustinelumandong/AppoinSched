@@ -17,9 +17,10 @@ class TestAppointments extends Seeder
         // Get the first user and staff member
 
 
+        Appointments::factory(10)->create();
         Appointments::create([
-            'user_id' => 12,
-            'staff_id' => 14,
+            'user_id' => 13,
+            'staff_id' => 15,
             'office_id' => 13,
             'service_id' => 3,
             'booking_date' => now(),
@@ -27,6 +28,7 @@ class TestAppointments extends Seeder
             'status' => 'pending',
             'notes' => 'Test appointment',
         ]);
+
 
     }
 }

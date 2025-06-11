@@ -4,7 +4,6 @@
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    transition: all 0.2s ease-in-out;
 }
 
 .flux-card:hover {
@@ -14,14 +13,12 @@
 .flux-select-option {
     border-radius: 8px;
     border: 1px solid #d1d5db;
-    transition: all 0.2s ease-in-out;
     padding: 0.75rem;
 }
 
 .flux-btn {
     border-radius: 8px;
     font-weight: 500;
-    transition: all 0.2s ease-in-out;
     border: none;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
@@ -35,7 +32,6 @@
 .flux-btn-primary:hover {
     background: #2563eb;
     color: white;
-    transform: translateY(-1px);
 }
 
 .flux-btn-secondary {
@@ -162,7 +158,6 @@
 .flux-form-control {
     border-radius: 8px;
     border: 1px solid #d1d5db;
-    transition: all 0.2s ease-in-out;
     padding: 0.75rem;
 }
 
@@ -239,7 +234,6 @@
     font-weight: 500;
     font-size: 0.875rem;
     text-decoration: none;
-    transition: all 0.2s ease-in-out;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -251,7 +245,6 @@
     background: #f9fafb;
     border-color: #9ca3af;
     color: #374151;
-    transform: translateY(-1px);
     box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
 }
 
@@ -273,7 +266,6 @@
     background: #2563eb;
     border-color: #2563eb;
     color: white;
-    transform: translateY(-1px);
 }
 
 .flux-pagination .page-item.disabled .page-link {

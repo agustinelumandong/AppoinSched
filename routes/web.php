@@ -33,7 +33,11 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('admin/services', 'services.services-management')->name('admin.services');
 
-    Volt::route('admin/appointments-managemnet', 'appointments.appointments-management')->name('admin.appointments-management');
+    Volt::route('admin/appointments-management', 'appointments.appointments-management')->name('admin.appointments-management');
+
+    Volt::route('slot-picker', 'slot-picker')->name('slot-picker');
+
+
 
 });
 
