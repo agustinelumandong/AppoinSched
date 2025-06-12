@@ -299,3 +299,19 @@
         height: 2rem;
     }
 }
+
+/* Form Field Underline Styling */
+.form-field-underline {
+    min-height: 1.5rem;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.form-field-underline:hover {
+    border-bottom-color: #9ca3af;
+}
+
+.form-field-underline:focus-within {
+    border-bottom-color: #3b82f6;
+}
