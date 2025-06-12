@@ -37,7 +37,8 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('slot-picker', 'slot-picker')->name('slot-picker');
 
-
+    Volt::route('admin/document-request', 'documentrequest.document-request')->name('admin.document-request');
+    Volt::route('admin/view/document-request/{id}', 'documentrequest.view-document-request')->name('admin.view-document-request');
 
 });
 
