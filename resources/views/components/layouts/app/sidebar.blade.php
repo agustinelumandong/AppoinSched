@@ -6,10 +6,11 @@
 </head>
 
 <body class="min-h-screen bg-white dark:bg-zinc-800">
-    <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900 ">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
-        <a href="{{ route('dashboard') }}" class="me-5 flex items-center space-x-2 rtl:space-x-reverse text-decoration-none text-black" wire:navigate>
+        <a href="{{ route('dashboard') }}"
+            class="me-5 flex items-center space-x-2 rtl:space-x-reverse text-decoration-none text-black" wire:navigate>
             <x-app-logo />
         </a>
 
@@ -21,23 +22,31 @@
             </flux:navlist.group>
 
             <flux:navlist.group :heading="__('Administration')" class="grid">
-                <flux:navlist.item icon="building-office" :href="route('admin.offices')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.offices')" wire:navigate>{{ __('Offices') }}
+                <flux:navlist.item icon="building-office" :href="route('admin.offices')"
+                    class="text-decoration-none text-black" :current="request()->routeIs('admin.offices')"
+                    wire:navigate>{{ __('Offices') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="building-office" :href="route('admin.services')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.services')" wire:navigate>{{ __('Services') }}
+                <flux:navlist.item icon="building-office" :href="route('admin.services')"
+                    class="text-decoration-none text-black" :current="request()->routeIs('admin.services')"
+                    wire:navigate>{{ __('Services') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="calendar" :href="route('admin.appointments-management')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.appointments-management')" wire:navigate>{{ __('Appointments') }}
+                <flux:navlist.item icon="calendar" :href="route('admin.appointments-management')"
+                    class="text-decoration-none text-black"
+                    :current="request()->routeIs('admin.appointments-management')" wire:navigate>
+                    {{ __('Appointments') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="document-text" :href="route('admin.document-request')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.document-request')" wire:navigate>{{ __('Document Request') }}
+                <flux:navlist.item icon="document-text" :href="route('admin.document-request')"
+                    class="text-decoration-none text-black" :current="request()->routeIs('admin.document-request')"
+                    wire:navigate>{{ __('Document Request') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="user" :href="route('admin.users.users-management')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.users.users-management')" wire:navigate>{{ __('Users Management') }}
+                <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
+                    class="text-decoration-none text-black"
+                    :current="request()->routeIs('admin.users.users-management')" wire:navigate>
+                    {{ __('Users Management') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')" class="text-decoration-none text-black"
-                    :current="request()->routeIs('admin.roles-permissions')" wire:navigate>{{ __('Roles & Permissions') }}
+                <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')"
+                    class="text-decoration-none text-black" :current="request()->routeIs('admin.roles-permissions')"
+                    wire:navigate>{{ __('Roles & Permissions') }}
                 </flux:navlist.item>
             </flux:navlist.group>
         </flux:navlist>
@@ -45,21 +54,15 @@
         <flux:spacer />
 
         <flux:navlist variant="outline">
-            <flux:navlist.item icon="folder-git-2" href="https://github.com/laravel/livewire-starter-kit" class="text-decoration-none text-black"
-                target="_blank">
-                {{ __('Repository') }}
-            </flux:navlist.item>
-
-            <flux:navlist.item icon="book-open-text" href="https://laravel.com/docs/starter-kits#livewire" class="text-decoration-none text-black"
-                target="_blank">
-                {{ __('Documentation') }}
+            <flux:navlist.item icon="user" href="#" class="text-decoration-none text-black">
+                {{ __('User Information') }}
             </flux:navlist.item>
         </flux:navlist>
 
         <!-- Desktop User Menu -->
         <flux:dropdown position="bottom" align="start">
-            <flux:profile :name="auth()->user()->first_name . ' ' . auth()->user()->last_name" :initials="auth()->user()->initials()"
-                icon-trailing="chevrons-up-down" />
+            <flux:profile :name="auth()->user()->first_name . ' ' . auth()->user()->last_name"
+                :initials="auth()->user()->initials()" icon-trailing="chevrons-up-down" />
 
             <flux:menu class="w-[220px]">
                 <flux:menu.radio.group>
@@ -83,7 +86,8 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
-                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate class="text-decoration-none text-black">{{ __('Settings') }}
+                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate
+                        class="text-decoration-none text-black">{{ __('Settings') }}
                     </flux:menu.item>
                 </flux:menu.radio.group>
 
@@ -130,8 +134,10 @@
                 <flux:menu.separator />
 
                 <flux:menu.radio.group>
-                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate class="text-decoration-none text-black">
-                        {{ __('Settings') }}</flux:menu.item>
+                    <flux:menu.item :href="route('settings.profile')" icon="cog" wire:navigate
+                        class="text-decoration-none text-black">
+                        {{ __('Settings') }}
+                    </flux:menu.item>
                 </flux:menu.radio.group>
 
                 <flux:menu.separator />
@@ -147,7 +153,7 @@
     </flux:header>
 
     {{ $slot }}
-@livewireScripts
+    @livewireScripts
     @fluxScripts
 </body>
 

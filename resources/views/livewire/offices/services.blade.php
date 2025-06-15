@@ -2,8 +2,9 @@
 
 use Livewire\Volt\Component;
 use App\Models\Offices;
+use Livewire\Attributes\{Title};
 
-new class extends Component {
+new #[Title('Services')] class extends Component {
     public Offices $office;
 
     public function mount(Offices $office)
@@ -38,8 +39,8 @@ new class extends Component {
                         <p class="text-muted mb-3">{{ $service->description }}</p>
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="h5 mb-0">₱{{ number_format($service->price, 2) }}</span>
-                            <a href="{{ route('offices.service.request', ['office' => $office->slug, 'service' => $service->slug]) }}" 
-                               class="flux-btn flux-btn-primary">
+                            <a href="{{ route('offices.service.request', ['office' => $office->slug, 'service' => $service->slug]) }}"
+                                class="flux-btn flux-btn-primary">
                                 <i class="bi bi-calendar-check me-2"></i>Book Now
                             </a>
                         </div>
@@ -58,4 +59,4 @@ new class extends Component {
             </div>
         @endforelse
     </div>
-</div> 
+</div>
