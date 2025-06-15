@@ -3,8 +3,9 @@
 use Livewire\Volt\Component;
 use App\Models\Offices;
 use App\Models\Services;
+use Livewire\Attributes\{Title};
 
-new class extends Component {
+new #[Title('Request')] class extends Component {
     public Offices $office;
     public Services $service;
 
@@ -20,5 +21,5 @@ new class extends Component {
 }; ?>
 
 <div>
-     <h1>Request</h1>
-</div> 
+    <h1>Request</h1>
+</div>

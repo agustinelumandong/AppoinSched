@@ -86,7 +86,7 @@ new class extends Component {
         ]);
 
         // Save the file first
-        $logoName = $this->logo->hashName();
+        $logoName = $this->logo->hashName;
         $this->logo->storeAs('offices', $logoName, 'public');
 
         // Create office record
