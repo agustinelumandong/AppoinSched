@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\Model>
  */
-class AppointmentFactory extends Factory
+class AppointmentsFactory extends Factory
 {
     /**
      * Define the model's default state.
@@ -24,8 +24,8 @@ class AppointmentFactory extends Factory
             'office_id' => Offices::inRandomOrder()->first()->id,
             'service_id' => Services::inRandomOrder()->first()->id,
             'staff_id' => User::inRandomOrder()->first()->id,
-            'date' => fake()->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
-            'time' => fake()->dateTimeBetween('08:00', '17:00')->format('H:i'),
+            'booking_date' => fake()->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
+            'booking_time' => fake()->dateTimeBetween('08:00', '17:00')->format('H:i'),
             'status' => fake()->randomElement(['pending', 'approved', 'cancelled', 'completed', 'no-show']),
             'notes' => fake()->optional(0.7)->sentence(),
         ];

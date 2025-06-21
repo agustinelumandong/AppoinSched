@@ -29,9 +29,19 @@
     color: white;
 }
 
+.flux-btn-primary.flux-btn-active {
+    background: #2563eb;
+    color: white;
+}
+
 .flux-btn-primary:hover {
     background: #2563eb;
     color: white;
+}
+
+.flux-btn-active-primary {
+    background: #2563eb !important;
+    color: white !important;
 }
 
 .flux-btn-secondary {
@@ -155,10 +165,19 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+.flux-input-primary {
+    border-radius: 8px;
+    border: 1px solid #2563eb !important;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #2563eb;
+}
+
 .flux-form-control {
     border-radius: 8px;
     border: 1px solid #d1d5db;
     padding: 0.75rem;
+    width: 100%;
 }
 
 .flux-form-control:focus {

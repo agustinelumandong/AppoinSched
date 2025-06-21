@@ -70,6 +70,10 @@ new class extends Component {
         try {
             $selectedDate = Carbon::parse($date);
 
+            if ($selectedDate->isWeekend()) {
+                $this->error = 'Cannot select weekend dates';
+                return;
+            }
             if ($selectedDate->isPast()) {
                 $this->error = 'Cannot select past dates';
                 return;
@@ -92,6 +96,11 @@ new class extends Component {
     public function selectTime(string $time): void
     {
         try {
+            if(Carbon::parse($this->selectedDate)->isWeekend()) {
+                $this->error = 'Cannot select weekend dates';
+                return;
+            }
+
             if (!$this->isValidTimeFormat($time)) {
                 throw new \InvalidArgumentException('Invalid time format');
             }
@@ -184,6 +193,8 @@ new class extends Component {
             });
 
             $this->availableSlots = $slots;
+
+            // $this->availableSlots = $this->generateTimeSlotsFromScratch();
         } catch (\Exception $e) {
             Log::error('Error generating time slots: ' . $e->getMessage());
             $this->error = 'Failed to generate time slots';
@@ -344,7 +355,7 @@ new class extends Component {
         currentYear: new Date().getFullYear(),
         selectedDate: @entangle('selectedDate'),
         calendar: [],
-        weekDays: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'],
+        weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 
         init() {
             // Initialize to the selected date's month if available
@@ -377,28 +388,35 @@ new class extends Component {
         selectDate(day, event) {
             event.preventDefault();
             event.stopPropagation();
-            const dateStr = `${this.currentYear}-${(this.currentMonth + 1).toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
-            $wire.selectDate(dateStr);
+            const dateStr = `${this.currentYear}-${(this.currentMonth + 1).toString().padStart(2, '0')}-${day.number.toString().padStart(2, '0')}`;
+            this.$wire.selectDate(dateStr);
             // Don't reset the calendar view after selection
         },
 
         generateCalendar() {
             const firstDay = new Date(this.currentYear, this.currentMonth, 1);
             const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-            const startingDay = firstDay.getDay() || 7; // Make Monday = 1, Sunday = 7
+            const startingDay = firstDay.getDay(); // Make Sunday = 0, Saturday = 6
             const daysInMonth = lastDay.getDate();
 
             let calendar = [];
             let week = [];
 
             // Add empty cells for days before the first day of the month
-            for (let i = 1; i < startingDay; i++) {
+            for (let i = 0; i < startingDay; i++) {
                 week.push(null);
             }
 
             // Add days of the month
             for (let day = 1; day <= daysInMonth; day++) {
-                week.push(day);
+                const date = new Date(this.currentYear, this.currentMonth, day);
+                const dayOfWeek = date.getDay();
+
+                week.push({ 
+                    number: day, 
+                    isWeekend: dayOfWeek === 0 || dayOfWeek === 6
+                });
+
                 if (week.length === 7) {
                     calendar.push(week);
                     week = [];
@@ -439,14 +457,19 @@ new class extends Component {
             return selectedDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
         },
 
+        isDayWeekend(day) {
+            const dayOfWeek = new Date(this.currentYear, this.currentMonth, day).getDay();
+            return dayOfWeek === 0 || dayOfWeek === 6;
+        },
+
         getDateClasses(day) {
             let classes = [];
 
-            if (this.isSelectedDate(day)) {
+            if (this.isSelectedDate(day.number)) {
                 classes.push('bg-blue-500 text-white hover:bg-blue-600');
-            } else if (this.isToday(day)) {
+            } else if (this.isToday(day.number)) {
                 classes.push('bg-blue-100 text-blue-600 hover:bg-blue-200');
-            } else if (!this.isPastDate(day)) {
+            } else if (!this.isPastDate(day.number) && !day.isWeekend) {
                 classes.push('text-gray-700 hover:bg-blue-50 hover:text-blue-600');
             } else {
                 classes.push('text-gray-400 cursor-not-allowed opacity-50');
@@ -494,7 +517,7 @@ new class extends Component {
                             <template x-if="day">
                                 <button type="button" @click="selectDate(day, $event)"
                                     class="w-full h-full flex items-center justify-center text-sm font-medium rounded-lg transition-all duration-200"
-                                    :class="getDateClasses(day)" :disabled="isPastDate(day)" x-text="day">
+                                    :class="getDateClasses(day)" :disabled="isPastDate(day.number) || day.isWeekend" x-text="day.number">
                                 </button>
                             </template>
                             <template x-if="!day">
@@ -546,7 +569,12 @@ new class extends Component {
 
             <!-- Time Slots Display -->
             <div wire:loading.remove>
-                @if ($selectedDate)
+                @if($selectedDate && Carbon::parse($selectedDate)->isWeekend())
+                    <div class="text-center py-8">
+                        <h4 class="text-lg font-medium text-gray-700 mb-2">Cannot select weekend dates</h4>
+                        <p class="text-gray-500">Please select a different date.</p>
+                    </div>
+                @elseif ($selectedDate && !Carbon::parse($selectedDate)->isWeekend())
                     <div class="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
                         <div class="flex items-center text-blue-700">
                             <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -555,7 +583,10 @@ new class extends Component {
                                 </path>
                             </svg>
                             <span class="font-medium">
-                                {{ Carbon::parse($selectedDate)->format('F j, Y') }}
+                                {{ Carbon::parse($selectedDate)->format('F j, Y') }}  
+                                @if($selectedDate && $selectedTime)
+                                    at  {{ Carbon::parse($selectedTime)->format('g:i A') ?? '' }}
+                                @endif
                             </span>
                         </div>
                     </div>
