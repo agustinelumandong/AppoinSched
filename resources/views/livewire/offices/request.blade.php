@@ -5,7 +5,8 @@ use App\Models\Offices;
 use App\Models\Services;
 use Livewire\Attributes\{Title};
 
-new #[Title('Request')] class extends Component {
+new #[Title('Request')]
+    class extends Component {
     public Offices $office;
     public Services $service;
 
