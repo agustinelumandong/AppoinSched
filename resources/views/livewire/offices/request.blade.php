@@ -22,5 +22,6 @@ new #[Title('Request')]
 }; ?>
 
 <div>
-    <h1>Request</h1>
+    {{-- Not Final --}}
+    <livewire:components.appointmentstepper :office="$office" :service="$service" />
 </div>
