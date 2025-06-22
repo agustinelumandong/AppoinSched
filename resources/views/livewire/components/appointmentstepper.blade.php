@@ -32,7 +32,7 @@ new #[Title('Appointment')]
     public ?int $appointmentId = null;
     public bool $isLoading = false;
 
-    public ?int $id = 12;
+    public ?int $id = null;
 
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
@@ -48,6 +48,7 @@ new #[Title('Appointment')]
         $this->office = $office;
         $this->service = $service;
         $this->staff = $staff;
+        $this->id = auth()->user()->id;
     }
 
     public function nextStep()
@@ -111,6 +112,7 @@ new #[Title('Appointment')]
     public function submitAppointment()
     {
         try {
+            $user_id = auth()->user()->id;
             // Check for scheduling conflicts
             $conflict = $this->checkForConflicts();
             if ($conflict) {
@@ -140,7 +142,7 @@ new #[Title('Appointment')]
 
             // Create the appointment
             $appointment = Appointments::create([
-                'user_id' => $this->id,
+                'user_id' => $user_id,
                 'office_id' => $this->office->id,
                 'service_id' => $this->service->id,
                 'staff_id' => $this->staff->id,
@@ -183,7 +185,7 @@ new #[Title('Appointment')]
             Log::error('Exception during appointment creation: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'data' => [
-                    'user_id' => $this->id,
+                    'user_id' => $user_id,
                     'office_id' => $this->office->id,
                     'service_id' => $this->service->id,
                     'staff_id' => $this->staff->id,
