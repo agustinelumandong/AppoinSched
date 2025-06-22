@@ -32,7 +32,7 @@ new class extends Component {
         $this->search = $office->search ?? '';
         $this->logo = $office->logo ?? '';
         // $this->logoUrl = $office->logo ?? asset('storage/offices/default.png');
-            $this->redirectTo = route('admin.offices');
+        $this->redirectTo = route('admin.offices');
         $this->resetPage();
     }
 
@@ -65,10 +65,10 @@ new class extends Component {
 
         while (
             Offices::where('slug', $slug)
-                  ->when(isset($this->office), function ($query) {
-                      return $query->where('id', '!=', $this->office->id);
-                  })
-                  ->exists()
+                ->when(isset($this->office), function ($query) {
+                    return $query->where('id', '!=', $this->office->id);
+                })
+                ->exists()
         ) {
             $slug = $original . '-' . $count++;
         }
@@ -86,7 +86,7 @@ new class extends Component {
         ]);
 
         // Save the file first
-        $logoName = $this->logo->hashName();
+        $logoName = $this->logo->hashName;
         $this->logo->storeAs('offices', $logoName, 'public');
 
         // Create office record
@@ -147,6 +147,11 @@ new class extends Component {
         }
     }
 
+    public function resetForm()
+    {
+        $this->reset();
+    }
+
     public function openDeleteOfficeModal($id)
     {
         $this->officeId = $id;
@@ -170,11 +175,10 @@ new class extends Component {
             session()->flash('error', 'Office not found');
         }
     }
-
-    
 }; ?>
 
 <div>
+
     <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
 
     <!-- Flash Messages -->
