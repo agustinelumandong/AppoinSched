@@ -68,4 +68,19 @@ class User extends Authenticatable
     {
         return trim($this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name);
     }
+
+    public function personalInformation()
+    {
+        return $this->hasOne(PersonalInformation::class, 'user_id');
+    }
+
+    public function userAddresses()
+    {
+        return $this->hasMany(UserAddresses::class, 'user_id');
+    }
+
+    public function userFamilies()
+    {
+        return $this->hasMany(UserFamily::class, 'user_id');
+    }
 }

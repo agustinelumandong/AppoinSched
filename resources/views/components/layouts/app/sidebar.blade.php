@@ -54,7 +54,7 @@
         <flux:spacer />
 
         <flux:navlist variant="outline">
-            <flux:navlist.item icon="user" href="#" class="text-decoration-none text-black">
+            <flux:navlist.item icon="user" href="{{ route('userinfo') }}" class="text-decoration-none text-black">
                 {{ __('User Information') }}
             </flux:navlist.item>
         </flux:navlist>
