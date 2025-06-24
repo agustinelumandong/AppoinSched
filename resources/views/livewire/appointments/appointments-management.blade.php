@@ -125,9 +125,9 @@ new class extends Component {
         try {
             // Convert the selected time to 24-hour format for comparison
             $timeToCheck = Carbon::parse($this->selectedTime)->format('H:i');
-            
+
             $conflict = Appointments::where('booking_date', $this->selectedDate)
-                ->where(function($query) use ($timeToCheck) {
+                ->where(function ($query) use ($timeToCheck) {
                     $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
                 })
                 ->where('office_id', $this->appointment->office_id)

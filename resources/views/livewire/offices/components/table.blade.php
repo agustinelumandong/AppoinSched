@@ -52,8 +52,7 @@
 
                                     </button>
                                     <button class="flux-btn flux-btn-danger btn-sm"
-                                        wire:click="openDeleteOfficeModal({{ $office->id }})"
-                                        wire:loading.attr="disabled">
+                                        wire:click="openDeleteOfficeModal({{ $office->id }})" wire:loading.attr="disabled">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </div>

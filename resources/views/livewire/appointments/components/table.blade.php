@@ -26,55 +26,60 @@
                 </thead>
                 <tbody>
                     @forelse($appointments as $appointment)
-                        <tr>
-                            <td>
-                                <p class="fw-semibold">{{ $appointment->user->first_name . ' ' . $appointment->user->last_name ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ $appointment->staff->first_name . ' ' . $appointment->staff->last_name ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold ">{{ $appointment->office->name ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ $appointment->service->title ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}</p>
-                            </td>
-                            <td>
-                                <span
-                                    class="flux-badge flux-badge-{{ match ($appointment->status) {
-                                        'pending' => 'warning',
-                                        'approved' => 'success',
-                                        'cancelled' => 'danger',
-                                        'completed' => 'success',
-                                        'no-show' => 'danger',
-                                        default => 'light',
-                                    } }}">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ $appointment->notes ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <button class="flux-btn flux-btn-outline btn-sm"
-                                        wire:click="openShowAppointmentModal({{ $appointment->id }})"
-                                        title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </button>
-                                    <button class="flux-btn flux-btn-outline btn-sm"
-                                        wire:click="openEditAppointmentModal({{ $appointment->id }})" title="Edit">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
+                                        <tr>
+                                            <td>
+                                                <p class="fw-semibold">
+                                                    {{ $appointment->user?->first_name . ' ' . $appointment->user?->last_name ?? 'N/A' }}
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">
+                                                    {{ $appointment->staff?->first_name . ' ' . $appointment->staff?->last_name ?? 'N/A' }}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold ">{{ $appointment->office?->name ?? 'N/A' }}</p>
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">{{ $appointment->service?->title ?? 'N/A' }}</p>
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">
+                                                    {{ \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') }}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">
+                                                    {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <span class="flux-badge flux-badge-{{ match ($appointment->status) {
+                            'pending' => 'warning',
+                            'approved' => 'success',
+                            'cancelled' => 'danger',
+                            'completed' => 'success',
+                            'no-show' => 'danger',
+                            default => 'light',
+                        } }}">
+                                                    {{ ucfirst($appointment->status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">{{ $appointment->notes ?? 'N/A' }}</p>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                                        wire:click="openShowAppointmentModal({{ $appointment->id }})" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </button>
+                                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                                        wire:click="openEditAppointmentModal({{ $appointment->id }})" title="Edit">
+                                                        <i class="bi bi-pencil"></i>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                     @empty
                         <tr>
                             <td colspan="9" class="text-center py-5">
