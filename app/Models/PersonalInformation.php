@@ -35,4 +35,6 @@ class PersonalInformation extends Model
     {
         return $this->hasMany(UserFamily::class, 'personal_information_id');
     }
+
+ 
 }

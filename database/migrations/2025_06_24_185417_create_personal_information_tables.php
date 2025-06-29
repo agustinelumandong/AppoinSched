@@ -10,15 +10,16 @@ return new class extends Migration {
      */
     public function up(): void
     {
+
         Schema::create('personal_information', function (Blueprint $table) {
             $table->id();
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
             // Basic Information
             $table->enum('suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
-            $table->date('date_of_birth');
+            $table->date('date_of_birth')->nullable();
             $table->string('place_of_birth')->nullable();
-            $table->enum('sex_at_birth', ['Male', 'Female']);
+            $table->enum('sex_at_birth', ['Male', 'Female'])->nullable();
             $table->enum('civil_status', ['Single', 'Married', 'Widowed', 'Divorced', 'Separated'])->nullable();
             $table->string('religion')->nullable();
             $table->string('nationality')->nullable();
@@ -33,5 +34,6 @@ return new class extends Migration {
     public function down(): void
     {
         Schema::dropIfExists('personal_information');
+
     }
 };

@@ -18,6 +18,7 @@ class UserAddresses extends Model
         'province',
         'city',
         'barangay',
+        'street',
         'zip_code',
     ];
 
