@@ -29,11 +29,17 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('admin/offices', 'offices.offices')->name('admin.offices');
 
-    Volt::route('admin/offices/{office:slug}', 'offices.show')->name('offices.show');
+    Volt::route('admin/offices/{office:slug}', 'offices.show')
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('offices.show');
 
-    Volt::route('admin/offices/{office:slug}/services', 'offices.services')->name('offices.services');
+    Volt::route('admin/offices/{office:slug}/services', 'offices.services')
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('offices.services');
 
-    Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
+    Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('offices.service.request');
 
     Volt::route('admin/services', 'services.services-management')->name('admin.services');
 
@@ -41,10 +47,17 @@ Route::middleware(['auth'])->group(function () {
 
     Volt::route('slot-picker', 'slot-picker')->name('slot-picker');
 
-    Volt::route('admin/document-request', 'documentrequest.document-request')->name('admin.document-request');
-    Volt::route('admin/view/document-request/{id}', 'documentrequest.view-document-request')->name('admin.view-document-request');
+    Volt::route('admin/document-request', 'documentrequest.document-request')
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('admin.document-request');
 
-    Volt::route('offices/{office:slug}/services/appointments', 'offices.appointment')->name('offices.service.appointment');
+    Volt::route('admin/view/document-request/{id}', 'documentrequest.view-document-request')
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('admin.view-document-request');
+
+    Volt::route('offices/{office:slug}/services/appointments', 'offices.appointment')
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('offices.service.appointment');
 
     Volt::route('userinfo', 'user.userinfo')->name('userinfo');
 
