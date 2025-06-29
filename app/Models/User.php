@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
@@ -76,11 +78,307 @@ class User extends Authenticatable
 
     public function userAddresses()
     {
-        return $this->hasMany(UserAddresses::class, 'user_id');
+        return $this->hasManyThrough(
+            UserAddresses::class,
+            PersonalInformation::class,
+            'user_id',
+            'personal_information_id',
+            'id',
+            'id'
+        );
     }
 
     public function userFamilies()
     {
-        return $this->hasMany(UserFamily::class, 'user_id');
+        return $this->hasManyThrough(
+            UserFamily::class,
+            PersonalInformation::class,
+            'user_id',
+            'personal_information_id',
+            'id',
+            'id'
+        );
+    }
+
+    /**
+     * Check if user has completed their basic profile information
+     */
+    public function hasCompleteBasicProfile(): bool
+    {
+        return !empty($this->first_name) &&
+            !empty($this->last_name) &&
+            !empty($this->email) &&
+            !empty($this->personalInformation?->contact_no);
+    }
+
+    /**
+     * Check if user has completed their personal information
+     */
+    public function hasCompletePersonalInfo(): bool
+    {
+        if (!$this->personalInformation) {
+            return false;
+        }
+
+        return !empty($this->personalInformation->sex_at_birth) &&
+            !empty($this->personalInformation->date_of_birth) &&
+            !empty($this->personalInformation->place_of_birth) &&
+            !empty($this->personalInformation->civil_status) &&
+            !empty($this->personalInformation->nationality);
+    }
+
+    /**
+     * Check if user has completed their address information
+     */
+    public function hasCompleteAddress(): bool
+    {
+        $address = $this->userAddresses->first();
+        if (!$address) {
+            return false;
+        }
+
+        return !empty($address->address_line_1) &&
+            !empty($address->region) &&
+            !empty($address->province) &&
+            !empty($address->city) &&
+            !empty($address->barangay) &&
+            // !empty($address->street) &&
+            !empty($address->zip_code);
+    }
+
+    /**
+     * Check if user has completed their family information
+     */
+    public function hasCompleteFamilyInfo(): bool
+    {
+        $family = $this->userFamilies->first();
+        if (!$family) {
+            return false;
+        }
+
+        // At minimum, require father's or mother's information
+        $hasFatherInfo = !empty($family->father_first_name) && !empty($family->father_last_name);
+        $hasMotherInfo = !empty($family->mother_first_name) && !empty($family->mother_last_name);
+
+        return $hasFatherInfo || $hasMotherInfo;
+    }
+
+    /**
+     * Check if user has completed their full profile
+     */
+    public function hasCompleteProfile(): bool
+    {
+        return $this->hasCompleteBasicProfile() &&
+            $this->hasCompletePersonalInfo() &&
+            $this->hasCompleteAddress() &&
+            $this->hasCompleteFamilyInfo();
+    }
+
+    /**
+     * Get profile completion percentage
+     */
+    public function getProfileCompletionPercentage(): int
+    {
+        $totalFields = 4; // basic, personal, address, family
+        $completedFields = 0;
+
+        if ($this->hasCompleteBasicProfile())
+            $completedFields++;
+        if ($this->hasCompletePersonalInfo())
+            $completedFields++;
+        if ($this->hasCompleteAddress())
+            $completedFields++;
+        if ($this->hasCompleteFamilyInfo())
+            $completedFields++;
+
+        return (int) round(($completedFields / $totalFields) * 100);
+    }
+
+
+    public function getDocumentRequestFormData(): array
+    {
+        $personalInfo = $this->personalInformation;
+        $userAddress = $this->userAddresses->first();
+        $userFamily = $this->userFamilies->first();
+
+        return [
+            // Basic info
+            'last_name' => $this->last_name ?? '',
+            'first_name' => $this->first_name ?? '',
+            'middle_name' => $this->middle_name ?? '',
+            'email' => $this->email ?? '',
+
+            // Personal Information
+            'suffix' => $personalInfo?->suffix ?? 'N/A',
+            'phone' => $personalInfo?->contact_no ?? '',
+            'sex_at_birth' => $personalInfo?->sex_at_birth ?? '',
+            'date_of_birth' => $personalInfo?->date_of_birth instanceof \Carbon\Carbon ? $personalInfo->date_of_birth->format('Y-m-d') : ($personalInfo?->date_of_birth ?? ''),
+            'place_of_birth' => $personalInfo?->place_of_birth ?? '',
+            'civil_status' => $personalInfo?->civil_status ?? 'Single',
+            'religion' => $personalInfo?->religion ?? '',
+            'nationality' => $personalInfo?->nationality ?? 'Filipino',
+
+            // Address Information
+            'address_type' => $userAddress?->address_type ?? 'Permanent',
+            'address_line_1' => $userAddress?->address_line_1 ?? '',
+            'address_line_2' => $userAddress?->address_line_2 ?? '',
+            'region' => $userAddress?->region ?? '',
+            'province' => $userAddress?->province ?? '',
+            'city' => $userAddress?->city ?? '',
+            'barangay' => $userAddress?->barangay ?? '',
+            'street' => $userAddress?->street ?? '',
+            'zip_code' => $userAddress?->zip_code ?? '',
+
+            // Family Information
+            'father_last_name' => $userFamily?->father_last_name ?? '',
+            'father_first_name' => $userFamily?->father_first_name ?? '',
+            'father_middle_name' => $userFamily?->father_middle_name ?? '',
+            'father_suffix' => $userFamily?->father_suffix ?? 'N/A',
+            'father_birthdate' => $userFamily?->father_birthdate instanceof \Carbon\Carbon ? $userFamily->father_birthdate->format('Y-m-d') : ($userFamily?->father_birthdate ?? ''),
+            'father_nationality' => $userFamily?->father_nationality ?? '',
+            'father_religion' => $userFamily?->father_religion ?? '',
+            'father_contact_no' => $userFamily?->father_contact_no ?? '',
+
+            'mother_last_name' => $userFamily?->mother_last_name ?? '',
+            'mother_first_name' => $userFamily?->mother_first_name ?? '',
+            'mother_middle_name' => $userFamily?->mother_middle_name ?? '',
+            'mother_suffix' => $userFamily?->mother_suffix ?? 'N/A',
+            'mother_birthdate' => $userFamily?->mother_birthdate instanceof \Carbon\Carbon ? $userFamily->mother_birthdate->format('Y-m-d') : ($userFamily?->mother_birthdate ?? ''),
+            'mother_nationality' => $userFamily?->mother_nationality ?? '',
+            'mother_religion' => $userFamily?->mother_religion ?? '',
+            'mother_contact_no' => $userFamily?->mother_contact_no ?? '',
+
+            'spouse_last_name' => $userFamily?->spouse_last_name ?? '',
+            'spouse_first_name' => $userFamily?->spouse_first_name ?? '',
+            'spouse_middle_name' => $userFamily?->spouse_middle_name ?? '',
+            'spouse_suffix' => $userFamily?->spouse_suffix ?? 'N/A',
+            'spouse_birthdate' => $userFamily?->spouse_birthdate instanceof \Carbon\Carbon ? $userFamily->spouse_birthdate->format('Y-m-d') : ($userFamily?->spouse_birthdate ?? ''),
+            'spouse_nationality' => $userFamily?->spouse_nationality ?? '',
+            'spouse_religion' => $userFamily?->spouse_religion ?? '',
+            'spouse_contact_no' => $userFamily?->spouse_contact_no ?? '',
+        ];
+    }
+
+    /**
+     * Get all document requests made by this user
+     */
+    public function documentRequests()
+    {
+        return $this->hasMany(DocumentRequest::class);
+    }
+
+    /**
+     * Get all document requests where this user is the assigned staff
+     */
+    public function assignedDocumentRequests()
+    {
+        return $this->hasMany(DocumentRequest::class, 'staff_id');
+    }
+
+    /**
+     * Check if user can make document requests
+     */
+    public function canMakeDocumentRequests(): bool
+    {
+        // User must have complete profile to make document requests
+        return $this->hasCompleteProfile();
+    }
+
+    /**
+     * Get the user's most recent document request
+     */
+    public function latestDocumentRequest()
+    {
+        return $this->documentRequests()->latest()->first();
+    }
+
+    /**
+     * Get pending document requests count
+     */
+    public function getPendingDocumentRequestsCount(): int
+    {
+        return $this->documentRequests()->where('status', 'pending')->count();
+    }
+
+    /**
+     * Get approved document requests count
+     */
+    public function getApprovedDocumentRequestsCount(): int
+    {
+        return $this->documentRequests()->where('status', 'approved')->count();
+    }
+
+    /**
+     * Check if user has any pending document requests
+     */
+    public function hasPendingDocumentRequests(): bool
+    {
+        return $this->getPendingDocumentRequestsCount() > 0;
+    }
+
+    /**
+     * Populate form data for document request without modifying user profile
+     *
+     * @param array $overrides Additional data to override or add to the form
+     * @return array
+     */
+    public function getDocumentRequestFormDataWithOverrides(array $overrides = []): array
+    {
+        $defaultData = $this->getDocumentRequestFormData();
+        return array_merge($defaultData, $overrides);
+    }
+
+    /**
+     * Get user's complete address as a formatted string
+     */
+    public function getFormattedAddress(): string
+    {
+        $address = $this->userAddresses->first();
+        if (!$address) {
+            return 'No address on file';
+        }
+
+        $addressParts = array_filter([
+            $address->address_line_1,
+            $address->address_line_2,
+            $address->street,
+            $address->barangay,
+            $address->city,
+            $address->province,
+            $address->region,
+            $address->zip_code,
+        ]);
+
+        return implode(', ', $addressParts);
+    }
+
+    /**
+     * Get user's profile completion details
+     */
+    public function getProfileCompletionDetails(): array
+    {
+        return [
+            'basic_profile' => [
+                'completed' => $this->hasCompleteBasicProfile(),
+                'percentage' => 25,
+                'fields' => ['first_name', 'last_name', 'email', 'contact_no']
+            ],
+            'personal_info' => [
+                'completed' => $this->hasCompletePersonalInfo(),
+                'percentage' => 25,
+                'fields' => ['sex_at_birth', 'date_of_birth', 'place_of_birth', 'civil_status', 'nationality']
+            ],
+            'address' => [
+                'completed' => $this->hasCompleteAddress(),
+                'percentage' => 25,
+                'fields' => ['address_line_1', 'region', 'province', 'city', 'barangay', 'street', 'zip_code']
+            ],
+            'family_info' => [
+                'completed' => $this->hasCompleteFamilyInfo(),
+                'percentage' => 25,
+                'fields' => ['father_info_or_mother_info']
+            ],
+            'overall_percentage' => $this->getProfileCompletionPercentage()
+        ];
     }
 }
