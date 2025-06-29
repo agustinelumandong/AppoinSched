@@ -49,6 +49,12 @@ new #[Title('Appointment')]
         $this->service = $service;
         $this->staff = $staff;
         $this->id = auth()->user()->id;
+
+        // Check if user has complete profile
+        if (!auth()->user()->hasCompleteProfile()) {
+            session()->flash('warning', 'Please complete your profile information before making an appointment.');
+            $this->redirect(route('userinfo'));
+        }
     }
 
     public function nextStep()
@@ -666,7 +672,8 @@ new #[Title('Appointment')]
                             <p class="text-gray-600">Loading...</p>
                         </div>
 
-                        <div class="flex flex-col gap-2 w-1/2 text-sm text-base-content/70" wire:loading.remove>
+                        <div class="flex flex-col gap-2 w-full md:w-2/3 lg:w-1/2 text-sm text-base-content/70"
+                            wire:loading.remove>
                             <div class="grid grid-cols-2 gap-4">
                                 <div class="flex flex-col gap-2">
                                     <p class="font-medium">Appointment Details</p>
