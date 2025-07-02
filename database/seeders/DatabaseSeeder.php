@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\DB;
+
 class DatabaseSeeder extends Seeder
 {
     /**
@@ -16,20 +17,28 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
         DB::table('users')->delete();
+
+        // Create test users
         User::factory()->create([
             'first_name' => 'User',
             'last_name' => 'User',
             'email' => 'test@test.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
-
         ]);
+
         User::factory()->create([
             'first_name' => 'Admin',
             'last_name' => 'User',
             'email' => 'admin@test.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+        ]);
+
+        // Run other seeders
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            OfficeSeeder::class,
         ]);
     }
 }

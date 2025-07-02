@@ -89,7 +89,7 @@ new class extends Component {
         $this->province = $this->userAddresses->province ?? '';
         $this->city = $this->userAddresses->city ?? '';
         $this->barangay = $this->userAddresses->barangay ?? '';
-        $this->street = $this->userAddresses->street ?? '';
+        // $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
         // Family - Father
         $this->father_last_name = $this->userFamily->father_last_name ?? '';
@@ -158,7 +158,7 @@ new class extends Component {
             'province' => ['nullable', 'string', 'max:100'],
             'city' => ['nullable', 'string', 'max:100'],
             'barangay' => ['nullable', 'string', 'max:100'],
-            'street' => ['nullable', 'string', 'max:255'],
+            // 'street' => ['nullable', 'string', 'max:255'],
             'zip_code' => ['nullable', 'string', 'max:20'],
             'father_last_name' => ['required', 'string', 'max:255'],
             'father_first_name' => ['required', 'string', 'max:255'],
@@ -218,7 +218,7 @@ new class extends Component {
             'province' => $this->province ?: null,
             'city' => $this->city ?: null,
             'barangay' => $this->barangay ?: null,
-            'street' => $this->street ?: null,
+            // 'street' => $this->street ?: null,
             'zip_code' => $this->zip_code ?: null,
         ])->save();
 

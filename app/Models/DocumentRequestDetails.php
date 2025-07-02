@@ -91,8 +91,7 @@ class DocumentRequestDetails extends Model
         'father_birthdate' => 'date',
         'mother_birthdate' => 'date',
         'spouse_birthdate' => 'date',
-        'death_date' => 'date',
-        'death_time' => 'time',
+        'death_date' => 'date', // For death certificates
     ];
 
     public function documentRequest(): BelongsTo

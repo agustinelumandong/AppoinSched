@@ -276,6 +276,83 @@ class User extends Authenticatable
     }
 
     /**
+     * Get all appointments where this user is the assigned staff
+     */
+    public function assignedAppointments()
+    {
+        return $this->hasMany(Appointments::class, 'staff_id');
+    }
+
+    public function getOfficeIdForStaff(): ?int
+    {
+        if ($this->hasRole('MCR-staff')) {
+            return Offices::where('slug', 'municipal-civil-registrar')->value('id');
+        }
+        if ($this->hasRole('MTO-staff')) {
+            return Offices::where('slug', 'municipal-treasurers-office')->value('id');
+        }
+        if ($this->hasRole('BPLS-staff')) {
+            return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
+        }
+        return null;
+    }
+
+
+    /**
+     * Get all offices this staff is assigned to
+     */
+    public function assignedOffices()
+    {
+        return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
+            ->withPivot('is_primary')
+            ->withTimestamps();
+    }
+
+    /**
+     * Get the primary office assignment for this staff
+     */
+    public function primaryOffice()
+    {
+        return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
+            ->wherePivot('is_primary', true)
+            ->first();
+    }
+
+    /**
+     * Check if user is assigned to a specific office (role-based)
+     */
+    public function isAssignedToOffice(int $officeId): bool
+    {
+        return $this->getOfficeIdForStaff() === $officeId;
+    }
+
+    /**
+     * Get assigned office IDs for this staff (role-based)
+     */
+    public function getAssignedOfficeIds(): array
+    {
+        $officeId = $this->getOfficeIdForStaff();
+        return $officeId ? [$officeId] : [];
+    }
+
+    /**
+     * Get the office for this staff based on their role
+     */
+    public function getAssignedOffice()
+    {
+        $officeId = $this->getOfficeIdForStaff();
+        return $officeId ? Offices::find($officeId) : null;
+    }
+    /**
+     * Get assigned offices for this staff (role-based)
+     */
+    public function getAssignedOffices()
+    {
+        $office = $this->getAssignedOffice();
+        return $office ? collect([$office]) : collect();
+    }
+
+    /**
      * Check if user can make document requests
      */
     public function canMakeDocumentRequests(): bool
@@ -380,5 +457,15 @@ class User extends Authenticatable
             ],
             'overall_percentage' => $this->getProfileCompletionPercentage()
         ];
+    }
+
+    protected static function boot()
+    {
+        parent::boot();
+        static::created(function ($user) {
+            if (!$user->hasAnyRole(['super-admin', 'admin', 'MCR-staff', 'MTO-staff', 'BPLS-staff', 'client'])) {
+                $user->assignRole('client');
+            }
+        });
     }
 }

@@ -66,13 +66,18 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Date of Birth</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->date_of_birth ? \Carbon\Carbon::parse($personalInformation->date_of_birth)->format('M d, Y') : 'N/A' }}
+                                {{ optional($documentRequest->details)->date_of_birth
+            ? \Carbon\Carbon::parse($documentRequest->details->date_of_birth)->format('M d, Y')
+            : (optional($documentRequest->user)->date_of_birth
+                ? \Carbon\Carbon::parse($documentRequest->user->date_of_birth)->format('M d, Y')
+                : 'N/A') }}
+
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Place of Birth</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->place_of_birth ?? 'N/A' }}
+                                {{ $documentRequest->details->place_of_birth ?? ($documentRequest->user->place_of_birth ?? 'N/A') }}
                             </p>
                         </div>
                     </div>
@@ -81,19 +86,19 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Sex at Birth</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->sex_at_birth ?? 'N/A' }}
+                                {{ $documentRequest->details->sex_at_birth ?? ($documentRequest->user->sex_at_birth ?? 'N/A') }}
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Civil Status</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->civil_status ?? 'N/A' }}
+                                {{ $documentRequest->details->civil_status ?? ($documentRequest->user->civil_status ?? 'N/A') }}
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->nationality ?? 'N/A' }}
+                                {{ $documentRequest->details->nationality ?? ($documentRequest->user->nationality ?? 'N/A') }}
                             </p>
                         </div>
                     </div>
@@ -102,13 +107,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->religion ?? 'N/A' }}
+                                {{ $documentRequest->details->religion ?? ($documentRequest->user->religion ?? 'N/A') }}
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $personalInformation->contact_no ?? 'N/A' }}
+                                {{ $documentRequest->details->contact_no ?? ($documentRequest->user->contact_no ?? 'N/A') }}
                             </p>
                         </div>
                     </div>
@@ -174,7 +179,7 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $documentRequest->details->contact_no ?? ($personalInformation->contact_no ?? 'N/A') }}
+                                    {{ $documentRequest->details->contact_no ?? ($documentRequest->user->contact_no ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>
@@ -184,13 +189,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $userAddresses->address_type ?? 'N/A' }}
+                                {{ $documentRequest->details->address_type ?? ($documentRequest->user->address_type ?? 'N/A') }}
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Zip Code</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $userAddresses->zip_code ?? 'N/A' }}
+                                {{ $documentRequest->details->zip_code ?? ($documentRequest->user->zip_code ?? 'N/A') }}
                             </p>
                         </div>
                     </div>
@@ -198,14 +203,14 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 1</label>
                         <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $userAddresses->address_line_1 ?? 'N/A' }}
+                            {{ $documentRequest->details->address_line_1 ?? ($documentRequest->user->address_line_1 ?? 'N/A') }}
                         </p>
                     </div>
 
                     <div>
                         <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 2</label>
                         <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $userAddresses->address_line_2 ?? 'N/A' }}
+                            {{ $documentRequest->details->address_line_2 ?? ($documentRequest->user->address_line_2 ?? 'N/A') }}
                         </p>
                     </div>
 
@@ -213,13 +218,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Region</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $userAddresses->region ?? 'N/A' }}
+                                {{ $documentRequest->details->region ?? ($documentRequest->user->region ?? 'N/A') }}
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $userAddresses->province ?? 'N/A' }}
+                                {{ $documentRequest->details->province ?? ($documentRequest->user->province ?? 'N/A') }}
                             </p>
                         </div>
                     </div>
@@ -228,13 +233,13 @@
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">City</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $userAddresses->city ?? 'N/A' }}
+                                {{ $documentRequest->details->city ?? ($documentRequest->user->city ?? 'N/A') }}
                             </p>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Barangay</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $userAddresses->barangay ?? 'N/A' }}
+                                {{ $documentRequest->details->barangay ?? ($documentRequest->user->barangay ?? 'N/A') }}
                             </p>
                         </div>
                     </div>
@@ -242,7 +247,7 @@
                     <div>
                         <label class="block text-sm font-medium text-gray-600 mb-1">Street</label>
                         <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $userAddresses->street ?? 'N/A' }}
+                            {{ $documentRequest->details->street ?? ($documentRequest->user->street ?? 'N/A') }}
                         </p>
                     </div>
                 </div>
@@ -259,25 +264,25 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_last_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_last_name ?? ($documentRequest->user->father_last_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_first_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_first_name ?? ($documentRequest->user->father_first_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_middle_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_middle_name ?? ($documentRequest->user->father_middle_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_suffix ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_suffix ?? ($documentRequest->user->father_suffix ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>
@@ -285,25 +290,29 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily?->father_birthdate ? \Carbon\Carbon::parse($userFamily->father_birthdate)->format('M d, Y') : 'N/A' }}
+                                    {{ optional($documentRequest->details)->father_birthdate
+            ? \Carbon\Carbon::parse($documentRequest->details->father_birthdate)->format('M d, Y')
+            : (optional($documentRequest->user)->father_birthdate
+                ? \Carbon\Carbon::parse($documentRequest->user->father_birthdate)->format('M d, Y')
+                : 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_nationality ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_nationality ?? ($documentRequest->user->father_nationality ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_religion ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_religion ?? ($documentRequest->user->father_religion ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->father_contact_no ?? 'N/A' }}
+                                    {{ $documentRequest->details->father_contact_no ?? ($documentRequest->user->father_contact_no ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>
@@ -316,25 +325,25 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_last_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_last_name ?? ($documentRequest->user->mother_last_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_first_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_first_name ?? ($documentRequest->user->mother_first_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_middle_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_middle_name ?? ($documentRequest->user->mother_middle_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_suffix ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_suffix ?? ($documentRequest->user->mother_suffix ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>
@@ -342,25 +351,29 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily && $userFamily->mother_birthdate ? \Carbon\Carbon::parse($userFamily->mother_birthdate)->format('M d, Y') : 'N/A' }}
+                                    {{ optional($documentRequest->details)->mother_birthdate
+            ? \Carbon\Carbon::parse($documentRequest->details->mother_birthdate)->format('M d, Y')
+            : (optional($documentRequest->user)->mother_birthdate
+                ? \Carbon\Carbon::parse($documentRequest->user->mother_birthdate)->format('M d, Y')
+                : 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_nationality ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_nationality ?? ($documentRequest->user->mother_nationality ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_religion ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_religion ?? ($documentRequest->user->mother_religion ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->mother_contact_no ?? 'N/A' }}
+                                    {{ $documentRequest->details->mother_contact_no ?? ($documentRequest->user->mother_contact_no ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>
@@ -373,25 +386,25 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_last_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_last_name ?? ($documentRequest->user->spouse_last_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_first_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_first_name ?? ($documentRequest->user->spouse_first_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_middle_name ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_middle_name ?? ($documentRequest->user->spouse_middle_name ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_suffix ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_suffix ?? ($documentRequest->user->spouse_suffix ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>
@@ -399,25 +412,29 @@
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily && $userFamily->spouse_birthdate ? \Carbon\Carbon::parse($userFamily->spouse_birthdate)->format('M d, Y') : 'N/A' }}
+                                    {{ optional($documentRequest->details)->spouse_birthdate
+            ? \Carbon\Carbon::parse($documentRequest->details->spouse_birthdate)->format('M d, Y')
+            : (optional($documentRequest->user)->spouse_birthdate
+                ? \Carbon\Carbon::parse($documentRequest->user->spouse_birthdate)->format('M d, Y')
+                : 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_nationality ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_nationality ?? ($documentRequest->user->spouse_nationality ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_religion ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_religion ?? ($documentRequest->user->spouse_religion ?? 'N/A') }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $userFamily->spouse_contact_no ?? 'N/A' }}
+                                    {{ $documentRequest->details->spouse_contact_no ?? ($documentRequest->user->spouse_contact_no ?? 'N/A') }}
                                 </p>
                             </div>
                         </div>

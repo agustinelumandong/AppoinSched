@@ -21,34 +21,77 @@
                 </flux:navlist.item>
             </flux:navlist.group>
 
-            <flux:navlist.group :heading="__('Administration')" class="grid">
-                <flux:navlist.item icon="building-office" :href="route('admin.offices')"
-                    class="text-decoration-none text-black" :current="request()->routeIs('admin.offices')"
-                    wire:navigate>{{ __('Offices') }}
+            {{-- Client Navigation --}}
+            @hasrole('client')
+            <flux:navlist.group expandable :expanded="request()->routeIs('client.*')" heading="My Services">
+                <flux:navlist.item icon="calendar" :href="route('client.appointments')"
+                    :current="request()->routeIs('client.appointments')" wire:navigate>
+                    {{ __('My Appointments') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="building-office" :href="route('admin.services')"
-                    class="text-decoration-none text-black" :current="request()->routeIs('admin.services')"
-                    wire:navigate>{{ __('Services') }}
+                <flux:navlist.item icon="document-text" :href="route('client.documents')"
+                    :current="request()->routeIs('client.documents')" wire:navigate>
+                    {{ __('My Documents') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="building-office" :href="route('admin.offices')"
+                    :current="request()->routeIs('admin.offices')" wire:navigate>
+                    {{ __('Book Appointment') }}
+                </flux:navlist.item>
+            </flux:navlist.group>
+            @endhasrole
+
+            {{-- Staff Navigation --}}
+            @hasrole('MCR-staff|MTO-staff|BPLS-staff|admin|super-admin')
+            <flux:navlist.group expandable :expanded="request()->routeIs('staff.*')" heading="Staff Management">
+                <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
+                    :current="request()->routeIs('staff.appointments')" wire:navigate>
+                    {{ __('Manage Appointments') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="document-duplicate" :href="route('staff.documents')"
+                    :current="request()->routeIs('staff.documents')" wire:navigate>
+                    {{ __('Process Documents') }}
+                </flux:navlist.item>
+            </flux:navlist.group>
+            @endhasrole
+
+            {{-- Admin Navigation --}}
+            @hasrole('admin|super-admin')
+            <flux:navlist.group expandable :expanded="request()->routeIs('admin.*')" heading="Administration">
+                <flux:navlist.item icon="chart-bar" :href="route('admin.dashboard')"
+                    :current="request()->routeIs('admin.dashboard')" wire:navigate>
+                    {{ __('Admin Dashboard') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="building-office-2" :href="route('admin.offices')"
+                    :current="request()->routeIs('admin.offices')" wire:navigate>
+                    {{ __('Offices Management') }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="cog-6-tooth" :href="route('admin.services')"
+                    :current="request()->routeIs('admin.services')" wire:navigate>
+                    {{ __('Services Management') }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="calendar" :href="route('admin.appointments-management')"
-                    class="text-decoration-none text-black"
                     :current="request()->routeIs('admin.appointments-management')" wire:navigate>
-                    {{ __('Appointments') }}
+                    {{ __('Appointments Management') }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('admin.document-request')"
-                    class="text-decoration-none text-black" :current="request()->routeIs('admin.document-request')"
-                    wire:navigate>{{ __('Document Request') }}
+                    :current="request()->routeIs('admin.document-request')" wire:navigate>
+                    {{ __('Document Request') }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
-                    class="text-decoration-none text-black"
                     :current="request()->routeIs('admin.users.users-management')" wire:navigate>
                     {{ __('Users Management') }}
                 </flux:navlist.item>
+            </flux:navlist.group>
+            @endhasrole
+
+            {{-- Super Admin Navigation --}}
+            @hasrole('super-admin')
+            <flux:navlist.group expandable :expanded="request()->routeIs('admin.roles-permissions')" heading="System">
                 <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')"
-                    class="text-decoration-none text-black" :current="request()->routeIs('admin.roles-permissions')"
-                    wire:navigate>{{ __('Roles & Permissions') }}
+                    :current="request()->routeIs('admin.roles-permissions')" wire:navigate>
+                    {{ __('Roles & Permissions') }}
                 </flux:navlist.item>
             </flux:navlist.group>
+            @endhasrole
         </flux:navlist>
 
         <flux:spacer />

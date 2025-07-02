@@ -17,6 +17,13 @@ new class extends Component {
     public string $permissionName = '';
     public mixed $role = null;
 
+    public function mount()
+    {
+        if (!auth()->user()->hasRole('super-admin')) {
+            abort(403, 'Unauthorized access. Only super administrators can manage roles and permissions.');
+        }
+    }
+
     // Save Permission
     public function savePermission()
     {
@@ -244,8 +251,8 @@ new class extends Component {
     @push('scripts')
         <script>
             // Auto-hide alerts after 5 seconds
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(function () {
                     const alerts = document.querySelectorAll('.alert');
                     alerts.forEach(alert => {
                         if (alert) {
