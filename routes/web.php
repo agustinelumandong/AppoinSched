@@ -53,7 +53,7 @@ Route::middleware(['auth'])->group(function () {
         Volt::route('admin/offices/{office:slug}', 'offices.show')->name('offices.show');
         Volt::route('admin/offices/{office:slug}/services', 'offices.services')->name('offices.services');
         Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
-        Volt::route('offices/{office:slug}/services/appointments', 'offices.appointment')->name('offices.service.appointment');
+        Volt::route('offices/{office:slug}/services/appointment', 'offices.appointmentbooking')->name('offices.service.appointment');
     });
 
     // Testing route (remove in production)

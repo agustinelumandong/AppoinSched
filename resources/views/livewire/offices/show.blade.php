@@ -62,6 +62,29 @@ new #[Title('Office Details')]
         <div class="col-md-12">
             <h4 class="mb-3">Services Offered</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <a href="{{ route('offices.service.appointment', ['office' => $office->slug]) }}"
+                    class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black">
+                    {{-- Header --}}
+                    <header class="flex flex-col ">
+                        <h3 class="text-lg font-bold  text-decoration-none text-black ">
+                            Appointment Booking
+                        </h3>
+                        <p class="text-sm text-gray-500  text-decoration-none text-black ">
+                            Book an appointment with the office
+                        </p>
+                        <p class="text-sm text-gray-800 font-bold  text-decoration-none text-black">
+                            Free
+                        </p>
+                    </header>
+                    {{-- Footer --}}
+                    <footer class="flex items-center justify-between pt-10">
+                        <span
+                            class="text-blue-50 hover:text-blue-700  text-decoration-none  flux-btn flux-btn-primary">Request
+                            Book Appointment</span>
+                    </footer>
+                </a>
+
                 @forelse($services as $service)
                     <a href="{{ route('offices.service.request', ['office' => $office->slug, 'service' => $service->slug]) }}"
                         class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"

@@ -53,6 +53,13 @@ new class extends Component {
         ->count(),
       'totalDocumentRequests' => DocumentRequest::where('office_id', $this->getOfficeIdForStaff())
         ->count(),
+      'offices' => Offices::orderBy('created_at', 'DESC')->get(),
+      'profileCompletion' => $user->getProfileCompletionPercentage(),
+      'hasCompleteProfile' => $user->hasCompleteProfile(),
+      'hasCompleteBasicProfile' => $user->hasCompleteBasicProfile(),
+      'hasCompletePersonalInfo' => $user->hasCompletePersonalInfo(),
+      'hasCompleteAddress' => $user->hasCompleteAddress(),
+      'hasCompleteFamilyInfo' => $user->hasCompleteFamilyInfo(),
     ];
   }
 
@@ -173,6 +180,15 @@ new class extends Component {
         </div>
       </div>
     </div>
+
+    <div class="container-fluid mx-auto px-4 py-8">
+      <div class="mb-6">
+        <h1 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
+        <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff</p>
+      </div>
+      <livewire:components.full-calendar />
+    </div>
+
     <div class="bg-white rounded-lg shadow">
       <div class="p-6 border-b border-gray-200">
         <h3 class="text-lg font-semibold text-gray-900">Recent Appointments</h3>
