@@ -422,7 +422,7 @@ new #[Title('Document Request')] class extends Component {
                     ]);
 
                     // Spouse Information 
-                    if ($this->service->title    !== 'Certificate of No Marriage (CENOMAR)') {
+                    if ($this->service->title !== 'Certificate of No Marriage (CENOMAR)') {
                         $detailsData = array_merge($detailsData, [
                             'spouse_last_name' => $this->spouse_last_name,
                             'spouse_first_name' => $this->spouse_first_name,
@@ -483,8 +483,6 @@ new #[Title('Document Request')] class extends Component {
 <div class="card shadow-xl border-none border-gray-200" style="border-radius: 1rem;">
 
     <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
-
-
 
     <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request a {{ $this->service->title }}
     </h1>

@@ -270,17 +270,11 @@ new class extends Component {
 
 <div class="space-y-8">
 
-    <div class="flex justify-end">
-        @if (session()->has('success'))
-            <div class="text-green-500">{{ session('success') }}</div>
-        @endif
-        @if (session()->has('warning'))
-            <div class="text-yellow-500">{{ session('warning') }}</div>
-        @endif
-    </div>
-
     <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
 
+    {{-- Flash Messages --}}
+    @include('components.alert')
+    
     <!-- Profile Completion Status -->
     <div class="flux-card p-6">
         <div class="flex items-center justify-between mb-4">

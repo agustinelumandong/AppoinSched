@@ -140,19 +140,8 @@ new class extends Component {
 <div>
     <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
 
-    <div>
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
-
-        @if (session()->has('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
-    </div>
+    {{-- Flash Messages --}}
+    @include('components.alert')
 
     {{-- Header --}}
     @include('livewire.admin.users.components.header')
