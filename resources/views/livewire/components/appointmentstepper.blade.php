@@ -157,17 +157,27 @@ new #[Title('Appointment')]
                 'status' => 'pending',
                 'to_whom' => $this->to_whom,
                 'purpose' => $this->purpose,
-                'client_first_name' => $this->first_name,
-                'client_last_name' => $this->last_name,
-                'client_middle_name' => $this->middle_name,
-                'client_email' => $this->email,
-                'client_phone' => $this->phone,
-                'client_address' => $this->address,
-                'client_city' => $this->city,
-                'client_state' => $this->state,
-                'client_zip_code' => $this->zip_code,
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
             ]);
+
+            // Create appointment details
+            if ($appointment) {
+                \App\Models\AppointmentDetails::create([
+                    'appointment_id' => $appointment->id,
+                    'request_for' => $this->to_whom,
+                    'first_name' => $this->first_name,
+                    'middle_name' => $this->middle_name,
+                    'last_name' => $this->last_name,
+                    'email' => $this->email,
+                    'phone' => $this->phone,
+                    'address' => $this->address,
+                    'city' => $this->city,
+                    'state' => $this->state,
+                    'zip_code' => $this->zip_code,
+                    'purpose' => $this->purpose,
+                    'notes' => $appointment->notes,
+                ]);
+            }
 
             $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
             Cache::forget($cacheKey);
@@ -178,8 +188,6 @@ new #[Title('Appointment')]
                 // Reset the form
                 $this->reset(['step', 'to_whom', 'purpose', 'first_name', 'last_name', 'middle_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'selectedDate', 'selectedTime']);
                 $this->step = 1;
-
-
 
                 $this->dispatch('refresh-slots');
                 $this->isLoading = true;
@@ -343,374 +351,16 @@ new #[Title('Appointment')]
 
     {{-- Stepper Content --}}
     @if ($step == 1)
-        <div class="px-5 py-2 mt-5">
-            <div class="flex flex-col gap-4">
-                <div>
-                    <div class="header mb-4">
-                        <h3 class="text-xl font-semibold text-base-content">For Yourself or Someone Else?</h3>
-                        <div class="flex items-center gap-2 text-sm text-base-content/70">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Please select who this appointment is for</span>
-                        </div>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div wire:loading.delay class="text-center ">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                        <p class="text-gray-600">Loading...</p>
-                    </div>
-
-                    <div class="flex flex-col gap-2 w-full" wire:loading.remove>
-                        <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom" hidden />
-                        <label for="myself"
-                            class="flux-input-primary flux-btn cursor-pointer {{ $to_whom === 'myself' ? 'flux-btn-active-primary' : '' }} p-2">Myself</label>
-                        <input type="radio" id="someone_else" name="to_whom" value="someone_else" wire:model.live="to_whom"
-                            hidden />
-                        <label for="someone_else"
-                            class="flux-input-primary flux-btn cursor-pointer {{ $to_whom === 'someone_else' ? 'flux-btn-active-primary' : '' }} p-2">Someone
-                            Else</label>
-                    </div>
-
-
-                    <footer class="my-6 flex justify-end gap-2">
-                        {{-- <button class="btn btn-ghost" wire:click="previousStep">Previous</button> --}}
-                        <button class="btn btn-primary" wire:click="nextStep">Next</button>
-                    </footer>
-                </div>
-            </div>
-        </div>
+        @include('livewire.appointments.components.appointment-steps.step1')
     @elseif($step == 2)
-        <div class="px-5 py-2 mt-5">
-            <div class="flex flex-col gap-4">
-                <div>
-                    <div class="header mb-4">
-                        <h3 class="text-xl font-semibold text-base-content">State your purpose</h3>
-                        <div class="flex items-center gap-2 text-sm text-base-content/70">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Please select the purpose of your appointment</span>
-                        </div>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div wire:loading.delay class="text-center ">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                        <p class="text-gray-600">Loading...</p>
-                    </div>
-
-                    <div class="flex flex-col gap-2 w-full" wire:loading.remove>
-                        <input type="radio" id="consultation" name="purpose" value="consultation" wire:model.live="purpose"
-                            hidden />
-                        <label for="consultation"
-                            class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'consultation' ? 'flux-btn-active-primary' : '' }} p-2">Consultation</label>
-                        <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose"
-                            hidden />
-                        <label for="follow_up"
-                            class="flux-input-primary  flux-btn cursor-pointer {{ $purpose === 'follow_up' ? 'flux-btn-active-primary' : '' }} p-2">Follow
-                            Up</label>
-                    </div>
-
-
-                    <footer class="my-6 flex justify-end gap-2">
-                        <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                        <button class="btn btn-primary" wire:click="nextStep">Next</button>
-                    </footer>
-                </div>
-            </div>
-        </div>
+        @include('livewire.appointments.components.appointment-steps.step2')
     @elseif($step == 3)
-        <div class="px-5 py-2 mt-5">
-            <div class="flex flex-col gap-4">
-                <div>
-                    <div class="header mb-4">
-                        <h3 class="text-xl font-semibold text-base-content">Your/Someone details</h3>
-                        <div class="flex items-center gap-2 text-sm text-base-content/70">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Please provide your/someone details</span>
-                        </div>
-                    </div>
-
-                    <!-- Loading State -->
-                    <div wire:loading.delay class="text-center">
-                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2">
-                        </div>
-                        <p class="text-gray-600">Loading...</p>
-                    </div>
-
-                    <div class="flex flex-col gap-2 w-full" wire:loading.remove>
-
-                        <div class="flex flex-row gap-2 w-full">
-                            <div class="w-full">
-                                <input type="text" placeholder="Last Name" class="flux-form-control"
-                                    wire:model="last_name" />
-                                @error('last_name') <span class="text-red-500">{{ $message }}</span> @enderror
-                            </div>
-
-
-                            <div class="w-full">
-                                <input type="text" placeholder="First Name" class="flux-form-control"
-                                    wire:model="first_name" />
-                                @error('first_name') <span class="text-red-500">{{ $message }}</span> @enderror
-                            </div>
-
-                            <div class="w-full">
-                                <input type="text" placeholder="Middle Name" class="flux-form-control"
-                                    wire:model="middle_name" />
-                                @error('middle_name') <span class="text-red-500">{{ $message }}</span> @enderror
-                            </div>
-                        </div>
-
-                        <div class="flex flex-row gap-2 w-full">
-                            <div class=" w-full">
-                                <input type="email" placeholder="Email" class="flux-form-control" wire:model="email" />
-                                @error('email')
-                                    <span class="text-red-500">{{ $message }}</span>
-                                @enderror
-                            </div>
-
-                            <div class="w-full">
-                                <input type="tel" placeholder="Phone" class="flux-form-control" wire:model="phone" />
-                                @error('phone')
-                                    <span class="text-red-500">{{ $message }}</span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="w-full">
-                            <input type="text" placeholder="Address" class="flux-form-control" wire:model="address" />
-                            @error('address')
-                                <span class="text-red-500">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="w-full">
-                            <input type="text" placeholder="City" class="flux-form-control" wire:model="city" />
-                            @error('city')
-                                <span class="text-red-500">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="w-full">
-                            <input type="text" placeholder="State" class="flux-form-control" wire:model="state" />
-                            @error('state')
-                                <span class="text-red-500">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-                        <div class="w-full">
-                            <input type="text" placeholder="Zip Code" class="flux-form-control" wire:model="zip_code" />
-                            @error('zip_code')
-                                <span class="text-red-500">{{ $message }}</span>
-                            @enderror
-                        </div>
-
-
-                        <footer class="my-6 flex justify-end gap-2">
-                            <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                            <button class="btn btn-primary" wire:click="nextStep" wire:loading.disable>Next</button>
-
-                        </footer>
-                    </div>
-                </div>
-            </div>
+        @include('livewire.appointments.components.appointment-steps.step3')
     @elseif($step == 4)
-            <div class="px-5 py-2 mt-5" wire:key="step-4-container">
-                <div class="flex flex-col gap-4">
-                    <div>
-                        {{-- Header --}}
-                        <div class="header mb-4">
-                            <h3 class="text-xl font-semibold text-base-content">Schedule</h3>
-                            <div class="flex items-center gap-2 text-sm text-base-content/70">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Please select a date and time for your appointment</span>
-                            </div>
-                        </div>
-
-                        {{-- Slot Picker --}}
-                        <div class="mb-4" wire:key="slot-picker-wrapper">
-                            <label class="form-label fw-semibold">Select Date and Time</label>
-                            <div id=" slot-picker-container-stepper" wire:ignore>
-                                <livewire:slot-picker :office-id="$office->id" :service-id="$service->id"
-                                    :staff-id="$staff->id" :pre-selected-date="$selectedDate"
-                                    :pre-selected-time="$selectedTime"
-                                    wire:key="stepper-slot-picker-{{ $office->id }}-{{ $service->id }}-{{ $staff->id }}" />
-                            </div>
-                        </div>
-
-                        {{-- DEBUG: current selection --}}
-                        {{-- @if ($selectedDate && $selectedTime)
-                        <div class="mb-4" wire:key="selection-display">
-                            <div class="alert alert-info flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                <div>
-                                    <strong>Selected:</strong>
-                                    {{ Carbon::parse($selectedDate)->format('F j, Y') }} at
-                                    {{ Carbon::parse($selectedTime)->format('g:i A') }}
-                                </div>
-                            </div>
-                        </div>
-                        @endif --}}
-
-                        {{-- Footer --}}
-                        <footer class="my-6 flex justify-end gap-2">
-                            <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                            <button class="btn btn-primary" wire:click="nextStep" {{ !$selectedDate || !$selectedTime ? 'disabled' : '' }}>
-                                Next
-                            </button>
-
-                        </footer>
-                    </div>
-                </div>
-            </div>
-        @elseif($step == 5)
-            <div class="px-5 py-2 mt-5">
-                <div class="flex flex-col gap-4">
-                    <div>
-                        <div class="header mb-4">
-                            <h3 class="text-xl font-semibold text-base-content">Contact Information</h3>
-                            <div class="flex items-center gap-2 text-sm text-base-content/70">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Please confirm your contact information</span>
-                            </div>
-                        </div>
-
-                        <!-- Loading State -->
-                        <div wire:loading.delay class="text-center">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                            <p class="text-gray-600">Loading...</p>
-                        </div>
-
-                        <div class="flex flex-col gap-2 w-1/2" wire:loading.remove>
-                            <p class="text-sm text-base-content/70 mb-2">Please review and confirm your contact details:
-                            </p>
-
-
-
-                            <div class="bg-base-200 p-4 rounded-lg">
-                                <div class=" grid grid-cols-1 gap-2">
-                                    <div>
-                                        <label class="font-medium text-sm">Email:</label>
-                                        <p class="text-base-content">{{ $email }}</p>
-                                    </div>
-                                    <div>
-                                        <label class=" font-medium text-sm">Phone:</label>
-                                        <p class="text-base-content">{{ $phone }}</p>
-                                    </div>
-                                    <div>
-                                        <label class=" font-medium text-sm">Address:</label>
-                                        <p class="text-base-content">{{ $address }}</p>
-                                    </div>
-                                    <div>
-                                        <label class=" font-medium text-sm">Location:</label>
-                                        <p class="text-base-content">{{ $city }}, {{ $state }}
-                                            {{ $zip_code }}
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-
-                            <p class="text-sm text-base-content/70 mt-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                We will use this information to contact you about your appointment.
-                            </p>
-                        </div>
-
-                        <footer class="my-6 flex justify-end gap-2">
-                            <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                            <button class="btn btn-primary" wire:click="nextStep">Next</button>
-
-                        </footer>
-                    </div>
-                </div>
-            </div>
-        @elseif($step == 6)
-            <div class="px-5 py-2 mt-5">
-                <div class="flex flex-col gap-4">
-                    <div>
-                        <div class="header mb-4">
-                            <h3 class="text-xl font-semibold text-base-content">Confirmation</h3>
-                            <div class="flex items-center gap-2 text-sm text-base-content/70">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Please review your appointment details</span>
-                            </div>
-                        </div>
-
-                        <!-- Loading State -->
-                        <div wire:loading.delay class="text-center">
-                            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                            <p class="text-gray-600">Loading...</p>
-                        </div>
-
-                        <div class="flex flex-col gap-2 w-full md:w-2/3 lg:w-1/2 text-sm text-base-content/70"
-                            wire:loading.remove>
-                            <div class="grid grid-cols-2 gap-4">
-                                <div class="flex flex-col gap-2">
-                                    <p class="font-medium">Appointment Details</p>
-                                    <p>Who User Id: {{ $id }}</p>
-                                    <p>Office Id: {{ $office->id }}</p>
-                                    <p>Service Id: {{ $service->id }}</p>
-                                    <p>Staff Id: {{ $staff->id }}</p>
-
-                                    <p>To Whom: <span class="text-base-content">{{ $to_whom }}</span></p>
-                                    <p>Purpose: <span class="text-base-content">{{ $purpose }}</span></p>
-                                    <p>Date: <span class=" text-base-content">{{ $selectedDate }}</span></p>
-                                    <p>Time: <span class="text-base-content">{{ $selectedTime }}</span></p>
-                                </div>
-                                <div class=" flex flex-col gap-2">
-                                    <p class="font-medium">Personal Information</p>
-                                    <p>Name: <span class="text-base-content">{{ $first_name }}
-                                            {{ $last_name }}</span></p>
-                                    <p>Email: <span class=" text-base-content">{{ $email }}</span>
-                                    </p>
-                                    <p>Phone: <span class="text-base-content">{{ $phone }}
-                                        </span>
-                                    </p>
-                                    <p>Address: <span class="text-base-content">{{ $address }}</span></p>
-                                    <p>Location: <span class="text-base-content">{{ $city }}, {{ $state }}
-                                            {{ $zip_code }}
-                                        </span></p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <footer class="my-6 flex justify-end gap-2">
-                            <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                            <button class="btn btn-primary" wire:click="submitAppointment">Submit</button>
-
-                        </footer>
-                    </div>
-                </div>
-            </div>
-        @endif
-    </div>
+        @include('livewire.appointments.components.appointment-steps.step4')
+    @elseif($step == 5)
+        @include('livewire.appointments.components.appointment-steps.step5')
+    @elseif($step == 6)
+        @include('livewire.appointments.components.appointment-steps.step6')
+    @endif
+</div>
