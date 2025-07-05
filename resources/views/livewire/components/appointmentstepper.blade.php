@@ -12,7 +12,11 @@ use Illuminate\Support\Facades\Cache;
 use App\Models\Offices;
 use App\Models\Services;
 use App\Models\Staff;
+use App\Models\AppointmentDetails;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema as FacadesSchema;
 
 new #[Title('Appointment')]
     class extends Component {
@@ -115,15 +119,18 @@ new #[Title('Appointment')]
         $this->isLoading = true;
     }
 
-    public function submitAppointment()
+    public function submitAppointment(): void
     {
+        $this->isLoading = true;
+
         try {
-            $user_id = auth()->user()->id;
+            $userId = auth()->id();
+
             // Check for scheduling conflicts
-            $conflict = $this->checkForConflicts();
-            if ($conflict) {
+            if ($this->checkForConflicts()) {
                 Log::info('Conflict found, appointment not saved');
                 session()->flash('error', 'This time slot is already booked. Please select a different time.');
+                $this->isLoading = false;
                 return;
             }
 
@@ -144,11 +151,11 @@ new #[Title('Appointment')]
                 'selectedTime' => 'required|string',
             ]);
 
-            Log::info('Validation passed, attempting to create appointment', $validated);
+            DB::beginTransaction();
 
             // Create the appointment
             $appointment = Appointments::create([
-                'user_id' => $user_id,
+                'user_id' => $userId,
                 'office_id' => $this->office->id,
                 'service_id' => $this->service->id,
                 'staff_id' => $this->staff->id,
@@ -160,9 +167,9 @@ new #[Title('Appointment')]
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
             ]);
 
-            // Create appointment details
-            if ($appointment) {
-                \App\Models\AppointmentDetails::create([
+            // Only create details if appointment was created and the details table has the correct FK
+            if ($appointment && FacadesSchema::hasColumn('appointment_details', 'appointment_id')) {
+                AppointmentDetails::create([
                     'appointment_id' => $appointment->id,
                     'request_for' => $this->to_whom,
                     'first_name' => $this->first_name,
@@ -179,14 +186,32 @@ new #[Title('Appointment')]
                 ]);
             }
 
+            DB::commit();
+
             $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
             Cache::forget($cacheKey);
+
             if ($appointment) {
                 Log::info('Appointment created successfully', ['appointment_id' => $appointment->id]);
                 session()->flash('success', 'Appointment created successfully! We will contact you soon to confirm.');
 
                 // Reset the form
-                $this->reset(['step', 'to_whom', 'purpose', 'first_name', 'last_name', 'middle_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'selectedDate', 'selectedTime']);
+                $this->reset([
+                    'step',
+                    'to_whom',
+                    'purpose',
+                    'first_name',
+                    'last_name',
+                    'middle_name',
+                    'email',
+                    'phone',
+                    'address',
+                    'city',
+                    'state',
+                    'zip_code',
+                    'selectedDate',
+                    'selectedTime'
+                ]);
                 $this->step = 1;
 
                 $this->dispatch('refresh-slots');
@@ -196,16 +221,19 @@ new #[Title('Appointment')]
                 session()->flash('error', 'Failed to create appointment. Please try again.');
             }
         } catch (\Exception $e) {
+            DB::rollBack();
             Log::error('Exception during appointment creation: ' . $e->getMessage(), [
                 'trace' => $e->getTraceAsString(),
                 'data' => [
-                    'user_id' => $user_id,
-                    'office_id' => $this->office->id,
-                    'service_id' => $this->service->id,
-                    'staff_id' => $this->staff->id,
+                    'user_id' => auth()->id() ?? null,
+                    'office_id' => $this->office->id ?? null,
+                    'service_id' => $this->service->id ?? null,
+                    'staff_id' => $this->staff->id ?? null,
                 ]
             ]);
             session()->flash('error', 'Error: ' . $e->getMessage());
+        } finally {
+            $this->isLoading = false;
         }
     }
 

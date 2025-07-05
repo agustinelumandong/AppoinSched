@@ -50,7 +50,7 @@ new class extends Component {
         </div>
 
         <div class="mb-6">
-            <h1 class="text-3xl font-bold text-gray-900">Available Offices</h1>
+            <h4 class="text-3xl font-bold text-gray-900">Available Offices</h4>
         </div>
 
         @if(!$hasCompleteProfile)
@@ -96,6 +96,7 @@ new class extends Component {
             </div>
             --}}
 
+            {{-- Offices --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 @forelse ($offices as $office)
                     <a href="{{ route('offices.show', $office->slug) }}"
@@ -130,50 +131,54 @@ new class extends Component {
                     </div>
                 @endforelse
             </div>
-        @endif
-        <div class="container-fluid mx-auto px-4 py-8">
-            <div class="mb-6">
-                <h1 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
-                <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff</p>
+
+            {{-- Appointments Calendar --}}
+            <div class="container-fluid mx-auto px-4 py-8">
+                <div class="mb-6">
+                    <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
+                        <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff</p>
+                </div>
+                <livewire:components.full-calendar />
             </div>
-            <livewire:components.full-calendar />
-        </div>
-        <div class="bg-white rounded-lg shadow">
+        @endif
+
+        {{-- Recent Appointments --}}
+        {{-- <div class="bg-white rounded-lg shadow">
             <div class="p-6 border-b border-gray-200">
                 <h3 class="text-lg font-semibold text-gray-900">Recent Appointments</h3>
             </div>
             <div class="p-6">
                 <div class="space-y-4">
                     @forelse($myAppointments as $appointment)
-                        <div class="flex items-center justify-between p-4 border rounded-lg">
-                            <div>
-                                <h4 class="font-medium text-gray-900">{{ $appointment->service->name ?? 'N/A' }}</h4>
-                                <p class="text-sm text-gray-600">{{ $appointment->office->name ?? 'N/A' }}</p>
-                                <p class="text-sm text-gray-500">{{ $appointment->booking_date }} at
-                                    {{ $appointment->booking_time }}
-                                </p>
-                            </div>
-                            <div class="text-right">
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <div class="flex items-center justify-between p-4 border rounded-lg">
+                        <div>
+                            <h4 class="font-medium text-gray-900">{{ $appointment->service->name ?? 'N/A' }}</h4>
+                            <p class="text-sm text-gray-600">{{ $appointment->office->name ?? 'N/A' }}</p>
+                            <p class="text-sm text-gray-500">{{ $appointment->booking_date }} at
+                                {{ $appointment->booking_time }}
+                            </p>
+                        </div>
+                        <div class="text-right">
+                            <span
+                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                                                                                             @if ($appointment->status === 'pending') bg-yellow-100 text-yellow-800
                                                                                                             @elseif($appointment->status === 'approved') bg-green-100 text-green-800
                                                                                                             @elseif($appointment->status === 'cancelled') bg-red-100 text-red-800
                                                                                                             @else bg-gray-100 text-gray-800 @endif">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
-                                @if ($appointment->status === 'pending')
-                                    <button class="btn btn-sm btn-outline mt-2">Cancel</button>
-                                @endif
-                            </div>
+                                {{ ucfirst($appointment->status) }}
+                            </span>
+                            @if ($appointment->status === 'pending')
+                            <button class="btn btn-sm btn-outline mt-2">Cancel</button>
+                            @endif
                         </div>
+                    </div>
                     @empty
-                        <p class="text-gray-500 text-center">No appointments found. <a href="{{ route('admin.offices') }}"
-                                class="text-blue-600 hover:underline">Book your
-                                first appointment!</a></p>
+                    <p class="text-gray-500 text-center">No appointments found. <a href="{{ route('admin.offices') }}"
+                            class="text-blue-600 hover:underline">Book your
+                            first appointment!</a></p>
                     @endforelse
                 </div>
             </div>
-        </div>
+        </div> --}}
     </div>
 </div>

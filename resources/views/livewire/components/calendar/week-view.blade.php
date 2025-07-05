@@ -9,7 +9,7 @@
       </div>
       <div
       class="text-lg font-semibold mt-1
-            {{ $day['isToday'] ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : 'text-gray-900' }}">
+      {{ $day['isToday'] ? 'bg-blue-600 text-white rounded-full w-8 h-8 flex items-center justify-center mx-auto' : 'text-gray-900' }}">
       {{ $day['date']->day }}
       </div>
     </div>
@@ -22,13 +22,19 @@
       <div class="p-2 text-xs text-gray-500 border-r border-gray-100 text-right">
         {{ $timeSlot['display'] }}
       </div>
+
       <!-- Day Columns -->
       @foreach($calendarData['days'] ?? [] as $day)
       <div class="min-h-[60px] border-r border-b border-gray-100 last:border-r-0 p-1 relative">
         @foreach($day['appointments'] as $appointment)
-        @if(Carbon\Carbon::parse($appointment->booking_time)->format('H:i') === $timeSlot['time'])
-        <div
-        class="appointment-item text-xs p-1 rounded mb-1 cursor-pointer
+        @php
+        // Normalize time formats for comparison
+        $appointmentTime = Carbon\Carbon::parse($appointment->booking_time)->format('H:i');
+        $slotTime = $timeSlot['time'];
+        @endphp
+
+        @if($appointmentTime === $slotTime)
+        <div class="appointment-item text-xs p-1 rounded mb-1 cursor-pointer
         {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800 border-l-2 border-yellow-400' : '' }}
         {{ $appointment->status === 'approved' ? 'bg-green-100 text-green-800 border-l-2 border-green-400' : '' }}
         {{ $appointment->status === 'completed' ? 'bg-blue-100 text-blue-800 border-l-2 border-blue-400' : '' }}
@@ -42,7 +48,7 @@
         {{ $appointment->service->name ?? 'N/A' }}
         </div>
         </div>
-      @endif
+        @endif
       @endforeach
       </div>
       @endforeach

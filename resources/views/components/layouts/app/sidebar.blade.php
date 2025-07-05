@@ -25,17 +25,19 @@
             @hasrole('client')
             <flux:navlist.group expandable :expanded="request()->routeIs('client.*')" heading="My Services">
                 <flux:navlist.item icon="calendar" :href="route('client.appointments')"
-                    :current="request()->routeIs('client.appointments')" wire:navigate>
+                    :current="request()->routeIs('client.appointments')" wire:navigate
+                    class="text-decoration-none text-black opacity-50 cursor-not-allowed" disabled>
                     {{ __('My Appointments') }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('client.documents')"
-                    :current="request()->routeIs('client.documents')" wire:navigate>
+                    :current="request()->routeIs('client.documents')" wire:navigate
+                    class="text-decoration-none text-black opacity-50 cursor-not-allowed" disabled>
                     {{ __('My Documents') }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="building-office" :href="route('admin.offices')"
+                {{-- <flux:navlist.item icon="building-office" :href="route('admin.offices')"
                     :current="request()->routeIs('admin.offices')" wire:navigate>
                     {{ __('Book Appointment') }}
-                </flux:navlist.item>
+                </flux:navlist.item> --}}
             </flux:navlist.group>
             @endhasrole
 

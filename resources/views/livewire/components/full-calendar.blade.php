@@ -9,9 +9,11 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\On;
+use Carbon\CarbonInterface;
+
 
 new class extends Component {
-  public string $view = 'month'; // month, week, day
+  public string $view = 'month';
   public Carbon $currentDate;
   public ?int $selectedOfficeId = null;
   public ?int $selectedStaffId = null;
@@ -104,6 +106,7 @@ new class extends Component {
   {
     $this->isLoading = true;
     try {
+      $this->clearCache();
       $cacheKey = $this->generateCacheKey();
       $this->calendarData = Cache::remember($cacheKey, now()->addMinutes(5), function () {
         return match ($this->view) {
@@ -121,13 +124,13 @@ new class extends Component {
   }
   private function generateMonthData(): array
   {
-    $startOfMonth = $this->currentDate->copy()->startOfMonth()->startOfWeek();
-    $endOfMonth = $this->currentDate->copy()->endOfMonth()->endOfWeek();
+    $startOfMonth = $this->currentDate->copy()->startOfMonth()->startOfWeek(CarbonInterface::SUNDAY);
+    $endOfMonth = $this->currentDate->copy()->endOfMonth()->endOfWeek(CarbonInterface::SATURDAY);
     $weeks = [];
     $current = $startOfMonth->copy();
     while ($current <= $endOfMonth) {
       $week = [];
-      for ($i = 0; $i < 7; $i++) {
+      for ($i = 1; $i <= 7; $i++) {
         $dayData = [
           'date' => $current->copy(),
           'isCurrentMonth' => $current->month === $this->currentDate->month,
@@ -179,17 +182,28 @@ new class extends Component {
   }
   private function getAppointmentsForDate(Carbon $date): Collection
   {
-    $query = Appointments::with(['user', 'staff', 'office', 'service'])
+    $query = Appointments::with(['user', 'staff', 'office', 'service', 'appointmentDetails'])
       ->whereDate('booking_date', $date->format('Y-m-d'));
+
+    // If user is a client, only show their appointments
+    if (auth()->check() && auth()->user()->hasRole('client')) {
+      $query->where('user_id', auth()->id());
+    } elseif (auth()->check() && auth()->user()->hasRole('admin|super-admin|MCR-staff|MTO-staff')) {
+      $query->where('staff_id', auth()->id());
+    }
+
     if ($this->selectedOfficeId) {
       $query->where('office_id', $this->selectedOfficeId);
     }
+
     if ($this->selectedStaffId) {
       $query->where('staff_id', $this->selectedStaffId);
     }
+
     if (!empty($this->statusFilters)) {
       $query->whereIn('status', $this->statusFilters);
     }
+
     return $query->orderBy('booking_time')->get();
   }
   private function generateTimeSlots(): array
@@ -287,6 +301,7 @@ new class extends Component {
       </div>
     </div>
     <!-- Filters -->
+    @hasrole('admin|super-admin|MCR-staff|MTO-staff')
     <div class="mt-4 pt-4 border-t border-gray-100">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Office Filter -->
@@ -326,6 +341,7 @@ new class extends Component {
         </div>
       </div>
     </div>
+    @endhasrole
   </div>
   <!-- Calendar Body -->
   <div class="calendar-body" wire:loading.class="opacity-50">

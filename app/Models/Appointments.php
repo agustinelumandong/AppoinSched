@@ -57,6 +57,11 @@ class Appointments extends Model
         return $this->belongsTo(Services::class, 'service_id');
     }
 
+    public function appointmentDetails()
+    {
+        return $this->hasOne(AppointmentDetails::class, 'appointment_id');
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);
