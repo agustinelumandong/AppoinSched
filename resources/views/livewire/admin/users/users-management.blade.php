@@ -25,7 +25,11 @@ new class extends Component {
 
     public function mount()
     {
-        if (!auth()->user()->hasAnyRole(['admin', 'super-admin'])) {
+        if (
+            !auth()
+                ->user()
+                ->hasAnyRole(['admin', 'super-admin'])
+        ) {
             abort(403, 'Unauthorized to manage users');
         }
     }
@@ -138,7 +142,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     {{-- Flash Messages --}}
     @include('components.alert')

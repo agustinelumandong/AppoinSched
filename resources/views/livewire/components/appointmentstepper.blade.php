@@ -18,8 +18,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as FacadesSchema;
 
-new #[Title('Appointment')]
-    class extends Component {
+new #[Title('Appointment')] class extends Component {
     public int $step = 1;
     public string $to_whom = 'myself';
     public string $purpose = 'consultation';
@@ -196,22 +195,7 @@ new #[Title('Appointment')]
                 session()->flash('success', 'Appointment created successfully! We will contact you soon to confirm.');
 
                 // Reset the form
-                $this->reset([
-                    'step',
-                    'to_whom',
-                    'purpose',
-                    'first_name',
-                    'last_name',
-                    'middle_name',
-                    'email',
-                    'phone',
-                    'address',
-                    'city',
-                    'state',
-                    'zip_code',
-                    'selectedDate',
-                    'selectedTime'
-                ]);
+                $this->reset(['step', 'to_whom', 'purpose', 'first_name', 'last_name', 'middle_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'selectedDate', 'selectedTime']);
                 $this->step = 1;
 
                 $this->dispatch('refresh-slots');
@@ -229,7 +213,7 @@ new #[Title('Appointment')]
                     'office_id' => $this->office->id ?? null,
                     'service_id' => $this->service->id ?? null,
                     'staff_id' => $this->staff->id ?? null,
-                ]
+                ],
             ]);
             session()->flash('error', 'Error: ' . $e->getMessage());
         } finally {
@@ -310,7 +294,7 @@ new #[Title('Appointment')]
 
 <div class="card shadow-xl border-none border-gray-200" style="border-radius: 1rem;">
 
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     @include('components.alert')
 

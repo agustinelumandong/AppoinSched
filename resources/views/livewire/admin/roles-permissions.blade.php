@@ -195,7 +195,7 @@ new class extends Component {
 
 <div>
 
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <!-- Flash Messages -->
     @include('components.alert')
@@ -235,8 +235,8 @@ new class extends Component {
     @push('scripts')
         <script>
             // Auto-hide alerts after 5 seconds
-            document.addEventListener('DOMContentLoaded', function () {
-                setTimeout(function () {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
                     const alerts = document.querySelectorAll('.alert');
                     alerts.forEach(alert => {
                         if (alert) {

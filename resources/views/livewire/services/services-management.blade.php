@@ -9,7 +9,6 @@ use Illuminate\Support\Str;
 use App\Models\Offices;
 
 new class extends Component {
-
     use WithPagination;
 
     public string $search = '';
@@ -18,7 +17,7 @@ new class extends Component {
     public string $title = '';
     public string $slug = '';
     public string $description = '';
-    public float $price = 0.00;
+    public float $price = 0.0;
     public int $is_active = 1;
     public string $redirectTo = '';
     public bool $confirmDeletion = false;
@@ -31,16 +30,17 @@ new class extends Component {
         $this->title = $service->title ?? '';
         $this->slug = $service->slug ?? '';
         $this->description = $service->description ?? '';
-        $this->price = $service->price ?? 0.00;
+        $this->price = $service->price ?? 0.0;
         $this->is_active = $service->is_active ?? 1;
         $this->redirectTo = route('admin.services');
         $this->resetPage();
-    }  
+    }
 
     public function with()
     {
         return [
-            'services' => Services::with('office')->where('title', 'like', '%' . $this->search . '%')
+            'services' => Services::with('office')
+                ->where('title', 'like', '%' . $this->search . '%')
                 ->orWhere('slug', 'like', '%' . $this->search . '%')
                 ->orWhere('description', 'like', '%' . $this->search . '%')
                 ->orderBy('created_at', 'DESC')
@@ -67,10 +67,10 @@ new class extends Component {
 
         while (
             Services::where('slug', $slug)
-                  ->when(isset($this->service), function ($query) {
-                      return $query->where('id', '!=', $this->service->id);
-                  })
-                  ->exists()
+                ->when(isset($this->service), function ($query) {
+                    return $query->where('id', '!=', $this->service->id);
+                })
+                ->exists()
         ) {
             $slug = $original . '-' . $count++;
         }
@@ -88,32 +88,31 @@ new class extends Component {
             'price' => 'required|numeric|min:0',
             'is_active' => 'required',
         ]);
-        
-        if($validated){
-            $services = Services::create(
-                [
-                    'office_id' => $validated['office_id'],
-                    'title' => $validated['title'],
-                    'slug' => $validated['slug'],
-                    'description' => $validated['description'],
-                    'price' => $validated['price'],
-                    'is_active' => $validated['is_active'],
-                ]
-            );
-            if($services){
-                $this->dispatch('close-modal-add-service'); 
+
+        if ($validated) {
+            $services = Services::create([
+                'office_id' => $validated['office_id'],
+                'title' => $validated['title'],
+                'slug' => $validated['slug'],
+                'description' => $validated['description'],
+                'price' => $validated['price'],
+                'is_active' => $validated['is_active'],
+            ]);
+            if ($services) {
+                $this->dispatch('close-modal-add-service');
                 session()->flash('success', 'Service created successfully');
                 $this->redirectTo = route('admin.services');
-            }else{
+            } else {
                 session()->flash('error', 'Failed to create service');
             }
-        }else{
+        } else {
             session()->flash('error', 'Failed to save service');
         }
-        $this->reset(); 
+        $this->reset();
     }
 
-    public function openEditServiceModal($id){
+    public function openEditServiceModal($id)
+    {
         $service = Services::findOrFail($id);
         $this->office_id = $service->office_id;
         $this->serviceId = $service->id;
@@ -125,7 +124,8 @@ new class extends Component {
         $this->dispatch('open-modal-edit-service');
     }
 
-    public function updateService(){
+    public function updateService()
+    {
         $validated = $this->validate([
             'office_id' => 'required|exists:offices,id',
             'title' => 'required|string|max:255',
@@ -134,59 +134,58 @@ new class extends Component {
             'price' => 'required|numeric|min:0',
             'is_active' => 'required',
         ]);
-        if($validated){
+        if ($validated) {
             $service = Services::findOrFail($this->serviceId);
-            $service->update(
-                [
-                    'office_id' => $validated['office_id'],
-                    'title' => $validated['title'],
-                    'slug' => $validated['slug'],
-                    'description' => $validated['description'],
-                    'price' => $validated['price'],
-                    'is_active' => $validated['is_active'],
-                ]
-            );
-            if($service){
+            $service->update([
+                'office_id' => $validated['office_id'],
+                'title' => $validated['title'],
+                'slug' => $validated['slug'],
+                'description' => $validated['description'],
+                'price' => $validated['price'],
+                'is_active' => $validated['is_active'],
+            ]);
+            if ($service) {
                 $this->dispatch('close-modal-edit-service');
                 session()->flash('success', 'Service updated successfully');
                 $this->redirectTo = route('admin.services');
-            }else{
+            } else {
                 session()->flash('error', 'Failed to update service');
             }
-        }else{
+        } else {
             session()->flash('error', 'Failed to update service');
         }
         $this->reset();
     }
 
-    public function openDeleteServiceModal($id){
+    public function openDeleteServiceModal($id)
+    {
         $service = Services::findOrFail($id);
         $this->serviceId = $service->id;
-        $this->title = $service->title; 
+        $this->title = $service->title;
         $this->confirmDeletion = false;
         $this->dispatch('open-modal-delete-service');
     }
 
-    public function deleteService(){
+    public function deleteService()
+    {
         $service = Services::findOrFail($this->serviceId);
-        if($service){
-            if($this->confirmDeletion){
+        if ($service) {
+            if ($this->confirmDeletion) {
                 $service->delete();
                 session()->flash('success', 'Service deleted successfully');
                 $this->redirectTo = route('admin.services');
-            }else{
+            } else {
                 session()->flash('error', 'Please confirm the deletion');
             }
-        }else{
+        } else {
             session()->flash('error', 'Failed to delete service');
         }
         $this->resetPage();
     }
-    
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
     <!-- Flash Messages -->
     @include('components.alert')
     <!-- Header -->

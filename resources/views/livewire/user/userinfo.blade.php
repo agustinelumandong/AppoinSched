@@ -187,70 +187,78 @@ new class extends Component {
         ]);
 
         // Update User
-        $this->user->fill([
-            'last_name' => $this->last_name,
-            'first_name' => $this->first_name,
-            'middle_name' => $this->middle_name ?? 'N/A',
-            'email' => $this->email,
-        ])->save();
+        $this->user
+            ->fill([
+                'last_name' => $this->last_name,
+                'first_name' => $this->first_name,
+                'middle_name' => $this->middle_name ?? 'N/A',
+                'email' => $this->email,
+            ])
+            ->save();
 
         // Update Personal Information
-        $this->personalInformation->fill([
-            'user_id' => $this->user->id,
-            'suffix' => $this->suffix ?? 'N/A',
-            'contact_no' => $this->contact_no ?: null,
-            'sex_at_birth' => $this->sex_at_birth ?: null,
-            'date_of_birth' => $this->date_of_birth ?: null,
-            'place_of_birth' => $this->place_of_birth ?: null,
-            'civil_status' => $this->civil_status ?? 'Single',
-            'religion' => $this->religion ?: null,
-            'nationality' => $this->nationality ?? 'Filipino',
-        ])->save();
+        $this->personalInformation
+            ->fill([
+                'user_id' => $this->user->id,
+                'suffix' => $this->suffix ?? 'N/A',
+                'contact_no' => $this->contact_no ?: null,
+                'sex_at_birth' => $this->sex_at_birth ?: null,
+                'date_of_birth' => $this->date_of_birth ?: null,
+                'place_of_birth' => $this->place_of_birth ?: null,
+                'civil_status' => $this->civil_status ?? 'Single',
+                'religion' => $this->religion ?: null,
+                'nationality' => $this->nationality ?? 'Filipino',
+            ])
+            ->save();
 
         // Update User Addresses
-        $this->userAddresses->fill([
-            'user_id' => $this->user->id,
-            'personal_information_id' => $this->personalInformation->id,
-            'address_type' => $this->address_type ?? 'Permanent',
-            'address_line_1' => $this->address_line_1 ?: null,
-            'address_line_2' => $this->address_line_2 ?: null,
-            'region' => $this->region ?: null,
-            'province' => $this->province ?: null,
-            'city' => $this->city ?: null,
-            'barangay' => $this->barangay ?: null,
-            // 'street' => $this->street ?: null,
-            'zip_code' => $this->zip_code ?: null,
-        ])->save();
+        $this->userAddresses
+            ->fill([
+                'user_id' => $this->user->id,
+                'personal_information_id' => $this->personalInformation->id,
+                'address_type' => $this->address_type ?? 'Permanent',
+                'address_line_1' => $this->address_line_1 ?: null,
+                'address_line_2' => $this->address_line_2 ?: null,
+                'region' => $this->region ?: null,
+                'province' => $this->province ?: null,
+                'city' => $this->city ?: null,
+                'barangay' => $this->barangay ?: null,
+                // 'street' => $this->street ?: null,
+                'zip_code' => $this->zip_code ?: null,
+            ])
+            ->save();
 
         // Update User Family
-        $this->userFamily->fill([
-            'user_id' => $this->user->id,
-            'personal_information_id' => $this->personalInformation->id,
-            'father_last_name' => $this->father_last_name ?: null,
-            'father_first_name' => $this->father_first_name ?: null,
-            'father_middle_name' => $this->father_middle_name ?: null,
-            'father_suffix' => $this->father_suffix ?? 'N/A',
-            'father_birthdate' => $this->father_birthdate ?: null,
-            'father_nationality' => $this->father_nationality ?: null,
-            'father_religion' => $this->father_religion ?: null,
-            'father_contact_no' => $this->father_contact_no ?: null,
-            'mother_last_name' => $this->mother_last_name ?: null,
-            'mother_first_name' => $this->mother_first_name ?: null,
-            'mother_middle_name' => $this->mother_middle_name ?: null,
-            'mother_suffix' => $this->mother_suffix ?? 'N/A',
-            'mother_birthdate' => $this->mother_birthdate ?: null,
-            'mother_nationality' => $this->mother_nationality ?: null,
-            'mother_religion' => $this->mother_religion ?: null,
-            'mother_contact_no' => $this->mother_contact_no ?: null,
-            'spouse_last_name' => $this->spouse_last_name ?: null,
-            'spouse_first_name' => $this->spouse_first_name ?: null,
-            'spouse_middle_name' => $this->spouse_middle_name ?: null,
-            'spouse_suffix' => $this->spouse_suffix ?? 'N/A',
-            'spouse_birthdate' => $this->spouse_birthdate ?: null,
-            'spouse_nationality' => $this->spouse_nationality ?: null,
-            'spouse_religion' => $this->spouse_religion ?: null,
-            'spouse_contact_no' => $this->spouse_contact_no ?: null,
-        ])->save();
+        $this->userFamily
+            ->fill([
+                'user_id' => $this->user->id,
+                'personal_information_id' => $this->personalInformation->id,
+                'father_last_name' => $this->father_last_name ?: null,
+                'father_first_name' => $this->father_first_name ?: null,
+                'father_middle_name' => $this->father_middle_name ?: null,
+                'father_suffix' => $this->father_suffix ?? 'N/A',
+                'father_birthdate' => $this->father_birthdate ?: null,
+                'father_nationality' => $this->father_nationality ?: null,
+                'father_religion' => $this->father_religion ?: null,
+                'father_contact_no' => $this->father_contact_no ?: null,
+                'mother_last_name' => $this->mother_last_name ?: null,
+                'mother_first_name' => $this->mother_first_name ?: null,
+                'mother_middle_name' => $this->mother_middle_name ?: null,
+                'mother_suffix' => $this->mother_suffix ?? 'N/A',
+                'mother_birthdate' => $this->mother_birthdate ?: null,
+                'mother_nationality' => $this->mother_nationality ?: null,
+                'mother_religion' => $this->mother_religion ?: null,
+                'mother_contact_no' => $this->mother_contact_no ?: null,
+                'spouse_last_name' => $this->spouse_last_name ?: null,
+                'spouse_first_name' => $this->spouse_first_name ?: null,
+                'spouse_middle_name' => $this->spouse_middle_name ?: null,
+                'spouse_suffix' => $this->spouse_suffix ?? 'N/A',
+                'spouse_birthdate' => $this->spouse_birthdate ?: null,
+                'spouse_nationality' => $this->spouse_nationality ?: null,
+                'spouse_religion' => $this->spouse_religion ?: null,
+                'spouse_contact_no' => $this->spouse_contact_no ?: null,
+            ])
+            ->save();
 
         session()->flash('success', 'All information updated!');
     }
@@ -270,11 +278,11 @@ new class extends Component {
 
 <div class="space-y-8">
 
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     {{-- Flash Messages --}}
     @include('components.alert')
-    
+
     <!-- Profile Completion Status -->
     <div class="flux-card p-6">
         <div class="flex items-center justify-between mb-4">
@@ -321,7 +329,7 @@ new class extends Component {
             </div>
         </div>
 
-        @if(!$hasCompleteProfile)
+        @if (!$hasCompleteProfile)
             <div class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <div class="flex items-center">
                     <svg class="w-5 h-5 text-yellow-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
@@ -432,7 +440,8 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col">
                 <label for="religion" class="text-xs font-medium mb-1">Religion</label>
-                <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
+                <input id="religion" class="flux-form-control" type="text" wire:model="religion"
+                    placeholder="Religion">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -469,28 +478,34 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex flex-col">
                 <label for="region" class="text-xs font-medium mb-1">Region</label>
-                <input id="region" class="flux-form-control" type="text" wire:model="region" placeholder="Region">
+                <input id="region" class="flux-form-control" type="text" wire:model="region"
+                    placeholder="Region">
             </div>
             <div class="flex flex-col">
                 <label for="province" class="text-xs font-medium mb-1">Province</label>
-                <input id="province" class="flux-form-control" type="text" wire:model="province" placeholder="Province">
+                <input id="province" class="flux-form-control" type="text" wire:model="province"
+                    placeholder="Province">
             </div>
             <div class="flex flex-col">
                 <label for="city" class="text-xs font-medium mb-1">City</label>
-                <input id="city" class="flux-form-control" type="text" wire:model="city" placeholder="City">
+                <input id="city" class="flux-form-control" type="text" wire:model="city"
+                    placeholder="City">
             </div>
             <div class="flex flex-col">
                 <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
-                <input id="barangay" class="flux-form-control" type="text" wire:model="barangay" placeholder="Barangay">
+                <input id="barangay" class="flux-form-control" type="text" wire:model="barangay"
+                    placeholder="Barangay">
             </div>
             <div class="flex flex-col">
                 <label for="street" class="text-xs font-medium mb-1">Street</label>
-                <input id="street" class="flux-form-control" type="text" wire:model="street" placeholder="Street">
+                <input id="street" class="flux-form-control" type="text" wire:model="street"
+                    placeholder="Street">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
+                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code"
+                    placeholder="Zip Code">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
@@ -503,8 +518,8 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
             <div class="flex flex-col md:col-span-3">
                 <label for="father_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="father_last_name" class="flux-form-control w-full" type="text" wire:model="father_last_name"
-                    placeholder="Last Name">
+                <input id="father_last_name" class="flux-form-control w-full" type="text"
+                    wire:model="father_last_name" placeholder="Last Name">
             </div>
             <div class="flex flex-col md:col-span-3">
                 <label for="father_first_name" class="text-xs font-medium mb-1">First Name</label>
@@ -536,8 +551,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="father_nationality" class="text-xs font-medium mb-1">Father's Nationality</label>
-                <input id="father_nationality" class="flux-form-control" type="text" wire:model="father_nationality"
-                    placeholder="Father's Nationality">
+                <input id="father_nationality" class="flux-form-control" type="text"
+                    wire:model="father_nationality" placeholder="Father's Nationality">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -548,8 +563,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="father_contact_no" class="text-xs font-medium mb-1">Father's Contact No</label>
-                <input id="father_contact_no" class="flux-form-control" type="text" wire:model="father_contact_no"
-                    placeholder="Father's Contact No">
+                <input id="father_contact_no" class="flux-form-control" type="text"
+                    wire:model="father_contact_no" placeholder="Father's Contact No">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
@@ -557,8 +572,8 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
             <div class="flex flex-col md:col-span-3">
                 <label for="mother_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="mother_last_name" class="flux-form-control w-full" type="text" wire:model="mother_last_name"
-                    placeholder="Last Name">
+                <input id="mother_last_name" class="flux-form-control w-full" type="text"
+                    wire:model="mother_last_name" placeholder="Last Name">
             </div>
             <div class="flex flex-col md:col-span-3">
                 <label for="mother_first_name" class="text-xs font-medium mb-1">First Name</label>
@@ -590,8 +605,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="mother_nationality" class="text-xs font-medium mb-1">Mother's Nationality</label>
-                <input id="mother_nationality" class="flux-form-control" type="text" wire:model="mother_nationality"
-                    placeholder="Mother's Nationality">
+                <input id="mother_nationality" class="flux-form-control" type="text"
+                    wire:model="mother_nationality" placeholder="Mother's Nationality">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -602,8 +617,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="mother_contact_no" class="text-xs font-medium mb-1">Mother's Contact No</label>
-                <input id="mother_contact_no" class="flux-form-control" type="text" wire:model="mother_contact_no"
-                    placeholder="Mother's Contact No">
+                <input id="mother_contact_no" class="flux-form-control" type="text"
+                    wire:model="mother_contact_no" placeholder="Mother's Contact No">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
@@ -611,8 +626,8 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
             <div class="flex flex-col md:col-span-3">
                 <label for="spouse_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="spouse_last_name" class="flux-form-control w-full" type="text" wire:model="spouse_last_name"
-                    placeholder="Last Name">
+                <input id="spouse_last_name" class="flux-form-control w-full" type="text"
+                    wire:model="spouse_last_name" placeholder="Last Name">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col md:col-span-3">
@@ -647,8 +662,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="spouse_nationality" class="text-xs font-medium mb-1">Spouse's Nationality</label>
-                <input id="spouse_nationality" class="flux-form-control" type="text" wire:model="spouse_nationality"
-                    placeholder="Spouse's Nationality">
+                <input id="spouse_nationality" class="flux-form-control" type="text"
+                    wire:model="spouse_nationality" placeholder="Spouse's Nationality">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -659,8 +674,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="spouse_contact_no" class="text-xs font-medium mb-1">Spouse's Contact No</label>
-                <input id="spouse_contact_no" class="flux-form-control" type="text" wire:model="spouse_contact_no"
-                    placeholder="Spouse's Contact No">
+                <input id="spouse_contact_no" class="flux-form-control" type="text"
+                    wire:model="spouse_contact_no" placeholder="Spouse's Contact No">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>

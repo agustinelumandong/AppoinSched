@@ -39,7 +39,7 @@ new class extends Component {
 
 <div title="Client Dashboard">
 
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <div class="space-y-6">
         <div class="flex justify-between items-center">
@@ -53,12 +53,13 @@ new class extends Component {
             <h4 class="text-3xl font-bold text-gray-900">Available Offices</h4>
         </div>
 
-        @if(!$hasCompleteProfile)
+        @if (!$hasCompleteProfile)
             <div id="alert" class="opacity-100 transition-all" x-data="{ show: true }" x-show="show">
                 <div class="flux-card p-4 bg-yellow-50 border-yellow-200 shadow-lg rounded-lg">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
                                 </path>
@@ -72,7 +73,8 @@ new class extends Component {
                                 </div>
                             </div>
                         </div>
-                        <button x-on:click="show = false" class="text-yellow-600 hover:text-yellow-800 focus:outline-none">
+                        <button x-on:click="show = false"
+                            class="text-yellow-600 hover:text-yellow-800 focus:outline-none">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12">
@@ -115,19 +117,22 @@ new class extends Component {
                                     Services
                                 </p> --}}
                             </div>
-                            <p class="text-sm text-gray-500 mt-2   text-decoration-none text-black">{{ $office->description }}
+                            <p class="text-sm text-gray-500 mt-2   text-decoration-none text-black">
+                                {{ $office->description }}
                             </p>
                         </header>
                         {{-- Footer --}}
                         <footer class="flex items-center justify-between pt-10">
-                            <span class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
+                            <span
+                                class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
                                 Office</span>
                         </footer>
                     </a>
                 @empty
                     <div class="flux-card p-4 bg-red-50 border-red-200 shadow-lg rounded-lg">
                         <p class="text-gray-500">No offices found</p>
-                        <p class="text-sm text-gray-500">You don't have any offices yet. Please create one to get started.</p>
+                        <p class="text-sm text-gray-500">You don't have any offices yet. Please create one to get
+                            started.</p>
                     </div>
                 @endforelse
             </div>
@@ -136,7 +141,8 @@ new class extends Component {
             <div class="container-fluid mx-auto px-4 py-8">
                 <div class="mb-6">
                     <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
-                        <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff</p>
+                        <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff
+                        </p>
                 </div>
                 <livewire:components.full-calendar />
             </div>

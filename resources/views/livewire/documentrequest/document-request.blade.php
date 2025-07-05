@@ -36,7 +36,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
     @include('components.alert')
 
     @include('livewire.documentrequest.components.header')

@@ -107,7 +107,7 @@ new class extends Component {
 }; ?>
 
 <div class="max-w-4xl mx-auto p-6 space-y-6">
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
     @include('components.alert')
 
     <!-- Header -->

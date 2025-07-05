@@ -6,8 +6,7 @@ use App\Models\Services;
 use Illuminate\Support\Str;
 use Livewire\Attributes\{Title};
 
-new #[Title('Office Details')]
-    class extends Component {
+new #[Title('Office Details')] class extends Component {
     public Offices $office;
     public $services;
 
@@ -16,11 +15,10 @@ new #[Title('Office Details')]
         $this->office = $office;
         $this->services = $office->services()->where('is_active', 1)->get();
     }
-
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <!-- Flash Messages -->
     @include('components.alert')
@@ -114,8 +112,8 @@ new #[Title('Office Details')]
     @push('scripts')
         <script>
             // Auto-hide alerts after 5 seconds
-            document.addEventListener('DOMContentLoaded', function () {
-                setTimeout(function () {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
                     const alerts = document.querySelectorAll('.alert');
                     alerts.forEach(alert => {
                         if (alert) {

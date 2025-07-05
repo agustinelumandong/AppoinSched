@@ -46,7 +46,7 @@ new class extends Component {
             Log::info('Slot picker updated', [
                 'date' => $this->selectedDate,
                 'time' => $this->selectedTime,
-                'appointment_id' => $this->appointment?->id
+                'appointment_id' => $this->appointment?->id,
             ]);
         } catch (\Exception $e) {
             Log::error('Error handling slot update: ' . $e->getMessage());
@@ -143,7 +143,7 @@ new class extends Component {
                 'office_id' => $this->appointment->office_id,
                 'staff_id' => $this->appointment->staff_id,
                 'appointment_id' => $this->appointment->id,
-                'has_conflict' => $conflict
+                'has_conflict' => $conflict,
             ]);
 
             return $conflict;
@@ -151,7 +151,7 @@ new class extends Component {
             Log::error('Error checking for conflicts: ' . $e->getMessage(), [
                 'date' => $this->selectedDate,
                 'time' => $this->selectedTime,
-                'appointment_id' => $this->appointment->id
+                'appointment_id' => $this->appointment->id,
             ]);
             return true; // Return true to prevent booking in case of error
         }
@@ -202,7 +202,7 @@ new class extends Component {
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <!-- Flash Messages -->
     @include('components.alert')

@@ -4,17 +4,21 @@
     border-radius: 12px;
     border: 1px solid #e5e7eb;
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    transition: all 0.2s ease-in-out;
 }
 
 .flux-card:hover {
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
+.flux-select-option {
+    border-radius: 8px;
+    border: 1px solid #d1d5db;
+    padding: 0.75rem;
+}
+
 .flux-btn {
     border-radius: 8px;
     font-weight: 500;
-    transition: all 0.2s ease-in-out;
     border: none;
     padding: 0.5rem 1rem;
     font-size: 0.875rem;
@@ -25,10 +29,19 @@
     color: white;
 }
 
+.flux-btn-primary.flux-btn-active {
+    background: #2563eb;
+    color: white;
+}
+
 .flux-btn-primary:hover {
     background: #2563eb;
     color: white;
-    transform: translateY(-1px);
+}
+
+.flux-btn-active-primary {
+    background: #2563eb !important;
+    color: white !important;
 }
 
 .flux-btn-secondary {
@@ -120,6 +133,28 @@
     color: #065f46;
 }
 
+.flux-badge-danger {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.flux-badge-warning {
+    background: #fef3c7;
+    color: #eab308;
+}
+
+.flux-badge-info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+
+.flux-badge-light {
+    background: #f9fafb;
+    color: #6b7280;
+}
+
+
 .flux-modal {
     backdrop-filter: blur(4px);
 }
@@ -130,10 +165,17 @@
     box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
+.flux-input-primary {
+    border-radius: 8px;
+    border: 1px solid #2563eb !important;
+    padding: 0.75rem;
+    font-size: 0.875rem;
+    color: #2563eb;
+}
+
 .flux-form-control {
     border-radius: 8px;
     border: 1px solid #d1d5db;
-    transition: all 0.2s ease-in-out;
     padding: 0.75rem;
     width: 100%;
 }
@@ -144,7 +186,10 @@
     outline: none;
 }
 
-
+.flux-form-control.search {
+    width: 250px;
+    padding: 0.5rem 1rem;
+}
 
 .action-buttons {
     display: flex;
@@ -176,4 +221,121 @@
     font-size: 0.875rem;
     font-weight: 500;
     margin-top: 0.5rem;
+}
+
+/* Flux UI Pagination Styles */
+.flux-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+}
+
+.flux-pagination .pagination {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0;
+}
+
+.flux-pagination .page-item {
+    border: none;
+    margin: 0;
+}
+
+.flux-pagination .page-link {
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 0.5rem 0.75rem;
+    color: #374151;
+    background: white;
+    font-weight: 500;
+    font-size: 0.875rem;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 2.5rem;
+    height: 2.5rem;
+}
+
+.flux-pagination .page-link:hover {
+    background: #f9fafb;
+    border-color: #9ca3af;
+    color: #374151;
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+
+.flux-pagination .page-link:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+    color: #374151;
+}
+
+.flux-pagination .page-item.active .page-link {
+    background: #3b82f6;
+    border-color: #3b82f6;
+    color: white;
+    font-weight: 600;
+}
+
+.flux-pagination .page-item.active .page-link:hover {
+    background: #2563eb;
+    border-color: #2563eb;
+    color: white;
+}
+
+.flux-pagination .page-item.disabled .page-link {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.flux-pagination .page-item.disabled .page-link:hover {
+    background: #f9fafb;
+    border-color: #e5e7eb;
+    color: #9ca3af;
+    transform: none;
+    box-shadow: none;
+}
+
+/* Loading state for pagination buttons */
+.flux-pagination .page-link[wire\:loading\.attr="disabled"] {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+/* Responsive pagination */
+@media (max-width: 576px) {
+    .flux-pagination .page-link {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.8125rem;
+        min-width: 2rem;
+        height: 2rem;
+    }
+}
+
+/* Form Field Underline Styling */
+.form-field-underline {
+    min-height: 1.5rem;
+    border-bottom-style: solid;
+    border-bottom-width: 1px;
+    transition: border-color 0.2s ease-in-out;
+}
+
+.form-field-underline:hover {
+    border-bottom-color: #9ca3af;
+}
+
+.form-field-underline:focus-within {
+    border-bottom-color: #3b82f6;
+}
+
+.flux-btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
 }
