@@ -155,7 +155,7 @@ new class extends Component {
 
                     <span
                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {{ auth()->user()->getAssignedOffice()->name }}
+                        {{ auth()->user()->getAssignedOffice()->name ?? 'No assigned office' }}
                     </span>
 
                 </div>

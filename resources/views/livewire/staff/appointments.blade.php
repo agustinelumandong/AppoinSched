@@ -265,7 +265,7 @@ new class extends Component {
 
                     <span
                         class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                        {{ auth()->user()->getAssignedOffice()->name }}
+                        {{ auth()->user()->getAssignedOffice()->name ?? 'No assigned office' }}
                     </span>
 
 
@@ -310,8 +310,7 @@ new class extends Component {
                             <td>
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <div
-                                            class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                                             <span class="text-sm font-medium text-gray-700">
                                                 {{ $appointment->user->initials() }}
                                             </span>
