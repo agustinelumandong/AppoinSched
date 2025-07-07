@@ -6,8 +6,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     /**
      * Run the migrations.
      */
@@ -24,6 +23,11 @@ return new class extends Migration
             $table->enum('suffix', ['Jr.', 'Sr.'])->nullable();
             $table->string('email');
             $table->string('contact_no')->nullable();
+            $table->string('contact_first_name')->nullable()->after('contact_no');
+            $table->string('contact_last_name')->nullable()->after('contact_first_name');
+            $table->string('contact_middle_name')->nullable()->after('contact_last_name');
+            $table->string('contact_email')->nullable()->after('contact_middle_name');
+            $table->string('contact_phone')->nullable()->after('contact_email');
             $table->enum('sex_at_birth', ['Male', 'Female'])->nullable();
             $table->date('date_of_birth')->nullable();
             $table->string('place_of_birth')->nullable();
@@ -69,6 +73,25 @@ return new class extends Migration
             $table->string('spouse_nationality')->nullable();
             $table->string('spouse_religion')->nullable();
             $table->string('spouse_contact_no')->nullable();
+
+            // Death Certificate specific fields
+            $table->string('deceased_last_name')->nullable();
+            $table->string('deceased_first_name')->nullable();
+            $table->string('deceased_middle_name')->nullable();
+            $table->date('death_date')->nullable();
+            $table->time('death_time')->nullable();
+            $table->string('death_place')->nullable();
+            $table->enum('relationship_to_deceased', [
+                'Spouse',
+                'Child',
+                'Parent',
+                'Sibling',
+                'Grandchild',
+                'Grandparent',
+                'Other Relative',
+                'Legal Representative',
+                'Other'
+            ])->nullable();
 
             // Indicates if this is for the requesting user or someone else
             $table->enum('request_for', ['myself', 'someone_else'])->default('myself');
