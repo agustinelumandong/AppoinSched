@@ -59,6 +59,8 @@ new class extends Component {
     public string $spouse_nationality = '';
     public string $spouse_religion = '';
     public string $spouse_contact_no = '';
+    public bool $father_is_unknown = false;
+    public bool $spouse_is_unknown = false;
 
     public function mount()
     {
@@ -118,6 +120,27 @@ new class extends Component {
         $this->spouse_nationality = $this->userFamily->spouse_nationality ?? '';
         $this->spouse_religion = $this->userFamily->spouse_religion ?? '';
         $this->spouse_contact_no = $this->userFamily->spouse_contact_no ?? '';
+
+        // Set father_is_unknown if all father fields are N/A
+        $this->father_is_unknown = (
+            $this->father_last_name === 'N/A' &&
+            $this->father_first_name === 'N/A' &&
+            $this->father_middle_name === 'N/A' &&
+            $this->father_suffix === 'N/A' &&
+            $this->father_nationality === 'N/A' &&
+            $this->father_religion === 'N/A' &&
+            $this->father_contact_no === 'N/A'
+        );
+        // Set spouse_is_unknown if all spouse fields are N/A
+        $this->spouse_is_unknown = (
+            $this->spouse_last_name === 'N/A' &&
+            $this->spouse_first_name === 'N/A' &&
+            $this->spouse_middle_name === 'N/A' &&
+            $this->spouse_suffix === 'N/A' &&
+            $this->spouse_nationality === 'N/A' &&
+            $this->spouse_religion === 'N/A' &&
+            $this->spouse_contact_no === 'N/A'
+        );
     }
 
     public function updatePersonalInformation()
@@ -160,14 +183,14 @@ new class extends Component {
             'barangay' => ['nullable', 'string', 'max:100'],
             // 'street' => ['nullable', 'string', 'max:255'],
             'zip_code' => ['nullable', 'string', 'max:20'],
-            'father_last_name' => ['required', 'string', 'max:255'],
-            'father_first_name' => ['required', 'string', 'max:255'],
+            'father_last_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
+            'father_first_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
             'father_middle_name' => ['nullable', 'string', 'max:255'],
             'father_suffix' => ['nullable', 'string', 'max:10'],
             'father_birthdate' => ['nullable', 'date'],
-            'father_nationality' => ['required', 'string', 'max:100'],
-            'father_religion' => ['required', 'string', 'max:100'],
-            'father_contact_no' => ['required', 'string', 'max:20'],
+            'father_nationality' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
+            'father_religion' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
+            'father_contact_no' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
             'mother_last_name' => ['required', 'string', 'max:255'],
             'mother_first_name' => ['required', 'string', 'max:255'],
             'mother_middle_name' => ['nullable', 'string', 'max:255'],
@@ -176,14 +199,14 @@ new class extends Component {
             'mother_nationality' => ['required', 'string', 'max:100'],
             'mother_religion' => ['required', 'string', 'max:100'],
             'mother_contact_no' => ['required', 'string', 'max:20'],
-            'spouse_last_name' => ['nullable', 'string', 'max:255'],
-            'spouse_first_name' => ['nullable', 'string', 'max:255'],
+            'spouse_last_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
+            'spouse_first_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
             'spouse_middle_name' => ['nullable', 'string', 'max:255'],
             'spouse_suffix' => ['nullable', 'string', 'max:10'],
             'spouse_birthdate' => ['nullable', 'date'],
-            'spouse_nationality' => ['nullable', 'string', 'max:100'],
-            'spouse_religion' => ['nullable', 'string', 'max:100'],
-            'spouse_contact_no' => ['nullable', 'string', 'max:20'],
+            'spouse_nationality' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
+            'spouse_religion' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
+            'spouse_contact_no' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:20'],
         ]);
 
         // Update User
@@ -273,6 +296,52 @@ new class extends Component {
             'hasCompleteAddress' => $this->user->hasCompleteAddress(),
             'hasCompleteFamilyInfo' => $this->user->hasCompleteFamilyInfo(),
         ];
+    }
+
+    public function updatedFatherIsUnknown($value)
+    {
+        if ($value) {
+            $this->father_last_name = 'N/A';
+            $this->father_first_name = 'N/A';
+            $this->father_middle_name = 'N/A';
+            $this->father_suffix = 'N/A';
+            $this->father_birthdate = '';
+            $this->father_nationality = 'N/A';
+            $this->father_religion = 'N/A';
+            $this->father_contact_no = 'N/A';
+        } else {
+            $this->father_last_name = '';
+            $this->father_first_name = '';
+            $this->father_middle_name = '';
+            $this->father_suffix = 'N/A';
+            $this->father_birthdate = '';
+            $this->father_nationality = '';
+            $this->father_religion = '';
+            $this->father_contact_no = '';
+        }
+    }
+
+    public function updatedSpouseIsUnknown($value)
+    {
+        if ($value) {
+            $this->spouse_last_name = 'N/A';
+            $this->spouse_first_name = 'N/A';
+            $this->spouse_middle_name = 'N/A';
+            $this->spouse_suffix = 'N/A';
+            $this->spouse_birthdate = '';
+            $this->spouse_nationality = 'N/A';
+            $this->spouse_religion = 'N/A';
+            $this->spouse_contact_no = 'N/A';
+        } else {
+            $this->spouse_last_name = '';
+            $this->spouse_first_name = '';
+            $this->spouse_middle_name = '';
+            $this->spouse_suffix = 'N/A';
+            $this->spouse_birthdate = '';
+            $this->spouse_nationality = '';
+            $this->spouse_religion = '';
+            $this->spouse_contact_no = '';
+        }
     }
 }; ?>
 
@@ -401,19 +470,12 @@ new class extends Component {
                     placeholder="Contact No">
             </div>
             <div class="flex flex-col">
-                <label class="text-xs font-medium mb-1">Sex at Birth</label>
-                <div class="flex flex-col md:flex-row gap-4">
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="radio" name="sex_at_birth" class="flux-radio" wire:model="sex_at_birth"
-                            value="Male">
-                        <span class="ml-2">Male</span>
-                    </label>
-                    <label class="inline-flex items-center cursor-pointer">
-                        <input type="radio" name="sex_at_birth" class="flux-radio" wire:model="sex_at_birth"
-                            value="Female">
-                        <span class="ml-2">Female</span>
-                    </label>
-                </div>
+                <label for="sex_at_birth" class="text-xs font-medium mb-1">Sex at Birth</label>
+                <select id="sex_at_birth" class="flux-form-control" wire:model="sex_at_birth">
+                    <option value="">Select Sex at Birth</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                </select>
             </div>
             <div class="flex flex-col">
                 <label for="date_of_birth" class="text-xs font-medium mb-1">Date of Birth</label>
@@ -440,8 +502,7 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col">
                 <label for="religion" class="text-xs font-medium mb-1">Religion</label>
-                <input id="religion" class="flux-form-control" type="text" wire:model="religion"
-                    placeholder="Religion">
+                <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -478,34 +539,28 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex flex-col">
                 <label for="region" class="text-xs font-medium mb-1">Region</label>
-                <input id="region" class="flux-form-control" type="text" wire:model="region"
-                    placeholder="Region">
+                <input id="region" class="flux-form-control" type="text" wire:model="region" placeholder="Region">
             </div>
             <div class="flex flex-col">
                 <label for="province" class="text-xs font-medium mb-1">Province</label>
-                <input id="province" class="flux-form-control" type="text" wire:model="province"
-                    placeholder="Province">
+                <input id="province" class="flux-form-control" type="text" wire:model="province" placeholder="Province">
             </div>
             <div class="flex flex-col">
                 <label for="city" class="text-xs font-medium mb-1">City</label>
-                <input id="city" class="flux-form-control" type="text" wire:model="city"
-                    placeholder="City">
+                <input id="city" class="flux-form-control" type="text" wire:model="city" placeholder="City">
             </div>
             <div class="flex flex-col">
                 <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
-                <input id="barangay" class="flux-form-control" type="text" wire:model="barangay"
-                    placeholder="Barangay">
+                <input id="barangay" class="flux-form-control" type="text" wire:model="barangay" placeholder="Barangay">
             </div>
             <div class="flex flex-col">
                 <label for="street" class="text-xs font-medium mb-1">Street</label>
-                <input id="street" class="flux-form-control" type="text" wire:model="street"
-                    placeholder="Street">
+                <input id="street" class="flux-form-control" type="text" wire:model="street" placeholder="Street">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code"
-                    placeholder="Zip Code">
+                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
@@ -515,65 +570,109 @@ new class extends Component {
     <div class="flux-card p-6">
         <h2 class="text-xl font-bold mb-4">Family Information</h2>
         <h4 class="text-lg font-bold mb-4">Father</h4>
+        <div class="form-control mb-2">
+            <label class="label cursor-pointer">
+                <span class="label-text">Father is Unknown</span>
+                <input type="checkbox" wire:model.live="father_is_unknown" class="checkbox" />
+            </label>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            <div class="flex flex-col md:col-span-3">
-                <label for="father_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="father_last_name" class="flux-form-control w-full" type="text"
-                    wire:model="father_last_name" placeholder="Last Name">
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label for="father_first_name" class="text-xs font-medium mb-1">First Name</label>
-                <input id="father_first_name" class="flux-form-control w-full" type="text"
-                    wire:model="father_first_name" placeholder="First Name">
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label for="father_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
-                <input id="father_middle_name" class="flux-form-control w-full" type="text"
-                    wire:model="father_middle_name" placeholder="Middle Name">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col md:col-span-1">
-                <label for="father_suffix" class="text-xs font-medium mb-1">Suffix</label>
-                <select id="father_suffix" class="flux-form-control w-full" wire:model="father_suffix">
-                    <option value="">Suffix</option>
-                    <option value="N/A">N/A</option>
-                    <option value="Jr.">Jr.</option>
-                    <option value="Sr.">Sr.</option>
-                </select>
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
+            @if($father_is_unknown)
+                <div class="flex flex-col md:col-span-3">
+                    <label class="text-xs font-medium mb-1">Last Name</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label class="text-xs font-medium mb-1">First Name</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label class="text-xs font-medium mb-1">Middle Name</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col md:col-span-1">
+                    <label class="text-xs font-medium mb-1">Suffix</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+            @else
+                <div class="flex flex-col md:col-span-3">
+                    <label for="father_last_name" class="text-xs font-medium mb-1">Last Name</label>
+                    <input id="father_last_name" class="flux-form-control w-full" type="text"
+                        wire:model="father_last_name" placeholder="Last Name">
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label for="father_first_name" class="text-xs font-medium mb-1">First Name</label>
+                    <input id="father_first_name" class="flux-form-control w-full" type="text"
+                        wire:model="father_first_name" placeholder="First Name">
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label for="father_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
+                    <input id="father_middle_name" class="flux-form-control w-full" type="text"
+                        wire:model="father_middle_name" placeholder="Middle Name">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col md:col-span-1">
+                    <label for="father_suffix" class="text-xs font-medium mb-1">Suffix</label>
+                    <select id="father_suffix" class="flux-form-control w-full" wire:model="father_suffix">
+                        <option value="">Suffix</option>
+                        <option value="N/A">N/A</option>
+                        <option value="Jr.">Jr.</option>
+                        <option value="Sr.">Sr.</option>
+                    </select>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+            @endif
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div class="flex flex-col">
-                <label for="father_birthdate" class="text-xs font-medium mb-1">Father's Birthdate</label>
-                <input id="father_birthdate" class="flux-form-control" type="date" wire:model="father_birthdate"
-                    placeholder="Father's Birthdate">
-            </div>
-            <div class="flex flex-col">
-                <label for="father_nationality" class="text-xs font-medium mb-1">Father's Nationality</label>
-                <input id="father_nationality" class="flux-form-control" type="text"
-                    wire:model="father_nationality" placeholder="Father's Nationality">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="father_religion" class="text-xs font-medium mb-1">Father's Religion</label>
-                <input id="father_religion" class="flux-form-control" type="text" wire:model="father_religion"
-                    placeholder="Father's Religion">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="father_contact_no" class="text-xs font-medium mb-1">Father's Contact No</label>
-                <input id="father_contact_no" class="flux-form-control" type="text"
-                    wire:model="father_contact_no" placeholder="Father's Contact No">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
+            @if($father_is_unknown)
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Father's Birthdate</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Father's Nationality</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Father's Religion</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Father's Contact No</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+            @else
+                <div class="flex flex-col">
+                    <label for="father_birthdate" class="text-xs font-medium mb-1">Father's Birthdate</label>
+                    <input id="father_birthdate" class="flux-form-control" type="date" wire:model="father_birthdate"
+                        placeholder="Father's Birthdate">
+                </div>
+                <div class="flex flex-col">
+                    <label for="father_nationality" class="text-xs font-medium mb-1">Father's Nationality</label>
+                    <input id="father_nationality" class="flux-form-control" type="text"
+                        wire:model="father_nationality" placeholder="Father's Nationality">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col">
+                    <label for="father_religion" class="text-xs font-medium mb-1">Father's Religion</label>
+                    <input id="father_religion" class="flux-form-control" type="text" wire:model="father_religion"
+                        placeholder="Father's Religion">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col">
+                    <label for="father_contact_no" class="text-xs font-medium mb-1">Father's Contact No</label>
+                    <input id="father_contact_no" class="flux-form-control" type="text"
+                        wire:model="father_contact_no" placeholder="Father's Contact No">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+            @endif
         </div>
         <h4 class="text-lg font-bold mb-4">Mother</h4>
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
             <div class="flex flex-col md:col-span-3">
                 <label for="mother_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="mother_last_name" class="flux-form-control w-full" type="text"
-                    wire:model="mother_last_name" placeholder="Last Name">
+                <input id="mother_last_name" class="flux-form-control w-full" type="text" wire:model="mother_last_name"
+                    placeholder="Last Name">
             </div>
             <div class="flex flex-col md:col-span-3">
                 <label for="mother_first_name" class="text-xs font-medium mb-1">First Name</label>
@@ -605,8 +704,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="mother_nationality" class="text-xs font-medium mb-1">Mother's Nationality</label>
-                <input id="mother_nationality" class="flux-form-control" type="text"
-                    wire:model="mother_nationality" placeholder="Mother's Nationality">
+                <input id="mother_nationality" class="flux-form-control" type="text" wire:model="mother_nationality"
+                    placeholder="Mother's Nationality">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -617,67 +716,111 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="mother_contact_no" class="text-xs font-medium mb-1">Mother's Contact No</label>
-                <input id="mother_contact_no" class="flux-form-control" type="text"
-                    wire:model="mother_contact_no" placeholder="Mother's Contact No">
+                <input id="mother_contact_no" class="flux-form-control" type="text" wire:model="mother_contact_no"
+                    placeholder="Mother's Contact No">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
         <h4 class="text-lg font-bold mb-4">Spouse</h4>
+        <div class="form-control mb-2">
+            <label class="label cursor-pointer">
+                <span class="label-text">Spouse is Unknown</span>
+                <input type="checkbox" wire:model.live="spouse_is_unknown" class="checkbox" />
+            </label>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            <div class="flex flex-col md:col-span-3">
-                <label for="spouse_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="spouse_last_name" class="flux-form-control w-full" type="text"
-                    wire:model="spouse_last_name" placeholder="Last Name">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label for="spouse_first_name" class="text-xs font-medium mb-1">First Name</label>
-                <input id="spouse_first_name" class="flux-form-control w-full" type="text"
-                    wire:model="spouse_first_name" placeholder="First Name">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label for="spouse_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
-                <input id="spouse_middle_name" class="flux-form-control w-full" type="text"
-                    wire:model="spouse_middle_name" placeholder="Middle Name">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col md:col-span-1">
-                <label for="spouse_suffix" class="text-xs font-medium mb-1">Suffix</label>
-                <select id="spouse_suffix" class="flux-form-control w-full" wire:model="spouse_suffix">
-                    <option value="">Suffix</option>
-                    <option value="N/A">N/A</option>
-                    <option value="Jr.">Jr.</option>
-                    <option value="Sr.">Sr.</option>
-                </select>
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
+            @if($spouse_is_unknown)
+                <div class="flex flex-col md:col-span-3">
+                    <label class="text-xs font-medium mb-1">Last Name</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label class="text-xs font-medium mb-1">First Name</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label class="text-xs font-medium mb-1">Middle Name</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col md:col-span-1">
+                    <label class="text-xs font-medium mb-1">Suffix</label>
+                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
+                </div>
+            @else
+                <div class="flex flex-col md:col-span-3">
+                    <label for="spouse_last_name" class="text-xs font-medium mb-1">Last Name</label>
+                    <input id="spouse_last_name" class="flux-form-control w-full" type="text"
+                        wire:model="spouse_last_name" placeholder="Last Name">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label for="spouse_first_name" class="text-xs font-medium mb-1">First Name</label>
+                    <input id="spouse_first_name" class="flux-form-control w-full" type="text"
+                        wire:model="spouse_first_name" placeholder="First Name">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col md:col-span-3">
+                    <label for="spouse_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
+                    <input id="spouse_middle_name" class="flux-form-control w-full" type="text"
+                        wire:model="spouse_middle_name" placeholder="Middle Name">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col md:col-span-1">
+                    <label for="spouse_suffix" class="text-xs font-medium mb-1">Suffix</label>
+                    <select id="spouse_suffix" class="flux-form-control w-full" wire:model="spouse_suffix">
+                        <option value="">Suffix</option>
+                        <option value="N/A">N/A</option>
+                        <option value="Jr.">Jr.</option>
+                        <option value="Sr.">Sr.</option>
+                    </select>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+            @endif
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div class="flex flex-col">
-                <label for="spouse_birthdate" class="text-xs font-medium mb-1">Spouse's Birthdate</label>
-                <input id="spouse_birthdate" class="flux-form-control" type="date" wire:model="spouse_birthdate"
-                    placeholder="Spouse's Birthdate">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="spouse_nationality" class="text-xs font-medium mb-1">Spouse's Nationality</label>
-                <input id="spouse_nationality" class="flux-form-control" type="text"
-                    wire:model="spouse_nationality" placeholder="Spouse's Nationality">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="spouse_religion" class="text-xs font-medium mb-1">Spouse's Religion</label>
-                <input id="spouse_religion" class="flux-form-control" type="text" wire:model="spouse_religion"
-                    placeholder="Spouse's Religion">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="spouse_contact_no" class="text-xs font-medium mb-1">Spouse's Contact No</label>
-                <input id="spouse_contact_no" class="flux-form-control" type="text"
-                    wire:model="spouse_contact_no" placeholder="Spouse's Contact No">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
+            @if($spouse_is_unknown)
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Spouse's Birthdate</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Spouse's Nationality</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Spouse's Religion</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+                <div class="flex flex-col">
+                    <label class="text-xs font-medium mb-1">Spouse's Contact No</label>
+                    <span class="flux-form-control bg-gray-100">N/A</span>
+                </div>
+            @else
+                <div class="flex flex-col">
+                    <label for="spouse_birthdate" class="text-xs font-medium mb-1">Spouse's Birthdate</label>
+                    <input id="spouse_birthdate" class="flux-form-control" type="date" wire:model="spouse_birthdate"
+                        placeholder="Spouse's Birthdate">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col">
+                    <label for="spouse_nationality" class="text-xs font-medium mb-1">Spouse's Nationality</label>
+                    <input id="spouse_nationality" class="flux-form-control" type="text"
+                        wire:model="spouse_nationality" placeholder="Spouse's Nationality">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col">
+                    <label for="spouse_religion" class="text-xs font-medium mb-1">Spouse's Religion</label>
+                    <input id="spouse_religion" class="flux-form-control" type="text" wire:model="spouse_religion"
+                        placeholder="Spouse's Religion">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+                <div class="flex flex-col">
+                    <label for="spouse_contact_no" class="text-xs font-medium mb-1">Spouse's Contact No</label>
+                    <input id="spouse_contact_no" class="flux-form-control" type="text"
+                        wire:model="spouse_contact_no" placeholder="Spouse's Contact No">
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                </div>
+            @endif
         </div>
     </div>
 
