@@ -23,15 +23,6 @@ class Appointments extends Model
         'notes',
         'to_whom',
         'purpose',
-        'client_first_name',
-        'client_last_name',
-        'client_middle_name',
-        'client_email',
-        'client_phone',
-        'client_address',
-        'client_city',
-        'client_state',
-        'client_zip_code',
     ];
 
     /** @var array<int,string> */
@@ -66,6 +57,11 @@ class Appointments extends Model
         return $this->belongsTo(Services::class, 'service_id');
     }
 
+    public function appointmentDetails()
+    {
+        return $this->hasOne(AppointmentDetails::class, 'appointment_id');
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', self::STATUS_PENDING);
@@ -91,5 +87,9 @@ class Appointments extends Model
         return $query->where('status', self::STATUS_NO_SHOW);
     }
 
+    public function details()
+    {
+        return $this->hasOne(AppointmentDetails::class, 'appointment_id');
+    }
 
 }

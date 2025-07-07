@@ -14,7 +14,7 @@ new #[Title('Services')] class extends Component {
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">

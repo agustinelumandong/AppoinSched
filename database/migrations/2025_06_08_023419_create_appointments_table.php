@@ -20,6 +20,17 @@ return new class extends Migration {
             $table->time('booking_time');
             $table->enum('status', ['pending', 'approved', 'cancelled', 'completed', 'no-show'])->default('pending');
             $table->text('notes')->nullable();
+            $table->string('to_whom')->nullable()->after('notes');
+            $table->string('purpose')->nullable()->after('to_whom');
+            $table->string('client_first_name')->nullable()->after('purpose');
+            $table->string('client_last_name')->nullable()->after('client_first_name');
+            $table->string('client_middle_name')->nullable()->after('client_last_name');
+            $table->string('client_email')->nullable()->after('client_last_name');
+            $table->string('client_phone')->nullable()->after('client_email');
+            $table->string('client_address')->nullable()->after('client_phone');
+            $table->string('client_city')->nullable()->after('client_address');
+            $table->string('client_state')->nullable()->after('client_city');
+            $table->string('client_zip_code', 10)->nullable()->after('client_state');
             $table->timestamps();
         });
     }
