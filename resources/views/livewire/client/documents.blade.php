@@ -29,9 +29,18 @@ new class extends Component {
         $id = $this->selectedDocumentRequest->id; 
         $request = DocumentRequest::findOrFail($id);
         $method = $this->selectedPaymentMethod; 
-        $request->update([
-            'payment_status' => 'paid',
-        ]);
+        if($method === 'online') {
+            $request->update([
+                'payment_status' => 'paid',
+            ]);
+        } elseif($method === 'walkIn') {
+            $request->update([
+                'payment_status' => 'walk-in',
+            ]);
+            $mto_slug = 'municipal-treasurers-office';
+            $this->redirect(route('offices.service.appointment', ['office' => $mto_slug]));
+            
+        }
         $this->dispatch('close-modal-payment-method');
         $this->reset(); 
     }
