@@ -179,26 +179,10 @@ new class extends Component {
 
 <div>
 
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <!-- Flash Messages -->
-    <div>
-        @if (session()->has('success'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle me-2"></i>
-                {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        @if (session()->has('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-    </div>
+    @include('components.alert')
 
     <!-- Header -->
     @include('livewire.offices.components.header')

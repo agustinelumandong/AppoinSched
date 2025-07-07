@@ -334,3 +334,8 @@
 .form-field-underline:focus-within {
     border-bottom-color: #3b82f6;
 }
+
+.flux-btn-sm {
+    padding: 0.25rem 0.75rem;
+    font-size: 0.75rem;
+}

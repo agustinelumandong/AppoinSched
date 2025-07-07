@@ -6,8 +6,7 @@ use App\Models\Services;
 use Illuminate\Support\Str;
 use Livewire\Attributes\{Title};
 
-new #[Title('Office Details')]
-    class extends Component {
+new #[Title('Office Details')] class extends Component {
     public Offices $office;
     public $services;
 
@@ -16,30 +15,13 @@ new #[Title('Office Details')]
         $this->office = $office;
         $this->services = $office->services()->where('is_active', 1)->get();
     }
-
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
+
 
     <!-- Flash Messages -->
-    <div>
-        @if (session()->has('message'))
-            <div class="alert alert-success alert-dismissible fade show" role="alert">
-                <i class="bi bi-check-circle me-2"></i>
-                {{ session('message') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-
-        @if (session()->has('error'))
-            <div class="alert alert-danger alert-dismissible fade show" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
-                {{ session('error') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
-        @endif
-    </div>
+    @include('components.alert')
 
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
@@ -62,6 +44,29 @@ new #[Title('Office Details')]
         <div class="col-md-12">
             <h4 class="mb-3">Services Offered</h4>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+
+                <a href="{{ route('offices.service.appointment', ['office' => $office->slug]) }}"
+                    class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black">
+                    {{-- Header --}}
+                    <header class="flex flex-col ">
+                        <h3 class="text-lg font-bold  text-decoration-none text-black ">
+                            Appointment Booking
+                        </h3>
+                        <p class="text-sm text-gray-500  text-decoration-none text-black ">
+                            Book an appointment with the office
+                        </p>
+                        <p class="text-sm text-gray-800 font-bold  text-decoration-none text-black">
+                            Free
+                        </p>
+                    </header>
+                    {{-- Footer --}}
+                    <footer class="flex items-center justify-between pt-10">
+                        <span
+                            class="text-blue-50 hover:text-blue-700  text-decoration-none  flux-btn flux-btn-primary">Request
+                            Book Appointment</span>
+                    </footer>
+                </a>
+
                 @forelse($services as $service)
                     <a href="{{ route('offices.service.request', ['office' => $office->slug, 'service' => $service->slug]) }}"
                         class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
@@ -107,8 +112,8 @@ new #[Title('Office Details')]
     @push('scripts')
         <script>
             // Auto-hide alerts after 5 seconds
-            document.addEventListener('DOMContentLoaded', function () {
-                setTimeout(function () {
+            document.addEventListener('DOMContentLoaded', function() {
+                setTimeout(function() {
                     const alerts = document.querySelectorAll('.alert');
                     alerts.forEach(alert => {
                         if (alert) {

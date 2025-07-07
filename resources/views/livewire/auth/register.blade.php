@@ -32,7 +32,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));
-
+        // Assign default client role to new users
+        $user->assignRole('client');
         Auth::login($user);
 
         $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
@@ -47,64 +48,26 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     <form wire:submit="register" class="flex flex-col gap-6">
         <!-- Name -->
-        <flux:input
-            wire:model="first_name"
-            :label="__('First name')"
-            type="text"
-            required
-            autocomplete="name"
-            :placeholder="__('First name')"
-        />
+        <flux:input wire:model="first_name" :label="__('First name')" type="text" required autocomplete="name"
+            :placeholder="__('First name')" />
 
-        <flux:input
-            wire:model="middle_name"
-            :label="__('Middle name')"
-            type="text"
-            required
-            autocomplete="name"
-            :placeholder="__('Middle name')"
-        />
+        <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" required autocomplete="name"
+            :placeholder="__('Middle name')" />
 
-        <flux:input
-            wire:model="last_name"
-            :label="__('Last name')"
-            type="text"
-            required
-            autocomplete="name"
-            :placeholder="__('Last name')"
-        />
+        <flux:input wire:model="last_name" :label="__('Last name')" type="text" required autocomplete="name"
+            :placeholder="__('Last name')" />
 
         <!-- Email Address -->
-        <flux:input
-            wire:model="email"
-            :label="__('Email address')"
-            type="email"
-            required
-            autocomplete="email"
-            placeholder="email@example.com"
-        />
+        <flux:input wire:model="email" :label="__('Email address')" type="email" required autocomplete="email"
+            placeholder="email@example.com" />
 
         <!-- Password -->
-        <flux:input
-            wire:model="password"
-            :label="__('Password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Password')"
-            viewable
-        />
+        <flux:input wire:model="password" :label="__('Password')" type="password" required autocomplete="new-password"
+            :placeholder="__('Password')" viewable />
 
         <!-- Confirm Password -->
-        <flux:input
-            wire:model="password_confirmation"
-            :label="__('Confirm password')"
-            type="password"
-            required
-            autocomplete="new-password"
-            :placeholder="__('Confirm password')"
-            viewable
-        />
+        <flux:input wire:model="password_confirmation" :label="__('Confirm password')" type="password" required
+            autocomplete="new-password" :placeholder="__('Confirm password')" viewable />
 
         <div class="flex items-center justify-end">
             <flux:button type="submit" variant="primary" class="w-full">

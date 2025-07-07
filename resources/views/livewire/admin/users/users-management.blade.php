@@ -23,6 +23,17 @@ new class extends Component {
     public mixed $user = null;
     public bool $confirmDeletion = false;
 
+    public function mount()
+    {
+        if (
+            !auth()
+                ->user()
+                ->hasAnyRole(['admin', 'super-admin'])
+        ) {
+            abort(403, 'Unauthorized to manage users');
+        }
+    }
+
     public function saveUser()
     {
         $validated = $this->validate([
@@ -131,21 +142,10 @@ new class extends Component {
 }; ?>
 
 <div>
-    <link rel="stylesheet" href="{{ asset('css/fluxUI.css') }}">
 
-    <div>
-        @if (session()->has('success'))
-            <div class="alert alert-success">
-                {{ session('success') }}
-            </div>
-        @endif
 
-        @if (session()->has('error'))
-            <div class="alert alert-danger">
-                {{ session('error') }}
-            </div>
-        @endif
-    </div>
+    {{-- Flash Messages --}}
+    @include('components.alert')
 
     {{-- Header --}}
     @include('livewire.admin.users.components.header')

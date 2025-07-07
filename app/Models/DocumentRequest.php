@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
@@ -7,6 +9,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use App\Models\Offices;
 use App\Models\Services;
 use App\Models\User;
+use App\Models\DocumentRequestDetails;
 
 class DocumentRequest extends Model
 {
@@ -23,6 +26,8 @@ class DocumentRequest extends Model
         'purpose',
         'requested_date',
         'completed_date',
+        'payment_status',
+        'payment_reference',
     ];
 
     public function user()
@@ -68,6 +73,11 @@ class DocumentRequest extends Model
     public function scopeNoShow($query)
     {
         return $query->where('status', 'no-show');
+    }
+
+    public function details()
+    {
+        return $this->hasOne(DocumentRequestDetails::class);
     }
 
 }
