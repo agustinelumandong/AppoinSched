@@ -1,21 +1,24 @@
 <x-modal id="payment-method" title="Payment Method" size="max-w-2xl">
     <div class="modal-body">
-        {{ $selectedDocumentRequest->id ?? 'null' }}
+        {{-- Debug --}}
+        {{-- {{ $selectedDocumentRequest->id ?? 'null' }}  --}}
         <div class="row" x-data="{ selectedPaymentMethod: null }">
             <div class="col-md-6">
-                <div class="flux-card payment-option-card p-5 opacity-50" 
-                     style="cursor: not-allowed; transition: all 0.2s ease; height: 178px; position: relative;"
+                <div class="flux-card payment-option-card p-5" 
+                     style="cursor: pointer; transition: all 0.2s ease; height: 178px; position: relative;"
+                     x-on:click="selectedPaymentMethod = 'walkIn'; $wire.selectPaymentMethod('walkIn')"
+                     :class="{ 'border-primary bg-primary-subtle': selectedPaymentMethod === 'walkIn' }"
                      name="paymentMethod"
-                     value="walkIn"
-                     disabled>
-                    <!-- Coming Soon Overlay -->
-                    <div class="absolute inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center rounded-lg">
+                     value="walkIn">
+
+                      {{-- Debug --}} 
+                    {{-- <div class="absolute inset-0 bg-gray-100 bg-opacity-75 flex items-center justify-center rounded-lg">
                         <div class="text-center">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium text-danger">
                                 Walk-in Payment Coming Soon!
                             </span>
                         </div>
-                    </div>
+                    </div> --}}
                     
                     <div class="card-body">
                         <div class="d-flex align-items-center">

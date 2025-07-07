@@ -26,6 +26,8 @@ class DocumentRequest extends Model
         'purpose',
         'requested_date',
         'completed_date',
+        'payment_status',
+        'payment_reference',
     ];
 
     public function user()

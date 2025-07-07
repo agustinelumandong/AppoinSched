@@ -19,6 +19,8 @@ new #[Title('Document Request')] class extends Component {
     public int $step = 1;
     public string $to_whom = 'myself';
     public string $purpose = '';
+    public string $relationship = '';
+    public string $relationship_others = '';
 
     // User Information
     public string $first_name = '';
@@ -72,6 +74,9 @@ new #[Title('Document Request')] class extends Component {
     public string $street = '';
     public string $zip_code = '';
 
+    public bool $father_is_unknown = false;
+    public bool $spouse_is_unknown = false;
+
     // Death Certificate specific fields
     public string $deceased_last_name = '';
     public string $deceased_first_name = '';
@@ -111,6 +116,9 @@ new #[Title('Document Request')] class extends Component {
             session()->flash('warning', 'Please complete your profile information before making a document request.');
             $this->redirect(route('userinfo'));
         }
+
+        $this->updatedFatherIsUnknown($this->father_is_unknown);
+        $this->updatedSpouseIsUnknown($this->spouse_is_unknown);
 
         // Only populate user data if "myself" is selected
         if ($this->to_whom === 'myself') {
@@ -214,6 +222,52 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+    public function updatedFatherIsUnknown(bool $value): void
+    {
+        if ($value) {
+            $this->father_last_name = 'N/A';
+            $this->father_first_name = 'N/A';
+            $this->father_middle_name = 'N/A';
+            $this->father_suffix = 'N/A';
+            $this->father_birthdate = '';
+            $this->father_nationality = 'N/A';
+            $this->father_religion = 'N/A';
+            $this->father_contact_no = 'N/A';
+        } else {
+            $this->father_last_name = '';
+            $this->father_first_name = '';
+            $this->father_middle_name = '';
+            $this->father_suffix = '';
+            $this->father_birthdate = '';
+            $this->father_nationality = '';
+            $this->father_religion = '';
+            $this->father_contact_no = '';
+        }
+    }
+
+    public function updatedSpouseIsUnknown(bool $value): void
+    {
+        if ($value) {
+            $this->spouse_last_name = 'N/A';
+            $this->spouse_first_name = 'N/A';
+            $this->spouse_middle_name = 'N/A';
+            $this->spouse_suffix = 'N/A';
+            $this->spouse_birthdate = '';
+            $this->spouse_nationality = 'N/A';
+            $this->spouse_religion = 'N/A';
+            $this->spouse_contact_no = 'N/A';
+        } else {
+            $this->spouse_last_name = '';
+            $this->spouse_first_name = '';
+            $this->spouse_middle_name = '';
+            $this->spouse_suffix = '';
+            $this->spouse_birthdate = '';
+            $this->spouse_nationality = '';
+            $this->spouse_religion = '';
+            $this->spouse_contact_no = '';
+        }
+    }
+
     public function nextStep()
     {
         switch ($this->step) {
@@ -221,6 +275,9 @@ new #[Title('Document Request')] class extends Component {
                 $this->isLoading = true;
                 $this->validate([
                     'to_whom' => 'required',
+                    'relationship' => $this->to_whom === 'someone_else'
+                        ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
+                        : 'nullable|in:my_father,my_mother,my_son,my_daughter,others',
                 ]);
                 break;
             case 2:
@@ -261,16 +318,20 @@ new #[Title('Document Request')] class extends Component {
                     ];
 
                     if (($this->to_whom === 'someone_else' || $this->requiresFamilyInfo()) && $this->service->title !== 'Death Certificate') {
-                        $rules = array_merge($rules, [
-                            'father_last_name' => 'required|string|max:255',
-                            'father_first_name' => 'required|string|max:255',
-                            'father_middle_name' => 'required|string|max:255',
-                            'father_suffix' => 'nullable|string|max:10',
-                            'father_birthdate' => 'nullable|date',
-                            'father_nationality' => 'required|string|max:255',
-                            'father_religion' => 'required|string|max:255',
-                            'father_contact_no' => 'required|string|max:20',
+                        if (!$this->father_is_unknown) {
+                            $rules = array_merge($rules, [
+                                'father_last_name' => 'required|string|max:255',
+                                'father_first_name' => 'required|string|max:255',
+                                'father_middle_name' => 'required|string|max:255',
+                                'father_suffix' => 'nullable|string|max:10',
+                                'father_birthdate' => 'nullable|date',
+                                'father_nationality' => 'required|string|max:255',
+                                'father_religion' => 'required|string|max:255',
+                                'father_contact_no' => 'required|string|max:20',
+                            ]);
+                        }
 
+                        $rules = array_merge($rules, [
                             'mother_last_name' => 'required|string|max:255',
                             'mother_first_name' => 'required|string|max:255',
                             'mother_middle_name' => 'required|string|max:255',
@@ -281,7 +342,7 @@ new #[Title('Document Request')] class extends Component {
                             'mother_contact_no' => 'required|string|max:20',
                         ]);
 
-                        if ($this->service->title !== 'Certificate of No Marriage (CENOMAR)') {
+                        if ($this->service->title === 'Certificate of No Marriage (CENOMAR)'  || $this->service->title === 'Marriage Certificate' && $this->to_whom !== 'myself' && !$this->spouse_is_unknown) {
                             $rules = array_merge($rules, [
                                 'spouse_last_name' => 'required|string|max:255',
                                 'spouse_first_name' => 'required|string|max:255',
@@ -304,7 +365,7 @@ new #[Title('Document Request')] class extends Component {
                     'contact_first_name' => 'required|string|max:255',
                     'contact_last_name' => 'required|string|max:255',
                     'contact_email' => 'required|email|max:255',
-                    'contact_phone' => 'nullable|string|max:20',
+                    'contact_phone' => 'required|string|max:20',
                 ]);
                 break;
             case 5:
@@ -422,7 +483,7 @@ new #[Title('Document Request')] class extends Component {
                     ]);
 
                     // Spouse Information
-                    if ($this->service->title !== 'Certificate of No Marriage (CENOMAR)') {
+                    if ($this->service->title !== 'Certificate of No Marriage (CENOMAR)' && !$this->spouse_is_unknown) {
                         $detailsData = array_merge($detailsData, [
                             'spouse_last_name' => $this->spouse_last_name,
                             'spouse_first_name' => $this->spouse_first_name,

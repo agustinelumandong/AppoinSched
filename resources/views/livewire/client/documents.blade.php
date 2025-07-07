@@ -29,7 +29,11 @@ new class extends Component {
         $id = $this->selectedDocumentRequest->id; 
         $request = DocumentRequest::findOrFail($id);
         $method = $this->selectedPaymentMethod; 
-        dd($method, $request);
+        $request->update([
+            'payment_status' => 'paid',
+        ]);
+        $this->dispatch('close-modal-payment-method');
+        $this->reset(); 
     }
 
     public function setSelectedDocumentRequest($id)
@@ -108,14 +112,14 @@ new class extends Component {
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
-                                                <span class="flux-badge flux-badge-{{ match ($request->status) {
-                                                        'pending' => 'warning',
-                                                        'approved' => 'success',
-                                                        'rejected' => 'danger',
+                                                <span class="flux-badge flux-badge-{{ match ($request->payment_status) {
+                                                        'unpaid' => 'warning',
+                                                        'paid' => 'success',
+                                                        'pending' => 'danger',
                                                         'completed' => 'success',
                                                         default => 'light',
                                                     } }}">
-                                                    {{ ucfirst($request->status) }}
+                                                    {{ ucfirst($request->payment_status) }}
                                                 </span>
                                             </td>
                                             <td class="px-6 py-4 whitespace-nowrap">
@@ -124,12 +128,15 @@ new class extends Component {
                                                 </p>
                                             </td>
                                             <td>
-                                                {{-- && $request->payment_status === 'unpaid' --}}
-                                                @if($request->status === 'approved' )
-                                                    <button class="flux-btn btn-sm flux-btn-primary text-decoration-none" wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})">Pay Now</button>
-                                                @else
-                                                    <span class="text-muted">Paid</span>
-                                                @endif
+                                                {{--  --}}
+                                                <button
+                                                    class="flux-btn btn-sm flux-btn-primary text-decoration-none {{ $request->status === 'approved' && $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
+                                                    wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
+                                                    @if(!($request->status === 'approved' && $request->payment_status === 'unpaid')) disabled aria-disabled="true" @endif
+                                                >
+                                                    Pay Now
+                                                </button>
+                                                
                                                 <div class="d-flex gap-2">
                                                     {{-- <a href="#" class="flux-btn flux-btn-outline btn-sm" title="View Details">
                                                         <i class="bi bi-eye"></i>
@@ -158,13 +165,7 @@ new class extends Component {
         </div> --}}
     </div>
 
-    <button wire:click="$dispatch('open-modal-payment-method')"
-                class="flux-btn flux-btn-success flex items-center">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                </svg>
-                Pay Now
-            </button>
+    
 
     @include('livewire.client.components.modal.payment-method-modal')
 
