@@ -8,8 +8,7 @@ class UserAddresses extends Model
 {
     protected $table = 'user_addresses';
 
-    protected $fillable = [
-        'user_id',
+    protected $fillable = [ 
         'personal_information_id',
         'address_type',
         'address_line_1',
