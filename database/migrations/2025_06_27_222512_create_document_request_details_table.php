@@ -17,17 +17,18 @@ return new class extends Migration {
             $table->foreignId('document_request_id')->constrained('document_requests')->onDelete('cascade');
 
             // Personal Information for this specific request
+            
             $table->string('last_name');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
             $table->enum('suffix', ['Jr.', 'Sr.'])->nullable();
             $table->string('email');
             $table->string('contact_no')->nullable();
-            $table->string('contact_first_name')->nullable()->after('contact_no');
-            $table->string('contact_last_name')->nullable()->after('contact_first_name');
-            $table->string('contact_middle_name')->nullable()->after('contact_last_name');
-            $table->string('contact_email')->nullable()->after('contact_middle_name');
-            $table->string('contact_phone')->nullable()->after('contact_email');
+            $table->string('contact_first_name')->nullable();
+            $table->string('contact_last_name')->nullable();
+            $table->string('contact_middle_name')->nullable();
+            $table->string('contact_email')->nullable();
+            $table->string('contact_phone')->nullable();
             $table->enum('sex_at_birth', ['Male', 'Female'])->nullable();
             $table->date('date_of_birth')->nullable();
             $table->string('place_of_birth')->nullable();

@@ -130,8 +130,7 @@ new class extends Component {
                     $query->where('status', $this->status);
                 })
                 ->latest()
-                ->paginate(10),
-            'assignedOffices' => auth()->user()->assignedOffices(),
+                ->paginate(10), 
         ];
     }
 }; ?>

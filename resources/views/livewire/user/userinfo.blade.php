@@ -66,7 +66,7 @@ new class extends Component {
     {
         $this->user = auth()->user();
         $this->personalInformation = $this->user->personalInformation ?? new PersonalInformation(['user_id' => $this->user->id]);
-        $this->userAddresses = $this->user->userAddresses->first() ?? new UserAddresses(['user_id' => $this->user->id]);
+        $this->userAddresses = $this->user->userAddresses->first() ?? new UserAddresses(['personal_information_id' => $this->personalInformation->id]);
         $this->userFamily = $this->user->userFamilies->first() ?? new UserFamily(['user_id' => $this->user->id]);
 
         // User
@@ -237,7 +237,7 @@ new class extends Component {
         // Update User Addresses
         $this->userAddresses
             ->fill([
-                'user_id' => $this->user->id,
+                // 'user_id' => $this->user->id,
                 'personal_information_id' => $this->personalInformation->id,
                 'address_type' => $this->address_type ?? 'Permanent',
                 'address_line_1' => $this->address_line_1 ?: null,
