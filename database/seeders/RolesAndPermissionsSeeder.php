@@ -232,6 +232,41 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $client->assignRole($clientRole);
 
+        // Create additional Staff users (MCR personnel examples)
+        $staff2 = User::firstOrCreate(
+            ['email' => 'MCR@gmail.com'],
+            [
+                'first_name' => 'MCR',
+                'last_name' => 'Staff',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $staff2->assignRole($staffRole);
+
+        $staff3 = User::firstOrCreate(
+            ['email' => 'MTO@gmail.com'],
+            [
+                'first_name' => 'MTO',
+                'last_name' => 'Staff',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $staff3->assignRole($staffRole);
+
+        $staff4 = User::firstOrCreate(
+            ['email' => 'BPLS@gmail.com'],
+            [
+                'first_name' => 'BPLS',
+                'last_name' => 'Staff',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $staff4->assignRole($staffRole);
+ 
+
         $this->command->info('Example users created and roles assigned successfully!');
     }
 }

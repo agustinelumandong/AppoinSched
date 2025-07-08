@@ -109,11 +109,6 @@
             {{-- Admin Navigation --}}
             @hasrole('admin|super-admin')
             <flux:navlist.group expandable :expanded="request()->routeIs('admin.*')" heading="Administration">
-                <flux:navlist.item icon="chart-bar" :href="route('admin.dashboard')"
-                    :current="request()->routeIs('admin.dashboard')" wire:navigate
-                    class="text-decoration-none text-black truncate">
-                    {{ Str::limit(__('Admin Dashboard'), 14) }}
-                </flux:navlist.item>
                 <flux:navlist.item icon="building-office-2" :href="route('admin.offices')"
                     :current="request()->routeIs('admin.offices')" wire:navigate
                     class="text-decoration-none text-black truncate">
