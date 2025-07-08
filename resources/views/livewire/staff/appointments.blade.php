@@ -239,8 +239,7 @@ new class extends Component {
                         ->orWhereHas('staff', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'));
                 })
                 ->orderBy('created_at', 'desc')
-                ->paginate(10),
-            'assignedOffices' => auth()->user()->assignedOffices()->get(),
+                ->paginate(10), 
         ];
     }
 }; ?>
