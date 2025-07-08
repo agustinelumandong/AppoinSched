@@ -301,22 +301,22 @@ class User extends Authenticatable
     /**
      * Get all offices this staff is assigned to
      */
-    public function assignedOffices()
-    {
-        return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
-            ->withPivot('is_primary')
-            ->withTimestamps();
-    }
+    // public function assignedOffices()
+    // {
+    //     return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
+    //         ->withPivot('is_primary')
+    //         ->withTimestamps();
+    // }
 
     /**
      * Get the primary office assignment for this staff
      */
-    public function primaryOffice()
-    {
-        return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
-            ->wherePivot('is_primary', true)
-            ->first();
-    }
+    // public function primaryOffice()
+    // {
+    //     return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
+    //         ->wherePivot('is_primary', true)
+    //         ->first();
+    // }
 
     /**
      * Check if user is assigned to a specific office (role-based)

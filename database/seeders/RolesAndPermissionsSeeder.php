@@ -81,6 +81,21 @@ class RolesAndPermissionsSeeder extends Seeder
             'guard_name' => 'web'
         ]);
 
+        $mcrStaffRole = Role::firstOrCreate([
+            'name' => 'MCR-staff',
+            'guard_name' => 'web'
+        ]);
+
+        $mtoStaffRole = Role::firstOrCreate([
+            'name' => 'MTO-staff',
+            'guard_name' => 'web'
+        ]);
+
+        $bplsStaffRole = Role::firstOrCreate([
+            'name' => 'BPLS-staff',
+            'guard_name' => 'web'
+        ]);
+
         // Assign permissions to roles
 
         // SuperAdmin - Full system access for maintenance and upgrades
@@ -126,6 +141,32 @@ class RolesAndPermissionsSeeder extends Seeder
             'view-reports'
         ]);
 
+        $mcrStaffRole->givePermissionTo([
+            'create-documents',
+            'edit-documents',
+            'view-documents',
+            'request-documents',
+            'approve-documents',
+            'reject-documents',
+        ]);
+
+        $mtoStaffRole->givePermissionTo([
+            'create-documents',
+            'edit-documents',
+            'view-documents',
+            'request-documents',
+            'approve-documents',
+            'reject-documents',
+        ]);
+
+        $bplsStaffRole->givePermissionTo([
+            'create-documents',
+            'edit-documents',
+            'view-documents',
+            'request-documents',
+            'approve-documents',
+            'reject-documents',
+        ]);
         // Client - Citizens requesting documents or permits
         $clientRole->givePermissionTo([
             'view-documents',
