@@ -17,11 +17,11 @@ return new class extends Migration {
             $table->foreignId('document_request_id')->constrained('document_requests')->onDelete('cascade');
 
             // Personal Information for this specific request
-            
+
             $table->string('last_name');
             $table->string('first_name');
             $table->string('middle_name')->nullable();
-            $table->enum('suffix', ['Jr.', 'Sr.'])->nullable();
+            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
             $table->string('email');
             $table->string('contact_no')->nullable();
             $table->string('contact_first_name')->nullable();

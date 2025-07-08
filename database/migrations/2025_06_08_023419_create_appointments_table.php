@@ -15,7 +15,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
             $table->foreignId('staff_id')->nullable()->constrained('users')->onDelete('cascade');
             $table->foreignId('office_id')->constrained('offices')->onDelete('cascade');
-            $table->foreignId('service_id')->constrained('services')->onDelete('cascade');
+            $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
             $table->date('booking_date');
             $table->time('booking_time');
             $table->enum('status', ['pending', 'approved', 'cancelled', 'completed', 'no-show'])->default('pending');
