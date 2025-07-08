@@ -24,7 +24,8 @@ return new class extends Migration {
             $table->string('religion')->nullable();
             $table->string('nationality')->nullable();
             $table->string('contact_no')->nullable();
-            $table->string('government_id')->nullable();
+            $table->string('government_type')->nullable();
+            $table->string('government_id_image_path')->nullable();
             $table->timestamps();
         });
     }
