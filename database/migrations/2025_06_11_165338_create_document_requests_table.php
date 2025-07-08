@@ -20,9 +20,9 @@ return new class extends Migration {
             $table->string('purpose')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed'])->default('pending');
             $table->text('remarks')->nullable();
-            $table->enum('payment_status', ['unpaid', 'processing', 'paid', 'failed'])->default('unpaid')->after('remarks');
-            $table->string('payment_reference')->nullable()->after('payment_status');
-            $table->string('reference')->nullable()->after('payment_reference');
+            $table->enum('payment_status', ['unpaid', 'processing', 'paid', 'failed'])->default('unpaid');
+            $table->string('payment_reference')->nullable();
+            $table->string('reference')->nullable();
             $table->date('date_requested')->nullable();
             $table->date('completed_date')->nullable();
             $table->timestamps();
