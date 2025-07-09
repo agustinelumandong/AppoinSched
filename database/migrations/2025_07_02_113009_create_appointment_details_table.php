@@ -18,8 +18,12 @@ return new class extends Migration {
             $table->string('first_name')->nullable();
             $table->string('middle_name')->nullable();
             $table->string('last_name')->nullable();
+            $table->string('suffix')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
+            $table->string('sex')->nullable(); 
+            $table->string('government_id_type')->nullable();
+            $table->string('government_id_image_path')->nullable();
             // Address information
             $table->string('address')->nullable();
             $table->string('city')->nullable();

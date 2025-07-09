@@ -10,17 +10,26 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class AppointmentDetails extends Model
 {
   protected $fillable = [
-    'appointment_id',
-    'request_for',
+    // Personal information
     'first_name',
     'middle_name',
     'last_name',
+    'suffix',
+    'sex',
+    'government_id_type',
+    'government_id_image_path',
+
+    // Address information
     'email',
     'phone',
     'address',
     'city',
     'state',
     'zip_code',
+
+    // Additional fields
+    'request_for',
+    'appointment_id',
     'purpose',
     'notes',
   ];
@@ -39,6 +48,7 @@ class AppointmentDetails extends Model
       $this->first_name,
       $this->middle_name,
       $this->last_name,
+      $this->suffix,
     ]);
     return implode(' ', $parts);
   }
