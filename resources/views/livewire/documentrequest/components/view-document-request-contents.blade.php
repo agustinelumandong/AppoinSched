@@ -117,6 +117,31 @@
                             </p>
                         </div>
                     </div>
+
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Government ID Type</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->government_id_type ?? ($documentRequest->user->government_id_type ?? 'N/A') }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Government ID Image</label>
+                            @if($documentRequest->details && $documentRequest->details->government_id_image_path)
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/' . $documentRequest->details->government_id_image_path) }}"
+                                        alt="Government ID" class="w-32 h-20 object-cover border rounded">
+                                </div>
+                            @elseif($documentRequest->user->personalInformation && $documentRequest->user->personalInformation->government_id_image_path)
+                                <div class="mt-2">
+                                    <img src="{{ asset('storage/' . $documentRequest->user->personalInformation->government_id_image_path) }}"
+                                        alt="Government ID" class="w-32 h-20 object-cover border rounded">
+                                </div>
+                            @else
+                                <p class="text-gray-500 text-sm">No government ID image uploaded</p>
+                            @endif
+                        </div>
+                    </div>
                 </div>
             </div>
 
