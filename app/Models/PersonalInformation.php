@@ -18,6 +18,8 @@ class PersonalInformation extends Model
         'religion',
         'nationality',
         'contact_no',
+        'government_id_type',
+        'government_id_image_path',
     ];
 
 
@@ -36,5 +38,5 @@ class PersonalInformation extends Model
         return $this->hasMany(UserFamily::class, 'personal_information_id');
     }
 
- 
+
 }

@@ -124,7 +124,9 @@ class User extends Authenticatable
             !empty($this->personalInformation->date_of_birth) &&
             !empty($this->personalInformation->place_of_birth) &&
             !empty($this->personalInformation->civil_status) &&
-            !empty($this->personalInformation->nationality);
+            !empty($this->personalInformation->nationality) &&
+            !empty($this->personalInformation->government_id_type) &&
+            !empty($this->personalInformation->government_id_image_path);
     }
 
     /**
@@ -217,6 +219,8 @@ class User extends Authenticatable
             'civil_status' => $personalInfo?->civil_status ?? 'Single',
             'religion' => $personalInfo?->religion ?? '',
             'nationality' => $personalInfo?->nationality ?? 'Filipino',
+            'government_id_type' => $personalInfo?->government_id_type ?? '',
+            'government_id_image_path' => $personalInfo?->government_id_image_path ?? '',
 
             // Address Information
             'address_type' => $userAddress?->address_type ?? 'Permanent',
