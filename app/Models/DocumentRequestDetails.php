@@ -27,6 +27,8 @@ class DocumentRequestDetails extends Model
         'civil_status',
         'religion',
         'nationality',
+        'government_id_type',
+        'government_id_image_path',
 
         // Address information
         'address_type',
