@@ -177,12 +177,12 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         // Create example users and assign roles
-        $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole);
+        $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole, $mcrStaffRole, $mtoStaffRole, $bplsStaffRole);
 
         $this->command->info('Roles and permissions seeded successfully!');
     }
 
-    private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole): void
+    private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole, Role $mcrStaffRole, Role $mtoStaffRole, Role $bplsStaffRole): void
     {
         // Create SuperAdmin user
         $superAdmin = User::firstOrCreate(
@@ -242,7 +242,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        $staff2->assignRole($staffRole);
+        $staff2->assignRole($mcrStaffRole);
 
         $staff3 = User::firstOrCreate(
             ['email' => 'MTO@gmail.com'],
@@ -253,7 +253,7 @@ class RolesAndPermissionsSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        $staff3->assignRole($staffRole);
+        $staff3->assignRole($mtoStaffRole);
 
         $staff4 = User::firstOrCreate(
             ['email' => 'BPLS@gmail.com'],
@@ -264,8 +264,8 @@ class RolesAndPermissionsSeeder extends Seeder
                 'email_verified_at' => now(),
             ]
         );
-        $staff4->assignRole($staffRole);
- 
+        $staff4->assignRole($bplsStaffRole);
+
 
         $this->command->info('Example users created and roles assigned successfully!');
     }
