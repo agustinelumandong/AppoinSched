@@ -114,6 +114,18 @@
                                 {{ $nationality }}</p>
                         </div>
                     </div>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Government ID Type</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $government_id_type }}</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Government ID Image</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $government_id_image_path ? 'Uploaded' : 'Not uploaded' }}</p>
+                        </div>
+                    </div>
                 </div>
             </div>
 
