@@ -68,7 +68,14 @@ new #[Title('Office Details')] class extends Component {
                 </a>
 
                 @forelse($services as $service)
-                    <a href="{{ route('offices.service.request', ['office' => $office->slug, 'service' => $service->slug]) }}"
+                    @php
+                        $isAppointment = $service->slug === 'appointment-mto' || $service->slug === 'appointment-mcr' || $service->slug === 'appointment-bpls' || $service->slug === 'appointment-bpls';
+                        $isDocumentRequest = $service->slug === 'document-request-mto' || $service->slug === 'document-request-mcr' || $service->slug === 'document-request-bpls' || $service->slug === 'document-request-bpls';
+
+                        $requestRoute = $isAppointment ? 'offices.service.appointment' : 'offices.service.request';
+                    @endphp
+
+                    <a href="{{ route($requestRoute, ['office' => $office->slug, 'service' => $service->slug]) }}"
                         class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
                         id="office-{{ $service->id }}">
                         <div class="absolute" style="top: -50px; right: -80px;">
@@ -95,6 +102,7 @@ new #[Title('Office Details')] class extends Component {
                                 Document</span>
                         </footer>
                     </a>
+
                 @empty
                     <div class="col-12">
                         <div class="alert alert-info">
@@ -112,8 +120,8 @@ new #[Title('Office Details')] class extends Component {
     @push('scripts')
         <script>
             // Auto-hide alerts after 5 seconds
-            document.addEventListener('DOMContentLoaded', function() {
-                setTimeout(function() {
+            document.addEventListener('DOMContentLoaded', function () {
+                setTimeout(function () {
                     const alerts = document.querySelectorAll('.alert');
                     alerts.forEach(alert => {
                         if (alert) {

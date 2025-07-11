@@ -15,6 +15,7 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\WithFileUploads;
+use Illuminate\Support\Str;
 
 new #[Title('Document Request')] class extends Component {
     use WithFileUploads;
@@ -78,6 +79,8 @@ new #[Title('Document Request')] class extends Component {
     public string $government_id_type = '';
     public mixed $government_id_image_path = null;
     public mixed $government_id_image_file = null;
+    public string $reference_number = '';
+    public string $payment_reference = '';
 
     public bool $father_is_unknown = false;
     public bool $spouse_is_unknown = false;
@@ -286,6 +289,9 @@ new #[Title('Document Request')] class extends Component {
                         ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
                         : 'nullable|in:my_father,my_mother,my_son,my_daughter,others',
                 ]);
+                do {
+                    $this->reference_number = 'DOC-' . strtoupper(Str::random(10));
+                } while (DocumentRequest::where('reference_number', $this->reference_number)->exists());
                 break;
             case 2:
                 $this->isLoading = true;
@@ -427,6 +433,7 @@ new #[Title('Document Request')] class extends Component {
                 'to_whom' => $this->to_whom,
                 'purpose' => $this->purpose === 'others' ? $this->purpose_others : $this->purpose,
                 'requested_date' => now(),
+                'reference_number' => $this->reference_number,
             ]);
 
             // Prepare data for DocumentRequestDetails

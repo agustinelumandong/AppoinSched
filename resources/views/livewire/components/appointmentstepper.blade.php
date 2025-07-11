@@ -17,6 +17,8 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as FacadesSchema;
+use Illuminate\Support\Str;
+use App\Models\DocumentRequest;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -34,6 +36,7 @@ new #[Title('Appointment')] class extends Component {
     public string $message = '';
     public ?int $appointmentId = null;
     public bool $isLoading = false;
+    public ?string $reference_number = null;
 
     public ?int $id = null;
 
@@ -46,13 +49,16 @@ new #[Title('Appointment')] class extends Component {
 
     public ?Appointments $appointment = null;
 
-    public function mount(Offices $office, Services $service, User $staff): void
+    public function mount(Offices $office, Services $service, User $staff, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
         $this->staff = $staff;
         $this->id = auth()->user()->id;
-
+        // Set the reference_number if provided
+        if ($reference_number) {
+            $this->reference_number = $reference_number;
+        }
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making an appointment.');
@@ -152,6 +158,14 @@ new #[Title('Appointment')] class extends Component {
 
             DB::beginTransaction();
 
+            if (!empty($this->reference_number)) {
+                $reference_number = $this->reference_number;
+            } else {
+                do {
+                    $reference_number = 'APPOINTMENT-' . strtoupper(Str::random(10));
+                } while (Appointments::where('reference_number', $reference_number)->exists());
+            }
+
             // Create the appointment
             $appointment = Appointments::create([
                 'user_id' => $userId,
@@ -164,6 +178,7 @@ new #[Title('Appointment')] class extends Component {
                 'to_whom' => $this->to_whom,
                 'purpose' => $this->purpose,
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
+                'reference_number' => $reference_number,
             ]);
 
             // Only create details if appointment was created and the details table has the correct FK
@@ -183,6 +198,17 @@ new #[Title('Appointment')] class extends Component {
                     'purpose' => $this->purpose,
                     'notes' => $appointment->notes,
                 ]);
+            }
+
+
+            if (str_starts_with($reference_number, 'DOC')) {
+                $request = DocumentRequest::where('reference_number', $reference_number)->first();
+                if ($request) {
+                    $request->update([
+                        'payment_status' => 'walk-in',
+                        'payment_reference' => $reference_number,
+                    ]);
+                }
             }
 
             DB::commit();
