@@ -32,14 +32,17 @@ new class extends Component {
         if($method === 'online') {
             $request->update([
                 'payment_status' => 'paid',
+                'payment_reference' => $request->reference_number,
             ]);
-        } elseif($method === 'walkIn') {
-            $request->update([
-                'payment_status' => 'walk-in',
-            ]);
-            $mto_slug = 'municipal-treasurers-office';
-            $this->redirect(route('offices.service.appointment', ['office' => $mto_slug]));
-            
+        } elseif($method === 'walkIn') { 
+            $office_slug = $request->office->slug;
+            $service_slug = $request->service->slug;
+            $reference_number = $request->reference_number;
+            $this->redirect(route('offices.service.appointment', 
+            [
+                'office' => $office_slug, 
+                'service' => $service_slug, 
+                'reference_number' => $reference_number]));
         }
         $this->dispatch('close-modal-payment-method');
         $this->reset(); 
