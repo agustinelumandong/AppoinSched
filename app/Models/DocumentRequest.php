@@ -24,6 +24,7 @@ class DocumentRequest extends Model
         'remarks',
         'to_whom',
         'purpose',
+        'reference_number',
         'requested_date',
         'completed_date',
         'payment_status',
