@@ -64,6 +64,45 @@ new #[Title('Appointment')] class extends Component {
             session()->flash('warning', 'Please complete your profile information before making an appointment.');
             $this->redirect(route('userinfo'));
         }
+
+        // Only populate user data if "myself" is selected
+        if ($this->to_whom === 'myself') {
+            $this->populateUserData();
+        }
+    }
+
+    public function populateUserData(): void
+    {
+        $userData = auth()->user()->getAppointmentFormData();
+        // Populate form fields with user data (temporary data for this request only)
+        foreach ($userData as $field => $value) {
+            if (property_exists($this, $field)) {
+                $this->{$field} = $value;
+            }
+        }
+    }
+
+    public function updatedToWhom(): void
+    {
+        if ($this->to_whom === 'myself') {
+            $this->populateUserData();
+        } else {
+            $this->clearPersonalData();
+        }
+    }
+
+    public function clearPersonalData(): void
+    {
+        // Clear all personal information fields
+        $this->first_name = '';
+        $this->last_name = '';
+        $this->middle_name = '';
+        $this->email = '';
+        $this->phone = '';
+        $this->address = '';
+        $this->city = '';
+        $this->state = '';
+        $this->zip_code = '';
     }
 
     public function nextStep()

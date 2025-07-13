@@ -264,6 +264,30 @@ class User extends Authenticatable
     }
 
     /**
+     * Get user data for appointment form (basic info only)
+     */
+    public function getAppointmentFormData(): array
+    {
+        $personalInfo = $this->personalInformation;
+        $userAddress = $this->userAddresses->first();
+
+        return [
+            // Basic info
+            'first_name' => $this->first_name ?? '',
+            'last_name' => $this->last_name ?? '',
+            'middle_name' => $this->middle_name ?? '',
+            'email' => $this->email ?? '',
+            'phone' => $personalInfo?->contact_no ?? '',
+
+            // Address Information (basic)
+            'address' => $userAddress?->address_line_1 ?? '',
+            'city' => $userAddress?->city ?? '',
+            'state' => $userAddress?->province ?? '',
+            'zip_code' => $userAddress?->zip_code ?? '',
+        ];
+    }
+
+    /**
      * Get all document requests made by this user
      */
     public function documentRequests()
