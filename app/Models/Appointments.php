@@ -23,6 +23,7 @@ class Appointments extends Model
         'notes',
         'to_whom',
         'purpose',
+        'reference_number',
     ];
 
     /** @var array<int,string> */

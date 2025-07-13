@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
 use App\Models\Offices;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new class extends Component {
     use WithPagination;
@@ -124,9 +126,13 @@ new class extends Component {
                 'notes' => $this->notes,
             ];
 
+            $oldStatus = $this->appointment->status;
             $updated = $this->appointment->update($updateData);
 
             if ($updated) {
+                // Send notification based on status change
+                $this->sendStatusChangeNotification($oldStatus, $this->status);
+
                 $this->resetAppointmentData();
                 $this->dispatch('appointmentUpdated');
                 $this->dispatch('close-modal-edit-appointment');
@@ -140,6 +146,32 @@ new class extends Component {
         } catch (\Exception $e) {
             Log::error('Appointment update failed: ' . $e->getMessage());
             session()->flash('error', 'An error occurred while updating the appointment');
+        }
+    }
+
+    private function sendStatusChangeNotification(string $oldStatus, string $newStatus): void
+    {
+        if ($oldStatus === $newStatus) {
+            return; // No status change
+        }
+
+        $appointment = $this->appointment;
+        $user = $appointment->user;
+
+        $notificationData = [
+            'date' => $appointment->booking_date->format('M d, Y'),
+            'time' => $appointment->booking_time,
+            'location' => $appointment->office->name,
+        ];
+
+        $event = match ($newStatus) {
+            'approved' => RequestNotificationEvent::AppointmentApproved,
+            'cancelled' => RequestNotificationEvent::AppointmentCancelled,
+            default => null,
+        };
+
+        if ($event) {
+            $user->notify(new RequestEventNotification($event, $notificationData));
         }
     }
 
@@ -239,7 +271,7 @@ new class extends Component {
                         ->orWhereHas('staff', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'));
                 })
                 ->orderBy('created_at', 'desc')
-                ->paginate(10), 
+                ->paginate(10),
         ];
     }
 }; ?>

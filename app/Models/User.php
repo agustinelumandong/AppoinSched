@@ -27,6 +27,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'notification_settings',
     ];
 
     /**
@@ -49,6 +50,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_settings' => 'array',
         ];
     }
 
@@ -124,7 +126,9 @@ class User extends Authenticatable
             !empty($this->personalInformation->date_of_birth) &&
             !empty($this->personalInformation->place_of_birth) &&
             !empty($this->personalInformation->civil_status) &&
-            !empty($this->personalInformation->nationality);
+            !empty($this->personalInformation->nationality) &&
+            !empty($this->personalInformation->government_id_type) &&
+            !empty($this->personalInformation->government_id_image_path);
     }
 
     /**
@@ -217,6 +221,8 @@ class User extends Authenticatable
             'civil_status' => $personalInfo?->civil_status ?? 'Single',
             'religion' => $personalInfo?->religion ?? '',
             'nationality' => $personalInfo?->nationality ?? 'Filipino',
+            'government_id_type' => $personalInfo?->government_id_type ?? '',
+            'government_id_image_path' => $personalInfo?->government_id_image_path ?? '',
 
             // Address Information
             'address_type' => $userAddress?->address_type ?? 'Permanent',
@@ -256,6 +262,30 @@ class User extends Authenticatable
             'spouse_nationality' => $userFamily?->spouse_nationality ?? '',
             'spouse_religion' => $userFamily?->spouse_religion ?? '',
             'spouse_contact_no' => $userFamily?->spouse_contact_no ?? '',
+        ];
+    }
+
+    /**
+     * Get user data for appointment form (basic info only)
+     */
+    public function getAppointmentFormData(): array
+    {
+        $personalInfo = $this->personalInformation;
+        $userAddress = $this->userAddresses->first();
+
+        return [
+            // Basic info
+            'first_name' => $this->first_name ?? '',
+            'last_name' => $this->last_name ?? '',
+            'middle_name' => $this->middle_name ?? '',
+            'email' => $this->email ?? '',
+            'phone' => $personalInfo?->contact_no ?? '',
+
+            // Address Information (basic)
+            'address' => $userAddress?->address_line_1 ?? '',
+            'city' => $userAddress?->city ?? '',
+            'state' => $userAddress?->province ?? '',
+            'zip_code' => $userAddress?->zip_code ?? '',
         ];
     }
 
@@ -459,13 +489,51 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get default notification settings
+     */
+    public function getDefaultNotificationSettings(): array
+    {
+        return [
+            'submitted' => true,
+            'approved' => true,
+            'rejected' => true,
+            'payment_uploaded' => true,
+            'payment_verified' => true,
+            'appointment_scheduled' => true,
+            'appointment_approved' => true,
+            'appointment_cancelled' => true,
+            'appointment_rescheduled' => true,
+            'completed' => true,
+            'appointment_reminder' => true,
+        ];
+    }
+
+    /**
+     * Get notification settings with defaults
+     */
+    public function getNotificationSettings(): array
+    {
+        return $this->notification_settings ?? $this->getDefaultNotificationSettings();
+    }
+
+    /**
+     * Update notification settings
+     */
+    public function updateNotificationSettings(array $settings): void
+    {
+        $this->update(['notification_settings' => $settings]);
+    }
+
     protected static function boot()
     {
         parent::boot();
         static::created(function ($user) {
-            if (!$user->hasAnyRole(['super-admin', 'admin', 'MCR-staff', 'MTO-staff', 'BPLS-staff', 'client'])) {
+            if ($user->roles()->count() === 0) {
                 $user->assignRole('client');
             }
+            // Set default notification settings
+            $user->updateNotificationSettings($user->getDefaultNotificationSettings());
         });
     }
 }

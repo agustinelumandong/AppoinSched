@@ -14,8 +14,13 @@ use App\Models\UserAddresses;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\WithFileUploads;
+use Illuminate\Support\Str;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new #[Title('Document Request')] class extends Component {
+    use WithFileUploads;
     public int $step = 1;
     public string $to_whom = 'myself';
     public string $purpose = '';
@@ -73,6 +78,11 @@ new #[Title('Document Request')] class extends Component {
     public string $barangay = '';
     public string $street = '';
     public string $zip_code = '';
+    public string $government_id_type = '';
+    public mixed $government_id_image_path = null;
+    public mixed $government_id_image_file = null;
+    public ?string $reference_number = '';
+    public string $payment_reference = '';
 
     public bool $father_is_unknown = false;
     public bool $spouse_is_unknown = false;
@@ -194,6 +204,8 @@ new #[Title('Document Request')] class extends Component {
         $this->spouse_nationality = '';
         $this->spouse_religion = '';
         $this->spouse_contact_no = '';
+        $this->government_id_type = '';
+        $this->government_id_image_path = null;
         // Clear death certificate fields
         $this->deceased_last_name = '';
         $this->deceased_first_name = '';
@@ -279,6 +291,9 @@ new #[Title('Document Request')] class extends Component {
                         ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
                         : 'nullable|in:my_father,my_mother,my_son,my_daughter,others',
                 ]);
+                do {
+                    $this->reference_number = 'DOC-' . strtoupper(Str::random(10));
+                } while (DocumentRequest::where('reference_number', $this->reference_number)->exists());
                 break;
             case 2:
                 $this->isLoading = true;
@@ -308,6 +323,8 @@ new #[Title('Document Request')] class extends Component {
                         'place_of_birth' => 'required|string|max:255',
                         'civil_status' => 'required|in:Single,Married,Widowed,Divorced,Separated',
                         'nationality' => 'required|string|max:255',
+                        'government_id_type' => 'nullable|string|max:100',
+                        'government_id_image_file' => 'nullable|image|max:2048', // 2MB max
                         'address_type' => 'required|in:Permanent,Temporary',
                         'address_line_1' => 'required|string|max:255',
                         'region' => 'required|string|max:255',
@@ -342,7 +359,7 @@ new #[Title('Document Request')] class extends Component {
                             'mother_contact_no' => 'required|string|max:20',
                         ]);
 
-                        if ($this->service->title === 'Certificate of No Marriage (CENOMAR)'  || $this->service->title === 'Marriage Certificate' && $this->to_whom !== 'myself' && !$this->spouse_is_unknown) {
+                        if ($this->service->title === 'Certificate of No Marriage (CENOMAR)' || $this->service->title === 'Marriage Certificate' && $this->to_whom !== 'myself' && !$this->spouse_is_unknown) {
                             $rules = array_merge($rules, [
                                 'spouse_last_name' => 'required|string|max:255',
                                 'spouse_first_name' => 'required|string|max:255',
@@ -418,6 +435,7 @@ new #[Title('Document Request')] class extends Component {
                 'to_whom' => $this->to_whom,
                 'purpose' => $this->purpose === 'others' ? $this->purpose_others : $this->purpose,
                 'requested_date' => now(),
+                'reference_number' => $this->reference_number,
             ]);
 
             // Prepare data for DocumentRequestDetails
@@ -428,6 +446,14 @@ new #[Title('Document Request')] class extends Component {
 
             // Personal Information
             if ($this->service->title !== 'Death Certificate') {
+                // Handle file upload for government ID image
+                $governmentIdImagePath = $this->government_id_image_path; // Keep existing path if no new upload
+
+                if ($this->government_id_image_file) {
+                    // New file uploaded, store it
+                    $governmentIdImagePath = $this->government_id_image_file->storeAs('government-ids', auth()->id() . '_' . $this->government_id_image_file->getClientOriginalName(), 'public');
+                }
+
                 $detailsData = array_merge($detailsData, [
                     'last_name' => $this->last_name,
                     'first_name' => $this->first_name,
@@ -441,6 +467,8 @@ new #[Title('Document Request')] class extends Component {
                     'civil_status' => $this->civil_status,
                     'religion' => $this->religion,
                     'nationality' => $this->nationality,
+                    'government_id_type' => $this->government_id_type,
+                    'government_id_image_path' => $governmentIdImagePath,
                 ]);
 
                 // Address Information
@@ -525,6 +553,15 @@ new #[Title('Document Request')] class extends Component {
 
             DB::commit();
 
+            // Send notification to user
+            auth()->user()->notify(new RequestEventNotification(
+                RequestNotificationEvent::Submitted,
+                [
+                    'reference_no' => $this->reference_number,
+                    'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name
+                ]
+            ));
+
             session()->flash('success', 'Document request submitted successfully!');
 
             // Redirect to success page or document requests list
@@ -536,6 +573,19 @@ new #[Title('Document Request')] class extends Component {
         } finally {
             $this->isLoading = false;
         }
+    }
+
+    public function getGovernmentIdImageUrl()
+    {
+        if ($this->government_id_image_file) {
+            return $this->government_id_image_file->temporaryUrl();
+        }
+
+        if ($this->government_id_image_path) {
+            return asset('storage/' . $this->government_id_image_path);
+        }
+
+        return null;
     }
 }; ?>
 

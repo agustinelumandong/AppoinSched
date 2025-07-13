@@ -61,16 +61,16 @@
                         <div class="flex flex-row md:flex-col gap-4 mb-4">
                             <div class="w-full md:w-1/3">
                                 <label for="last_name" class="block text-xs font-medium mb-1">Last Name</label>
-                                <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="last_name" placeholder="Last Name" name="last_name" id="last_name">
+                                <input class="flux-form-control md:col-span-3 w-full" type="text" wire:model="last_name"
+                                    placeholder="Last Name" name="last_name" id="last_name">
                                 @error('last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="w-full md:w-1/3">
                                 <label for="first_name" class="block text-xs font-medium mb-1">First Name</label>
-                                <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="first_name" placeholder="First Name" name="first_name" id="first_name">
+                                <input class="flux-form-control md:col-span-3 w-full" type="text" wire:model="first_name"
+                                    placeholder="First Name" name="first_name" id="first_name">
                                 @error('first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -78,17 +78,16 @@
                             <div class="w-full md:w-1/3">
                                 <label for="middle_name" class="block text-xs font-medium mb-1">Middle
                                     Name</label>
-                                <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="middle_name" placeholder="Middle Name" name="middle_name"
-                                    id="middle_name">
+                                <input class="flux-form-control md:col-span-3 w-full" type="text" wire:model="middle_name"
+                                    placeholder="Middle Name" name="middle_name" id="middle_name">
                                 @error('middle_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="w-1/7">
                                 <label for="suffix" class="block text-xs font-medium mb-1">Suffix</label>
-                                <select class="flux-form-control md:col-span-1 w-full" wire:model="suffix"
-                                    name="suffix" id="suffix">
+                                <select class="flux-form-control md:col-span-1 w-full" wire:model="suffix" name="suffix"
+                                    id="suffix">
                                     <option value="">Suffix</option>
                                     <option value="N/A">N/A</option>
                                     <option value="Jr.">Jr.</option>
@@ -118,7 +117,8 @@
                             </div>
                             <div>
                                 <label for="sex_at_birth" class="block text-xs font-medium mb-1">Sex at Birth</label>
-                                <select class="flux-form-control w-full" wire:model="sex_at_birth" name="sex_at_birth" id="sex_at_birth" aria-label="Sex at Birth">
+                                <select class="flux-form-control w-full" wire:model="sex_at_birth" name="sex_at_birth"
+                                    id="sex_at_birth" aria-label="Sex at Birth">
                                     <option value="">Select Sex at Birth</option>
                                     <option value="Male">Male</option>
                                     <option value="Female">Female</option>
@@ -167,8 +167,8 @@
                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label for="religion" class="block text-xs font-medium mb-1">Religion</label>
-                                <input class="flux-form-control" type="text" wire:model="religion"
-                                    placeholder="Religion" name="religion" id="religion">
+                                <input class="flux-form-control" type="text" wire:model="religion" placeholder="Religion"
+                                    name="religion" id="religion">
                                 @error('religion')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -180,6 +180,59 @@
                                 @error('nationality')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                            <div>
+                                <label for="government_id_type" class="block text-xs font-medium mb-1">Government ID
+                                    Type</label>
+                                <select class="flux-form-control" wire:model="government_id_type" name="government_id_type"
+                                    id="government_id_type">
+                                    <option value="">Select Government ID Type *</option>
+                                    <option value="SSS">SSS</option>
+                                    <option value="GSIS">GSIS</option>
+                                    <option value="TIN">TIN</option>
+                                    <option value="PhilHealth">PhilHealth</option>
+                                    <option value="Passport">Passport</option>
+                                    <option value="Driver's License">Driver's License</option>
+                                    <option value="UMID">UMID</option>
+                                    <option value="Postal ID">Postal ID</option>
+                                    <option value="Voter's ID">Voter's ID</option>
+                                    <option value="Senior Citizen ID">Senior Citizen ID</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                                @error('government_id_type')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+                            </div>
+                            <div>
+                                <label for="government_id_image_file" class="block text-xs font-medium mb-1">Government ID Image</label>
+                                <input class="flux-form-control" type="file" wire:model="government_id_image_file"
+                                    name="government_id_image_file" id="government_id_image_file" accept="image/*">
+                                <span class="text-xs text-gray-500 mt-1">Upload a clear image of your government ID (Max 2MB)</span>
+                                @error('government_id_image_file')
+                                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                                @enderror
+
+                                <!-- Show existing file if available -->
+                                @if($this->government_id_image_path && !$this->government_id_image_file)
+                                    <div class="mt-2">
+                                        <p class="text-xs text-gray-600 mb-1">Current ID Image:</p>
+                                        <img src="{{ asset('storage/' . $this->government_id_image_path) }}" alt="Government ID"
+                                            class="w-32 h-20 object-cover border rounded">
+                                        <p class="text-xs text-gray-500 mt-1">File: {{ basename($this->government_id_image_path) }}</p>
+                                    </div>
+                                @endif
+
+                                <!-- Show new uploaded file preview -->
+                                @if($this->government_id_image_file)
+                                    <div class="mt-2">
+                                        <p class="text-xs text-gray-600 mb-1">New Upload:</p>
+                                        <img src="{{ $this->government_id_image_file->temporaryUrl() }}" alt="New Government ID"
+                                            class="w-32 h-20 object-cover border rounded">
+                                        <p class="text-xs text-gray-500 mt-1">File: {{ $this->government_id_image_file->getClientOriginalName() }}</p>
+                                    </div>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -221,40 +274,40 @@
                             <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                 <div>
                                     <label for="region" class="block text-xs font-medium mb-1">Region</label>
-                                    <input class="flux-form-control" type="text" wire:model="region"
-                                        name="region" placeholder="Region" id="region">
+                                    <input class="flux-form-control" type="text" wire:model="region" name="region"
+                                        placeholder="Region" id="region">
                                     @error('region')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
                                 <div>
                                     <label for="province" class="block text-xs font-medium mb-1">Province</label>
-                                    <input class="flux-form-control" type="text" wire:model="province"
-                                        name="province" placeholder="Province" id="province">
+                                    <input class="flux-form-control" type="text" wire:model="province" name="province"
+                                        placeholder="Province" id="province">
                                     @error('province')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
                                 <div>
                                     <label for="city" class="block text-xs font-medium mb-1">City</label>
-                                    <input class="flux-form-control" type="text" wire:model="city"
-                                        placeholder="City" name="city" id="city">
+                                    <input class="flux-form-control" type="text" wire:model="city" placeholder="City"
+                                        name="city" id="city">
                                     @error('city')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
                                 <div>
                                     <label for="barangay" class="block text-xs font-medium mb-1">Barangay</label>
-                                    <input class="flux-form-control" type="text" wire:model="barangay"
-                                        name="barangay" placeholder="Barangay" id="barangay">
+                                    <input class="flux-form-control" type="text" wire:model="barangay" name="barangay"
+                                        placeholder="Barangay" id="barangay">
                                     @error('barangay')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
                                 </div>
                                 <div>
                                     <label for="street" class="block text-xs font-medium mb-1">Street</label>
-                                    <input class="flux-form-control" type="text" wire:model="street"
-                                        placeholder="Street" name="street" id="street">
+                                    <input class="flux-form-control" type="text" wire:model="street" placeholder="Street"
+                                        name="street" id="street">
                                     @error('street')
                                         <span class="text-red-500 text-sm">{{ $message }}</span>
                                     @enderror
@@ -282,8 +335,7 @@
                                 <div class="form-control">
                                     <label class="label cursor-pointer">
                                         <span class="label-text">Father is Unknown</span>
-                                        <input type="checkbox" wire:model.live="father_is_unknown"
-                                            class="checkbox" />
+                                        <input type="checkbox" wire:model.live="father_is_unknown" class="checkbox" />
                                     </label>
                                 </div>
                                 <div class="flex flex-row md:flex-col gap-4 mb-4">
@@ -291,9 +343,8 @@
                                         <label for="father_last_name" class="block text-xs font-medium mb-1">Last
                                             Name</label>
                                         <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                            wire:model="father_last_name" placeholder="Last Name"
-                                            name="father_last_name" id="father_last_name" required
-                                            {{ $father_is_unknown ? 'disabled' : '' }}>
+                                            wire:model="father_last_name" placeholder="Last Name" name="father_last_name"
+                                            id="father_last_name" required {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_last_name')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -302,9 +353,8 @@
                                         <label for="father_first_name" class="block text-xs font-medium mb-1">First
                                             Name</label>
                                         <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                            wire:model="father_first_name" placeholder="First Name"
-                                            name="father_first_name" id="father_first_name" required
-                                            {{ $father_is_unknown ? 'disabled' : '' }}>
+                                            wire:model="father_first_name" placeholder="First Name" name="father_first_name"
+                                            id="father_first_name" required {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_first_name')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -313,19 +363,16 @@
                                         <label for="father_middle_name" class="block text-xs font-medium mb-1">Middle
                                             Name</label>
                                         <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                            wire:model="father_middle_name" placeholder="Middle Name"
-                                            name="father_middle_name" id="father_middle_name" required
-                                            {{ $father_is_unknown ? 'disabled' : '' }}>
+                                            wire:model="father_middle_name" placeholder="Middle Name" name="father_middle_name"
+                                            id="father_middle_name" required {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_middle_name')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="w-1/7">
-                                        <label for="father_suffix"
-                                            class="block text-xs font-medium mb-1">Suffix</label>
-                                        <select class="flux-form-control md:col-span-1 w-full"
-                                            wire:model="father_suffix" name="father_suffix" id="father_suffix"
-                                            {{ $father_is_unknown ? 'disabled' : '' }}>
+                                        <label for="father_suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                                        <select class="flux-form-control md:col-span-1 w-full" wire:model="father_suffix"
+                                            name="father_suffix" id="father_suffix" {{ $father_is_unknown ? 'disabled' : '' }}>
                                             <option value="">Suffix</option>
                                             <option value="N/A">N/A</option>
                                             <option value="Jr.">Jr.</option>
@@ -341,8 +388,7 @@
                                         <label for="father_birthdate" class="block text-xs font-medium mb-1">Date of
                                             Birth</label>
                                         <input class="flux-form-control" type="date" wire:model="father_birthdate"
-                                            name="father_birthdate" id="father_birthdate"
-                                            {{ $father_is_unknown ? 'disabled' : '' }}>
+                                            name="father_birthdate" id="father_birthdate" {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_birthdate')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -350,20 +396,17 @@
                                     <div>
                                         <label for="father_nationality"
                                             class="block text-xs font-medium mb-1">Nationality</label>
-                                        <input class="flux-form-control" type="text"
-                                            wire:model="father_nationality" placeholder="Nationality"
-                                            name="father_nationality" id="father_nationality" required
+                                        <input class="flux-form-control" type="text" wire:model="father_nationality"
+                                            placeholder="Nationality" name="father_nationality" id="father_nationality" required
                                             {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_nationality')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div>
-                                        <label for="father_religion"
-                                            class="block text-xs font-medium mb-1">Religion</label>
+                                        <label for="father_religion" class="block text-xs font-medium mb-1">Religion</label>
                                         <input class="flux-form-control" type="text" wire:model="father_religion"
-                                            placeholder="Religion" name="father_religion" id="father_religion"
-                                            required {{ $father_is_unknown ? 'disabled' : '' }}>
+                                            placeholder="Religion" name="father_religion" id="father_religion" required {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_religion')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -371,10 +414,9 @@
                                     <div>
                                         <label for="father_contact_no" class="block text-xs font-medium mb-1">Contact
                                             No.</label>
-                                        <input class="flux-form-control" type="text"
-                                            wire:model="father_contact_no" placeholder="Contact Number"
-                                            name="father_contact_no" id="father_contact_no" required
-                                            {{ $father_is_unknown ? 'disabled' : '' }}>
+                                        <input class="flux-form-control" type="text" wire:model="father_contact_no"
+                                            placeholder="Contact Number" name="father_contact_no" id="father_contact_no"
+                                            required {{ $father_is_unknown ? 'disabled' : '' }}>
                                         @error('father_contact_no')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -390,8 +432,8 @@
                                         <label for="mother_last_name" class="block text-xs font-medium mb-1">Last
                                             Name</label>
                                         <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                            wire:model="mother_last_name" placeholder="Last Name"
-                                            name="mother_last_name" id="mother_last_name">
+                                            wire:model="mother_last_name" placeholder="Last Name" name="mother_last_name"
+                                            id="mother_last_name">
                                         @error('mother_last_name')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -400,8 +442,8 @@
                                         <label for="mother_first_name" class="block text-xs font-medium mb-1">First
                                             Name</label>
                                         <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                            wire:model="mother_first_name" placeholder="First Name"
-                                            name="mother_first_name" id="mother_first_name">
+                                            wire:model="mother_first_name" placeholder="First Name" name="mother_first_name"
+                                            id="mother_first_name">
                                         @error('mother_first_name')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -410,17 +452,16 @@
                                         <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle
                                             Name</label>
                                         <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                            wire:model="mother_middle_name" placeholder="Middle Name"
-                                            name="mother_middle_name" id="mother_middle_name">
+                                            wire:model="mother_middle_name" placeholder="Middle Name" name="mother_middle_name"
+                                            id="mother_middle_name">
                                         @error('mother_middle_name')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="w-1/7">
-                                        <label for="mother_suffix"
-                                            class="block text-xs font-medium mb-1">Suffix</label>
-                                        <select class="flux-form-control md:col-span-1 w-full"
-                                            wire:model="mother_suffix" name="mother_suffix" id="mother_suffix">
+                                        <label for="mother_suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                                        <select class="flux-form-control md:col-span-1 w-full" wire:model="mother_suffix"
+                                            name="mother_suffix" id="mother_suffix">
                                             <option value="">Suffix</option>
                                             <option value="N/A">N/A</option>
                                             <option value="Jr.">Jr.</option>
@@ -436,19 +477,17 @@
                                         <label for="mother_birthdate" class="block text-xs font-medium mb-1">Mother's
                                             Birthdate</label>
                                         <input class="flux-form-control" type="date" wire:model="mother_birthdate"
-                                            placeholder="Mother's Birthdate" name="mother_birthdate"
-                                            id="mother_birthdate">
+                                            placeholder="Mother's Birthdate" name="mother_birthdate" id="mother_birthdate">
                                         @error('mother_birthdate')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_nationality"
-                                            class="block text-xs font-medium mb-1">Mother's
+                                        <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's
                                             Nationality</label>
-                                        <input class="flux-form-control" type="text"
-                                            wire:model="mother_nationality" placeholder="Mother's Nationality"
-                                            name="mother_nationality" id="mother_nationality">
+                                        <input class="flux-form-control" type="text" wire:model="mother_nationality"
+                                            placeholder="Mother's Nationality" name="mother_nationality"
+                                            id="mother_nationality">
                                         @error('mother_nationality')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -457,8 +496,7 @@
                                         <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's
                                             Religion</label>
                                         <input class="flux-form-control" type="text" wire:model="mother_religion"
-                                            placeholder="Mother's Religion" name="mother_religion"
-                                            id="mother_religion">
+                                            placeholder="Mother's Religion" name="mother_religion" id="mother_religion">
                                         @error('mother_religion')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -467,9 +505,8 @@
                                         <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's
                                             Contact
                                             No</label>
-                                        <input class="flux-form-control" type="text"
-                                            wire:model="mother_contact_no" placeholder="Mother's Contact No"
-                                            name="mother_contact_no" id="mother_contact_no">
+                                        <input class="flux-form-control" type="text" wire:model="mother_contact_no"
+                                            placeholder="Mother's Contact No" name="mother_contact_no" id="mother_contact_no">
                                         @error('mother_contact_no')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
@@ -477,56 +514,50 @@
                                 </div>
 
                                 <!-- Spouse -->
-                                @if ($this->service->title === 'Certificate of No Marriage (CENOMAR)'  || $this->service->title === 'Marriage Certificate' && $this->to_whom !== 'myself')
+                                @if ($this->service->title === 'Certificate of No Marriage (CENOMAR)' || $this->service->title === 'Marriage Certificate' && $this->to_whom !== 'myself')
                                     <div>
                                         <h5 class="text-md font-bold mb-4">Spouse</h5>
                                         <div class="form-control">
                                             <label class="label cursor-pointer">
                                                 <span class="label-text">Spouse is Unknown</span>
-                                                <input type="checkbox" wire:model.live="spouse_is_unknown"
-                                                    class="checkbox" />
+                                                <input type="checkbox" wire:model.live="spouse_is_unknown" class="checkbox" />
                                             </label>
                                         </div>
                                         <div class="flex flex-row md:flex-col gap-4 mb-4">
                                             <div class="w-full md:w-1/3">
-                                                <label for="spouse_last_name"
-                                                    class="block text-xs font-medium mb-1">Last Name</label>
+                                                <label for="spouse_last_name" class="block text-xs font-medium mb-1">Last
+                                                    Name</label>
                                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                                    wire:model="spouse_last_name" placeholder="Last Name"
-                                                    name="spouse_last_name" id="spouse_last_name" required
-                                                    {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                    wire:model="spouse_last_name" placeholder="Last Name" name="spouse_last_name"
+                                                    id="spouse_last_name" required {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_last_name')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                             <div class="w-full md:w-1/3">
-                                                <label for="spouse_first_name"
-                                                    class="block text-xs font-medium mb-1">First Name</label>
+                                                <label for="spouse_first_name" class="block text-xs font-medium mb-1">First
+                                                    Name</label>
                                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                                    wire:model="spouse_first_name" placeholder="First Name"
-                                                    name="spouse_first_name" id="spouse_first_name" required
-                                                    {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                    wire:model="spouse_first_name" placeholder="First Name" name="spouse_first_name"
+                                                    id="spouse_first_name" required {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_first_name')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                             <div class="w-full md:w-1/3">
-                                                <label for="spouse_middle_name"
-                                                    class="block text-xs font-medium mb-1">Middle Name</label>
+                                                <label for="spouse_middle_name" class="block text-xs font-medium mb-1">Middle
+                                                    Name</label>
                                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                                     wire:model="spouse_middle_name" placeholder="Middle Name"
-                                                    name="spouse_middle_name" id="spouse_middle_name" required
-                                                    {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                    name="spouse_middle_name" id="spouse_middle_name" required {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_middle_name')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                             <div class="w-1/7">
-                                                <label for="spouse_suffix"
-                                                    class="block text-xs font-medium mb-1">Suffix</label>
-                                                <select class="flux-form-control md:col-span-1 w-full"
-                                                    wire:model="spouse_suffix" name="spouse_suffix"
-                                                    id="spouse_suffix" {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                <label for="spouse_suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                                                <select class="flux-form-control md:col-span-1 w-full" wire:model="spouse_suffix"
+                                                    name="spouse_suffix" id="spouse_suffix" {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                     <option value="">Suffix</option>
                                                     <option value="N/A">N/A</option>
                                                     <option value="Jr.">Jr.</option>
@@ -539,11 +570,10 @@
                                         </div>
                                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                             <div>
-                                                <label for="spouse_birthdate"
-                                                    class="block text-xs font-medium mb-1">Date of Birth</label>
-                                                <input class="flux-form-control" type="date"
-                                                    wire:model="spouse_birthdate" name="spouse_birthdate"
-                                                    id="spouse_birthdate" {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                <label for="spouse_birthdate" class="block text-xs font-medium mb-1">Date of
+                                                    Birth</label>
+                                                <input class="flux-form-control" type="date" wire:model="spouse_birthdate"
+                                                    name="spouse_birthdate" id="spouse_birthdate" {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_birthdate')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
@@ -551,32 +581,27 @@
                                             <div>
                                                 <label for="spouse_nationality"
                                                     class="block text-xs font-medium mb-1">Nationality</label>
-                                                <input class="flux-form-control" type="text"
-                                                    wire:model="spouse_nationality" placeholder="Nationality"
-                                                    name="spouse_nationality" id="spouse_nationality" required
-                                                    {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                <input class="flux-form-control" type="text" wire:model="spouse_nationality"
+                                                    placeholder="Nationality" name="spouse_nationality" id="spouse_nationality"
+                                                    required {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_nationality')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                             <div>
-                                                <label for="spouse_religion"
-                                                    class="block text-xs font-medium mb-1">Religion</label>
-                                                <input class="flux-form-control" type="text"
-                                                    wire:model="spouse_religion" placeholder="Religion"
-                                                    name="spouse_religion" id="spouse_religion" required
-                                                    {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                <label for="spouse_religion" class="block text-xs font-medium mb-1">Religion</label>
+                                                <input class="flux-form-control" type="text" wire:model="spouse_religion"
+                                                    placeholder="Religion" name="spouse_religion" id="spouse_religion" required {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_religion')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
                                             </div>
                                             <div>
-                                                <label for="spouse_contact_no"
-                                                    class="block text-xs font-medium mb-1">Contact No.</label>
-                                                <input class="flux-form-control" type="text"
-                                                    wire:model="spouse_contact_no" placeholder="Contact Number"
-                                                    name="spouse_contact_no" id="spouse_contact_no" required
-                                                    {{ $spouse_is_unknown ? 'disabled' : '' }}>
+                                                <label for="spouse_contact_no" class="block text-xs font-medium mb-1">Contact
+                                                    No.</label>
+                                                <input class="flux-form-control" type="text" wire:model="spouse_contact_no"
+                                                    placeholder="Contact Number" name="spouse_contact_no" id="spouse_contact_no"
+                                                    required {{ $spouse_is_unknown ? 'disabled' : '' }}>
                                                 @error('spouse_contact_no')
                                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                                 @enderror
@@ -585,7 +610,7 @@
                                     </div>
                                 @endif
                             </div>
-                        @else
+                    @else
                             <div class="flux-card p-6">
                                 <h4 class="text-lg font-bold mb-4">Death Information</h4>
 
@@ -594,34 +619,28 @@
                                     <h5 class="text-md font-semibold mb-3">Full Name of the Deceased</h5>
                                     <div class="flex flex-row md:flex-col gap-4 mb-4">
                                         <div class="w-full md:w-1/3">
-                                            <label for="deceased_last_name"
-                                                class="block text-xs font-medium mb-1">Last
+                                            <label for="deceased_last_name" class="block text-xs font-medium mb-1">Last
                                                 Name</label>
-                                            <input class="flux-form-control" type="text"
-                                                wire:model="deceased_last_name" placeholder="Last Name"
-                                                name="deceased_last_name" id="deceased_last_name">
+                                            <input class="flux-form-control" type="text" wire:model="deceased_last_name"
+                                                placeholder="Last Name" name="deceased_last_name" id="deceased_last_name">
                                             @error('deceased_last_name')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
                                         <div class="w-full md:w-1/3">
-                                            <label for="deceased_first_name"
-                                                class="block text-xs font-medium mb-1">First
+                                            <label for="deceased_first_name" class="block text-xs font-medium mb-1">First
                                                 Name</label>
-                                            <input class="flux-form-control" type="text"
-                                                wire:model="deceased_first_name" placeholder="First Name"
-                                                name="deceased_first_name" id="deceased_first_name">
+                                            <input class="flux-form-control" type="text" wire:model="deceased_first_name"
+                                                placeholder="First Name" name="deceased_first_name" id="deceased_first_name">
                                             @error('deceased_first_name')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror
                                         </div>
                                         <div class="w-full md:w-1/3">
-                                            <label for="deceased_middle_name"
-                                                class="block text-xs font-medium mb-1">Middle
+                                            <label for="deceased_middle_name" class="block text-xs font-medium mb-1">Middle
                                                 Name</label>
-                                            <input class="flux-form-control" type="text"
-                                                wire:model="deceased_middle_name" placeholder="Middle Name"
-                                                name="deceased_middle_name" id="deceased_middle_name">
+                                            <input class="flux-form-control" type="text" wire:model="deceased_middle_name"
+                                                placeholder="Middle Name" name="deceased_middle_name" id="deceased_middle_name">
                                             @error('deceased_middle_name')
                                                 <span class="text-red-500 text-sm">{{ $message }}</span>
                                             @enderror

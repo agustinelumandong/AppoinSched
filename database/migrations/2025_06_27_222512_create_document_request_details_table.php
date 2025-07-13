@@ -35,6 +35,8 @@ return new class extends Migration {
             $table->enum('civil_status', ['Single', 'Married', 'Widowed', 'Divorced', 'Separated'])->nullable();
             $table->string('religion')->nullable();
             $table->string('nationality')->nullable();
+            $table->string('government_id_type')->nullable();
+            $table->string('government_id_image_path')->nullable();
 
             // Address Information for this specific request
             $table->enum('address_type', ['Permanent', 'Temporary'])->nullable();

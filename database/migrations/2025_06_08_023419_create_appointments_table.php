@@ -18,10 +18,17 @@ return new class extends Migration {
             $table->foreignId('service_id')->nullable()->constrained('services')->onDelete('cascade');
             $table->date('booking_date');
             $table->time('booking_time');
-            $table->enum('status', ['pending', 'approved', 'cancelled', 'completed', 'no-show'])->default('pending');
+            $table->enum('status', [
+                'pending',
+                'approved',
+                'cancelled',
+                'completed',
+                'no-show'
+            ])->default('pending');
+            $table->string('reference_number')->nullable();
+            $table->string('to_whom')->nullable();
+            $table->string('purpose')->nullable();
             $table->text('notes')->nullable();
-            $table->string('to_whom')->nullable() ;
-            $table->string('purpose')->nullable() ;
             $table->timestamps();
         });
     }

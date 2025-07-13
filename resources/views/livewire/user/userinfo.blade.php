@@ -3,12 +3,14 @@
 declare(strict_types=1);
 
 use Livewire\Volt\Component;
+use Livewire\WithFileUploads;
 use App\Models\User;
 use App\Models\PersonalInformation;
 use App\Models\UserAddresses;
 use App\Models\UserFamily;
 
 new class extends Component {
+    use WithFileUploads;
     public User $user;
     public PersonalInformation $personalInformation;
     public UserAddresses $userAddresses;
@@ -26,6 +28,8 @@ new class extends Component {
     public string $civil_status = 'Single';
     public string $religion = '';
     public string $nationality = 'Filipino';
+    public string $government_id_type = '';
+    public mixed $government_id_image_path = null;
     public string $address_type = '';
     public string $address_line_1 = '';
     public string $address_line_2 = '';
@@ -83,6 +87,8 @@ new class extends Component {
         $this->civil_status = $this->personalInformation->civil_status ?? 'Single';
         $this->religion = $this->personalInformation->religion ?? '';
         $this->nationality = $this->personalInformation->nationality ?? 'Filipino';
+        $this->government_id_type = $this->personalInformation->government_id_type ?? '';
+        // Note: government_id_image_path is handled as a file upload, not a string
         // Address
         $this->address_type = $this->userAddresses->address_type ?? 'Permanent';
         $this->address_line_1 = $this->userAddresses->address_line_1 ?? '';
@@ -174,6 +180,8 @@ new class extends Component {
             'civil_status' => ['nullable', 'string', 'max:50'],
             'religion' => ['nullable', 'string', 'max:100'],
             'nationality' => ['nullable', 'string', 'max:100'],
+            'government_id_type' => ['nullable', 'string', 'max:100'],
+            'government_id_image_path' => ['nullable', 'image', 'max:2048'], // 2MB max
             'address_type' => ['nullable', 'string', 'max:50'],
             'address_line_1' => ['nullable', 'string', 'max:255'],
             'address_line_2' => ['nullable', 'string', 'max:255'],
@@ -219,6 +227,12 @@ new class extends Component {
             ])
             ->save();
 
+        // Handle file upload for government ID image
+        $governmentIdImagePath = null;
+        if ($this->government_id_image_path) {
+            $governmentIdImagePath = $this->government_id_image_path->storeAs('government-ids', $this->user->id . '_' . $this->government_id_image_path->getClientOriginalName(), 'public');
+        }
+
         // Update Personal Information
         $this->personalInformation
             ->fill([
@@ -231,6 +245,8 @@ new class extends Component {
                 'civil_status' => $this->civil_status ?? 'Single',
                 'religion' => $this->religion ?: null,
                 'nationality' => $this->nationality ?? 'Filipino',
+                'government_id_type' => $this->government_id_type ?: null,
+                'government_id_image_path' => $governmentIdImagePath,
             ])
             ->save();
 
@@ -342,6 +358,14 @@ new class extends Component {
             $this->spouse_religion = '';
             $this->spouse_contact_no = '';
         }
+    }
+
+    public function getGovernmentIdImageUrl()
+    {
+        if ($this->personalInformation->government_id_image_path) {
+            return asset('storage/' . $this->personalInformation->government_id_image_path);
+        }
+        return null;
     }
 }; ?>
 
@@ -512,6 +536,40 @@ new class extends Component {
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="flex flex-col">
+                <label for="government_id_type" class="text-xs font-medium mb-1">Government ID Type</label>
+                <select id="government_id_type" class="flux-form-control" wire:model="government_id_type">
+                    <option value="">Select Government ID Type</option>
+                    <option value="SSS">SSS</option>
+                    <option value="GSIS">GSIS</option>
+                    <option value="TIN">TIN</option>
+                    <option value="PhilHealth">PhilHealth</option>
+                    <option value="Passport">Passport</option>
+                    <option value="Driver's License">Driver's License</option>
+                    <option value="UMID">UMID</option>
+                    <option value="Postal ID">Postal ID</option>
+                    <option value="Voter's ID">Voter's ID</option>
+                    <option value="Senior Citizen ID">Senior Citizen ID</option>
+                    <option value="Other">Other</option>
+                </select>
+                <span class="text-xs text-gray-500 mt-1">Select your primary government ID</span>
+            </div>
+            <div class="flex flex-col">
+                <label for="government_id_image_path" class="text-xs font-medium mb-1">Government ID Image</label>
+                <input id="government_id_image_path" class="flux-form-control" type="file"
+                    wire:model="government_id_image_path" accept="image/*">
+                <span class="text-xs text-gray-500 mt-1">Upload a clear image of your government ID (Max 2MB)</span>
+
+                @if($this->getGovernmentIdImageUrl())
+                    <div class="mt-2">
+                        <p class="text-xs text-gray-600 mb-1">Current ID Image:</p>
+                        <img src="{{ $this->getGovernmentIdImageUrl() }}" alt="Government ID"
+                            class="w-32 h-20 object-cover border rounded">
+                    </div>
+                @endif
+            </div>
+        </div>
     </div>
 
     <!-- Address Information -->
@@ -597,8 +655,8 @@ new class extends Component {
             @else
                 <div class="flex flex-col md:col-span-3">
                     <label for="father_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                    <input id="father_last_name" class="flux-form-control w-full" type="text"
-                        wire:model="father_last_name" placeholder="Last Name">
+                    <input id="father_last_name" class="flux-form-control w-full" type="text" wire:model="father_last_name"
+                        placeholder="Last Name">
                 </div>
                 <div class="flex flex-col md:col-span-3">
                     <label for="father_first_name" class="text-xs font-medium mb-1">First Name</label>
@@ -649,8 +707,8 @@ new class extends Component {
                 </div>
                 <div class="flex flex-col">
                     <label for="father_nationality" class="text-xs font-medium mb-1">Father's Nationality</label>
-                    <input id="father_nationality" class="flux-form-control" type="text"
-                        wire:model="father_nationality" placeholder="Father's Nationality">
+                    <input id="father_nationality" class="flux-form-control" type="text" wire:model="father_nationality"
+                        placeholder="Father's Nationality">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
                 <div class="flex flex-col">
@@ -661,8 +719,8 @@ new class extends Component {
                 </div>
                 <div class="flex flex-col">
                     <label for="father_contact_no" class="text-xs font-medium mb-1">Father's Contact No</label>
-                    <input id="father_contact_no" class="flux-form-control" type="text"
-                        wire:model="father_contact_no" placeholder="Father's Contact No">
+                    <input id="father_contact_no" class="flux-form-control" type="text" wire:model="father_contact_no"
+                        placeholder="Father's Contact No">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
             @endif
@@ -749,8 +807,8 @@ new class extends Component {
             @else
                 <div class="flex flex-col md:col-span-3">
                     <label for="spouse_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                    <input id="spouse_last_name" class="flux-form-control w-full" type="text"
-                        wire:model="spouse_last_name" placeholder="Last Name">
+                    <input id="spouse_last_name" class="flux-form-control w-full" type="text" wire:model="spouse_last_name"
+                        placeholder="Last Name">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
                 <div class="flex flex-col md:col-span-3">
@@ -804,8 +862,8 @@ new class extends Component {
                 </div>
                 <div class="flex flex-col">
                     <label for="spouse_nationality" class="text-xs font-medium mb-1">Spouse's Nationality</label>
-                    <input id="spouse_nationality" class="flux-form-control" type="text"
-                        wire:model="spouse_nationality" placeholder="Spouse's Nationality">
+                    <input id="spouse_nationality" class="flux-form-control" type="text" wire:model="spouse_nationality"
+                        placeholder="Spouse's Nationality">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
                 <div class="flex flex-col">
@@ -816,8 +874,8 @@ new class extends Component {
                 </div>
                 <div class="flex flex-col">
                     <label for="spouse_contact_no" class="text-xs font-medium mb-1">Spouse's Contact No</label>
-                    <input id="spouse_contact_no" class="flux-form-control" type="text"
-                        wire:model="spouse_contact_no" placeholder="Spouse's Contact No">
+                    <input id="spouse_contact_no" class="flux-form-control" type="text" wire:model="spouse_contact_no"
+                        placeholder="Spouse's Contact No">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
             @endif

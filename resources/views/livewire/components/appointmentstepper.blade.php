@@ -17,6 +17,10 @@ use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as FacadesSchema;
+use Illuminate\Support\Str;
+use App\Models\DocumentRequest;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -34,6 +38,7 @@ new #[Title('Appointment')] class extends Component {
     public string $message = '';
     public ?int $appointmentId = null;
     public bool $isLoading = false;
+    public ?string $reference_number = null;
 
     public ?int $id = null;
 
@@ -46,18 +51,60 @@ new #[Title('Appointment')] class extends Component {
 
     public ?Appointments $appointment = null;
 
-    public function mount(Offices $office, Services $service, User $staff): void
+    public function mount(Offices $office, Services $service, User $staff, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
         $this->staff = $staff;
         $this->id = auth()->user()->id;
-
+        // Set the reference_number if provided
+        if ($reference_number) {
+            $this->reference_number = $reference_number;
+        }
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making an appointment.');
             $this->redirect(route('userinfo'));
         }
+
+        // Only populate user data if "myself" is selected
+        if ($this->to_whom === 'myself') {
+            $this->populateUserData();
+        }
+    }
+
+    public function populateUserData(): void
+    {
+        $userData = auth()->user()->getAppointmentFormData();
+        // Populate form fields with user data (temporary data for this request only)
+        foreach ($userData as $field => $value) {
+            if (property_exists($this, $field)) {
+                $this->{$field} = $value;
+            }
+        }
+    }
+
+    public function updatedToWhom(): void
+    {
+        if ($this->to_whom === 'myself') {
+            $this->populateUserData();
+        } else {
+            $this->clearPersonalData();
+        }
+    }
+
+    public function clearPersonalData(): void
+    {
+        // Clear all personal information fields
+        $this->first_name = '';
+        $this->last_name = '';
+        $this->middle_name = '';
+        $this->email = '';
+        $this->phone = '';
+        $this->address = '';
+        $this->city = '';
+        $this->state = '';
+        $this->zip_code = '';
     }
 
     public function nextStep()
@@ -152,6 +199,14 @@ new #[Title('Appointment')] class extends Component {
 
             DB::beginTransaction();
 
+            if (!empty($this->reference_number)) {
+                $reference_number = $this->reference_number;
+            } else {
+                do {
+                    $reference_number = 'APPOINTMENT-' . strtoupper(Str::random(10));
+                } while (Appointments::where('reference_number', $reference_number)->exists());
+            }
+
             // Create the appointment
             $appointment = Appointments::create([
                 'user_id' => $userId,
@@ -164,6 +219,7 @@ new #[Title('Appointment')] class extends Component {
                 'to_whom' => $this->to_whom,
                 'purpose' => $this->purpose,
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
+                'reference_number' => $reference_number,
             ]);
 
             // Only create details if appointment was created and the details table has the correct FK
@@ -185,7 +241,30 @@ new #[Title('Appointment')] class extends Component {
                 ]);
             }
 
+
+            if (str_starts_with($reference_number, 'DOC')) {
+                $request = DocumentRequest::where('reference_number', $reference_number)->first();
+                if ($request) {
+                    $request->update([
+                        'payment_status' => 'walk-in',
+                        'payment_reference' => $reference_number,
+                    ]);
+                }
+            }
+
             DB::commit();
+
+            // Send notification to user
+            auth()->user()->notify(new RequestEventNotification(
+                RequestNotificationEvent::AppointmentScheduled,
+                [
+                    'date' => $this->selectedDate,
+                    'time' => $this->selectedTime,
+                    'location' => $this->office->name,
+                    'service' => $this->service->title,
+                    'reference_no' => $reference_number
+                ]
+            ));
 
             $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
             Cache::forget($cacheKey);

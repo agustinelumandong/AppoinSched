@@ -177,12 +177,12 @@ class RolesAndPermissionsSeeder extends Seeder
         ]);
 
         // Create example users and assign roles
-        $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole);
+        $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole, $mcrStaffRole, $mtoStaffRole, $bplsStaffRole);
 
         $this->command->info('Roles and permissions seeded successfully!');
     }
 
-    private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole): void
+    private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole, Role $mcrStaffRole, Role $mtoStaffRole, Role $bplsStaffRole): void
     {
         // Create SuperAdmin user
         $superAdmin = User::firstOrCreate(
@@ -231,6 +231,41 @@ class RolesAndPermissionsSeeder extends Seeder
             ]
         );
         $client->assignRole($clientRole);
+
+        // Create additional Staff users (MCR personnel examples)
+        $staff2 = User::firstOrCreate(
+            ['email' => 'MCR@gmail.com'],
+            [
+                'first_name' => 'MCR',
+                'last_name' => 'Staff',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $staff2->assignRole($mcrStaffRole);
+
+        $staff3 = User::firstOrCreate(
+            ['email' => 'MTO@gmail.com'],
+            [
+                'first_name' => 'MTO',
+                'last_name' => 'Staff',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $staff3->assignRole($mtoStaffRole);
+
+        $staff4 = User::firstOrCreate(
+            ['email' => 'BPLS@gmail.com'],
+            [
+                'first_name' => 'BPLS',
+                'last_name' => 'Staff',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $staff4->assignRole($bplsStaffRole);
+
 
         $this->command->info('Example users created and roles assigned successfully!');
     }

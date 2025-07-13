@@ -5,6 +5,8 @@ declare(strict_types=1);
 use Livewire\Volt\Component;
 use App\Models\Appointments;
 use Livewire\Attributes\On;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new class extends Component {
 
@@ -29,6 +31,18 @@ new class extends Component {
     // Only allow cancellation if appointment is pending or approved
     if (in_array($appointment->status, ['pending', 'approved'])) {
       $appointment->update(['status' => 'cancelled']);
+
+      // Send cancellation notification
+      $appointment->user->notify(new RequestEventNotification(
+        RequestNotificationEvent::AppointmentCancelled,
+        [
+          'date' => $appointment->booking_date->format('M d, Y'),
+          'time' => $appointment->booking_time,
+          'location' => $appointment->office->name,
+          'reason' => 'Cancelled by user'
+        ]
+      ));
+
       session()->flash('success', 'Appointment cancelled successfully.');
     } else {
       session()->flash('error', 'This appointment cannot be cancelled.');
@@ -60,11 +74,26 @@ new class extends Component {
     }
 
     try {
+      $oldDate = $this->selectedAppointment->booking_date->format('M d, Y');
+      $oldTime = $this->selectedAppointment->booking_time;
+      
       $this->selectedAppointment->update([
         'booking_date' => $this->selectedDate,
         'booking_time' => $this->selectedTime,
         'status' => 'pending', // Reset to pending for approval
       ]);
+
+      // Send reschedule notification
+      $this->selectedAppointment->user->notify(new RequestEventNotification(
+        RequestNotificationEvent::AppointmentRescheduled,
+        [
+          'old_date' => $oldDate,
+          'old_time' => $oldTime,
+          'new_date' => \Carbon\Carbon::parse($this->selectedDate)->format('M d, Y'),
+          'new_time' => $this->selectedTime,
+          'location' => $this->selectedAppointment->office->name,
+        ]
+      ));
 
       session()->flash('success', 'Appointment rescheduled successfully. Please wait for approval.');
       $this->closeRescheduleModal();
