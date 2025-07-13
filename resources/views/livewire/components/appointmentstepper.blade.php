@@ -19,6 +19,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema as FacadesSchema;
 use Illuminate\Support\Str;
 use App\Models\DocumentRequest;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -251,6 +253,18 @@ new #[Title('Appointment')] class extends Component {
             }
 
             DB::commit();
+
+            // Send notification to user
+            auth()->user()->notify(new RequestEventNotification(
+                RequestNotificationEvent::AppointmentScheduled,
+                [
+                    'date' => $this->selectedDate,
+                    'time' => $this->selectedTime,
+                    'location' => $this->office->name,
+                    'service' => $this->service->title,
+                    'reference_no' => $reference_number
+                ]
+            ));
 
             $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
             Cache::forget($cacheKey);

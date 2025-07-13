@@ -4,6 +4,7 @@ use App\Models\Offices;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\NotificationController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -20,6 +21,11 @@ Route::middleware(['auth'])->group(function () {
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
     Volt::route('userinfo', 'user.userinfo')->name('userinfo');
+
+    // Notification routes
+    Volt::route('notifications', 'notifications.index')->name('notifications.index');
+    Volt::route('notifications/{notification}/mark-as-read', 'notifications.index')->name('notifications.mark-as-read');
+    Volt::route('notifications/mark-all-as-read', 'notifications.index')->name('notifications.mark-all-as-read');
 
     // SuperAdmin only routes
     Route::middleware(['role:super-admin'])->group(function () {

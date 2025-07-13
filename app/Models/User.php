@@ -27,6 +27,7 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'notification_settings',
     ];
 
     /**
@@ -49,6 +50,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'notification_settings' => 'array',
         ];
     }
 
@@ -487,6 +489,42 @@ class User extends Authenticatable
         ];
     }
 
+    /**
+     * Get default notification settings
+     */
+    public function getDefaultNotificationSettings(): array
+    {
+        return [
+            'submitted' => true,
+            'approved' => true,
+            'rejected' => true,
+            'payment_uploaded' => true,
+            'payment_verified' => true,
+            'appointment_scheduled' => true,
+            'appointment_approved' => true,
+            'appointment_cancelled' => true,
+            'appointment_rescheduled' => true,
+            'completed' => true,
+            'appointment_reminder' => true,
+        ];
+    }
+
+    /**
+     * Get notification settings with defaults
+     */
+    public function getNotificationSettings(): array
+    {
+        return $this->notification_settings ?? $this->getDefaultNotificationSettings();
+    }
+
+    /**
+     * Update notification settings
+     */
+    public function updateNotificationSettings(array $settings): void
+    {
+        $this->update(['notification_settings' => $settings]);
+    }
+
     protected static function boot()
     {
         parent::boot();
@@ -494,6 +532,8 @@ class User extends Authenticatable
             if ($user->roles()->count() === 0) {
                 $user->assignRole('client');
             }
+            // Set default notification settings
+            $user->updateNotificationSettings($user->getDefaultNotificationSettings());
         });
     }
 }

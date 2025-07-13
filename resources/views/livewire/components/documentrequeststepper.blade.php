@@ -16,6 +16,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new #[Title('Document Request')] class extends Component {
     use WithFileUploads;
@@ -79,7 +81,7 @@ new #[Title('Document Request')] class extends Component {
     public string $government_id_type = '';
     public mixed $government_id_image_path = null;
     public mixed $government_id_image_file = null;
-    public string $reference_number = '';
+    public ?string $reference_number = '';
     public string $payment_reference = '';
 
     public bool $father_is_unknown = false;
@@ -550,6 +552,15 @@ new #[Title('Document Request')] class extends Component {
             DocumentRequestDetails::create($detailsData);
 
             DB::commit();
+
+            // Send notification to user
+            auth()->user()->notify(new RequestEventNotification(
+                RequestNotificationEvent::Submitted,
+                [
+                    'reference_no' => $this->reference_number,
+                    'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name
+                ]
+            ));
 
             session()->flash('success', 'Document request submitted successfully!');
 
