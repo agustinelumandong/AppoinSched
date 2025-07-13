@@ -467,7 +467,7 @@ class User extends Authenticatable
     {
         parent::boot();
         static::created(function ($user) {
-            if (!$user->hasAnyRole(['super-admin', 'admin', 'MCR-staff', 'MTO-staff', 'BPLS-staff', 'client'])) {
+            if ($user->roles()->count() === 0) {
                 $user->assignRole('client');
             }
         });

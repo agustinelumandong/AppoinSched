@@ -91,7 +91,7 @@
             @endhasrole
 
             {{-- Staff Navigation --}}
-            @hasrole('MCR-staff|MTO-staff|BPLS-staff|admin|super-admin')
+            @hasrole('MCR-staff|MTO-staff|BPLS-staff')
             <flux:navlist.group expandable :expanded="request()->routeIs('staff.*')" heading="Staff Management">
                 <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
                     :current="request()->routeIs('staff.appointments')" wire:navigate
@@ -237,7 +237,7 @@
             @endhasrole
 
             {{-- Staff Navigation --}}
-            @hasrole('MCR-staff|MTO-staff|BPLS-staff|admin|super-admin')
+            @hasrole('MCR-staff|MTO-staff|BPLS-staff')
             <flux:navlist.group expandable :expanded="request()->routeIs('staff.*')" heading="Staff Management">
                 <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
                     :current="request()->routeIs('staff.appointments')" wire:navigate
