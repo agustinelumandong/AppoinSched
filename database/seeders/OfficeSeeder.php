@@ -56,7 +56,7 @@ class OfficeSeeder extends Seeder
         $mcr->services()->create([
             'office_id' => $mcr->id,
             'title' => 'Appointment (MCR)',
-            'slug' => Str::slug('Appointment (MCR)'),
+            'slug' => 'appointment-mcr',
             'description' => 'Appointment for the registration of births, marriages, and deaths.',
             'price' => 0.00,
             'is_active' => 1,
@@ -94,7 +94,7 @@ class OfficeSeeder extends Seeder
         $bpls->services()->create([
             'office_id' => $bpls->id,
             'title' => 'Appointment (BPLS)',
-            'slug' => Str::slug('Appointment (BPLS)'),
+            'slug' => 'appointment-bpls',
             'description' => 'Appointment for the registration of business permits, special permits, and burial permits.',
             'price' => 0.00,
             'is_active' => 1,
@@ -116,7 +116,7 @@ class OfficeSeeder extends Seeder
         $mto->services()->create([
             'office_id' => $mto->id,
             'title' => 'Appointment (MTO)',
-            'slug' => Str::slug('Appointment (MTO)'),
+            'slug' => 'appointment-mto',
             'description' => 'Appointment for the payment of taxes.',
             'price' => 0.00,
             'is_active' => 1,
