@@ -46,14 +46,16 @@ new #[Title('Appointment')] class extends Component {
     public ?string $selectedTime = null;
 
     public Offices $office;
+    public ?string $services = null;
     public Services $service;
     public User $staff;
 
     public ?Appointments $appointment = null;
 
-    public function mount(Offices $office, Services $service, User $staff, ?string $reference_number = null): void
+    public function mount(Offices $office, Services $service, ?string $services = null, User $staff, ?string $reference_number = null): void
     {
         $this->office = $office;
+        $this->services = $services;
         $this->service = $service;
         $this->staff = $staff;
         $this->id = auth()->user()->id;
@@ -207,11 +209,13 @@ new #[Title('Appointment')] class extends Component {
                 } while (Appointments::where('reference_number', $reference_number)->exists());
             }
 
+            $service = Services::where('slug', $this->services)->first();
+
             // Create the appointment
             $appointment = Appointments::create([
                 'user_id' => $userId,
                 'office_id' => $this->office->id,
-                'service_id' => $this->service->id,
+                'service_id' => $service->id,
                 'staff_id' => $this->staff->id,
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
@@ -261,7 +265,7 @@ new #[Title('Appointment')] class extends Component {
                     'date' => $this->selectedDate,
                     'time' => $this->selectedTime,
                     'location' => $this->office->name,
-                    'service' => $this->service->title,
+                    'services' => $this->services,
                     'reference_no' => $reference_number
                 ]
             ));

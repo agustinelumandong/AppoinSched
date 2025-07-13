@@ -364,8 +364,9 @@ new class extends Component {
                                 </span>
                             </td>
                             <td>
-                                <div class="text-sm text-gray-900">{{ $appointment->service->title }}</div>
-                                <div class="text-sm text-gray-500">₱{{ number_format($appointment->service->price, 2) }}
+                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? ''}}</div>
+                                <div class="text-sm text-gray-500">
+                                    ₱{{ number_format($appointment->service->price ?? 0, 2) }}
                                 </div>
                             </td>
                             <td>

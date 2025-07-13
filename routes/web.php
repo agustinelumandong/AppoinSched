@@ -59,12 +59,12 @@ Route::middleware(['auth'])->group(function () {
         Volt::route('admin/offices/{office:slug}', 'offices.show')->name('offices.show');
         Volt::route('admin/offices/{office:slug}/services', 'offices.services')->name('offices.services');
         Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
-        Volt::route('offices/{office:slug}/services/{service:slug}', 'offices.appointmentbooking')->name('offices.service.appointment');
+        Volt::route('offices/{office:slug}/services/', 'offices.appointmentbooking')->name('offices.service.appointment');
     });
 
     // Testing route (remove in production)
     Volt::route('slot-picker', 'slot-picker')->name('slot-picker');
-    
+
     // Appointment slip download route
     Route::get('appointment-slip/{reference_number}/download', [App\Http\Controllers\AppointmentSlipController::class, 'downloadPdf'])
         ->name('appointment-slip.download');

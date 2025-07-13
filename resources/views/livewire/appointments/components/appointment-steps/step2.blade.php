@@ -22,10 +22,10 @@
         <input type="radio" id="consultation" name="purpose" value="consultation" wire:model.live="purpose" hidden />
         <label for="consultation"
           class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'consultation' ? 'flux-btn-active-primary' : '' }} p-2">Consultation</label>
-        <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose" hidden />
-        <label for="follow_up"
+        <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose" hidden /> <label
+          for="follow_up"
           class="flux-input-primary  flux-btn cursor-pointer {{ $purpose === 'follow_up' ? 'flux-btn-active-primary' : '' }} p-2">Follow
-          Up</label>
+        Up</label>
       </div>
 
       <footer class="my-6 flex justify-end gap-2">

@@ -35,13 +35,13 @@ new class extends Component {
                 'payment_reference' => $request->reference_number,
             ]);
         } elseif($method === 'walkIn') { 
-            $office_slug = $request->office->slug;
+            $office_slug = 'municipal-treasurers-office'; 
             $service_slug = $request->service->slug;
             $reference_number = $request->reference_number;
             $this->redirect(route('offices.service.appointment', 
             [
                 'office' => $office_slug, 
-                'service' => $service_slug, 
+                'services' => $service_slug, 
                 'reference_number' => $reference_number]));
         }
         $this->dispatch('close-modal-payment-method');

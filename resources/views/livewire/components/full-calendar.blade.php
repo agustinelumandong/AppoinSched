@@ -185,11 +185,36 @@ new class extends Component {
     $query = Appointments::with(['user', 'staff', 'office', 'service', 'appointmentDetails'])
       ->whereDate('booking_date', $date->format('Y-m-d'));
 
-    // If user is a client, only show their appointments
-    if (auth()->check() && auth()->user()->hasRole('client')) {
-      $query->where('user_id', auth()->id());
-    } elseif (auth()->check() && auth()->user()->hasRole('admin|super-admin|MCR-staff|MTO-staff')) {
-      $query->where('staff_id', auth()->id());
+    // Map office slugs to their corresponding staff roles
+    $officeRoleMap = [
+      'municipal-civil-registrar' => 'MCR-staff',
+      'municipal-treasurers-office' => 'MTO-staff',
+      'business-permits-and-licensing-section' => 'BPLS-staff',
+    ];
+
+    // Get all office IDs and their slugs
+    $offices = Offices::whereIn('slug', array_keys($officeRoleMap))
+      ->pluck('id', 'slug')
+      ->toArray();
+
+    if (auth()->check()) {
+      $user = auth()->user();
+
+      if ($user->hasRole('client')) {
+        // Clients see only their own appointments
+        $query->where('user_id', $user->id);
+      } else {
+        // For each office, if user has the corresponding staff role, filter by that office
+        $officeIdsForUser = [];
+        foreach ($officeRoleMap as $slug => $role) {
+          if ($user->hasRole($role) && isset($offices[$slug])) {
+            $officeIdsForUser[] = $offices[$slug];
+          }
+        }
+        if (!empty($officeIdsForUser)) {
+          $query->whereIn('office_id', $officeIdsForUser);
+        }
+      }
     }
 
     if ($this->selectedOfficeId) {
@@ -301,7 +326,7 @@ new class extends Component {
       </div>
     </div>
     <!-- Filters -->
-    @hasrole('admin|super-admin|MCR-staff|MTO-staff')
+    @hasrole('admin|super-admin')
     <div class="mt-4 pt-4 border-t border-gray-100">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Office Filter -->
