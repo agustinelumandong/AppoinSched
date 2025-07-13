@@ -64,6 +64,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Testing route (remove in production)
     Volt::route('slot-picker', 'slot-picker')->name('slot-picker');
+    
+    // Appointment slip download route
+    Route::get('appointment-slip/{reference_number}/download', [App\Http\Controllers\AppointmentSlipController::class, 'downloadPdf'])
+        ->name('appointment-slip.download');
 });
 
 require __DIR__ . '/auth.php';

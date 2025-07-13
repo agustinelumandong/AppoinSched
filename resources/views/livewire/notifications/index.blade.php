@@ -11,7 +11,8 @@ new class extends Component {
     public function markAsRead($data): void
     {
         $user = Auth::user();
-        $notificationId = $data['id'] ?? null;
+        dd($data);
+        $notificationId = $data['id'];
         if ($notificationId) {
             $notification = $user->notifications()->find($notificationId);
             if ($notification) {
@@ -82,7 +83,7 @@ new class extends Component {
                                         </div>
                                     </div>
                                     @if(!$notification->read_at)
-                                        <button wire:click="markAsRead('{{ $notification->id }}')"
+                                        <button wire:click="markAsRead({{ $notification->id }})"
                                             class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                             Mark as read
                                         </button>

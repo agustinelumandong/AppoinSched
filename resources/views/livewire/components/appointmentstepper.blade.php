@@ -266,19 +266,25 @@ new #[Title('Appointment')] class extends Component {
                 ]
             ));
 
+            // Send appointment slip email
+            auth()->user()->notify(new \App\Notifications\AppointmentSlipNotification($appointment));
+
             $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
             Cache::forget($cacheKey);
 
             if ($appointment) {
                 Log::info('Appointment created successfully', ['appointment_id' => $appointment->id]);
-                session()->flash('success', 'Appointment created successfully! We will contact you soon to confirm.');
 
-                // Reset the form
-                $this->reset(['step', 'to_whom', 'purpose', 'first_name', 'last_name', 'middle_name', 'email', 'phone', 'address', 'city', 'state', 'zip_code', 'selectedDate', 'selectedTime']);
-                $this->step = 1;
+                // Store the reference number for use in step 7
+                $this->reference_number = $reference_number;
 
+                // Move to step 7 instead of resetting
+                $this->step = 7;
+
+                // Clear cache and update UI
+                $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
+                Cache::forget($cacheKey);
                 $this->dispatch('refresh-slots');
-                $this->isLoading = true;
             } else {
                 Log::error('Appointment creation failed - no appointment object returned');
                 session()->flash('error', 'Failed to create appointment. Please try again.');
@@ -369,6 +375,28 @@ new #[Title('Appointment')] class extends Component {
             return true; // Return true to prevent booking in case of error
         }
     }
+
+    public function sendEmailSlip(): void
+    {
+        try {
+            // Find the appointment by reference number
+            $appointment = Appointments::where('reference_number', $this->reference_number)->first();
+
+            if (!$appointment) {
+                session()->flash('error', 'Appointment not found.');
+                return;
+            }
+
+            // Send the appointment slip notification
+            auth()->user()->notify(new \App\Notifications\AppointmentSlipNotification($appointment));
+
+            session()->flash('success', 'Appointment slip has been sent to your email address.');
+
+        } catch (\Exception $e) {
+            Log::error('Error sending appointment slip email: ' . $e->getMessage());
+            session()->flash('error', 'Failed to send appointment slip. Please try again.');
+        }
+    }
 }; ?>
 
 <div class="card shadow-xl border-none border-gray-200" style="border-radius: 1rem;">
@@ -418,6 +446,12 @@ new #[Title('Appointment')] class extends Component {
                     <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
             </li>
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+                <div class="step-content">
+                    <div class="step-title">Appointment Slip</div>
+                    <div class="step-description text-sm text-gray-500">Save Your Details</div>
+                </div>
+            </li>
         </ul>
     </div>
 
@@ -434,5 +468,7 @@ new #[Title('Appointment')] class extends Component {
         @include('livewire.appointments.components.appointment-steps.step5')
     @elseif($step == 6)
         @include('livewire.appointments.components.appointment-steps.step6')
+    @elseif($step == 7)
+        @include('livewire.appointments.components.appointment-steps.step7')
     @endif
 </div>
