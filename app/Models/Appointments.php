@@ -14,7 +14,6 @@ class Appointments extends Model
 
     protected $fillable = [
         'user_id',
-        'staff_id',
         'office_id',
         'service_id',
         'booking_date',
@@ -34,11 +33,6 @@ class Appointments extends Model
     public function user()
     {
         return $this->belongsTo(User::class, 'user_id');
-    }
-
-    public function staff()
-    {
-        return $this->belongsTo(User::class, 'staff_id');
     }
 
     public function office()

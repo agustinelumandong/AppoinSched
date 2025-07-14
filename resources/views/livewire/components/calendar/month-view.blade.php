@@ -29,7 +29,7 @@
       <!-- Appointments -->
       <div class="space-y-1">
 
-      @foreach($day['appointments'] as $appointment)
+      @foreach($day['appointments']->take(2) as $appointment)
       <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer bg-blue-100 text-blue-800"
       title="{{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} - {{ $appointment->service->name ?? 'N/A' }}">
       {{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} -
@@ -38,9 +38,9 @@
       @endforeach
 
 
-      @if($day['appointments']->count() > 3)
+      @if($day['appointments']->count() > 2)
       <div class="text-xs text-gray-500 font-medium">
-      +{{ $day['appointments']->count() - 3 }} more
+      +{{ $day['appointments']->count() - 2 }} more
       </div>
       @endif
       </div>

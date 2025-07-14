@@ -175,7 +175,7 @@ new class extends Component {
 
   private function getAppointmentsForDate(Carbon $date): Collection
   {
-    $query = Appointments::with(['user', 'staff', 'office', 'service', 'appointmentDetails'])
+    $query = Appointments::with(['user', 'office', 'service', 'appointmentDetails'])
       ->whereDate('booking_date', $date->format('Y-m-d'));
 
     // Map office slugs to their corresponding staff roles
@@ -214,10 +214,6 @@ new class extends Component {
       $query->where('office_id', $this->selectedOfficeId);
     }
 
-    if ($this->selectedStaffId) {
-      $query->where('staff_id', $this->selectedStaffId);
-    }
-
     return $query->orderBy('booking_time')->get();
   }
 
@@ -239,11 +235,10 @@ new class extends Component {
   private function generateCacheKey(): string
   {
     return sprintf(
-      'calendar_%s_%s_%s_%s',
+      'calendar_%s_%s_%s',
       $this->view,
       $this->currentDate->format('Y-m-d'),
       $this->selectedOfficeId ?? 'all',
-      $this->selectedStaffId ?? 'all'
     );
   }
 
@@ -332,17 +327,7 @@ new class extends Component {
       @endforeach
           </select>
         </div>
-        <!-- Staff Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Staff</label>
-          <select wire:model.live="selectedStaffId"
-            class="w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-            <option value="">All Staff</option>
-            @foreach($staff as $member)
-        <option value="{{ $member->id }}">{{ $member->first_name }} {{ $member->last_name }}</option>
-      @endforeach
-          </select>
-        </div>
+
         <!-- Status Filters -->
         <!-- Removed status filter UI -->
       </div>

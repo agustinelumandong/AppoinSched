@@ -27,5 +27,5 @@ new #[Title('Appointment')] class extends Component {
 
 <div>
     @include('components.alert')
-    <livewire:components.appointmentstepper :office="$office" />
+    <livewire:components.appointmentstepper :office="$office" :service="$service" />
 </div>

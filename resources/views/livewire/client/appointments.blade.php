@@ -5,35 +5,48 @@ declare(strict_types=1);
 use Livewire\Volt\Component;
 use App\Models\Appointments;
 use Livewire\Attributes\On;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 new class extends Component {
+  public ?Appointments $appointment = null;
+  public ?string $selectedDate = null;
+  public ?string $selectedTime = null;
 
-  public $selectedAppointment = null;
-  public $selectedDate = null;
-  public $selectedTime = null;
+  public function mount(): void
+  {
+    $this->resetRescheduleData();
+  }
 
-  public function with()
+  #[On('slot-picker-updated')]
+  public function updateRescheduleSlot($data): void
+  {
+    $this->selectedDate = $data['date'] ?? null;
+    $this->selectedTime = $data['time'] ?? null;
+  }
+
+  public function with(): array
   {
     return [
       'appointments' => Appointments::where('user_id', auth()->user()->id)
-        ->with(['office', 'service', 'staff', 'appointmentDetails'])
+        ->with(['office', 'service', 'appointmentDetails'])
         ->latest()
         ->paginate(10),
     ];
   }
 
-  public function openRescheduleModal($id)
+  public function openRescheduleModal(int $id): void
   {
-    $this->selectedAppointment = Appointments::with(['office', 'service', 'staff'])
-      ->findOrFail($id);
-    $this->selectedDate = null;
-    $this->selectedTime = null;
+    $appointment = Appointments::with(['office', 'service'])->findOrFail($id);
+    $this->appointment = $appointment;
+    $this->selectedDate = $appointment->booking_date?->format('Y-m-d');
+    $this->selectedTime = $appointment->booking_time;
     $this->dispatch('open-modal-reschedule-appointment');
   }
 
-  public function rescheduleAppointment()
+  public function rescheduleAppointment(): void
   {
-    if (!$this->selectedAppointment) {
+    if (!$this->appointment) {
       session()->flash('error', 'Appointment not found');
       return;
     }
@@ -45,39 +58,75 @@ new class extends Component {
       ]);
 
       // Check for scheduling conflicts
-      $conflict = Appointments::where('booking_date', $this->selectedDate)
-        ->where('booking_time', $this->selectedTime)
-        ->where('office_id', $this->selectedAppointment->office_id)
-        ->where('staff_id', $this->selectedAppointment->staff_id)
-        ->where('id', '!=', $this->selectedAppointment->id)
-        ->exists();
-
+      $conflict = $this->checkForConflicts();
       if ($conflict) {
         session()->flash('error', 'This time slot is already booked. Please select a different time.');
         return;
       }
 
-      $this->selectedAppointment->update([
+      $updated = $this->appointment->update([
         'booking_date' => $this->selectedDate,
         'booking_time' => $this->selectedTime,
       ]);
 
-      session()->flash('success', 'Appointment rescheduled successfully.');
-      $this->dispatch('close-modal-reschedule-appointment');
+      if ($updated) {
+        $this->resetRescheduleData();
+        $this->dispatch('close-modal-reschedule-appointment');
+        session()->flash('success', 'Appointment rescheduled successfully.');
+      } else {
+        session()->flash('error', 'Failed to reschedule appointment.');
+      }
+    } catch (\Illuminate\Validation\ValidationException $e) {
+      $errors = collect($e->errors())->flatten();
+      session()->flash('error', 'Validation failed: ' . $errors->first());
     } catch (\Exception $e) {
+      Log::error('Failed to reschedule appointment: ' . $e->getMessage());
       session()->flash('error', 'Failed to reschedule appointment.');
     }
   }
 
-  public function showAppointmentDetails($id)
+  private function checkForConflicts(): bool
   {
-    $this->selectedAppointment = Appointments::with(['office', 'service', 'staff'])
-      ->findOrFail($id);
+    try {
+      $timeToCheck = Carbon::parse($this->selectedTime)->format('H:i');
+      $conflict = Appointments::where('booking_date', $this->selectedDate)
+        ->where(function ($query) use ($timeToCheck) {
+          $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
+        })
+        ->where('office_id', $this->appointment->office_id)
+        ->where('service_id', $this->appointment->service_id)
+        ->where('id', '!=', $this->appointment->id)
+        ->exists();
+      return $conflict;
+    } catch (\Exception $e) {
+      Log::error('Error checking for conflicts: ' . $e->getMessage());
+      return true;
+    }
+  }
+
+  private function resetRescheduleData(): void
+  {
+    $this->appointment = null;
+    $this->selectedDate = null;
+    $this->selectedTime = null;
+  }
+
+  public function showAppointmentDetails(int $id): void
+  {
+    $this->appointment = Appointments::with(['office', 'service'])->findOrFail($id);
     $this->dispatch('open-modal-show-appointment');
+  }
+
+  public function searchs(): void
+  {
+    $this->resetPage();
   }
 }; ?>
 
 <div>
+
+  @include('components.alert')
+
   <div class="flux-card mb-4">
     <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
       <h5 class="mb-0 fw-semibold">My Appointments</h5>

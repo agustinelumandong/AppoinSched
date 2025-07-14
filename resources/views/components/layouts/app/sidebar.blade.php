@@ -213,14 +213,14 @@
 
         <flux:spacer />
 
-
+        @hasrole('client')
         <flux:navlist variant="outline">
             <flux:navlist.item icon="user" :href="route('userinfo')" wire:navigate
                 class="text-decoration-none text-black truncate">
                 {{ Str::limit(__('User Information'), 14) }}
             </flux:navlist.item>
         </flux:navlist>
-
+        @endhasrole
         <!-- Desktop User Menu -->
         {{-- <flux:dropdown position="bottom" align="start">
             <flux:profile :name="auth()->user()->first_name . ' ' . auth()->user()->last_name"

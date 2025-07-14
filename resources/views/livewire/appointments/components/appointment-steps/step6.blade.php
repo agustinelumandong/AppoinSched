@@ -27,13 +27,7 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Service</label>
-          <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $services }}</p>
-        </div>
-        <div>
-          <label class="block text-sm font-medium text-gray-600 mb-1">Staff</label>
-          <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $staff->first_name }}
-            {{ $staff->last_name }}
-          </p>
+          <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $service->title }}</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>

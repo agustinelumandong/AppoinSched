@@ -17,9 +17,8 @@
       <div class="mb-4" wire:key="slot-picker-wrapper">
         <label class="form-label fw-semibold">Select Date and Time</label>
         <div id="slot-picker-container-stepper" wire:ignore>
-          <livewire:slot-picker :office-id="$office->id" :service-id="$service->id" :staff-id="$staff->id"
-            :pre-selected-date="$selectedDate" :pre-selected-time="$selectedTime"
-            wire:key="stepper-slot-picker-{{ $office->id }}-{{ $service->id }}-{{ $staff->id }}" />
+          <livewire:slot-picker :office-id="$office->id" :service-id="$service->id" :pre-selected-date="$selectedDate"
+            :pre-selected-time="$selectedTime" wire:key="stepper-slot-picker-{{ $office->id }}-{{ $service->id }}" />
         </div>
       </div>
 
