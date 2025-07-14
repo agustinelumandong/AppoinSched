@@ -30,7 +30,7 @@
       <div class="space-y-1">
 
       @foreach($day['appointments'] as $appointment)
-      <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer bg-gray-100 text-gray-800"
+      <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer bg-blue-100 text-blue-800"
       title="{{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} - {{ $appointment->service->name ?? 'N/A' }}">
       {{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} -
       {{ Str::limit($appointment->service->title ?? 'N/A', 15) }}

@@ -34,7 +34,7 @@
         @endphp
 
         @if($appointmentTime === $slotTime)
-        <div class="appointment-item text-xs p-1 rounded mb-1 cursor-pointer bg-gray-100 text-gray-800"
+        <div class="appointment-item text-xs p-1 rounded mb-1 cursor-pointer bg-blue-100 text-blue-800"
         title="{{ $appointment->user->first_name }} {{ $appointment->user->last_name }} - {{ $appointment->service->name ?? 'N/A' }}">
         <div class="font-medium truncate">
         {{ $appointment->user->first_name }} {{ $appointment->user->last_name }}
