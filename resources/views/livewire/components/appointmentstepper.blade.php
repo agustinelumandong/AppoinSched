@@ -210,7 +210,7 @@ new #[Title('Appointment')] class extends Component {
             }
 
             $service = Services::where('slug', $this->services)->first();
-
+            $this->service = $service;
             // Create the appointment
             $appointment = Appointments::create([
                 'user_id' => $userId,
@@ -219,7 +219,6 @@ new #[Title('Appointment')] class extends Component {
                 'staff_id' => $this->staff->id,
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
-                'status' => 'pending',
                 'to_whom' => $this->to_whom,
                 'purpose' => $this->purpose,
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
@@ -358,7 +357,6 @@ new #[Title('Appointment')] class extends Component {
                 })
                 ->where('office_id', $this->office->id)
                 ->where('staff_id', $this->staff->id)
-                ->whereNotIn('status', ['cancelled', 'no-show'])
                 ->exists();
 
             Log::info('Checking for conflicts in stepper:', [

@@ -2,7 +2,7 @@
     <div class="modal-body">
         <div class="row g-4">
             <!-- User Information -->
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="info-group">
                     <h6 class="text-muted mb-2">User Information</h6>
                     <div class="p-3 rounded bg-light">
@@ -17,21 +17,7 @@
                 </div>
             </div>
 
-            <!-- Staff Information -->
-            <div class="col-md-6">
-                <div class="info-group">
-                    <h6 class="text-muted mb-2">Staff Information</h6>
-                    <div class="p-3 rounded bg-light">
-                        <p class="mb-0 text-dark">
-                            @if($appointment->staff->middle_name ?? '')
-                                {{ $appointment->staff->middle_name ?? '' }},
-                            @endif
-                            {{ $appointment->staff->first_name ?? '' }}
-                            {{ $appointment->staff->last_name ?? '' }}
-                        </p>
-                    </div>
-                </div>
-            </div>
+
 
             <!-- Service Information -->
             <div class="col-md-6">
@@ -58,7 +44,9 @@
                 <div class="info-group">
                     <h6 class="text-muted mb-2">Booking Date</h6>
                     <div class="p-3 rounded bg-light">
-                      <p class="mb-0 text-dark">{{ $appointment && $appointment->booking_date ? \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') : 'N/A' }}</p>
+                        <p class="mb-0 text-dark">
+                            {{ $appointment && $appointment->booking_date ? \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') : 'N/A' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -67,7 +55,9 @@
                 <div class="info-group">
                     <h6 class="text-muted mb-2">Booking Time</h6>
                     <div class="p-3 rounded bg-light">
-                      <p class="mb-0 text-dark">{{ $appointment && $appointment->booking_time ? \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') : 'N/A' }}</p>
+                        <p class="mb-0 text-dark">
+                            {{ $appointment && $appointment->booking_time ? \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') : 'N/A' }}
+                        </p>
                     </div>
                 </div>
             </div>
@@ -75,21 +65,9 @@
             <!-- Additional Information -->
             <div class="col-md-12">
                 <div class="info-group">
-                    <h6 class="text-muted mb-2">Additional Notes</h6>
-                    <div class="p-3 rounded bg-light">
-                        <p class="mb-0 text-dark">{{ $appointment->notes ?? '' }}</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Status Information -->
-            <div class="col-md-12">
-                <div class="info-group">
-                    <h6 class="text-muted mb-2">Appointment Status</h6>
+                    <h6 class="text-muted mb-2">Notes</h6>
                     <div class=" rounded ">
-                        <span class="flux-badge flux-badge-{{ $appointment && $appointment->status ? ($appointment->status === 'pending' ? 'warning' : ($appointment->status === 'approved' ? 'success' : ($appointment->status === 'cancelled' ? 'danger' : ($appointment->status === 'completed' ? 'success' : ($appointment->status === 'no-show' ? 'danger' : 'secondary'))))) : 'secondary' }}">
-                            {{ $appointment && $appointment->status ? ucfirst($appointment->status) : 'N/A' }}
-                        </span>
+                        <p class="mb-0">{{ $appointment?->notes ?? 'No notes available' }}</p>
                     </div>
                 </div>
             </div>
@@ -98,7 +76,8 @@
 
     <x-slot name="footer">
         <p class="text-muted">Created: {{ $appointment?->created_at?->format('M d, Y g:i A') ?? 'N/A' }}</p>
-        <button type="button" class="btn btn-outline-secondary" x-data x-on:click="$dispatch('close-modal-show-appointment')">
+        <button type="button" class="btn btn-outline-secondary" x-data
+            x-on:click="$dispatch('close-modal-show-appointment')">
             <i class="bi bi-x-lg me-1"></i>Back
         </button>
 

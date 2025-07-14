@@ -55,11 +55,9 @@
           <div class="mt-2 space-y-1">
             <p><span class="font-medium">Office:</span> {{ $office->name }}</p>
             <p><span class="font-medium">Service:</span> {{ $service->title }}</p>
-            <p><span class="font-medium">Staff:</span> {{ $staff->first_name }} {{ $staff->last_name }}</p>
             <p><span class="font-medium">Purpose:</span> {{ $purpose }}</p>
             <p><span class="font-medium">Date:</span> {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}</p>
             <p><span class="font-medium">Time:</span> {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}</p>
-            <p><span class="font-medium">Status:</span> <span class="text-yellow-600 font-semibold">Pending</span></p>
           </div>
         </div>
 

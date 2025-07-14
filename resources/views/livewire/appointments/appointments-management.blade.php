@@ -15,7 +15,6 @@ new class extends Component {
     public string $search = '';
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
-    public string $status = '';
     public string $notes = '';
 
     public ?Appointments $appointment = null;
@@ -62,7 +61,6 @@ new class extends Component {
             $this->appointment = $appointment;
             $this->selectedDate = $appointment->booking_date?->format('Y-m-d');
             $this->selectedTime = $appointment->booking_time;
-            $this->status = $appointment->status;
             $this->notes = $appointment->notes ?? '';
 
             $this->dispatch('open-modal-edit-appointment');
@@ -83,7 +81,6 @@ new class extends Component {
             $validated = $this->validate([
                 'selectedDate' => 'required|date|after_or_equal:today',
                 'selectedTime' => 'required|string',
-                'status' => 'required|string|in:pending,approved,cancelled,completed,no-show',
                 'notes' => 'nullable|string|max:1000',
             ]);
 
@@ -97,7 +94,6 @@ new class extends Component {
             $updateData = [
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
-                'status' => $this->status,
                 'notes' => $this->notes,
             ];
 
@@ -133,7 +129,6 @@ new class extends Component {
                 ->where('office_id', $this->appointment->office_id)
                 ->where('staff_id', $this->appointment->staff_id)
                 ->where('id', '!=', $this->appointment->id)
-                ->whereNotIn('status', ['cancelled', 'no-show'])
                 ->exists();
 
             Log::info('Checking for conflicts:', [
@@ -180,7 +175,6 @@ new class extends Component {
         $this->appointment = null;
         $this->selectedDate = null;
         $this->selectedTime = null;
-        $this->status = '';
         $this->notes = '';
     }
 
@@ -190,8 +184,7 @@ new class extends Component {
             'appointments' => Appointments::with('user', 'staff', 'office', 'service')
                 ->where(function ($query) {
                     $query
-                        ->where('status', 'like', '%' . $this->search . '%')
-                        ->orWhere('notes', 'like', '%' . $this->search . '%')
+                        ->where('notes', 'like', '%' . $this->search . '%')
                         ->orWhereHas('user', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'))
                         ->orWhereHas('staff', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'));
                 })

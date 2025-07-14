@@ -19,51 +19,25 @@ new class extends Component {
         }
     }
 
-    public function with()
+    public function with(): array
     {
-        $user = auth()->user();
         return [
-            'myAppointments' => Appointments::where('staff_id', $user->id)
+            'recentAppointments' => Appointments::with(['user', 'office', 'service'])
                 ->where('office_id', $this->getOfficeIdForStaff())
-                ->with(['user', 'office', 'service'])
-                ->latest()
-                ->take(10)
-                ->get(),
-            'pendingAppointments' => Appointments::where('status', 'pending')
-                ->where('office_id', $this->getOfficeIdForStaff())
-                ->with(['user', 'office', 'service'])
                 ->latest()
                 ->take(5)
                 ->get(),
-            'todayAppointments' => Appointments::whereDate('booking_date', today())->where('staff_id', $user->id)->where('office_id', $this->getOfficeIdForStaff())->count(),
-            'documentRequests' => DocumentRequest::where('office_id', $this->getOfficeIdForStaff())
-                ->with(['user', 'office'])
+            'recentDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
+                ->where('office_id', $this->getOfficeIdForStaff())
                 ->latest()
                 ->take(5)
                 ->get(),
-            'pendingDocumentRequests' => DocumentRequest::where('status', 'pending')
+            'todayAppointments' => Appointments::with(['user', 'office', 'service'])
                 ->where('office_id', $this->getOfficeIdForStaff())
-                ->with(['user', 'office'])
-                ->count(),
-            'approvedDocumentRequests' => DocumentRequest::where('status', 'approved')
-                ->where('office_id', $this->getOfficeIdForStaff())
-                ->with(['user', 'office'])
-                ->count(),
-            'rejectedDocumentRequests' => DocumentRequest::where('status', 'rejected')
-                ->where('office_id', $this->getOfficeIdForStaff())
-                ->with(['user', 'office'])
-                ->count(),
-            'totalDocumentRequests' => DocumentRequest::where('office_id', $this->getOfficeIdForStaff())->count(),
-            'offices' => Offices::orderBy('created_at', 'DESC')->get(),
-            'profileCompletion' => $user->getProfileCompletionPercentage(),
-            'hasCompleteProfile' => $user->hasCompleteProfile(),
-            'hasCompleteBasicProfile' => $user->hasCompleteBasicProfile(),
-            'hasCompletePersonalInfo' => $user->hasCompletePersonalInfo(),
-            'hasCompleteAddress' => $user->hasCompleteAddress(),
-            'hasCompleteFamilyInfo' => $user->hasCompleteFamilyInfo(),
+                ->where('booking_date', today())
+                ->get(),
         ];
     }
-
     public function getOfficeIdForStaff(): ?int
     {
         if (auth()->user()->hasRole('MCR-staff')) {
@@ -79,10 +53,6 @@ new class extends Component {
     }
 }; ?>
 <div title="Staff Dashboard">
-
-
-
-
     <div class="space-y-6">
         <div class="flex justify-between items-center">
             <div>
@@ -104,8 +74,8 @@ new class extends Component {
                         </svg>
                     </div>
                     <div class="ml-4">
-                        <p class="text-sm font-medium text-gray-600">My Appointments</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $myAppointments->count() }}</p>
+                        <p class="text-sm font-medium text-gray-600">Recent Appointments</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $recentAppointments->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -119,7 +89,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Today's Appointments</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $todayAppointments }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $todayAppointments->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -133,7 +103,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Pending Reviews</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $pendingAppointments->count() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $recentAppointments->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -150,7 +120,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Pending Document Requests</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $pendingDocumentRequests }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $recentDocumentRequests->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -164,7 +134,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Approved Document Requests</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $approvedDocumentRequests }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $recentDocumentRequests->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -178,7 +148,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Rejected Document Requests</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $rejectedDocumentRequests }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $recentDocumentRequests->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -208,33 +178,32 @@ new class extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($myAppointments as $appointment)
-                                <tr>
-                                    <td>
-                                        {{ $appointment->user?->first_name ?? 'N/A' }}
-                                        {{ $appointment->user?->last_name ?? '' }}
-                                    </td>
-                                    <td>
-                                        {{ $appointment->service?->name ?? 'N/A' }}
-                                    </td>
-                                    <td>
-                                        {{ \Illuminate\Support\Carbon::parse($appointment->booking_date)->format('M d, Y') }}
-                                        {{ \Illuminate\Support\Carbon::parse($appointment->booking_time)->format('h:i A') }}
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="flux-badge {{ $appointment->status === 'pending'
-                                                ? 'flux-badge-warning'
-                                                : ($appointment->status === 'approved'
-                                                    ? 'flux-badge-success'
-                                                    : ($appointment->status === 'cancelled'
-                                                        ? 'flux-badge-danger'
-                                                        : 'flux-badge-info')) }}">
-                                            {{ ucfirst($appointment->status) }}
-                                        </span>
-                                    </td>
+                            @forelse($recentAppointments as $appointment)
+                                                    <tr>
+                                                        <td>
+                                                            {{ $appointment->user?->first_name ?? 'N/A' }}
+                                                            {{ $appointment->user?->last_name ?? '' }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $appointment->service?->name ?? 'N/A' }}
+                                                        </td>
+                                                        <td>
+                                                            {{ \Illuminate\Support\Carbon::parse($appointment->booking_date)->format('M d, Y') }}
+                                                            {{ \Illuminate\Support\Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                                                        </td>
+                                                        <td>
+                                                            <span class="flux-badge {{ $appointment->status === 'pending'
+                                ? 'flux-badge-warning'
+                                : ($appointment->status === 'approved'
+                                    ? 'flux-badge-success'
+                                    : ($appointment->status === 'cancelled'
+                                        ? 'flux-badge-danger'
+                                        : 'flux-badge-info')) }}">
+                                                                {{ ucfirst($appointment->status) }}
+                                                            </span>
+                                                        </td>
 
-                                </tr>
+                                                    </tr>
                             @empty
                                 <tr>
                                     <td colspan="5" class="text-center text-gray-500">No appointments found</td>
@@ -261,33 +230,32 @@ new class extends Component {
                             </tr>
                         </thead>
                         <tbody>
-                            @forelse($documentRequests as $documentRequest)
-                                <tr>
-                                    <td>
-                                        {{ $documentRequest->user?->first_name ?? 'N/A' }}
-                                        {{ $documentRequest->user?->last_name ?? '' }}
-                                    </td>
-                                    <td>
-                                        {{ $documentRequest->service?->name ?? 'N/A' }}
-                                    </td>
-                                    <td>
-                                        {{ \Illuminate\Support\Carbon::parse($documentRequest->booking_date)->format('M d, Y') }}
-                                        {{ \Illuminate\Support\Carbon::parse($documentRequest->booking_time)->format('h:i A') }}
-                                    </td>
-                                    <td>
-                                        <span
-                                            class="flux-badge {{ $documentRequest->status === 'pending'
-                                                ? 'flux-badge-warning'
-                                                : ($documentRequest->status === 'approved'
-                                                    ? 'flux-badge-success'
-                                                    : ($documentRequest->status === 'cancelled'
-                                                        ? 'flux-badge-danger'
-                                                        : 'flux-badge-info')) }}">
-                                            {{ ucfirst($documentRequest->status) }}
-                                        </span>
-                                    </td>
+                            @forelse($recentDocumentRequests as $documentRequest)
+                                                    <tr>
+                                                        <td>
+                                                            {{ $documentRequest->user?->first_name ?? 'N/A' }}
+                                                            {{ $documentRequest->user?->last_name ?? '' }}
+                                                        </td>
+                                                        <td>
+                                                            {{ $documentRequest->service?->name ?? 'N/A' }}
+                                                        </td>
+                                                        <td>
+                                                            {{ \Illuminate\Support\Carbon::parse($documentRequest->booking_date)->format('M d, Y') }}
+                                                            {{ \Illuminate\Support\Carbon::parse($documentRequest->booking_time)->format('h:i A') }}
+                                                        </td>
+                                                        <td>
+                                                            <span class="flux-badge {{ $documentRequest->status === 'pending'
+                                ? 'flux-badge-warning'
+                                : ($documentRequest->status === 'approved'
+                                    ? 'flux-badge-success'
+                                    : ($documentRequest->status === 'cancelled'
+                                        ? 'flux-badge-danger'
+                                        : 'flux-badge-info')) }}">
+                                                                {{ ucfirst($documentRequest->status) }}
+                                                            </span>
+                                                        </td>
 
-                                </tr>
+                                                    </tr>
                             @empty
                                 <tr>
                                     <td colspan="5" class="text-center text-gray-500">No document requests found

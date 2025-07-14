@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
 use Livewire\Attributes\On;
 use App\Models\Offices;
-use App\Notifications\RequestEventNotification;
-use App\Enums\RequestNotificationEvent;
 
 new class extends Component {
     use WithPagination;
@@ -18,7 +16,6 @@ new class extends Component {
     public string $search = '';
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
-    public string $status = '';
     public string $notes = '';
     public ?int $selectedOfficeId = null;
 
@@ -81,7 +78,6 @@ new class extends Component {
             $this->appointment = $appointment;
             $this->selectedDate = $appointment->booking_date?->format('Y-m-d');
             $this->selectedTime = $appointment->booking_time;
-            $this->status = $appointment->status;
             $this->notes = $appointment->notes ?? '';
 
             $this->dispatch('open-modal-edit-appointment');
@@ -108,7 +104,6 @@ new class extends Component {
             $validated = $this->validate([
                 'selectedDate' => 'required|date|after_or_equal:today',
                 'selectedTime' => 'required|string',
-                'status' => 'required|string|in:pending,approved,cancelled,completed,no-show',
                 'notes' => 'nullable|string|max:1000',
             ]);
 
@@ -122,17 +117,12 @@ new class extends Component {
             $updateData = [
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
-                'status' => $this->status,
                 'notes' => $this->notes,
             ];
 
-            $oldStatus = $this->appointment->status;
             $updated = $this->appointment->update($updateData);
 
             if ($updated) {
-                // Send notification based on status change
-                $this->sendStatusChangeNotification($oldStatus, $this->status);
-
                 $this->resetAppointmentData();
                 $this->dispatch('appointmentUpdated');
                 $this->dispatch('close-modal-edit-appointment');
@@ -149,32 +139,6 @@ new class extends Component {
         }
     }
 
-    private function sendStatusChangeNotification(string $oldStatus, string $newStatus): void
-    {
-        if ($oldStatus === $newStatus) {
-            return; // No status change
-        }
-
-        $appointment = $this->appointment;
-        $user = $appointment->user;
-
-        $notificationData = [
-            'date' => $appointment->booking_date->format('M d, Y'),
-            'time' => $appointment->booking_time,
-            'location' => $appointment->office->name,
-        ];
-
-        $event = match ($newStatus) {
-            'approved' => RequestNotificationEvent::AppointmentApproved,
-            'cancelled' => RequestNotificationEvent::AppointmentCancelled,
-            default => null,
-        };
-
-        if ($event) {
-            $user->notify(new RequestEventNotification($event, $notificationData));
-        }
-    }
-
     private function checkForConflicts(): bool
     {
         try {
@@ -188,7 +152,6 @@ new class extends Component {
                 ->where('office_id', $this->appointment->office_id)
                 ->where('staff_id', $this->appointment->staff_id)
                 ->where('id', '!=', $this->appointment->id)
-                ->whereNotIn('status', ['cancelled', 'no-show'])
                 ->exists();
 
             Log::info('Checking for conflicts:', [
@@ -241,7 +204,6 @@ new class extends Component {
         $this->appointment = null;
         $this->selectedDate = null;
         $this->selectedTime = null;
-        $this->status = '';
         $this->notes = '';
     }
 
@@ -258,20 +220,34 @@ new class extends Component {
         }
         return null;
     }
+
     public function with(): array
     {
+        $query = Appointments::with(['user', 'staff', 'office', 'service'])
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->whereHas('user', function ($userQuery) {
+                        $userQuery->where('first_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                            ->orWhere('reference_number', 'like', '%' . $this->search . '%');
+                    });
+                });
+            })
+            ->when($this->selectedOfficeId, function ($query) {
+                $query->where('office_id', $this->selectedOfficeId);
+            });
+
+        // Filter by staff's assigned office if not admin/super-admin
+        if (!auth()->user()->hasAnyRole(['admin', 'super-admin'])) {
+            $officeId = $this->getOfficeIdForStaff();
+            if ($officeId) {
+                $query->where('office_id', $officeId);
+            }
+        }
+
         return [
-            'appointments' => Appointments::with('user', 'staff', 'office', 'service')
-                ->where('office_id', $this->getOfficeIdForStaff())
-                ->where(function ($query) {
-                    $query
-                        ->where('status', 'like', '%' . $this->search . '%')
-                        ->orWhere('notes', 'like', '%' . $this->search . '%')
-                        ->orWhereHas('user', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'))
-                        ->orWhereHas('staff', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'));
-                })
-                ->orderBy('created_at', 'desc')
-                ->paginate(10),
+            'appointments' => $query->latest()->paginate(10),
+            'offices' => Offices::all(),
         ];
     }
 }; ?>
@@ -328,10 +304,9 @@ new class extends Component {
                 <thead>
                     <tr>
                         <th>Client</th>
-                        <th>Office</th>
+                        <th>Reference Number</th>
                         <th>Service</th>
                         <th>Date & Time</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -358,16 +333,12 @@ new class extends Component {
                                 </div>
                             </td>
                             <td>
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                                    {{ $appointment->office->name }}
-                                </span>
+                                <div class="text-sm font-medium text-gray-900">
+                                    {{ $appointment->reference_number ?? 'N/A' }}
+                                </div>
                             </td>
                             <td>
                                 <div class="text-sm text-gray-900">{{ $appointment->service->title ?? ''}}</div>
-                                <div class="text-sm text-gray-500">
-                                    ₱{{ number_format($appointment->service->price ?? 0, 2) }}
-                                </div>
                             </td>
                             <td>
                                 <div class="text-sm text-gray-900">
@@ -376,22 +347,6 @@ new class extends Component {
                                 <div class="text-sm text-gray-500">
                                     {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
                                 </div>
-                            </td>
-                            <td>
-                                @php
-                                    $statusColors = [
-                                        'pending' => 'bg-yellow-100 text-yellow-800',
-                                        'approved' => 'bg-green-100 text-green-800',
-                                        'cancelled' => 'bg-red-100 text-red-800',
-                                        'completed' => 'bg-blue-100 text-blue-800',
-                                        'no-show' => 'bg-gray-100 text-gray-800',
-                                    ];
-                                    $statusColor = $statusColors[$appointment->status] ?? 'bg-gray-100 text-gray-800';
-                                @endphp
-                                <span
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ $statusColor }}">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
                             </td>
                             <td>
                                 <div class="flex items-center space-x-2">

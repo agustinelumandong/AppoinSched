@@ -23,7 +23,9 @@ new class extends Component {
                 ->latest()
                 ->take(5)
                 ->get(),
-            'upcomingAppointments' => Appointments::where('user_id', $user->id)->where('booking_date', '>=', today())->where('status', 'approved')->count(),
+            'upcomingAppointments' => Appointments::where('user_id', $user->id)
+                ->where('booking_date', '>=', today())
+                ->count(),
             'totalAppointments' => Appointments::where('user_id', $user->id)->count(),
             'offices' => Offices::take(6)->get(),
             // 'offices' => Offices::orderBy('created_at', 'DESC')->get(),
@@ -58,8 +60,7 @@ new class extends Component {
                 <div class="flux-card p-4 bg-yellow-50 border-yellow-200 shadow-lg rounded-lg">
                     <div class="flex items-center justify-between">
                         <div class="flex items-center">
-                            <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor"
-                                viewBox="0 0 24 24">
+                            <svg class="w-5 h-5 text-yellow-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
                                 </path>
@@ -73,8 +74,7 @@ new class extends Component {
                                 </div>
                             </div>
                         </div>
-                        <button x-on:click="show = false"
-                            class="text-yellow-600 hover:text-yellow-800 focus:outline-none">
+                        <button x-on:click="show = false" class="text-yellow-600 hover:text-yellow-800 focus:outline-none">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M6 18L18 6M6 6l12 12">
@@ -123,8 +123,7 @@ new class extends Component {
                         </header>
                         {{-- Footer --}}
                         <footer class="flex items-center justify-between pt-10">
-                            <span
-                                class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
+                            <span class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
                                 Office</span>
                         </footer>
                     </a>
@@ -165,17 +164,9 @@ new class extends Component {
                             </p>
                         </div>
                         <div class="text-right">
-                            <span
-                                class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                                                                                            @if ($appointment->status === 'pending') bg-yellow-100 text-yellow-800
-                                                                                                            @elseif($appointment->status === 'approved') bg-green-100 text-green-800
-                                                                                                            @elseif($appointment->status === 'cancelled') bg-red-100 text-red-800
-                                                                                                            @else bg-gray-100 text-gray-800 @endif">
-                                {{ ucfirst($appointment->status) }}
-                            </span>
-                            @if ($appointment->status === 'pending')
-                            <button class="btn btn-sm btn-outline mt-2">Cancel</button>
-                            @endif
+                            <div class="text-xs text-gray-500">
+                                {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                            </div>
                         </div>
                     </div>
                     @empty

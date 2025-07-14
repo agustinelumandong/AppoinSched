@@ -19,7 +19,6 @@ class Appointments extends Model
         'service_id',
         'booking_date',
         'booking_time',
-        'status',
         'notes',
         'to_whom',
         'purpose',
@@ -31,12 +30,6 @@ class Appointments extends Model
         'booking_date' => 'date',
         'booking_time' => 'string',
     ];
-
-    public const STATUS_PENDING = 'pending';
-    public const STATUS_APPROVED = 'approved';
-    public const STATUS_CANCELLED = 'cancelled';
-    public const STATUS_COMPLETED = 'completed';
-    public const STATUS_NO_SHOW = 'no-show';
 
     public function user()
     {
@@ -61,31 +54,6 @@ class Appointments extends Model
     public function appointmentDetails()
     {
         return $this->hasOne(AppointmentDetails::class, 'appointment_id');
-    }
-
-    public function scopePending($query)
-    {
-        return $query->where('status', self::STATUS_PENDING);
-    }
-
-    public function scopeApproved($query)
-    {
-        return $query->where('status', self::STATUS_APPROVED);
-    }
-
-    public function scopeCancelled($query)
-    {
-        return $query->where('status', self::STATUS_CANCELLED);
-    }
-
-    public function scopeCompleted($query)
-    {
-        return $query->where('status', self::STATUS_COMPLETED);
-    }
-
-    public function scopeNoShow($query)
-    {
-        return $query->where('status', self::STATUS_NO_SHOW);
     }
 
     public function details()

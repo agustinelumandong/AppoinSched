@@ -34,12 +34,7 @@
         @endphp
 
         @if($appointmentTime === $slotTime)
-        <div class="appointment-item text-xs p-1 rounded mb-1 cursor-pointer
-        {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800 border-l-2 border-yellow-400' : '' }}
-        {{ $appointment->status === 'approved' ? 'bg-green-100 text-green-800 border-l-2 border-green-400' : '' }}
-        {{ $appointment->status === 'completed' ? 'bg-blue-100 text-blue-800 border-l-2 border-blue-400' : '' }}
-        {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800 border-l-2 border-red-400' : '' }}
-        {{ $appointment->status === 'no-show' ? 'bg-gray-100 text-gray-800 border-l-2 border-gray-400' : '' }}"
+        <div class="appointment-item text-xs p-1 rounded mb-1 cursor-pointer bg-gray-100 text-gray-800"
         title="{{ $appointment->user->first_name }} {{ $appointment->user->last_name }} - {{ $appointment->service->name ?? 'N/A' }}">
         <div class="font-medium truncate">
         {{ $appointment->user->first_name }} {{ $appointment->user->last_name }}

@@ -133,11 +133,7 @@
       <div class="row">
         <div class="col label">Service:</div>
         <div class="col value">{{ $service->title }}</div>
-      </div>
-      <div class="row">
-        <div class="col label">Staff:</div>
-        <div class="col value">{{ $staff->first_name ?? '' }} {{ $staff->last_name ?? ''   }}</div>
-      </div>
+      </div> 
       <div class="row">
         <div class="col label">Purpose:</div>
         <div class="col value">{{ $purpose }}</div>
@@ -149,10 +145,6 @@
       <div class="row">
         <div class="col label">Time:</div>
         <div class="col value">{{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}</div>
-      </div>
-      <div class="row">
-        <div class="col label">Status:</div>
-        <div class="col value status">Pending</div>
       </div>
     </div>
   </div>

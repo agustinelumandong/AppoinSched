@@ -30,16 +30,10 @@
       <div class="space-y-1">
 
       @foreach($day['appointments'] as $appointment)
-      <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer
-      {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-      {{ $appointment->status === 'approved' ? 'bg-green-100 text-green-800' : '' }}
-      {{ $appointment->status === 'completed' ? 'bg-blue-100 text-blue-800' : '' }}
-      {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}
-      {{ $appointment->status === 'no-show' ? 'bg-gray-100 text-gray-800' : '' }}"
-      title="{{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} - {{ $appointment->service->name ?? 'N/A' }} ({{ ucfirst($appointment->status) }})">
+      <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer bg-gray-100 text-gray-800"
+      title="{{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} - {{ $appointment->service->name ?? 'N/A' }}">
       {{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} -
-      {{ Str::limit($appointment->service->title ?? 'N/A', 15) }} <br>
-
+      {{ Str::limit($appointment->service->title ?? 'N/A', 15) }}
       </div>
       @endforeach
 

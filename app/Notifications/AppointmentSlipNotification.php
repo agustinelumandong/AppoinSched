@@ -52,7 +52,7 @@ class AppointmentSlipNotification extends Notification implements ShouldQueue
     $data = [
       'reference_number' => $appointment->reference_number,
       'office' => $appointment->office,
-      'services' => $appointment->service,
+      'service' => $appointment->service,
       'staff' => $appointment->staff,
       'purpose' => $appointment->purpose,
       'selectedDate' => $appointment->booking_date,
