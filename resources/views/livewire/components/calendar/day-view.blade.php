@@ -37,7 +37,7 @@
                         @endphp
                         @if($appointmentTime === $slotTime)
                             <div
-                                class="appointment-item p-2 rounded-lg border-l-4 bg-white shadow-sm mb-2 cursor-pointer hover:shadow-md transition-shadow border-gray-400 bg-gray-50">
+                                class="appointment-item p-2 rounded-lg border-l-4 bg-white shadow-sm mb-2 cursor-pointer hover:shadow-md transition-shadow border-blue-400 bg-blue-100">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1 min-w-0">
                                         <div class="text-sm font-medium text-gray-900 truncate">
