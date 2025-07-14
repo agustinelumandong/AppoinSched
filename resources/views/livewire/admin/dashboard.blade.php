@@ -5,6 +5,7 @@ declare(strict_types=1);
 use Livewire\Volt\Component;
 use App\Models\User;
 use App\Models\Appointments;
+use App\Models\DocumentRequest;
 
 new class extends Component {
   public function mount()
@@ -14,14 +15,17 @@ new class extends Component {
     }
   }
 
-  public function with()
+  public function with(): array
   {
     return [
-      'totalUsers' => User::count(),
-      'totalAppointments' => Appointments::count(),
-      'pendingAppointments' => Appointments::where('status', 'pending')->count(),
-      'recentUsers' => User::latest()->take(5)->get(),
-      'recentAppointments' => Appointments::with(['user', 'office', 'service'])->latest()->take(5)->get(),
+      'recentAppointments' => Appointments::with(['user', 'office', 'service'])
+        ->latest()
+        ->take(5)
+        ->get(),
+      'recentDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
+        ->latest()
+        ->take(5)
+        ->get(),
     ];
   }
 }; ?>
@@ -37,7 +41,7 @@ new class extends Component {
         <span class="badge badge-primary">{{ auth()->user()->roles->first()->name ?? 'No Role' }}</span>
       </div>
     </div>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow p-6">
         <div class="flex items-center">
           <div class="p-2 bg-blue-100 rounded-lg">
@@ -49,7 +53,7 @@ new class extends Component {
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Total Users</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $totalUsers }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ User::count() }}</p>
           </div>
         </div>
       </div>
@@ -63,21 +67,7 @@ new class extends Component {
           </div>
           <div class="ml-4">
             <p class="text-sm font-medium text-gray-600">Total Appointments</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $totalAppointments }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="bg-white rounded-lg shadow p-6">
-        <div class="flex items-center">
-          <div class="p-2 bg-yellow-100 rounded-lg">
-            <svg class="w-6 h-6 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-            </svg>
-          </div>
-          <div class="ml-4">
-            <p class="text-sm font-medium text-gray-600">Pending Appointments</p>
-            <p class="text-2xl font-semibold text-gray-900">{{ $pendingAppointments }}</p>
+            <p class="text-2xl font-semibold text-gray-900">{{ Appointments::count() }}</p>
           </div>
         </div>
       </div>
@@ -89,7 +79,7 @@ new class extends Component {
         </div>
         <div class="p-6">
           <div class="space-y-4">
-            @forelse($recentUsers as $user)
+            @forelse(User::latest()->take(5)->get() as $user)
         <div class="flex items-center justify-between">
           <div class="flex items-center">
           <div class="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
@@ -128,8 +118,8 @@ new class extends Component {
               </div>
               <div class="text-right">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                  @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
-            @elseif($appointment->status === 'approved') bg-green-100 text-green-800
+              @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
+          @elseif($appointment->status === 'approved') bg-green-100 text-green-800
           @elseif($appointment->status === 'cancelled') bg-red-100 text-red-800
           @else bg-gray-100 text-gray-800 @endif">
                 {{ ucfirst($appointment->status) }}

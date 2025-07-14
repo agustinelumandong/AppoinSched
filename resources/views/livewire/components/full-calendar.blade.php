@@ -17,38 +17,30 @@ new class extends Component {
   public Carbon $currentDate;
   public ?int $selectedOfficeId = null;
   public ?int $selectedStaffId = null;
-  public array $statusFilters = [];
   public array $calendarData = [];
   public bool $isLoading = false;
-  public array $availableStatuses = [
-    'pending' => 'Pending',
-    'approved' => 'Approved',
-    'completed' => 'Completed',
-    'cancelled' => 'Cancelled',
-    'no-show' => 'No Show'
-  ];
+
   public function mount(): void
   {
     $this->currentDate = Carbon::today();
-    $this->statusFilters = array_keys($this->availableStatuses);
     $this->loadCalendarData();
   }
+
   public function updatedView(): void
   {
     $this->loadCalendarData();
   }
+
   public function updatedSelectedOfficeId(): void
   {
     $this->loadCalendarData();
   }
+
   public function updatedSelectedStaffId(): void
   {
     $this->loadCalendarData();
   }
-  public function updatedStatusFilters(): void
-  {
-    $this->loadCalendarData();
-  }
+
   public function previousPeriod(): void
   {
     match ($this->view) {
@@ -58,6 +50,7 @@ new class extends Component {
     };
     $this->loadCalendarData();
   }
+
   public function nextPeriod(): void
   {
     match ($this->view) {
@@ -67,25 +60,19 @@ new class extends Component {
     };
     $this->loadCalendarData();
   }
+
   public function goToToday(): void
   {
     $this->currentDate = Carbon::today();
     $this->loadCalendarData();
   }
+
   public function setView(string $view): void
   {
     $this->view = $view;
     $this->loadCalendarData();
   }
-  public function toggleStatusFilter(string $status): void
-  {
-    if (in_array($status, $this->statusFilters)) {
-      $this->statusFilters = array_values(array_filter($this->statusFilters, fn($s) => $s !== $status));
-    } else {
-      $this->statusFilters[] = $status;
-    }
-    $this->loadCalendarData();
-  }
+
   public function selectDate(string $date): void
   {
     $this->currentDate = Carbon::parse($date);
@@ -94,6 +81,7 @@ new class extends Component {
     }
     $this->loadCalendarData();
   }
+
   #[On('appointmentUpdated')]
   #[On('appointmentCreated')]
   #[On('appointmentDeleted')]
@@ -102,6 +90,7 @@ new class extends Component {
     $this->clearCache();
     $this->loadCalendarData();
   }
+
   private function loadCalendarData(): void
   {
     $this->isLoading = true;
@@ -122,6 +111,7 @@ new class extends Component {
       $this->isLoading = false;
     }
   }
+
   private function generateMonthData(): array
   {
     $startOfMonth = $this->currentDate->copy()->startOfMonth()->startOfWeek(CarbonInterface::SUNDAY);
@@ -149,6 +139,7 @@ new class extends Component {
       'title' => $this->currentDate->format('F Y')
     ];
   }
+
   private function generateWeekData(): array
   {
     $startOfWeek = $this->currentDate->copy()->startOfWeek();
@@ -171,6 +162,7 @@ new class extends Component {
       'timeSlots' => $this->generateTimeSlots()
     ];
   }
+
   private function generateDayData(): array
   {
     return [
@@ -180,16 +172,42 @@ new class extends Component {
       'timeSlots' => $this->generateTimeSlots()
     ];
   }
+
   private function getAppointmentsForDate(Carbon $date): Collection
   {
     $query = Appointments::with(['user', 'staff', 'office', 'service', 'appointmentDetails'])
       ->whereDate('booking_date', $date->format('Y-m-d'));
 
-    // If user is a client, only show their appointments
-    if (auth()->check() && auth()->user()->hasRole('client')) {
-      $query->where('user_id', auth()->id());
-    } elseif (auth()->check() && auth()->user()->hasRole('admin|super-admin|MCR-staff|MTO-staff')) {
-      $query->where('staff_id', auth()->id());
+    // Map office slugs to their corresponding staff roles
+    $officeRoleMap = [
+      'municipal-civil-registrar' => 'MCR-staff',
+      'municipal-treasurers-office' => 'MTO-staff',
+      'business-permits-and-licensing-section' => 'BPLS-staff',
+    ];
+
+    // Get all office IDs and their slugs
+    $offices = Offices::whereIn('slug', array_keys($officeRoleMap))
+      ->pluck('id', 'slug')
+      ->toArray();
+
+    if (auth()->check()) {
+      $user = auth()->user();
+
+      if ($user->hasRole('client')) {
+        // Clients see only their own appointments
+        $query->where('user_id', $user->id);
+      } else {
+        // For each office, if user has the corresponding staff role, filter by that office
+        $officeIdsForUser = [];
+        foreach ($officeRoleMap as $slug => $role) {
+          if ($user->hasRole($role) && isset($offices[$slug])) {
+            $officeIdsForUser[] = $offices[$slug];
+          }
+        }
+        if (!empty($officeIdsForUser)) {
+          $query->whereIn('office_id', $officeIdsForUser);
+        }
+      }
     }
 
     if ($this->selectedOfficeId) {
@@ -200,12 +218,9 @@ new class extends Component {
       $query->where('staff_id', $this->selectedStaffId);
     }
 
-    if (!empty($this->statusFilters)) {
-      $query->whereIn('status', $this->statusFilters);
-    }
-
     return $query->orderBy('booking_time')->get();
   }
+
   private function generateTimeSlots(): array
   {
     $slots = [];
@@ -220,17 +235,18 @@ new class extends Component {
     }
     return $slots;
   }
+
   private function generateCacheKey(): string
   {
     return sprintf(
-      'calendar_%s_%s_%s_%s_%s',
+      'calendar_%s_%s_%s_%s',
       $this->view,
       $this->currentDate->format('Y-m-d'),
       $this->selectedOfficeId ?? 'all',
-      $this->selectedStaffId ?? 'all',
-      implode(',', $this->statusFilters)
+      $this->selectedStaffId ?? 'all'
     );
   }
+
   private function clearCache(): void
   {
     $pattern = sprintf(
@@ -240,6 +256,7 @@ new class extends Component {
     );
     Cache::flush(); // Simplified for this example
   }
+
   public function with(): array
   {
     return [
@@ -301,7 +318,7 @@ new class extends Component {
       </div>
     </div>
     <!-- Filters -->
-    @hasrole('admin|super-admin|MCR-staff|MTO-staff')
+    @hasrole('admin|super-admin')
     <div class="mt-4 pt-4 border-t border-gray-100">
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
         <!-- Office Filter -->
@@ -327,18 +344,7 @@ new class extends Component {
           </select>
         </div>
         <!-- Status Filters -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-          <div class="flex flex-wrap gap-2">
-            @foreach($availableStatuses as $status => $label)
-        <label class="inline-flex items-center">
-          <input type="checkbox" wire:click="toggleStatusFilter('{{ $status }}')" {{ in_array($status, $statusFilters) ? 'checked' : '' }}
-          class="rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-500 focus:ring-blue-500">
-          <span class="ml-2 text-sm text-gray-700">{{ $label }}</span>
-        </label>
-      @endforeach
-          </div>
-        </div>
+        <!-- Removed status filter UI -->
       </div>
     </div>
     @endhasrole

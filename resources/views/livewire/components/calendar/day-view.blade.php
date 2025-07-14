@@ -37,12 +37,7 @@
                         @endphp
                         @if($appointmentTime === $slotTime)
                             <div
-                                class="appointment-item p-2 rounded-lg border-l-4 bg-white shadow-sm mb-2 cursor-pointer hover:shadow-md transition-shadow
-                                                        {{ $appointment->status === 'pending' ? 'border-yellow-400 bg-yellow-50' : '' }}
-                                                        {{ $appointment->status === 'approved' ? 'border-green-400 bg-green-50' : '' }}
-                                                        {{ $appointment->status === 'completed' ? 'border-blue-400 bg-blue-50' : '' }}
-                                                        {{ $appointment->status === 'cancelled' ? 'border-red-400 bg-red-50' : '' }}
-                                                        {{ $appointment->status === 'no-show' ? 'border-gray-400 bg-gray-50' : '' }}">
+                                class="appointment-item p-2 rounded-lg border-l-4 bg-white shadow-sm mb-2 cursor-pointer hover:shadow-md transition-shadow border-gray-400 bg-gray-50">
                                 <div class="flex items-center justify-between">
                                     <div class="flex-1 min-w-0">
                                         <div class="text-sm font-medium text-gray-900 truncate">
@@ -56,15 +51,9 @@
                                         </div>
                                     </div>
                                     <div class="ml-2 flex-shrink-0">
-                                        <span
-                                            class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium
-                                                                    {{ $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' : '' }}
-                                                                    {{ $appointment->status === 'approved' ? 'bg-green-100 text-green-800' : '' }}
-                                                                    {{ $appointment->status === 'completed' ? 'bg-blue-100 text-blue-800' : '' }}
-                                                                    {{ $appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' : '' }}
-                                                                    {{ $appointment->status === 'no-show' ? 'bg-gray-100 text-gray-800' : '' }}">
-                                            {{ ucfirst($appointment->status) }}
-                                        </span>
+                                        <div class="text-xs text-gray-500">
+                                            {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

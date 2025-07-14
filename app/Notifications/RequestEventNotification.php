@@ -52,7 +52,7 @@ class RequestEventNotification extends Notification
         ->subject('Appointment Scheduled')
         ->line("Your appointment is set for {$this->data['date']} at {$this->data['time']}")
         ->line("Location: {$this->data['location']}")
-        ->line("Service: {$this->data['service']}"),
+        ->line("Service: {$this->data['services']}"),
       RequestNotificationEvent::AppointmentApproved => (new MailMessage)
         ->subject('Appointment Approved')
         ->line("Your appointment has been approved.")

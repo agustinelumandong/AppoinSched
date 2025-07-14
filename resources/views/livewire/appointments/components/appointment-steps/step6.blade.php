@@ -27,12 +27,13 @@
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Service</label>
-          <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $service->title }}</p>
+          <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $services }}</p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Staff</label>
           <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $staff->first_name }}
-            {{ $staff->last_name }}</p>
+            {{ $staff->last_name }}
+          </p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
@@ -41,12 +42,14 @@
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
           <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-            {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}</p>
+            {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}
+          </p>
         </div>
         <div>
           <label class="block text-sm font-medium text-gray-600 mb-1">Time</label>
           <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-            {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}</p>
+            {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}
+          </p>
         </div>
       </div>
     </div>

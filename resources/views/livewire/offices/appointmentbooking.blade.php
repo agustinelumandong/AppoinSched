@@ -7,13 +7,13 @@ use Livewire\Attributes\{Title};
 
 new #[Title('Appointment Booking')] class extends Component {
     public Offices $office;
-    public Services $service;
+    public ?string $services = null;
     public ?string $reference_number = null;
 
-    public function mount(Offices $office, Services $service)
+    public function mount(Offices $office)
     {
         $this->office = $office;
-        $this->service = $service;
+        $this->services = request()->query('services');
         $this->reference_number = request()->query('reference_number');
     }
 
@@ -21,13 +21,12 @@ new #[Title('Appointment Booking')] class extends Component {
     {
         return [
             'office' => $this->office,
-            'service' => $this->service,
         ];
     }
 }; ?>
 
 <div>
     @include('components.alert')
-    <livewire:components.appointmentstepper :office="$office" :service="$service"
+    <livewire:components.appointmentstepper :office="$office" :services="$services"
         :reference_number="$reference_number" />
 </div>

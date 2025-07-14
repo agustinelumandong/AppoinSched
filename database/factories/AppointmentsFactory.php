@@ -26,7 +26,6 @@ class AppointmentsFactory extends Factory
             'staff_id' => User::inRandomOrder()->first()->id,
             'booking_date' => fake()->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
             'booking_time' => fake()->dateTimeBetween('08:00', '17:00')->format('H:i'),
-            'status' => fake()->randomElement(['pending', 'approved', 'cancelled', 'completed', 'no-show']),
             'notes' => fake()->optional(0.7)->sentence(),
         ];
     }

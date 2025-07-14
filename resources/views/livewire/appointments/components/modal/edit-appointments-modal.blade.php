@@ -30,8 +30,8 @@
                     </div>
                 </div>
 
-                <!-- Display current selection -->
-                @if ($selectedDate && $selectedTime)
+                <!-- Debug to Display current selection -->
+                {{-- @if ($selectedDate && $selectedTime)
                     <div class="mb-4">
                         <div class="alert alert-info d-flex align-items-center">
                             <i class="bi bi-calendar-check me-2"></i>
@@ -42,33 +42,15 @@
                             </div>
                         </div>
                     </div>
-                @endif
+                @endif --}}
             @endif
 
             <div class="row">
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="status" class="form-label fw-semibold">Status</label>
-                        <select class="form-control @error('status') is-invalid @enderror form-select" id="status"
-                            wire:model="status">
-                            <option value="">Select Status</option>
-                            <option value="pending">Pending</option>
-                            <option value="approved">Approved</option>
-                            <option value="cancelled">Cancelled</option>
-                            <option value="completed">Completed</option>
-                            <option value="no-show">No Show</option>
-                        </select>
-                        @error('status')
-                            <div class="invalid-feedback">{{ $message }}</div>
-                        @enderror
-                    </div>
-                </div>
-
                 <div class="col-md-12">
                     <div class="mb-3">
                         <label for="notes" class="form-label fw-semibold">Notes</label>
-                        <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" wire:model="notes"
-                            placeholder="Enter additional notes" rows="3"></textarea>
+                        <textarea class="form-control @error('notes') is-invalid @enderror" id="notes" rows="3"
+                            wire:model="notes" placeholder="Enter any additional notes..."></textarea>
                         @error('notes')
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror

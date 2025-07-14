@@ -275,10 +275,12 @@ new class extends Component {
             $bookedSlots = Appointments::query()
                 ->where('booking_date', $this->selectedDate)
                 ->where('office_id', $this->officeId)
+                ->when($this->staffId, function($q) {
+                    return $q->where('staff_id', $this->staffId);
+                })
                 ->when($this->excludeAppointmentId, function($q) {
                     return $q->where('id', '!=', $this->excludeAppointmentId);
                 })
-                ->whereNotIn('status', ['cancelled', 'no-show'])
                 ->get(['booking_time']);
 
             $formattedSlots = $bookedSlots->map(function($appointment) {
