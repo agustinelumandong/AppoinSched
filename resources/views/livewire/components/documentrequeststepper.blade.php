@@ -86,6 +86,7 @@ new #[Title('Document Request')] class extends Component {
 
     public bool $father_is_unknown = false;
     public bool $spouse_is_unknown = false;
+    public bool $deceased_is_unknown = true;
 
     // Death Certificate specific fields
     public string $deceased_last_name = '';
@@ -113,7 +114,10 @@ new #[Title('Document Request')] class extends Component {
     public UserFamily $userFamilies;
     public UserAddresses $userAddresses;
 
-    public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses): void
+    public $selectedPaymentMethod = null;
+    public $paymentProofImage = null;
+
+    public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
@@ -127,8 +131,49 @@ new #[Title('Document Request')] class extends Component {
             $this->redirect(route('userinfo'));
         }
 
+        // Use request()->string('reference_number') if not passed directly
+        $refNo = $reference_number ?? (request()->has('reference_number') ? request()->string('reference_number') : null);
+        if ($refNo) {
+            $existingRequest = DocumentRequest::where('reference_number', $refNo)
+                ->where('user_id', auth()->id())
+                ->with('details')
+                ->first();
+            if ($existingRequest) {
+                $this->id = $existingRequest->id;
+                $this->reference_number = $existingRequest->reference_number;
+                $this->to_whom = $existingRequest->to_whom;
+                $this->purpose = $existingRequest->purpose;
+                $this->payment_reference = $existingRequest->payment_reference ?? '';
+                $this->status = $existingRequest->status ?? '';
+                $this->payment_status = $existingRequest->payment_status ?? '';
+                // Set step based on payment status
+                if ($existingRequest->payment_status === 'unpaid') {
+                    $this->step = 6;
+                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
+                    $this->step = 7;
+                } else {
+                    $this->step = 1; // fallback
+                }
+                // Populate ALL fields from details if available
+                if ($existingRequest->details) {
+                    foreach ($existingRequest->details->toArray() as $field => $value) {
+                        if (property_exists($this, $field)) {
+                            $this->{$field} = $value;
+                        }
+                    }
+                }
+                return;
+            } else {
+                session()->flash('error', 'Document request not found or you do not have access.');
+                $this->redirect(route('client.documents'));
+            }
+        }
+
         $this->updatedFatherIsUnknown($this->father_is_unknown);
         $this->updatedSpouseIsUnknown($this->spouse_is_unknown);
+        if ($this->service->title !== 'Death Certificate') {
+            $this->updatedDeceasedIsUnknown($this->deceased_is_unknown);
+        }
 
         // Only populate user data if "myself" is selected
         if ($this->to_whom === 'myself') {
@@ -241,7 +286,7 @@ new #[Title('Document Request')] class extends Component {
             $this->father_first_name = 'N/A';
             $this->father_middle_name = 'N/A';
             $this->father_suffix = 'N/A';
-            $this->father_birthdate = '';
+            $this->father_birthdate = '0001-01-01';
             $this->father_nationality = 'N/A';
             $this->father_religion = 'N/A';
             $this->father_contact_no = 'N/A';
@@ -264,7 +309,7 @@ new #[Title('Document Request')] class extends Component {
             $this->spouse_first_name = 'N/A';
             $this->spouse_middle_name = 'N/A';
             $this->spouse_suffix = 'N/A';
-            $this->spouse_birthdate = '';
+            $this->spouse_birthdate = '0001-01-01';
             $this->spouse_nationality = 'N/A';
             $this->spouse_religion = 'N/A';
             $this->spouse_contact_no = 'N/A';
@@ -277,6 +322,27 @@ new #[Title('Document Request')] class extends Component {
             $this->spouse_nationality = '';
             $this->spouse_religion = '';
             $this->spouse_contact_no = '';
+        }
+    }
+
+    public function updatedDeceasedIsUnknown(bool $value): void
+    {
+        if ($value) {
+            $this->deceased_last_name = 'N/A';
+            $this->deceased_first_name = 'N/A';
+            $this->deceased_middle_name = 'N/A';
+            $this->death_date = '0001-01-01';
+            $this->death_time = '00:00';
+            $this->death_place = 'N/A';
+            $this->relationship_to_deceased = 'N/A';
+        } else {
+            $this->deceased_last_name = '';
+            $this->deceased_first_name = '';
+            $this->deceased_middle_name = '';
+            $this->death_date = '';
+            $this->death_time = '';
+            $this->death_place = '';
+            $this->relationship_to_deceased = '';
         }
     }
 
@@ -374,6 +440,7 @@ new #[Title('Document Request')] class extends Component {
                     }
                 }
                 $this->validate($rules);
+                $this->fillFamilyDefaults();
                 $this->initializeContactInfo();
                 break;
             case 4:
@@ -396,10 +463,122 @@ new #[Title('Document Request')] class extends Component {
                         'email' => 'required|email|max:255',
                         'phone' => 'required|string|max:20',
                     ]);
+                } else {
+                    // For other document types, validate contact information
+                    $this->validate([
+                        'contact_first_name' => 'required|string|max:255',
+                        'contact_last_name' => 'required|string|max:255',
+                        'contact_email' => 'required|email|max:255',
+                        'contact_phone' => 'required|string|max:20',
+                    ]);
                 }
                 break;
         }
         $this->step++;
+    }
+
+    private function fillFamilyDefaults(): void
+    {
+        // Father's Information - check each field individually
+        if (empty($this->father_last_name)) {
+            $this->father_last_name = 'N/A';
+        }
+        if (empty($this->father_first_name)) {
+            $this->father_first_name = 'N/A';
+        }
+        if (empty($this->father_middle_name)) {
+            $this->father_middle_name = 'N/A';
+        }
+        if (empty($this->father_suffix)) {
+            $this->father_suffix = 'N/A';
+        }
+        if (empty($this->father_birthdate)) {
+            $this->father_birthdate = '0001-01-01';
+        }
+        if (empty($this->father_nationality)) {
+            $this->father_nationality = 'N/A';
+        }
+        if (empty($this->father_religion)) {
+            $this->father_religion = 'N/A';
+        }
+        if (empty($this->father_contact_no)) {
+            $this->father_contact_no = 'N/A';
+        }
+
+        // Mother's Information - check each field individually
+        if (empty($this->mother_last_name)) {
+            $this->mother_last_name = 'N/A';
+        }
+        if (empty($this->mother_first_name)) {
+            $this->mother_first_name = 'N/A';
+        }
+        if (empty($this->mother_middle_name)) {
+            $this->mother_middle_name = 'N/A';
+        }
+        if (empty($this->mother_suffix)) {
+            $this->mother_suffix = 'N/A';
+        }
+        if (empty($this->mother_birthdate)) {
+            $this->mother_birthdate = '0001-01-01';
+        }
+        if (empty($this->mother_nationality)) {
+            $this->mother_nationality = 'N/A';
+        }
+        if (empty($this->mother_religion)) {
+            $this->mother_religion = 'N/A';
+        }
+        if (empty($this->mother_contact_no)) {
+            $this->mother_contact_no = 'N/A';
+        }
+
+        // Spouse Information - check each field individually
+        if (empty($this->spouse_last_name)) {
+            $this->spouse_last_name = 'N/A';
+        }
+        if (empty($this->spouse_first_name)) {
+            $this->spouse_first_name = 'N/A';
+        }
+        if (empty($this->spouse_middle_name)) {
+            $this->spouse_middle_name = 'N/A';
+        }
+        if (empty($this->spouse_suffix)) {
+            $this->spouse_suffix = 'N/A';
+        }
+        if (empty($this->spouse_birthdate)) {
+            $this->spouse_birthdate = '0001-01-01';
+        }
+        if (empty($this->spouse_nationality)) {
+            $this->spouse_nationality = 'N/A';
+        }
+        if (empty($this->spouse_religion)) {
+            $this->spouse_religion = 'N/A';
+        }
+        if (empty($this->spouse_contact_no)) {
+            $this->spouse_contact_no = 'N/A';
+        }
+
+        // Death Certificate fields - check each field individually
+        if (empty($this->deceased_last_name)) {
+            $this->deceased_last_name = 'N/A';
+        }
+        if (empty($this->deceased_first_name)) {
+            $this->deceased_first_name = 'N/A';
+        }
+        if (empty($this->deceased_middle_name)) {
+            $this->deceased_middle_name = 'N/A';
+        }
+        if (empty($this->death_date)) {
+            $this->death_date = '0001-01-01';
+        }
+        if (empty($this->death_time)) {
+            $this->death_time = '00:00';
+        }
+        if (empty($this->death_place)) {
+            $this->death_place = 'N/A';
+        }
+        if (empty($this->relationship_to_deceased)) {
+            $this->relationship_to_deceased = 'N/A';
+        }
     }
 
     // Check if the service requires family information
@@ -436,120 +615,107 @@ new #[Title('Document Request')] class extends Component {
                 'purpose' => $this->purpose === 'others' ? $this->purpose_others : $this->purpose,
                 'requested_date' => now(),
                 'reference_number' => $this->reference_number,
+                'payment_status' => 'unpaid', // Set initial payment status
             ]);
 
-            // Prepare data for DocumentRequestDetails
+            // Handle file upload for government ID image
+            $governmentIdImagePath = $this->government_id_image_path; // Keep existing path if no new upload
+            if ($this->government_id_image_file) {
+                // New file uploaded, store it
+                $governmentIdImagePath = $this->government_id_image_file->storeAs('government-ids', auth()->id() . '_' . $this->government_id_image_file->getClientOriginalName(), 'public');
+            }
+
+            // Prepare all data in one array
             $detailsData = [
                 'document_request_id' => $documentRequest->id,
                 'request_for' => $this->to_whom === 'myself' ? 'myself' : 'someone_else',
             ];
 
             // Personal Information
-            if ($this->service->title !== 'Death Certificate') {
-                // Handle file upload for government ID image
-                $governmentIdImagePath = $this->government_id_image_path; // Keep existing path if no new upload
 
-                if ($this->government_id_image_file) {
-                    // New file uploaded, store it
-                    $governmentIdImagePath = $this->government_id_image_file->storeAs('government-ids', auth()->id() . '_' . $this->government_id_image_file->getClientOriginalName(), 'public');
-                }
+            $detailsData = array_merge($detailsData, [
+                'last_name' => $this->last_name,
+                'first_name' => $this->first_name,
+                'middle_name' => $this->middle_name,
+                'suffix' => $this->suffix,
+                'email' => $this->email,
+                'contact_no' => $this->phone,
+                'sex_at_birth' => $this->sex_at_birth,
+                'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
+                'place_of_birth' => $this->place_of_birth,
+                'civil_status' => $this->civil_status,
+                'religion' => $this->religion,
+                'nationality' => $this->nationality,
+                'government_id_type' => $this->government_id_type,
+                'government_id_image_path' => $governmentIdImagePath,
+                'address_type' => $this->address_type,
+                'address_line_1' => $this->address_line_1,
+                'address_line_2' => $this->address_line_2,
+                'region' => $this->region,
+                'province' => $this->province,
+                'city' => $this->city,
+                'barangay' => $this->barangay,
+                'street' => $this->street,
+                'zip_code' => $this->zip_code,
 
-                $detailsData = array_merge($detailsData, [
-                    'last_name' => $this->last_name,
-                    'first_name' => $this->first_name,
-                    'middle_name' => $this->middle_name,
-                    'suffix' => $this->suffix,
-                    'email' => $this->email,
-                    'contact_no' => $this->phone,
-                    'sex_at_birth' => $this->sex_at_birth,
-                    'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
-                    'place_of_birth' => $this->place_of_birth,
-                    'civil_status' => $this->civil_status,
-                    'religion' => $this->religion,
-                    'nationality' => $this->nationality,
-                    'government_id_type' => $this->government_id_type,
-                    'government_id_image_path' => $governmentIdImagePath,
-                ]);
+                'father_last_name' => $this->father_last_name,
+                'father_first_name' => $this->father_first_name,
+                'father_middle_name' => $this->father_middle_name,
+                'father_suffix' => $this->father_suffix,
+                'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
+                'father_nationality' => $this->father_nationality,
+                'father_religion' => $this->father_religion,
+                'father_contact_no' => $this->father_contact_no,
+                'mother_last_name' => $this->mother_last_name,
+                'mother_first_name' => $this->mother_first_name,
+                'mother_middle_name' => $this->mother_middle_name,
+                'mother_suffix' => $this->mother_suffix,
+                'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
+                'mother_nationality' => $this->mother_nationality,
+                'mother_religion' => $this->mother_religion,
+                'mother_contact_no' => $this->mother_contact_no,
 
-                // Address Information
-                $detailsData = array_merge($detailsData, [
-                    'address_type' => $this->address_type,
-                    'address_line_1' => $this->address_line_1,
-                    'address_line_2' => $this->address_line_2,
-                    'region' => $this->region,
-                    'province' => $this->province,
-                    'city' => $this->city,
-                    'barangay' => $this->barangay,
-                    'street' => $this->street,
-                    'zip_code' => $this->zip_code,
-                ]);
 
-                // Family Information (if required)
-                if ($this->requiresFamilyInfo()) {
-                    // Father's Information
-                    $detailsData = array_merge($detailsData, [
-                        'father_last_name' => $this->father_last_name,
-                        'father_first_name' => $this->father_first_name,
-                        'father_middle_name' => $this->father_middle_name,
-                        'father_suffix' => $this->father_suffix,
-                        'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
-                        'father_nationality' => $this->father_nationality,
-                        'father_religion' => $this->father_religion,
-                        'father_contact_no' => $this->father_contact_no,
-                    ]);
+                // Spouse Information
 
-                    // Mother's Information
-                    $detailsData = array_merge($detailsData, [
-                        'mother_last_name' => $this->mother_last_name,
-                        'mother_first_name' => $this->mother_first_name,
-                        'mother_middle_name' => $this->mother_middle_name,
-                        'mother_suffix' => $this->mother_suffix,
-                        'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
-                        'mother_nationality' => $this->mother_nationality,
-                        'mother_religion' => $this->mother_religion,
-                        'mother_contact_no' => $this->mother_contact_no,
-                    ]);
+                'spouse_last_name' => $this->spouse_last_name,
+                'spouse_first_name' => $this->spouse_first_name,
+                'spouse_middle_name' => $this->spouse_middle_name,
+                'spouse_suffix' => $this->spouse_suffix,
+                'spouse_birthdate' => $this->spouse_birthdate ? Carbon::parse($this->spouse_birthdate) : null,
+                'spouse_nationality' => $this->spouse_nationality,
+                'spouse_religion' => $this->spouse_religion,
+                'spouse_contact_no' => $this->spouse_contact_no,
 
-                    // Spouse Information
-                    if ($this->service->title !== 'Certificate of No Marriage (CENOMAR)' && !$this->spouse_is_unknown) {
-                        $detailsData = array_merge($detailsData, [
-                            'spouse_last_name' => $this->spouse_last_name,
-                            'spouse_first_name' => $this->spouse_first_name,
-                            'spouse_middle_name' => $this->spouse_middle_name,
-                            'spouse_suffix' => $this->spouse_suffix,
-                            'spouse_birthdate' => $this->spouse_birthdate ? Carbon::parse($this->spouse_birthdate) : null,
-                            'spouse_nationality' => $this->spouse_nationality,
-                            'spouse_religion' => $this->spouse_religion,
-                            'spouse_contact_no' => $this->spouse_contact_no,
-                        ]);
-                    }
-                }
-            } else {
+
+
                 // Death Certificate specific fields
-                $detailsData = array_merge($detailsData, [
-                    'deceased_last_name' => $this->deceased_last_name,
-                    'deceased_first_name' => $this->deceased_first_name,
-                    'deceased_middle_name' => $this->deceased_middle_name,
-                    'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
-                    'death_time' => $this->death_time,
-                    'death_place' => $this->death_place,
-                    'relationship_to_deceased' => $this->relationship_to_deceased,
-                ]);
-            }
+
+                'deceased_last_name' => $this->deceased_last_name,
+                'deceased_first_name' => $this->deceased_first_name,
+                'deceased_middle_name' => $this->deceased_middle_name,
+                'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
+                'death_time' => $this->death_time,
+                'death_place' => $this->death_place,
+                'relationship_to_deceased' => $this->relationship_to_deceased,
+            ]);
+
 
             // Contact Information (for third-party requests)
-            if ($this->to_whom !== 'myself') {
-                $detailsData = array_merge($detailsData, [
-                    'contact_first_name' => $this->contact_first_name,
-                    'contact_last_name' => $this->contact_last_name,
-                    'contact_middle_name' => $this->contact_middle_name,
-                    'contact_email' => $this->contact_email,
-                    'contact_phone' => $this->contact_phone,
-                ]);
-            }
+
+            $detailsData = array_merge($detailsData, [
+                'contact_first_name' => $this->contact_first_name,
+                'contact_last_name' => $this->contact_last_name,
+                'contact_middle_name' => $this->contact_middle_name,
+                'contact_email' => $this->contact_email,
+                'contact_phone' => $this->contact_phone,
+            ]);
 
             // Create the document request details
             DocumentRequestDetails::create($detailsData);
+
+            // Store the document ID for the payment step
+            $this->id = $documentRequest->id;
 
             DB::commit();
 
@@ -564,12 +730,79 @@ new #[Title('Document Request')] class extends Component {
 
             session()->flash('success', 'Document request submitted successfully!');
 
-            // Redirect to success page or document requests list
-            return redirect(request()->header('Referer') ?? url()->current());
+            // Move to payment step instead of redirecting
+            $this->step = 6;
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Document Request Submission Error: ' . $e->getMessage());
             session()->flash('error', 'An error occurred while submitting your request. Please try again.');
+        } finally {
+            $this->isLoading = false;
+        }
+    }
+
+    public function completePayment()
+    {
+        try {
+            $this->isLoading = true;
+
+            // Validate inputs
+            $validatedData = $this->validate([
+                'selectedPaymentMethod' => 'required|in:gcash,bdo,maya',
+                'paymentProofImage' => 'required|image|max:2048',
+            ]);
+
+            // Try to find the document request by reference number if ID is missing
+            if (!empty($this->reference_number)) {
+
+                // Find by reference number instead
+                $documentRequest = DocumentRequest::where('reference_number', $this->reference_number)
+                    ->where('user_id', auth()->id())
+                    ->first();
+
+
+                if (!$documentRequest) {
+                    throw new \Exception("Document request not found. Please check your request and try again.");
+                }
+
+                // Update the ID for future use
+                $this->id = $documentRequest->id;
+            } else {
+                throw new \Exception("Document request information is missing. Please try again.");
+            }
+
+            // Save payment proof
+            $paymentProofPath = null;
+            try {
+                $paymentProofPath = $this->paymentProofImage->storeAs(
+                    'payment-proofs',
+                    'payment_' . $this->reference_number . '.' . $this->paymentProofImage->getClientOriginalExtension(),
+                    'public'
+                );
+            } catch (\Exception $fileException) {
+                Log::error('File upload error: ' . $fileException->getMessage());
+                // Continue without file path if there's an error
+                $paymentProofPath = 'payment-pending';
+            }
+
+            // Update payment status using the model
+            $documentRequest->payment_status = 'processing';
+
+            // Only set these fields if they exist in the database
+            $documentRequest->payment_method = $this->selectedPaymentMethod;
+
+            if ($paymentProofPath) {
+                $documentRequest->payment_proof_path = $paymentProofPath;
+            }
+
+            $documentRequest->payment_date = now();
+            $documentRequest->save();
+
+            // Move to success page
+            $this->step = 7;
+        } catch (\Exception $e) {
+            Log::error('Payment Processing Error: ' . $e->getMessage());
+            session()->flash('error', 'Payment processing failed: ' . $e->getMessage());
         } finally {
             $this->isLoading = false;
         }
@@ -630,6 +863,18 @@ new #[Title('Document Request')] class extends Component {
                     <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
             </li>
+            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+                <div class="step-content">
+                    <div class="step-title">Payment</div>
+                    <div class="step-description text-sm text-gray-500">Complete your transaction</div>
+                </div>
+            </li>
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+                <div class="step-content">
+                    <div class="step-title">Success</div>
+                    <div class="step-description text-sm text-gray-500">Done</div>
+                </div>
+            </li>
         </ul>
     </div>
 
@@ -644,5 +889,9 @@ new #[Title('Document Request')] class extends Component {
         @include('livewire.documentrequest.components.document-request-steps.step4')
     @elseif($step == 5)
         @include('livewire.documentrequest.components.document-request-steps.step5')
+    @elseif($step == 6)
+        @include('livewire.documentrequest.components.document-request-steps.step6')
+    @elseif($step == 7)
+        @include('livewire.documentrequest.components.document-request-steps.step7')
     @endif
 </div>

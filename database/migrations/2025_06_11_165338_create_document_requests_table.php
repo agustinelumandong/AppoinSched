@@ -23,6 +23,9 @@ return new class extends Migration {
             $table->text('remarks')->nullable();
             $table->enum('payment_status', ['unpaid', 'processing', 'paid', 'failed'])->default('unpaid');
             $table->string('payment_reference')->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('payment_proof_path')->nullable();
+            $table->timestamp('payment_date')->nullable();
             $table->timestamp('requested_date')->nullable();
             $table->timestamp('completed_date')->nullable();
             $table->timestamps();

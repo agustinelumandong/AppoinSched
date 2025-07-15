@@ -93,7 +93,8 @@ return new class extends Migration {
                 'Grandparent',
                 'Other Relative',
                 'Legal Representative',
-                'Other'
+                'Other',
+                'N/A'
             ])->nullable();
 
             // Indicates if this is for the requesting user or someone else
