@@ -99,23 +99,17 @@
   </div>
 
   <div class="flex justify-center mt-6 gap-4">
-    <a href="{{ route('appointment-slip.download', $reference_number) }}" class="btn btn-primary">
+    <a href="{{ route('appointment-slip.download', $reference_number) }}" class="btn btn-primary flex items-center"
+      style="display:flex; align-items:center;">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
           d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
       </svg>
-      Download Slip
+      <span>Download Slip</span>
     </a>
-    <button id="print-slip" class="btn btn-secondary">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-        stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-      </svg>
-      Print
-    </button>
-    <button wire:click="sendEmailSlip" wire:loading.attr="disabled" class="btn btn-accent">
+    <button wire:click="sendEmailSlip" wire:loading.attr="disabled" class="btn btn-accent flex items-center"
+      style="display:flex; align-items:center;">
       <svg wire:loading.remove wire:target="sendEmailSlip" xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2"
         fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -125,7 +119,8 @@
       <span wire:loading.remove wire:target="sendEmailSlip">Send to Email</span>
       <span wire:loading wire:target="sendEmailSlip">Sending...</span>
     </button>
-    <a href="{{ route('dashboard') }}" class="btn btn-outline">
+    <a href="{{ route('dashboard') }}" class="btn btn-outline flex items-center"
+      style="display:flex; align-items:center;">
       <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
         stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
