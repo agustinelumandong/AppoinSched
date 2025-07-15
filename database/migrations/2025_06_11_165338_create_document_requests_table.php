@@ -21,8 +21,11 @@ return new class extends Migration {
             $table->string('reference_number')->nullable();
             $table->enum('status', ['pending', 'approved', 'rejected', 'completed', 'canceled', 'in-progress', 'ready-for-pickup', 'cancelled'])->default('pending');
             $table->text('remarks')->nullable();
-            $table->enum('payment_status', ['unpaid', 'processing', 'paid', 'failed', 'walk-in'])->default('unpaid');
+            $table->enum('payment_status', ['unpaid', 'processing', 'paid', 'failed'])->default('unpaid');
             $table->string('payment_reference')->nullable();
+            $table->string('payment_method')->nullable();
+            $table->string('payment_proof_path')->nullable();
+            $table->timestamp('payment_date')->nullable();
             $table->timestamp('requested_date')->nullable();
             $table->timestamp('completed_date')->nullable();
             $table->timestamps();

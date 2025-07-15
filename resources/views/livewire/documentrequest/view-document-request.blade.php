@@ -104,6 +104,71 @@ new class extends Component {
         $this->confirmRejected = false;
         $this->confirmPending = false;
     }
+
+    public function updatePaymentStatus(string $status): void
+    {
+        try {
+            $this->documentRequest->update([
+                'payment_status' => $status,
+            ]);
+
+            session()->flash('success', 'Payment status updated to ' . ucfirst($status) . ' successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update payment status.');
+        }
+    }
+
+    public function updateDocumentStatus(string $status): void
+    {
+        try {
+            $updateData = [
+                'status' => $status,
+                'remarks' => $this->remarks,
+            ];
+
+            // Set staff_id if not already set
+            if (!$this->documentRequest->staff_id) {
+                $updateData['staff_id'] = auth()->id();
+            }
+
+            // Set completed_date if status is completed
+            if ($status === 'completed') {
+                $updateData['completed_date'] = now();
+            }
+
+            $this->documentRequest->update($updateData);
+
+            session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update document request status.');
+        }
+    }
+
+    public function updateDocumentStatusModal(string $status): void
+    {
+        try {
+            $updateData = [
+                'status' => $status,
+                'remarks' => $this->remarks,
+            ];
+
+            // Set staff_id if not already set
+            if (!$this->documentRequest->staff_id) {
+                $updateData['staff_id'] = auth()->id();
+            }
+
+            // Set completed_date if status is completed
+            if ($status === 'completed') {
+                $updateData['completed_date'] = now();
+            }
+
+            $this->documentRequest->update($updateData);
+
+            session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Failed to update document request status.');
+        }
+    }
 }; ?>
 
 <div class="max-w-4xl mx-auto p-6 space-y-6">
@@ -133,7 +198,7 @@ new class extends Component {
                             <!-- Request type badge -->
                             <span
                                 class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                                                                                                                                                                                                {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800' }}">
+                                                                                                                                                                                                                                            {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800' }}">
                                 {{ ucfirst(str_replace('_', ' ', $documentRequest->details->request_for)) }}
                             </span>
                         </div>

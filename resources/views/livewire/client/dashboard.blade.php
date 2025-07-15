@@ -85,19 +85,6 @@ new class extends Component {
                 </div>
             </div>
         @else
-            {{-- <div class="flux-card p-4 bg-green-50 border-green-200 shadow-lg rounded-lg mb-4">
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-green-600 mr-2" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd"
-                            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                            clip-rule="evenodd"></path>
-                    </svg>
-                    <span class="text-green-800 font-medium">Profile complete! You can now access appointments and document
-                        requests.</span>
-                </div>
-            </div>
-            --}}
-
             {{-- Offices --}}
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
                 @forelse ($offices as $office)
@@ -139,9 +126,9 @@ new class extends Component {
             {{-- Appointments Calendar --}}
             <div class="container-fluid mx-auto px-4 py-8">
                 <div class="mb-6">
-                    <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
-                        <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff
-                        </p>
+                    <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h4>
+                    <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff
+                    </p>
                 </div>
                 <livewire:components.full-calendar />
             </div>

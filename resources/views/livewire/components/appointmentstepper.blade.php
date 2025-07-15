@@ -46,18 +46,15 @@ new #[Title('Appointment')] class extends Component {
     public ?string $selectedTime = null;
 
     public Offices $office;
-    public ?string $services = null;
     public Services $service;
     public User $staff;
 
     public ?Appointments $appointment = null;
 
-    public function mount(Offices $office, Services $service, ?string $services = null, User $staff, ?string $reference_number = null): void
+    public function mount(Offices $office, Services $service, ?string $reference_number = null): void
     {
         $this->office = $office;
-        $this->services = $services;
         $this->service = $service;
-        $this->staff = $staff;
         $this->id = auth()->user()->id;
         // Set the reference_number if provided
         if ($reference_number) {
@@ -209,14 +206,11 @@ new #[Title('Appointment')] class extends Component {
                 } while (Appointments::where('reference_number', $reference_number)->exists());
             }
 
-            $service = Services::where('slug', $this->services)->first();
-            $this->service = $service;
             // Create the appointment
             $appointment = Appointments::create([
                 'user_id' => $userId,
                 'office_id' => $this->office->id,
-                'service_id' => $service->id,
-                'staff_id' => $this->staff->id,
+                'service_id' => $this->service->id,
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
                 'to_whom' => $this->to_whom,
@@ -264,7 +258,7 @@ new #[Title('Appointment')] class extends Component {
                     'date' => $this->selectedDate,
                     'time' => $this->selectedTime,
                     'location' => $this->office->name,
-                    'services' => $this->services,
+                    'service' => $this->service->title,
                     'reference_no' => $reference_number
                 ]
             ));
@@ -272,7 +266,7 @@ new #[Title('Appointment')] class extends Component {
             // Send appointment slip email
             auth()->user()->notify(new \App\Notifications\AppointmentSlipNotification($appointment));
 
-            $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
+            $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";
             Cache::forget($cacheKey);
 
             if ($appointment) {
@@ -285,7 +279,7 @@ new #[Title('Appointment')] class extends Component {
                 $this->step = 7;
 
                 // Clear cache and update UI
-                $cacheKey = "time_slots_{$this->office->id}_{$this->staff->id}_{$this->selectedDate}";
+                $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";
                 Cache::forget($cacheKey);
                 $this->dispatch('refresh-slots');
             } else {
@@ -300,7 +294,6 @@ new #[Title('Appointment')] class extends Component {
                     'user_id' => auth()->id() ?? null,
                     'office_id' => $this->office->id ?? null,
                     'service_id' => $this->service->id ?? null,
-                    'staff_id' => $this->staff->id ?? null,
                 ],
             ]);
             session()->flash('error', 'Error: ' . $e->getMessage());
@@ -331,7 +324,6 @@ new #[Title('Appointment')] class extends Component {
                 'time' => $this->selectedTime,
                 'office_id' => $this->office->id,
                 'service_id' => $this->service->id,
-                'staff_id' => $this->staff->id,
             ]);
 
             // Force Livewire to update the UI
@@ -356,7 +348,7 @@ new #[Title('Appointment')] class extends Component {
                     $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
                 })
                 ->where('office_id', $this->office->id)
-                ->where('staff_id', $this->staff->id)
+                ->where('service_id', $this->service->id)
                 ->exists();
 
             Log::info('Checking for conflicts in stepper:', [
@@ -364,7 +356,7 @@ new #[Title('Appointment')] class extends Component {
                 'time' => $this->selectedTime,
                 'time_to_check' => $timeToCheck,
                 'office_id' => $this->office->id,
-                'staff_id' => $this->staff->id,
+                'service_id' => $this->service->id,
                 'has_conflict' => $conflict,
             ]);
 

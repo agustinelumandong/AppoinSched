@@ -19,8 +19,7 @@
                             'slot-picker',
                             [
                                 'officeId' => $appointment->office_id,
-                                'serviceId' => $appointment->service_id,
-                                'staffId' => $appointment->staff_id,
+                                'serviceId' => $appointment->service_id, 
                                 'excludeAppointmentId' => $appointment->id,
                                 'preSelectedDate' => $selectedDate,
                                 'preSelectedTime' => $selectedTime,

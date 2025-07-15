@@ -1,13 +1,13 @@
 <x-modal id="show-appointment" title="Appointment Details" size="max-w-2xl">
   <div class="modal-body">
-    @if($selectedAppointment)
+    @if($appointment)
     <div class="row g-4">
       <!-- Office Information -->
       <div class="col-md-6">
       <div class="info-group">
         <h6 class="text-muted mb-2">Office</h6>
         <div class="p-3 rounded bg-light">
-        <p class="mb-0 text-dark">{{ $selectedAppointment->office?->name ?? 'N/A' }}</p>
+        <p class="mb-0 text-dark">{{ $appointment->office?->name ?? 'N/A' }}</p>
         </div>
       </div>
       </div>
@@ -17,23 +17,7 @@
       <div class="info-group">
         <h6 class="text-muted mb-2">Service</h6>
         <div class="p-3 rounded bg-light">
-        <p class="mb-0 text-dark">{{ $selectedAppointment->service?->title ?? 'N/A' }}</p>
-        </div>
-      </div>
-      </div>
-
-      <!-- Staff Information -->
-      <div class="col-md-6">
-      <div class="info-group">
-        <h6 class="text-muted mb-2">Assigned Staff</h6>
-        <div class="p-3 rounded bg-light">
-        <p class="mb-0 text-dark">
-          @if($selectedAppointment->staff)
-        {{ $selectedAppointment->staff->first_name }} {{ $selectedAppointment->staff->last_name }}
-      @else
-        Not Assigned Yet
-      @endif
-        </p>
+        <p class="mb-0 text-dark">{{ $appointment->service?->title ?? 'N/A' }}</p>
         </div>
       </div>
       </div>
@@ -44,8 +28,8 @@
         <h6 class="text-muted mb-2">Date & Time</h6>
         <div class="p-3 rounded bg-light">
         <p class="mb-0 text-dark">
-          {{ $selectedAppointment->booking_date->format('M d, Y') }} at
-          {{ \Carbon\Carbon::parse($selectedAppointment->booking_time)->format('h:i A') }}
+          {{ $appointment->booking_date->format('M d, Y') }} at
+          {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
         </p>
         </div>
       </div>
@@ -56,25 +40,25 @@
       <div class="info-group">
         <h6 class="text-muted mb-2">Purpose</h6>
         <div class="p-3 rounded bg-light">
-        <p class="mb-0 text-dark">{{ $selectedAppointment->purpose ?? 'Not specified' }}</p>
+        <p class="mb-0 text-dark">{{ $appointment->purpose ?? 'Not specified' }}</p>
         </div>
       </div>
       </div>
 
       <!-- Notes -->
-      @if($selectedAppointment->notes)
+      @if($appointment->notes)
       <div class="col-12">
       <div class="info-group">
       <h6 class="text-muted mb-2">Notes</h6>
       <div class="p-3 rounded bg-light">
-      <p class="mb-0 text-dark">{{ $selectedAppointment->notes }}</p>
+      <p class="mb-0 text-dark">{{ $appointment->notes }}</p>
       </div>
       </div>
       </div>
     @endif
 
       <!-- Appointment Details -->
-      @if($selectedAppointment->appointmentDetails)
+      @if($appointment->appointmentDetails)
       <div class="col-12">
       <div class="info-group">
       <h6 class="text-muted mb-2">Appointment Details</h6>
@@ -82,19 +66,19 @@
       <div class="row">
         <div class="col-md-6">
         <p class="mb-1"><strong>Request For:</strong>
-        {{ ucfirst($selectedAppointment->appointmentDetails->request_for ?? 'N/A') }}</p>
+        {{ ucfirst($appointment->appointmentDetails->request_for ?? 'N/A') }}</p>
         <p class="mb-1"><strong>Name:</strong>
-        {{ $selectedAppointment->appointmentDetails->full_name ?? 'N/A' }}</p>
-        <p class="mb-1"><strong>Email:</strong> {{ $selectedAppointment->appointmentDetails->email ?? 'N/A' }}
+        {{ $appointment->appointmentDetails->full_name ?? 'N/A' }}</p>
+        <p class="mb-1"><strong>Email:</strong> {{ $appointment->appointmentDetails->email ?? 'N/A' }}
         </p>
-        <p class="mb-1"><strong>Phone:</strong> {{ $selectedAppointment->appointmentDetails->phone ?? 'N/A' }}
+        <p class="mb-1"><strong>Phone:</strong> {{ $appointment->appointmentDetails->phone ?? 'N/A' }}
         </p>
         </div>
         <div class="col-md-6">
         <p class="mb-1"><strong>Address:</strong>
-        {{ $selectedAppointment->appointmentDetails->complete_address ?? 'N/A' }}</p>
-        @if($selectedAppointment->appointmentDetails->purpose)
-      <p class="mb-1"><strong>Purpose:</strong> {{ $selectedAppointment->appointmentDetails->purpose }}</p>
+        {{ $appointment->appointmentDetails->complete_address ?? 'N/A' }}</p>
+        @if($appointment->appointmentDetails->purpose)
+      <p class="mb-1"><strong>Purpose:</strong> {{ $appointment->appointmentDetails->purpose }}</p>
       @endif
         </div>
       </div>

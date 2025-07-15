@@ -12,7 +12,6 @@ use Illuminate\Support\Collection;
 new class extends Component {
     public int $officeId;
     public ?int $serviceId = null;
-    public ?int $staffId = null;
     public ?int $excludeAppointmentId = null;
 
     public ?string $selectedDate = null;
@@ -36,7 +35,6 @@ new class extends Component {
     public function mount(
         int $officeId, 
         ?int $serviceId = null, 
-        ?int $staffId = null, 
         ?int $excludeAppointmentId = null, 
         ?string $preSelectedDate = null, 
         ?string $preSelectedTime = null,
@@ -45,8 +43,7 @@ new class extends Component {
     ): void {
         try {
             $this->officeId = $officeId;
-            $this->serviceId = $serviceId;
-            $this->staffId = $staffId;
+            $this->serviceId = $serviceId; 
             $this->excludeAppointmentId = $excludeAppointmentId;
 
             // Set pre-selected values if provided (for editing)
@@ -134,7 +131,7 @@ new class extends Component {
                 'date' => $this->selectedDate,
                 'time' => $this->selectedTime,
                 'office_id' => $this->officeId,
-                'staff_id' => $this->staffId
+                'service_id' => $this->serviceId
             ]);
         } catch (\Exception $e) {
             $this->error = 'Failed to select time slot';
@@ -204,7 +201,7 @@ new class extends Component {
 
     private function generateCacheKey(): string
     {
-        return "time_slots_{$this->officeId}_{$this->staffId}_{$this->selectedDate}";
+        return "time_slots_{$this->officeId}_{$this->serviceId}_{$this->selectedDate}";
     }
 
     private function clearCache(): void
@@ -275,8 +272,8 @@ new class extends Component {
             $bookedSlots = Appointments::query()
                 ->where('booking_date', $this->selectedDate)
                 ->where('office_id', $this->officeId)
-                ->when($this->staffId, function($q) {
-                    return $q->where('staff_id', $this->staffId);
+                ->when($this->serviceId, function($q) {
+                    return $q->where('service_id', $this->serviceId);
                 })
                 ->when($this->excludeAppointmentId, function($q) {
                     return $q->where('id', '!=', $this->excludeAppointmentId);
@@ -292,7 +289,6 @@ new class extends Component {
                 'date' => $this->selectedDate,
                 'office_id' => $this->officeId,
                 'service_id' => $this->serviceId,
-                'staff_id' => $this->staffId,
                 'exclude_id' => $this->excludeAppointmentId,
                 'slots' => $formattedSlots,
                 'raw_slots' => $bookedSlots->pluck('booking_time')->toArray()

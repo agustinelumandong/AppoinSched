@@ -21,7 +21,6 @@ new class extends Component {
 
     public ?Appointments $appointment = null;
     public $user = null;
-    public $staff = null;
     public $office = null;
     public $service = null;
     public bool $showAppointmentModal = false;
@@ -150,7 +149,6 @@ new class extends Component {
                     $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
                 })
                 ->where('office_id', $this->appointment->office_id)
-                ->where('staff_id', $this->appointment->staff_id)
                 ->where('id', '!=', $this->appointment->id)
                 ->exists();
 
@@ -159,7 +157,6 @@ new class extends Component {
                 'time' => $this->selectedTime,
                 'time_to_check' => $timeToCheck,
                 'office_id' => $this->appointment->office_id,
-                'staff_id' => $this->appointment->staff_id,
                 'appointment_id' => $this->appointment->id,
                 'has_conflict' => $conflict,
             ]);
@@ -182,7 +179,7 @@ new class extends Component {
 
     public function openShowAppointmentModal(int $id): void
     {
-        $appointment = Appointments::with(['user', 'staff', 'office', 'service'])->findOrFail($id);
+        $appointment = Appointments::with(['user', 'office', 'service'])->findOrFail($id);
 
         // Check if staff is assigned to this appointment's office
         if (!auth()->user()->isAssignedToOffice($appointment->office_id)) {
@@ -192,7 +189,6 @@ new class extends Component {
 
         $this->appointment = $appointment;
         $this->user = $appointment->user;
-        $this->staff = $appointment->staff;
         $this->office = $appointment->office;
         $this->service = $appointment->service;
         $this->showAppointmentModal = true;
@@ -223,7 +219,7 @@ new class extends Component {
 
     public function with(): array
     {
-        $query = Appointments::with(['user', 'staff', 'office', 'service'])
+        $query = Appointments::with(['user', 'office', 'service'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->whereHas('user', function ($userQuery) {

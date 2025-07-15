@@ -6,7 +6,6 @@
     'title' => 'Select Available Slot',
     'officeId',
     'serviceId' => null,
-    'staffId' => null,
     'size' => 'max-w-6xl',
 ])
 
@@ -15,7 +14,6 @@
         <livewire:slot-picker
             :office-id="$officeId"
             :service-id="$serviceId"
-            :staff-id="$staffId"
             wire:key="slot-picker-{{ $id }}"
         />
     </div>

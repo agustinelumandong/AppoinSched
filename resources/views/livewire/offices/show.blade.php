@@ -52,6 +52,7 @@ new #[Title('Office Details')] class extends Component {
 
                         $requestRoute = $isAppointment ? 'offices.service.appointment' : 'offices.service.request';
                     @endphp
+                    {{-- Service Card --}}
 
                     <a href="{{ route($requestRoute, ['office' => $office->slug, 'service' => $service->slug]) }}"
                         class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"

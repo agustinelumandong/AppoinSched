@@ -28,24 +28,15 @@ new class extends Component {
     { 
         $id = $this->selectedDocumentRequest->id; 
         $request = DocumentRequest::findOrFail($id);
-        $method = $this->selectedPaymentMethod; 
-        if($method === 'online') {
-            $request->update([
-                'payment_status' => 'paid',
-                'payment_reference' => $request->reference_number,
-            ]);
-        } elseif($method === 'walkIn') { 
-            $office_slug = 'municipal-treasurers-office'; 
-            $service_slug = $request->service->slug;
-            $reference_number = $request->reference_number;
-            $this->redirect(route('offices.service.appointment', 
-            [
-                'office' => $office_slug, 
-                'services' => $service_slug, 
-                'reference_number' => $reference_number]));
-        }
-        $this->dispatch('close-modal-payment-method');
-        $this->reset(); 
+        $office = $request->office;
+        $service = $request->service;
+        $referenceNumber = $request->reference_number;
+        // Redirect to the document request stepper for payment
+        return redirect()->route('offices.service.request', [
+            'office' => $office->slug,
+            'service' => $service->slug,
+            'reference_number' => $referenceNumber,
+        ]);
     }
 
     public function setSelectedDocumentRequest($id)
@@ -142,9 +133,9 @@ new class extends Component {
                                             <td>
                                                 {{--  --}}
                                                 <button
-                                                    class="flux-btn btn-sm flux-btn-primary text-decoration-none {{ $request->status === 'approved' && $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
+                                                    class="flux-btn btn-sm flux-btn-primary text-decoration-none {{   $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
                                                     wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
-                                                    @if(!($request->status === 'approved' && $request->payment_status === 'unpaid')) disabled aria-disabled="true" @endif
+                                                    @if($request->status === 'approved' && $request->payment_status === 'processing') disabled aria-disabled="true" @endif
                                                 >
                                                     Pay Now
                                                 </button>

@@ -308,10 +308,10 @@ class User extends Authenticatable
     /**
      * Get all appointments where this user is the assigned staff
      */
-    public function assignedAppointments()
-    {
-        return $this->hasMany(Appointments::class, 'staff_id');
-    }
+    // public function assignedAppointments()
+    // {
+    //     return $this->hasMany(Appointments::class, 'staff_id');
+    // }
 
     public function getOfficeIdForStaff(): ?int
     {

@@ -73,7 +73,7 @@ new class extends Component {
             }
 
             $validated = $this->validate([
-                'status' => 'required|string|in:pending,approved,rejected,completed',
+                'status' => 'required|string|in:pending,approved,rejected,completed,canceled,in-progress,ready-for-pickup,cancelled',
             ]);
 
             $updateData = [
@@ -101,6 +101,39 @@ new class extends Component {
             session()->flash('error', 'An error occurred while updating the document request status');
         }
     }
+
+    public function updateDocumentStatusModal(string $status): void
+    {
+        try {
+            if (!$this->documentRequest) {
+                session()->flash('error', 'No document request selected.');
+                return;
+            }
+
+            // Check if staff is assigned to this document request's office
+            if (!auth()->user()->isAssignedToOffice($this->documentRequest->office_id)) {
+                session()->flash('error', 'You are not authorized to update this document request');
+                return;
+            }
+
+            $updateData = [
+                'status' => $status,
+                'staff_id' => auth()->id(),
+            ];
+
+            // Set completed_date if status is completed
+            if ($status === 'completed') {
+                $updateData['completed_date'] = now();
+            }
+
+            $this->documentRequest->update($updateData);
+
+            session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
+        } catch (\Exception $e) {
+            Log::error('Document status update failed: ' . $e->getMessage());
+            session()->flash('error', 'Failed to update document request status.');
+        }
+    }
     public function getOfficeIdForStaff(): ?int
     {
         if (auth()->user()->hasRole('MCR-staff')) {
@@ -123,16 +156,44 @@ new class extends Component {
                     $query->whereHas('user', function ($q) {
                         $q->where('first_name', 'like', '%' . $this->search . '%')
                             ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('email', 'like', '%' . $this->search . '%');
+                            ->orWhere('email', 'like', '%' . $this->search . '%')
+                            ->orWhere('reference_number', 'like', '%' . $this->search . '%');
                     });
                 })
                 ->when($this->status, function ($query) {
                     $query->where('status', $this->status);
                 })
                 ->latest()
-                ->paginate(10), 
+                ->paginate(10),
         ];
     }
+
+    public function updatePaymentStatus(string $status): void
+    {
+        try {
+            if (!$this->documentRequest) {
+                session()->flash('error', 'No document request selected.');
+                return;
+            }
+
+            // Check if staff is assigned to this document request's office
+            if (!auth()->user()->isAssignedToOffice($this->documentRequest->office_id)) {
+                session()->flash('error', 'You are not authorized to update this document request');
+                return;
+            }
+
+            $this->documentRequest->update([
+                'payment_status' => $status,
+            ]);
+
+            session()->flash('success', 'Payment status updated to ' . ucfirst($status) . ' successfully.');
+        } catch (\Exception $e) {
+            Log::error('Payment status update failed: ' . $e->getMessage());
+            session()->flash('error', 'Failed to update payment status.');
+        }
+    }
+
+
 }; ?>
 
 <div>
@@ -194,11 +255,10 @@ new class extends Component {
             <table class="table flux-table w-full">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Reference Number</th>
                         <th>Requestor</th>
                         <th>Document For</th>
                         <th>Service</th>
-                        <th>Office</th>
                         <th>Status</th>
                         <th>Date</th>
                         <th>Actions</th>
@@ -206,60 +266,57 @@ new class extends Component {
                 </thead>
                 <tbody>
                     @forelse($documentRequests as $documentRequest)
-                        <tr>
-                            <td>{{ $documentRequest->id }}</td>
-                            <td>
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $documentRequest->user?->first_name . ' ' . $documentRequest->user?->last_name ?? 'N/A' }}
-                                </div>
-                                <div class="text-sm text-gray-500">
-                                    {{ $documentRequest->user?->email ?? 'N/A' }}
-                                </div>
-                            </td>
-                            <td>
-                                @if ($documentRequest->details)
-                                    {{ $documentRequest->details->first_name }}
-                                    {{ $documentRequest->details->last_name }}
-                                    <span
-                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
-                                        {{ ucfirst(str_replace('_', ' ', $documentRequest->details->request_for)) }}
-                                    </span>
-                                @else
-                                    <span class="text-gray-400">No details</span>
-                                @endif
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ $documentRequest->service?->title ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ $documentRequest->office?->name ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <span
-                                    class="flux-badge flux-badge-{{ match ($documentRequest->status) {
-                                        'pending' => 'warning',
-                                        'approved' => 'success',
-                                        'rejected' => 'danger',
-                                        'completed' => 'success',
-                                        default => 'light',
-                                    } }}">
-                                    {{ ucfirst($documentRequest->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">
-                                    {{ $documentRequest->created_at?->format('M d, Y') ?? 'N/A' }}
-                                </p>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    <a href="{{ route('admin.view-document-request', Crypt::encryptString($documentRequest->id)) }}"
-                                        wire:navigate class="flux-btn flux-btn-outline btn-sm" title="View Details">
-                                        <i class="bi bi-eye"></i>
-                                    </a>
-                                </div>
-                            </td>
-                        </tr>
+                                        <tr>
+                                            <td>{{ $documentRequest->reference_number }}</td>
+                                            <td>
+                                                <div class="text-sm font-medium text-gray-900">
+                                                    {{ $documentRequest->user?->first_name . ' ' . $documentRequest->user?->last_name ?? 'N/A' }}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{ $documentRequest->user?->email ?? 'N/A' }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                @if ($documentRequest->details)
+                                                    {{ $documentRequest->details->first_name }}
+                                                    {{ $documentRequest->details->last_name }}
+                                                    <span
+                                                        class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
+                                                        {{ ucfirst(str_replace('_', ' ', $documentRequest->details->request_for)) }}
+                                                    </span>
+                                                @else
+                                                    <span class="text-gray-400">No details</span>
+                                                @endif
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">{{ $documentRequest->service?->title ?? 'N/A' }}</p>
+                                            </td>
+
+                                            <td>
+                                                <span class="flux-badge flux-badge-{{ match ($documentRequest->status) {
+                            'pending' => 'warning',
+                            'approved' => 'success',
+                            'rejected' => 'danger',
+                            'completed' => 'success',
+                            default => 'light',
+                        } }}">
+                                                    {{ ucfirst($documentRequest->status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <p class="fw-semibold">
+                                                    {{ $documentRequest->created_at?->format('M d, Y') ?? 'N/A' }}
+                                                </p>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+                                                    <a href="{{ route('admin.view-document-request', Crypt::encryptString($documentRequest->id)) }}"
+                                                        wire:navigate class="flux-btn flux-btn-outline btn-sm" title="View Details">
+                                                        <i class="bi bi-eye"></i>
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="text-center py-8">
