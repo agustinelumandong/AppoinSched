@@ -166,140 +166,198 @@ new class extends Component {
 
     public function updateAll(): void
     {
-        // Validate input using Laravel's validator
-        $validated = $this->validate([
-            'last_name' => ['required', 'string', 'max:255'],
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['nullable', 'string', 'max:255'],
-            'suffix' => ['nullable', 'string', 'max:10'],
-            'email' => ['required', 'email', 'max:255'],
-            'contact_no' => ['nullable', 'string', 'max:20'],
-            'sex_at_birth' => ['nullable', 'in:Male,Female'],
-            'date_of_birth' => ['nullable', 'date'],
-            'place_of_birth' => ['nullable', 'string', 'max:255'],
-            'civil_status' => ['nullable', 'string', 'max:50'],
-            'religion' => ['nullable', 'string', 'max:100'],
-            'nationality' => ['nullable', 'string', 'max:100'],
-            'government_id_type' => ['nullable', 'string', 'max:100'],
-            'government_id_image_path' => ['nullable', 'image', 'max:2048'], // 2MB max
-            'address_type' => ['nullable', 'string', 'max:50'],
-            'address_line_1' => ['nullable', 'string', 'max:255'],
-            'address_line_2' => ['nullable', 'string', 'max:255'],
-            'region' => ['nullable', 'string', 'max:100'],
-            'province' => ['nullable', 'string', 'max:100'],
-            'city' => ['nullable', 'string', 'max:100'],
-            'barangay' => ['nullable', 'string', 'max:100'],
-            // 'street' => ['nullable', 'string', 'max:255'],
-            'zip_code' => ['nullable', 'string', 'max:20'],
-            'father_last_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
-            'father_first_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
-            'father_middle_name' => ['nullable', 'string', 'max:255'],
-            'father_suffix' => ['nullable', 'string', 'max:10'],
-            'father_birthdate' => ['nullable', 'date'],
-            'father_nationality' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
-            'father_religion' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
-            'father_contact_no' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
-            'mother_last_name' => ['required', 'string', 'max:255'],
-            'mother_first_name' => ['required', 'string', 'max:255'],
-            'mother_middle_name' => ['nullable', 'string', 'max:255'],
-            'mother_suffix' => ['nullable', 'string', 'max:10'],
-            'mother_birthdate' => ['nullable', 'date'],
-            'mother_nationality' => ['required', 'string', 'max:100'],
-            'mother_religion' => ['required', 'string', 'max:100'],
-            'mother_contact_no' => ['required', 'string', 'max:20'],
-            'spouse_last_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
-            'spouse_first_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
-            'spouse_middle_name' => ['nullable', 'string', 'max:255'],
-            'spouse_suffix' => ['nullable', 'string', 'max:10'],
-            'spouse_birthdate' => ['nullable', 'date'],
-            'spouse_nationality' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
-            'spouse_religion' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
-            'spouse_contact_no' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:20'],
-        ]);
+        try {
+            // Validate input using Laravel's validator
+            $validated = $this->validate([
+                'last_name' => ['required', 'string', 'max:255'],
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['nullable', 'string', 'max:255'],
+                'suffix' => ['nullable', 'string', 'max:10'],
+                'email' => ['required', 'email', 'max:255'],
+                'contact_no' => ['required', 'string', 'max:20'],
+                'sex_at_birth' => ['required', 'in:Male,Female'],
+                'date_of_birth' => ['required', 'date'],
+                'place_of_birth' => ['required', 'string', 'max:255'],
+                'civil_status' => ['required', 'string', 'max:50'],
+                'religion' => ['required', 'string', 'max:100'],
+                'nationality' => ['required', 'string', 'max:100'],
+                'government_id_type' => ['nullable', 'string', 'max:100'],
+                'government_id_image_path' => ['nullable', 'image', 'max:2048'], // 2MB max
+                'address_type' => ['required', 'string', 'max:50'],
+                'address_line_1' => ['required', 'string', 'max:255'],
+                'address_line_2' => ['required', 'string', 'max:255'],
+                'region' => ['required', 'string', 'max:100'],
+                'province' => ['required', 'string', 'max:100'],
+                'city' => ['required', 'string', 'max:100'],
+                'barangay' => ['required', 'string', 'max:100'],
+                // 'street' => ['nullable', 'string', 'max:255'],
+                'zip_code' => ['nullable', 'string', 'max:20'],
+                'father_last_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
+                'father_first_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
+                'father_middle_name' => ['nullable', 'string', 'max:255'],
+                'father_suffix' => ['nullable', 'string', 'max:10'],
+                'father_birthdate' => ['nullable', 'date'],
+                'father_nationality' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
+                'father_religion' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
+                'father_contact_no' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
+                'mother_last_name' => ['required', 'string', 'max:255'],
+                'mother_first_name' => ['required', 'string', 'max:255'],
+                'mother_middle_name' => ['nullable', 'string', 'max:255'],
+                'mother_suffix' => ['nullable', 'string', 'max:10'],
+                'mother_birthdate' => ['nullable', 'date'],
+                'mother_nationality' => ['required', 'string', 'max:100'],
+                'mother_religion' => ['required', 'string', 'max:100'],
+                'mother_contact_no' => ['required', 'string', 'max:20'],
+                'spouse_last_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
+                'spouse_first_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
+                'spouse_middle_name' => ['nullable', 'string', 'max:255'],
+                'spouse_suffix' => ['nullable', 'string', 'max:10'],
+                'spouse_birthdate' => ['nullable', 'date'],
+                'spouse_nationality' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
+                'spouse_religion' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
+                'spouse_contact_no' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:20'],
+            ]);
 
-        // Update User
-        $this->user
-            ->fill([
-                'last_name' => $this->last_name,
-                'first_name' => $this->first_name,
-                'middle_name' => $this->middle_name ?? 'N/A',
-                'email' => $this->email,
-            ])
-            ->save();
+            // Check if required personal info fields are filled
+            $missingFields = [];
+            $requiredPersonalFields = [
+                'sex_at_birth',
+                'date_of_birth',
+                'place_of_birth',
+                'civil_status',
+                'religion',
+                'nationality',
+                'government_id_type',
+                'government_id_image_path',
+            ];
 
-        // Handle file upload for government ID image
-        $governmentIdImagePath = null;
-        if ($this->government_id_image_path) {
-            $governmentIdImagePath = $this->government_id_image_path->storeAs('government-ids', $this->user->id . '_' . $this->government_id_image_path->getClientOriginalName(), 'public');
+            foreach ($requiredPersonalFields as $field) {
+                // Special handling for government_id_image_path: skip if already present in DB
+                if (
+                    $field === 'government_id_image_path'
+                    && !empty(optional($this->personalInformation)->government_id_image_path)
+                ) {
+                    continue;
+                }
+                if (empty($this->{$field})) {
+                    $missingFields[] = $field;
+                }
+            }
+
+            if (count($missingFields) > 0) {
+                session()->flash('error', 'Please fill up the following personal information fields: ' . implode(', ', $missingFields));
+                return;
+            }
+
+            // Update User
+            $this->user
+                ->fill([
+                    'last_name' => $this->last_name,
+                    'first_name' => $this->first_name,
+                    'middle_name' => $this->middle_name ?? 'N/A',
+                    'email' => $this->email,
+                ])
+                ->save();
+
+
+            if (!empty(optional($this->personalInformation)->government_id_image_path)) {
+                if ($this->government_id_image_path !== $this->personalInformation->government_id_image_path) {
+                    $governmentIdImagePath = $this->government_id_image_path->storeAs(
+                        'government-ids',
+                        $this->user->id . '_' . $this->government_id_image_path->getClientOriginalName(),
+                        'public'
+                    );
+                } else {
+                    $governmentIdImagePath = $this->personalInformation->government_id_image_path;
+                }
+            } elseif ($this->government_id_image_path) {
+                $governmentIdImagePath = $this->government_id_image_path->storeAs(
+                    'government-ids',
+                    $this->user->id . '_' . $this->government_id_image_path->getClientOriginalName(),
+                    'public'
+                );
+            } else {
+                $governmentIdImagePath = null;
+            }
+
+            // Update Personal Information
+            $this->personalInformation
+                ->fill([
+                    'user_id' => $this->user->id,
+                    'suffix' => $this->suffix ?? 'N/A',
+                    'contact_no' => $this->contact_no ?: null,
+                    'sex_at_birth' => $this->sex_at_birth ?: null,
+                    'date_of_birth' => $this->date_of_birth ?: null,
+                    'place_of_birth' => $this->place_of_birth ?: null,
+                    'civil_status' => $this->civil_status ?? 'Single',
+                    'religion' => $this->religion ?: null,
+                    'nationality' => $this->nationality ?? 'Filipino',
+                    'government_id_type' => $this->government_id_type ?: null,
+                    'government_id_image_path' => $governmentIdImagePath,
+                ])
+                ->save();
+
+            // Update User Addresses
+            $this->userAddresses
+                ->fill([
+                    // 'user_id' => $this->user->id,
+                    'personal_information_id' => $this->personalInformation->id,
+                    'address_type' => $this->address_type ?? 'Permanent',
+                    'address_line_1' => $this->address_line_1 ?: null,
+                    'address_line_2' => $this->address_line_2 ?: null,
+                    'region' => $this->region ?: null,
+                    'province' => $this->province ?: null,
+                    'city' => $this->city ?: null,
+                    'barangay' => $this->barangay ?: null,
+                    // 'street' => $this->street ?: null,
+                    'zip_code' => $this->zip_code ?: null,
+                ])
+                ->save();
+
+            // Update User Family
+            $this->userFamily
+                ->fill([
+                    'user_id' => $this->user->id,
+                    'personal_information_id' => $this->personalInformation->id,
+                    'father_last_name' => $this->father_last_name ?: null,
+                    'father_first_name' => $this->father_first_name ?: null,
+                    'father_middle_name' => $this->father_middle_name ?: null,
+                    'father_suffix' => $this->father_suffix ?? 'N/A',
+                    'father_birthdate' => $this->father_birthdate ?: null,
+                    'father_nationality' => $this->father_nationality ?: null,
+                    'father_religion' => $this->father_religion ?: null,
+                    'father_contact_no' => $this->father_contact_no ?: null,
+                    'mother_last_name' => $this->mother_last_name ?: null,
+                    'mother_first_name' => $this->mother_first_name ?: null,
+                    'mother_middle_name' => $this->mother_middle_name ?: null,
+                    'mother_suffix' => $this->mother_suffix ?? 'N/A',
+                    'mother_birthdate' => $this->mother_birthdate ?: null,
+                    'mother_nationality' => $this->mother_nationality ?: null,
+                    'mother_religion' => $this->mother_religion ?: null,
+                    'mother_contact_no' => $this->mother_contact_no ?: null,
+                    'spouse_last_name' => $this->spouse_last_name ?: null,
+                    'spouse_first_name' => $this->spouse_first_name ?: null,
+                    'spouse_middle_name' => $this->spouse_middle_name ?: null,
+                    'spouse_suffix' => $this->spouse_suffix ?? 'N/A',
+                    'spouse_birthdate' => $this->spouse_birthdate ?: null,
+                    'spouse_nationality' => $this->spouse_nationality ?: null,
+                    'spouse_religion' => $this->spouse_religion ?: null,
+                    'spouse_contact_no' => $this->spouse_contact_no ?: null,
+                ])
+                ->save();
+
+            session()->flash('success', 'All information updated!');
+
+
+
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $messages = $e->validator->errors()->all();
+            session()->flash('error', 'Validation failed: ' . implode(' ', $messages));
+            return;
+        } catch (\Exception $e) {
+            session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
+            return;
         }
-
-        // Update Personal Information
-        $this->personalInformation
-            ->fill([
-                'user_id' => $this->user->id,
-                'suffix' => $this->suffix ?? 'N/A',
-                'contact_no' => $this->contact_no ?: null,
-                'sex_at_birth' => $this->sex_at_birth ?: null,
-                'date_of_birth' => $this->date_of_birth ?: null,
-                'place_of_birth' => $this->place_of_birth ?: null,
-                'civil_status' => $this->civil_status ?? 'Single',
-                'religion' => $this->religion ?: null,
-                'nationality' => $this->nationality ?? 'Filipino',
-                'government_id_type' => $this->government_id_type ?: null,
-                'government_id_image_path' => $governmentIdImagePath,
-            ])
-            ->save();
-
-        // Update User Addresses
-        $this->userAddresses
-            ->fill([
-                // 'user_id' => $this->user->id,
-                'personal_information_id' => $this->personalInformation->id,
-                'address_type' => $this->address_type ?? 'Permanent',
-                'address_line_1' => $this->address_line_1 ?: null,
-                'address_line_2' => $this->address_line_2 ?: null,
-                'region' => $this->region ?: null,
-                'province' => $this->province ?: null,
-                'city' => $this->city ?: null,
-                'barangay' => $this->barangay ?: null,
-                // 'street' => $this->street ?: null,
-                'zip_code' => $this->zip_code ?: null,
-            ])
-            ->save();
-
-        // Update User Family
-        $this->userFamily
-            ->fill([
-                'user_id' => $this->user->id,
-                'personal_information_id' => $this->personalInformation->id,
-                'father_last_name' => $this->father_last_name ?: null,
-                'father_first_name' => $this->father_first_name ?: null,
-                'father_middle_name' => $this->father_middle_name ?: null,
-                'father_suffix' => $this->father_suffix ?? 'N/A',
-                'father_birthdate' => $this->father_birthdate ?: null,
-                'father_nationality' => $this->father_nationality ?: null,
-                'father_religion' => $this->father_religion ?: null,
-                'father_contact_no' => $this->father_contact_no ?: null,
-                'mother_last_name' => $this->mother_last_name ?: null,
-                'mother_first_name' => $this->mother_first_name ?: null,
-                'mother_middle_name' => $this->mother_middle_name ?: null,
-                'mother_suffix' => $this->mother_suffix ?? 'N/A',
-                'mother_birthdate' => $this->mother_birthdate ?: null,
-                'mother_nationality' => $this->mother_nationality ?: null,
-                'mother_religion' => $this->mother_religion ?: null,
-                'mother_contact_no' => $this->mother_contact_no ?: null,
-                'spouse_last_name' => $this->spouse_last_name ?: null,
-                'spouse_first_name' => $this->spouse_first_name ?: null,
-                'spouse_middle_name' => $this->spouse_middle_name ?: null,
-                'spouse_suffix' => $this->spouse_suffix ?? 'N/A',
-                'spouse_birthdate' => $this->spouse_birthdate ?: null,
-                'spouse_nationality' => $this->spouse_nationality ?: null,
-                'spouse_religion' => $this->spouse_religion ?: null,
-                'spouse_contact_no' => $this->spouse_contact_no ?: null,
-            ])
-            ->save();
-
-        session()->flash('success', 'All information updated!');
     }
 
     public function with()
@@ -554,13 +612,19 @@ new class extends Component {
                     <option value="Other">Other</option>
                 </select>
                 <span class="text-xs text-gray-500 mt-1">Select your primary government ID</span>
+                @error('government_id_type')
+                    <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
+                @enderror
             </div>
+
             <div class="flex flex-col">
                 <label for="government_id_image_path" class="text-xs font-medium mb-1">Government ID Image</label>
                 <input id="government_id_image_path" class="flux-form-control" type="file"
-                    wire:model="government_id_image_path" accept="image/*">
+                    wire:model="government_id_image_path" accept="image/*" required>
                 <span class="text-xs text-gray-500 mt-1">Upload a clear image of your government ID (Max 2MB)</span>
-
+                @error('government_id_image_path')
+                    <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
+                @enderror
                 @if($this->getGovernmentIdImageUrl())
                     <div class="mt-2">
                         <p class="text-xs text-gray-600 mb-1">Current ID Image:</p>
