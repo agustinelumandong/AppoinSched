@@ -92,8 +92,20 @@ new class extends Component {
                         class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
                         id="office-{{ $office->id }}">
                         <div class="absolute" style="top: -50px; right: -80px;">
-                            <img src="{{ asset('storage/offices/' . $office->logo) }}" alt="{{ $office->name }} Logo"
-                                class="rounded-full"
+                            @php
+                                $logo = $office->logo;
+                                if (!empty($logo)) {
+                                    $logo = asset('storage/offices/' . $office->logo);
+                                }
+                                if ($office->slug === 'municipal-civil-registrar') {
+                                    $logo = asset('images/MCR_logo.jpg');
+                                } elseif ($office->slug === 'municipal-treasurers-office') {
+                                    $logo = asset('images/MTO_logo.jpg');
+                                } elseif ($office->slug === 'business-permits-and-licensing-section') {
+                                    $logo = asset('images/BPLS_logo.jpg');
+                                }
+                            @endphp
+                            <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
                                 style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
                         </div>
                         {{-- Header --}}
