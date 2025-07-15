@@ -156,7 +156,8 @@ new class extends Component {
                     $query->whereHas('user', function ($q) {
                         $q->where('first_name', 'like', '%' . $this->search . '%')
                             ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                            ->orWhere('email', 'like', '%' . $this->search . '%');
+                            ->orWhere('email', 'like', '%' . $this->search . '%')
+                            ->orWhere('reference_number', 'like', '%' . $this->search . '%');
                     });
                 })
                 ->when($this->status, function ($query) {
@@ -254,11 +255,10 @@ new class extends Component {
             <table class="table flux-table w-full">
                 <thead>
                     <tr>
-                        <th>ID</th>
+                        <th>Reference Number</th>
                         <th>Requestor</th>
                         <th>Document For</th>
                         <th>Service</th>
-                        <th>Office</th>
                         <th>Status</th>
                         <th>Date</th>
                         <th>Actions</th>
@@ -267,7 +267,7 @@ new class extends Component {
                 <tbody>
                     @forelse($documentRequests as $documentRequest)
                                         <tr>
-                                            <td>{{ $documentRequest->id }}</td>
+                                            <td>{{ $documentRequest->reference_number }}</td>
                                             <td>
                                                 <div class="text-sm font-medium text-gray-900">
                                                     {{ $documentRequest->user?->first_name . ' ' . $documentRequest->user?->last_name ?? 'N/A' }}
@@ -291,9 +291,7 @@ new class extends Component {
                                             <td>
                                                 <p class="fw-semibold">{{ $documentRequest->service?->title ?? 'N/A' }}</p>
                                             </td>
-                                            <td>
-                                                <p class="fw-semibold">{{ $documentRequest->office?->name ?? 'N/A' }}</p>
-                                            </td>
+
                                             <td>
                                                 <span class="flux-badge flux-badge-{{ match ($documentRequest->status) {
                             'pending' => 'warning',
