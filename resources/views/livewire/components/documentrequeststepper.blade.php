@@ -18,6 +18,9 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Str;
 use App\Notifications\RequestEventNotification;
 use App\Enums\RequestNotificationEvent;
+use App\Notifications\AdminEventNotification;
+use App\Enums\AdminNotificationEvent;
+use App\Models\User;
 
 new #[Title('Document Request')] class extends Component {
     use WithFileUploads;
@@ -727,6 +730,20 @@ new #[Title('Document Request')] class extends Component {
                     'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name
                 ]
             ));
+
+            // Send notification to staff
+            $staffs = User::getStaffsByOfficeId($this->office->id);
+            if ($staffs->count() > 0) {
+                foreach ($staffs as $staff) {
+                    $staff->notify(new AdminEventNotification(
+                        AdminNotificationEvent::UserSubmittedDocumentRequest,
+                        [
+                            'reference_no' => $this->reference_number,
+                            'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name
+                        ]
+                    ));
+                }
+            }
 
             session()->flash('success', 'Document request submitted successfully!');
 

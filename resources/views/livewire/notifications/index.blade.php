@@ -6,17 +6,15 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\On;
 
 new class extends Component {
-
-    #[On('markAsRead')]
-    public function markAsRead($data): void
+    public function markAsRead(?array $data = null): void
     {
         $user = Auth::user();
-        dd($data);
-        $notificationId = $data['id'];
+        $notificationId = is_array($data) ? $data['id'] ?? null : $data;
         if ($notificationId) {
             $notification = $user->notifications()->find($notificationId);
             if ($notification) {
                 $notification->markAsRead();
+                $this->dispatch('notificationRead');
             }
         }
     }
@@ -38,16 +36,17 @@ new class extends Component {
 
 <div>
 
-    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
-        {{ __('All Notifications') }}
-    </h2>
 
-    <div class="py-12">
+
+    <div>
 
         <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
             <div class="p-6 text-gray-900 dark:text-gray-100">
                 <div class="flex items-center justify-between mb-6">
-                    @if(auth()->user()->unreadNotifications->count() > 0)
+                    <h2 class="font-semibold text-xl text-gray-800 dark:text-gray-200 leading-tight">
+                        {{ __('All Notifications') }}
+                    </h2>
+                    @if (auth()->user()->unreadNotifications->count() > 0)
                         <button wire:click="markAllAsRead"
                             class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
                             Mark all as read
@@ -55,15 +54,15 @@ new class extends Component {
                     @endif
                 </div>
 
-                @if($notifications->count() > 0)
+                @if ($notifications->count() > 0)
                     <div class="space-y-4">
-                        @foreach($notifications as $notification)
+                        @foreach ($notifications as $notification)
                             <div
                                 class="border border-gray-200 dark:border-gray-700 rounded-lg p-4 {{ $notification->read_at ? 'bg-gray-50 dark:bg-gray-700' : 'bg-blue-50 dark:bg-blue-900/20' }}">
                                 <div class="flex items-start justify-between">
                                     <div class="flex items-start space-x-3">
                                         <div class="flex-shrink-0">
-                                            @if(!$notification->read_at)
+                                            @if (!$notification->read_at)
                                                 <div class="w-3 h-3 bg-blue-500 rounded-full"></div>
                                             @endif
                                         </div>
@@ -74,7 +73,7 @@ new class extends Component {
                                             <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                                                 {{ $notification->created_at->diffForHumans() }}
                                             </p>
-                                            @if(isset($notification->data['event']))
+                                            @if (isset($notification->data['event']))
                                                 <span
                                                     class="inline-block mt-2 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-600 text-gray-600 dark:text-gray-300 rounded">
                                                     {{ ucfirst(str_replace('_', ' ', $notification->data['event'])) }}
@@ -82,8 +81,8 @@ new class extends Component {
                                             @endif
                                         </div>
                                     </div>
-                                    @if(!$notification->read_at)
-                                        <button wire:click="markAsRead({{ $notification->id }})"
+                                    @if (!$notification->read_at)
+                                        <button wire:click="markAsRead({id: '{{ $notification->id }}'})"
                                             class="text-xs text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
                                             Mark as read
                                         </button>

@@ -10,6 +10,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
 use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Database\Eloquent\Collection;
 
 class User extends Authenticatable
 {
@@ -305,13 +306,6 @@ class User extends Authenticatable
         return $this->hasMany(DocumentRequest::class, 'staff_id');
     }
 
-    /**
-     * Get all appointments where this user is the assigned staff
-     */
-    // public function assignedAppointments()
-    // {
-    //     return $this->hasMany(Appointments::class, 'staff_id');
-    // }
 
     public function getOfficeIdForStaff(): ?int
     {
@@ -326,27 +320,6 @@ class User extends Authenticatable
         }
         return null;
     }
-
-
-    /**
-     * Get all offices this staff is assigned to
-     */
-    // public function assignedOffices()
-    // {
-    //     return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
-    //         ->withPivot('is_primary')
-    //         ->withTimestamps();
-    // }
-
-    /**
-     * Get the primary office assignment for this staff
-     */
-    // public function primaryOffice()
-    // {
-    //     return $this->belongsToMany(Offices::class, 'staff_office_assignments', 'user_id', 'office_id')
-    //         ->wherePivot('is_primary', true)
-    //         ->first();
-    // }
 
     /**
      * Check if user is assigned to a specific office (role-based)
@@ -380,6 +353,36 @@ class User extends Authenticatable
     {
         $office = $this->getAssignedOffice();
         return $office ? collect([$office]) : collect();
+    }
+
+    /**
+     * Get all staff users assigned to a specific office based on roles
+     *
+     * @param int $officeId The ID of the office to find staff for
+     * @return \Illuminate\Database\Eloquent\Collection Collection of User models
+     */
+    public static function getStaffsByOfficeId(int $officeId): Collection
+    {
+        return User::query()
+            ->whereHas('roles', function ($query) {
+                $query->whereIn('name', ['MCR-staff', 'MTO-staff', 'BPLS-staff']);
+            })
+            ->where(function ($query) use ($officeId) {
+                // Check if user's role-based office matches the requested office
+                $query->whereHas('roles', function ($roleQuery) use ($officeId) {
+                    // Match users whose role corresponds to this office
+                    $roleQuery->where(function ($q) use ($officeId) {
+                        if ($officeId === Offices::where('slug', 'municipal-civil-registrar')->value('id')) {
+                            $q->where('name', 'MCR-staff');
+                        } elseif ($officeId === Offices::where('slug', 'municipal-treasurers-office')->value('id')) {
+                            $q->where('name', 'MTO-staff');
+                        } elseif ($officeId === Offices::where('slug', 'business-permits-and-licensing-section')->value('id')) {
+                            $q->where('name', 'BPLS-staff');
+                        }
+                    });
+                });
+            })
+            ->get();
     }
 
     /**

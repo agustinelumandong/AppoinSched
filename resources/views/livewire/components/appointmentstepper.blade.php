@@ -21,6 +21,8 @@ use Illuminate\Support\Str;
 use App\Models\DocumentRequest;
 use App\Notifications\RequestEventNotification;
 use App\Enums\RequestNotificationEvent;
+use App\Notifications\AdminEventNotification;
+use App\Enums\AdminNotificationEvent;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -263,6 +265,24 @@ new #[Title('Appointment')] class extends Component {
                 ]
             ));
 
+            // Send notification to staff
+            $staffs = User::getStaffsByOfficeId($this->office->id);
+            if ($staffs->count() > 0) {
+                foreach ($staffs as $staff) {
+                    $staff->notify(new AdminEventNotification(
+                        AdminNotificationEvent::UserAppointmentScheduled,
+                        [
+                            'reference_no' => $reference_number,
+                            'date' => $this->selectedDate,
+                            'time' => $this->selectedTime,
+                            'location' => $this->office->name,
+                            'service' => $this->service->title,
+                            'user' => auth()->user()->name,
+                            'user_email' => auth()->user()->email,
+                        ]
+                    ));
+                }
+            }
             // Send appointment slip email
             auth()->user()->notify(new \App\Notifications\AppointmentSlipNotification($appointment));
 
