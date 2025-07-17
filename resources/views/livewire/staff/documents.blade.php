@@ -250,7 +250,7 @@ new class extends Component {
     </div>
 
     <!-- Document Requests Table -->
-    <div class="flux-card p-6">
+    <div class="flux-card">
         <div class="overflow-x-auto">
             <table class="table flux-table w-full">
                 <thead>

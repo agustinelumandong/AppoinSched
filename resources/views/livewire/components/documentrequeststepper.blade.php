@@ -815,6 +815,21 @@ new #[Title('Document Request')] class extends Component {
             $documentRequest->payment_date = now();
             $documentRequest->save();
 
+            // Send notification to staff
+            $staffs = User::getStaffsByOfficeId($this->office->id);
+            if ($staffs->count() > 0) {
+                foreach ($staffs as $staff) {
+                    $staff->notify(new AdminEventNotification(
+                        AdminNotificationEvent::UserPayedDocumentRequest,
+                        [
+                            'reference_no' => $this->reference_number,
+                            'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name,
+                            'payment_method' => $this->selectedPaymentMethod
+                        ]
+                    ));
+                }
+            }
+
             // Move to success page
             $this->step = 7;
         } catch (\Exception $e) {

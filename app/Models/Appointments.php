@@ -22,6 +22,7 @@ class Appointments extends Model
         'to_whom',
         'purpose',
         'reference_number',
+        'status',
     ];
 
     /** @var array<int,string> */

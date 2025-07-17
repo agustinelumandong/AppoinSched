@@ -532,9 +532,7 @@ class User extends Authenticatable
     {
         parent::boot();
         static::created(function ($user) {
-            if ($user->roles()->count() === 0) {
-                $user->assignRole('client');
-            }
+
             // Set default notification settings
             $user->updateNotificationSettings($user->getDefaultNotificationSettings());
         });

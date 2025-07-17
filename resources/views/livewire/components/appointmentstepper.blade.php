@@ -219,6 +219,7 @@ new #[Title('Appointment')] class extends Component {
                 'purpose' => $this->purpose,
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
                 'reference_number' => $reference_number,
+                'status' => 'on-going',
             ]);
 
             // Only create details if appointment was created and the details table has the correct FK

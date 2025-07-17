@@ -893,7 +893,7 @@
             <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Navigation</h4>
         </div>
         <div class="flex gap-2">
-            <a href="{{ route('admin.document-request') }}" class="flux-btn flux-btn-outline flex items-center">
+            <a href="{{ route('staff.documents') }}" class="flux-btn flux-btn-outline flex items-center">
                 <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                         d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
