@@ -709,8 +709,7 @@
                 <span class="flux-badge
                     @if ($documentRequest->payment_status === 'paid') flux-badge-success
                     @elseif ($documentRequest->payment_status === 'processing') flux-badge-warning
-                    @elseif ($documentRequest->payment_status === 'failed') flux-badge-danger
-                    @elseif ($documentRequest->payment_status === 'walk-in') flux-badge-info
+                    @elseif ($documentRequest->payment_status === 'failed') flux-badge-danger 
                     @else flux-badge-secondary @endif">
                     {{ ucfirst($documentRequest->payment_status ?? 'Unpaid') }}
                 </span>
@@ -756,15 +755,7 @@
                     </svg>
                     <span class="text-xs">Failed</span>
                 </button>
-
-                <button wire:click="updatePaymentStatus('walk-in')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->payment_status === 'walk-in') flux-btn-info @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
-                    </svg>
-                    <span class="text-xs">Walk-in</span>
-                </button>
+ 
             </div>
         </div>
     </div>
@@ -806,10 +797,9 @@
                     @elseif ($documentRequest->status === 'pending') flux-badge-warning
                     @elseif ($documentRequest->status === 'rejected') flux-badge-danger
                     @elseif ($documentRequest->status === 'completed') flux-badge-success
-                    @elseif ($documentRequest->status === 'canceled') flux-badge-danger
-                    @elseif ($documentRequest->status === 'in-progress') flux-badge-info
-                    @elseif ($documentRequest->status === 'ready-for-pickup') flux-badge-primary
                     @elseif ($documentRequest->status === 'cancelled') flux-badge-danger
+                    @elseif ($documentRequest->status === 'in-progress') flux-badge-info
+                    @elseif ($documentRequest->status === 'ready-for-pickup') flux-badge-primary 
                     @else flux-badge-secondary @endif">
                     {{ ucfirst($documentRequest->status ?? 'Pending') }}
                 </span>
@@ -852,12 +842,12 @@
                     <span class="text-xs">Completed</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('canceled')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'canceled') flux-btn-danger @else flux-btn-outline @endif">
+                <button wire:click="updateDocumentStatusModal('cancelled')"
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'cancelled') flux-btn-danger @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                    <span class="text-xs">Canceled</span>
+                    <span class="text-xs">Cancelled</span>
                 </button>
 
                 <button wire:click="updateDocumentStatusModal('in-progress')"
@@ -876,13 +866,7 @@
                     <span class="text-xs">Ready for Pickup</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('cancelled')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'cancelled') flux-btn-danger @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    <span class="text-xs">Cancelled</span>
-                </button>
+                 
             </div>
         </div>
     </div>

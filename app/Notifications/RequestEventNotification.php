@@ -44,10 +44,37 @@ class RequestEventNotification extends Notification
       RequestNotificationEvent::PaymentProofUploaded => (new MailMessage)
         ->subject('Payment Proof Received')
         ->line('Your proof of payment has been received and is under review.'),
+      // Payment Status Update
       RequestNotificationEvent::PaymentVerified => (new MailMessage)
         ->subject('Payment Confirmed – Document in Process')
         ->line('We’ve verified your payment.')
-        ->line('Expected release date: ' . $this->data['release_date']),
+        ->line('On your request ' . $this->data['reference_no'] . ' will be processed and you will be notified when it is ready for pickup.'),
+      RequestNotificationEvent::PaymentProcessing => (new MailMessage)
+        ->subject('Payment Processing')
+        ->line('We’ve received your payment for your request ' . $this->data['reference_no'] . ' and it is being processed.'),
+      RequestNotificationEvent::PaymentFailed => (new MailMessage)
+        ->subject('Payment Failed')
+        ->line('Your payment has failed for your request ' . $this->data['reference_no'] . '.')
+        ->line('Please try again.'),
+      // Document Status Update
+      RequestNotificationEvent::DocumentApproved => (new MailMessage)
+        ->subject('Document Approved')
+        ->line('Your document request ' . $this->data['reference_no'] . ' has been approved.'),
+      RequestNotificationEvent::DocumentRejected => (new MailMessage)
+        ->subject('Document Rejected')
+        ->line('Your document request ' . $this->data['reference_no'] . ' has been rejected.'),
+      RequestNotificationEvent::DocumentCompleted => (new MailMessage)
+        ->subject('Document Completed')
+        ->line('Your document request ' . $this->data['reference_no'] . ' has been completed.'),
+      RequestNotificationEvent::DocumentCancelled => (new MailMessage)
+        ->subject('Document Cancelled')
+        ->line('Your document request ' . $this->data['reference_no'] . ' has been cancelled.'),
+      RequestNotificationEvent::DocumentInProgress => (new MailMessage)
+        ->subject('Document in Progress')
+        ->line('Your document request ' . $this->data['reference_no'] . ' is being processed.'),
+      RequestNotificationEvent::DocumentReadyForPickup => (new MailMessage)
+        ->subject('Document Ready for Pickup')
+        ->line('Your document request ' . $this->data['reference_no'] . ' is ready for pickup.'),
       RequestNotificationEvent::AppointmentScheduled => (new MailMessage)
         ->subject('Appointment Scheduled')
         ->line("Your appointment is set for {$this->data['date']} at {$this->data['time']}")
@@ -95,6 +122,14 @@ class RequestEventNotification extends Notification
       RequestNotificationEvent::Rejected => 'Your request was rejected.',
       RequestNotificationEvent::PaymentProofUploaded => 'Payment proof uploaded.',
       RequestNotificationEvent::PaymentVerified => 'Your payment was verified.',
+      RequestNotificationEvent::PaymentProcessing => 'Your payment is being processed.',
+      RequestNotificationEvent::PaymentFailed => 'Your payment has failed.',
+      RequestNotificationEvent::DocumentApproved => 'Your document has been approved.',
+      RequestNotificationEvent::DocumentRejected => 'Your document has been rejected.',
+      RequestNotificationEvent::DocumentCompleted => 'Your document has been completed.',
+      RequestNotificationEvent::DocumentCancelled => 'Your document has been cancelled.',
+      RequestNotificationEvent::DocumentInProgress => 'Your document is being processed.',
+      RequestNotificationEvent::DocumentReadyForPickup => 'Your document is ready for pickup.',
       RequestNotificationEvent::AppointmentScheduled => 'Appointment scheduled.',
       RequestNotificationEvent::AppointmentApproved => 'Appointment approved.',
       RequestNotificationEvent::AppointmentCancelled => 'Appointment cancelled.',
