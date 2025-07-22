@@ -18,13 +18,78 @@ class DatabaseSeeder extends Seeder
         // User::factory(10)->create();
         DB::table('users')->delete();
 
+        // Run other seeders
+        $this->call([
+            RolesAndPermissionsSeeder::class,
+            OfficeSeeder::class,
+        ]);
+
         // Create test users
-        User::factory()->create([
-            'first_name' => 'User',
-            'last_name' => 'User',
-            'email' => 'test@test.com',
+        $user1 = User::factory()->create([
+            'first_name' => 'John',
+            'last_name' => 'Doe',
+            'email' => 'john@test.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
+        ]);
+
+        $user1->personalInformation()->create([
+            'user_id' => $user1->id,
+            'suffix' => 'Jr.',
+            'date_of_birth' => '1990-01-01',
+            'place_of_birth' => 'Anytown',
+            'sex_at_birth' => 'Male',
+            'civil_status' => 'Single',
+            'religion' => 'Catholic',
+            'nationality' => 'Filipino',
+            'contact_no' => '09123456789',
+            'government_id_type' => 'SSS',
+            'government_id_image_path' => 'ids/sss.png',
+        ]);
+
+        $user1->userAddresses()->create([
+            'personal_information_id' => $user1->personalInformation->id,
+            'address_type' => 'Permanent',
+            'address_line_1' => '123 Main St',
+            'address_line_2' => 'Apt 4B',
+            'region' => 'Region IV-A',
+            'province' => 'Anytown',
+            'city' => 'Anytown',
+            'barangay' => 'Barangay Uno',
+            'street' => 'Main St',
+            'zip_code' => '12345',
+        ]);
+
+        $user1->userFamilies()->create([
+            'personal_information_id' => $user1->personalInformation->id,
+            'user_id' => $user1->id,
+            // Father's info
+            'father_last_name' => 'Doe',
+            'father_first_name' => 'John',
+            'father_middle_name' => 'M',
+            'father_suffix' => 'Sr.',
+            'father_birthdate' => '1960-01-01',
+            'father_nationality' => 'Filipino',
+            'father_religion' => 'Catholic',
+            'father_contact_no' => '09123456780',
+            // Mother's info
+            'mother_last_name' => 'Smith',
+            'mother_first_name' => 'Jane',
+            'mother_middle_name' => 'A',
+            'mother_suffix' => 'N/A',
+            'mother_birthdate' => '1965-01-01',
+            'mother_nationality' => 'Filipino',
+            'mother_religion' => 'Catholic',
+            'mother_contact_no' => '09123456781',
+            // Spouse info (optional)
+            'spouse_last_name' => null,
+            'spouse_first_name' => null,
+            'spouse_middle_name' => null,
+            'spouse_suffix' => null,
+            'spouse_birthdate' => null,
+            'spouse_nationality' => null,
+            'spouse_religion' => null,
+            'spouse_contact_no' => null,
         ]);
 
         User::factory()->create([
@@ -35,10 +100,6 @@ class DatabaseSeeder extends Seeder
             'email_verified_at' => now(),
         ]);
 
-        // Run other seeders
-        $this->call([
-            RolesAndPermissionsSeeder::class,
-            OfficeSeeder::class,
-        ]);
+
     }
 }

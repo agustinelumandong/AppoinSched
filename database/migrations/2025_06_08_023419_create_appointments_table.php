@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string('to_whom')->nullable();
             $table->string('purpose')->nullable();
             $table->text('notes')->nullable();
+            $table->enum('status', ['on-going', 'cancelled', 'completed'])->default('on-going');
             $table->timestamps();
         });
     }

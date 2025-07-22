@@ -176,10 +176,12 @@ class RolesAndPermissionsSeeder extends Seeder
             'view-appointments'
         ]);
 
+        $this->command->info('Roles and permissions seeded successfully!');
+
         // Create example users and assign roles
         $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole, $mcrStaffRole, $mtoStaffRole, $bplsStaffRole);
 
-        $this->command->info('Roles and permissions seeded successfully!');
+
     }
 
     private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole, Role $mcrStaffRole, Role $mtoStaffRole, Role $bplsStaffRole): void

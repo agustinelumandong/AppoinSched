@@ -7,12 +7,14 @@ use App\Models\Appointments;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\Log;
 use Carbon\Carbon;
+use App\Models\User;
+use App\Notifications\AdminEventNotification;
+use App\Enums\AdminNotificationEvent;
 
 new class extends Component {
   public ?Appointments $appointment = null;
   public ?string $selectedDate = null;
   public ?string $selectedTime = null;
-
   public function mount(): void
   {
     $this->resetRescheduleData();
@@ -69,6 +71,25 @@ new class extends Component {
         'booking_time' => $this->selectedTime,
       ]);
 
+      // Send notification to staff
+      $staffs = User::getStaffsByOfficeId($this->appointment->office_id);
+      if ($staffs->count() > 0) {
+        foreach ($staffs as $staff) {
+          $staff->notify(new AdminEventNotification(
+            AdminNotificationEvent::UserAppointmentRescheduled,
+            [
+              'reference_no' => $this->appointment->reference_number,
+              'date' => $this->selectedDate,
+              'time' => $this->selectedTime,
+              'location' => $this->appointment->office->name,
+              'service' => $this->appointment->service->title,
+              'user' => auth()->user()->name,
+              'user_email' => auth()->user()->email,
+            ]
+          ));
+        }
+      }
+
       if ($updated) {
         $this->resetRescheduleData();
         $this->dispatch('close-modal-reschedule-appointment');
@@ -121,6 +142,39 @@ new class extends Component {
   {
     $this->resetPage();
   }
+
+  public function cancelAppointment(int $id): void
+  {
+    $this->appointment = Appointments::findOrFail($id);
+    $this->dispatch('open-modal-confirm-modal');
+  }
+
+  public function confirmCancelAppointment(int $id): void
+  {
+    $appointment = Appointments::findOrFail($id);
+    $appointment->update(['status' => 'cancelled']);
+    $staffs = User::getStaffsByOfficeId($appointment->office_id);
+    if ($staffs->count() > 0) {
+      foreach ($staffs as $staff) {
+        $staff->notify(new AdminEventNotification(
+          AdminNotificationEvent::UserAppointmentCancelled,
+          [
+            'reference_no' => $appointment->reference_number,
+            'date' => $appointment->booking_date,
+            'time' => $appointment->booking_time,
+            'location' => $appointment->office->name,
+            'service' => $appointment->service->title,
+            'user' => auth()->user()->name,
+            'user_email' => auth()->user()->email,
+          ]
+        ));
+      }
+    }
+    $this->dispatch('close-modal-confirm-modal');
+    session()->flash('success', 'Appointment cancelled successfully.');
+  }
+
+
 }; ?>
 
 <div>
@@ -158,6 +212,9 @@ new class extends Component {
               Time
             </th>
             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              Status
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
               Actions
             </th>
           </tr>
@@ -187,16 +244,39 @@ new class extends Component {
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="text-sm font-medium text-gray-900">
-          {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
+          {{  Carbon::parse($appointment->booking_time)->format('h:i A') }}
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-medium text-gray-900">
+          @php
+        $status = $appointment->status ?? 'N/A';
+        $badgeColor = match ($status) {
+        'on-going' => 'flux-badge-warning',
+        'completed' => 'flux-badge-success',
+        'cancelled' => 'flux-badge-danger',
+        default => 'flux-badge-light',
+        };
+      @endphp
+          <span class="flux-badge {{ $badgeColor }} capitalize">
+            {{ ucfirst($status) }}
+          </span>
           </div>
         </td>
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="d-flex gap-2">
-          <button class="flux-btn btn-sm flux-btn-outline flux-btn-primary"
-            wire:click="openRescheduleModal({{ $appointment->id }})">
-            Reschedule
-          </button>
-
+          @if($appointment->status == 'on-going')
+        <button class="flux-btn btn-sm flux-btn-outline flux-btn-primary"
+        wire:click="cancelAppointment({{ $appointment->id }})">
+        Cancel
+        </button>
+      @endif
+          @if($appointment->status == 'on-going')
+        <button class="flux-btn btn-sm flux-btn-outline flux-btn-primary"
+        wire:click="openRescheduleModal({{ $appointment->id }})">
+        Reschedule
+        </button>
+      @endif
           <button class="flux-btn btn-sm flux-btn-outline"
             wire:click="showAppointmentDetails({{ $appointment->id }})">
             View Details
@@ -225,5 +305,6 @@ new class extends Component {
   </div>
 
   @include('livewire.client.components.modal.show-appointment-modal')
+  @include('livewire.client.components.modal.confirmation-modal')
   @include('livewire.client.components.modal.reschedule-appointment-modal')
 </div>

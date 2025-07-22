@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\PersonalInformation;
 use App\Models\UserFamily;
 use App\Models\UserAddresses;
+use App\Notifications\RequestEventNotification;
+use App\Enums\RequestNotificationEvent;
 
 new class extends Component {
     public $id;
@@ -112,6 +114,28 @@ new class extends Component {
                 'payment_status' => $status,
             ]);
 
+            if ($status === 'paid') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::PaymentVerified,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'processing') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::PaymentProcessing,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'failed') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::PaymentFailed,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            }
             session()->flash('success', 'Payment status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update payment status.');
@@ -138,6 +162,51 @@ new class extends Component {
 
             $this->documentRequest->update($updateData);
 
+            if ($status === 'approved') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentApproved,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'rejected') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentRejected,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'cancelled') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentCancelled,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'completed') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentCompleted,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'in-progress') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentInProgress,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'ready-for-pickup') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentReadyForPickup,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            }
+
+
             session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update document request status.');
@@ -163,6 +232,50 @@ new class extends Component {
             }
 
             $this->documentRequest->update($updateData);
+
+            if ($status === 'approved') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentApproved,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'rejected') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentRejected,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'cancelled') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentCancelled,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'completed') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentCompleted,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'in-progress') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentInProgress,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            } elseif ($status === 'ready-for-pickup') {
+                $this->documentRequest->user->notify(new RequestEventNotification(
+                    RequestNotificationEvent::DocumentReadyForPickup,
+                    [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]
+                ));
+            }
 
             session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
@@ -198,7 +311,7 @@ new class extends Component {
                             <!-- Request type badge -->
                             <span
                                 class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
-                                                                                                                                                                                                                                            {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800' }}">
+                                                                                                                                                                                                                                                                {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800' }}">
                                 {{ ucfirst(str_replace('_', ' ', $documentRequest->details->request_for)) }}
                             </span>
                         </div>

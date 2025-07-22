@@ -223,7 +223,8 @@ new class extends Component {
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->whereHas('user', function ($userQuery) {
-                        $userQuery->where('first_name', 'like', '%' . $this->search . '%')
+                        $userQuery
+                            ->where('first_name', 'like', '%' . $this->search . '%')
                             ->orWhere('last_name', 'like', '%' . $this->search . '%')
                             ->orWhere('reference_number', 'like', '%' . $this->search . '%');
                     });
@@ -234,7 +235,11 @@ new class extends Component {
             });
 
         // Filter by staff's assigned office if not admin/super-admin
-        if (!auth()->user()->hasAnyRole(['admin', 'super-admin'])) {
+        if (
+            !auth()
+                ->user()
+                ->hasAnyRole(['admin', 'super-admin'])
+        ) {
             $officeId = $this->getOfficeIdForStaff();
             if ($officeId) {
                 $query->where('office_id', $officeId);
@@ -294,14 +299,15 @@ new class extends Component {
     </div>
 
     <!-- Appointments Table -->
-    <div class="flux-card p-6">
+    <div class="flux-card ">
         <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
+            <table class="table flux-table w-full">
                 <thead>
-                    <tr>
-                        <th>Client</th>
+                    <tr> 
                         <th>Reference Number</th>
+                        <th>Client</th>
                         <th>Service</th>
+                        <th>Status</th>
                         <th>Date & Time</th>
                         <th>Actions</th>
                     </tr>
@@ -309,10 +315,12 @@ new class extends Component {
                 <tbody>
                     @forelse($appointments as $appointment)
                         <tr>
+                            <td>{{ $appointment->reference_number }}</td>
                             <td>
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <div
+                                            class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                                             <span class="text-sm font-medium text-gray-700">
                                                 {{ $appointment->user->initials() }}
                                             </span>
@@ -326,42 +334,50 @@ new class extends Component {
                                             {{ $appointment->user->email }}
                                         </div>
                                     </div>
-                                </div>
+                                </div>  
                             </td>
                             <td>
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $appointment->reference_number ?? 'N/A' }}
-                                </div>
+                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? '' }}</div>
                             </td>
                             <td>
-                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? ''}}</div>
+                                <span
+                                    class="flux-badge flux-badge-{{ match ($appointment->status) {
+                                        'pending' => 'warning',
+                                        'approved' => 'success',
+                                        'rejected' => 'danger',
+                                        'completed' => 'success',
+                                        default => 'light',
+                                    } }}">
+                                    {{ ucfirst($appointment->status) }}
+                                </span>
                             </td>
                             <td>
                                 <div class="text-sm text-gray-900">
-                                    {{ \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') }}
+                                    {{  Carbon::parse($appointment->booking_date)->format('M d, Y') }}
                                 </div>
                                 <div class="text-sm text-gray-500">
-                                    {{ \Carbon\Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                                    {{  Carbon::parse($appointment->booking_time)->format('h:i A') }}
                                 </div>
                             </td>
                             <td>
-                                <div class="flex items-center space-x-2">
+                                <div class="d-flex gap-2">
+                                    
                                     <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
-                                        class="btn btn-sm btn-outline">
+                                        class="flux-btn flux-btn-outline btn-sm">
                                         <i class="bi bi-eye me-1"></i>View
                                     </button>
                                     <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
-                                        class="btn btn-sm btn-primary">
+                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
                                         <i class="bi bi-pencil me-1"></i>Edit
                                     </button>
-                                </div>
+                                </div> 
                             </td>
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="6" class="text-center py-8">
+                            <td colspan="8" class="text-center py-8">
                                 <div class="text-gray-500">
-                                    <i class="bi bi-calendar-x text-4xl mb-2"></i>
+                                    <i class="bi bi-file-earmark-text text-4xl mb-2"></i>
                                     <p>No appointments found for your assigned offices.</p>
                                 </div>
                             </td>
@@ -370,7 +386,6 @@ new class extends Component {
                 </tbody>
             </table>
         </div>
-
         <!-- Pagination -->
         <div class="mt-6">
             {{ $appointments->links() }}
