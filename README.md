@@ -60,7 +60,7 @@ AppoinSched is a robust Laravel-based appointment scheduling and document reques
   - TailwindCSS with daisyUI for styling
 - **Database**: MySQL/SQLite
 - **Authentication**: Laravel Breeze
-- **Authorization**: Spatie Permission
+- **Authorization**:  
 - **PDF Generation**: Laravel DomPDF
 - **Notification System**: Laravel Notifications
 
