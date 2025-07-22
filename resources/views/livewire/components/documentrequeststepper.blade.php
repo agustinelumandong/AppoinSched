@@ -59,14 +59,6 @@ new #[Title('Document Request')] class extends Component {
     public string $mother_nationality = '';
     public string $mother_religion = '';
     public string $mother_contact_no = '';
-    public string $spouse_first_name = '';
-    public string $spouse_middle_name = '';
-    public string $spouse_last_name = '';
-    public string $spouse_suffix = '';
-    public string $spouse_birthdate = '';
-    public string $spouse_nationality = '';
-    public string $spouse_religion = '';
-    public string $spouse_contact_no = '';
     public string $sex_at_birth = '';
     public string $date_of_birth = '';
     public string $place_of_birth = '';
@@ -88,7 +80,6 @@ new #[Title('Document Request')] class extends Component {
     public string $payment_reference = '';
 
     public bool $father_is_unknown = false;
-    public bool $spouse_is_unknown = false;
     public bool $deceased_is_unknown = true;
 
     // Death Certificate specific fields
@@ -119,6 +110,67 @@ new #[Title('Document Request')] class extends Component {
 
     public $selectedPaymentMethod = null;
     public $paymentProofImage = null;
+
+    // Marriage License Modular Fields
+    // Groom Personal Info
+    public string $groom_first_name = '';
+    public string $groom_middle_name = '';
+    public string $groom_last_name = '';
+    public string $groom_suffix = '';
+    public ?int $groom_age ;
+    public string $groom_date_of_birth = '';
+    public string $groom_place_of_birth = '';
+    public string $groom_sex = '';
+    public string $groom_citizenship = '';
+    public string $groom_residence = '';
+    public string $groom_religion = '';
+    public string $groom_civil_status = '';
+    // Groom Father
+    public string $groom_father_first_name = '';
+    public string $groom_father_middle_name = '';
+    public string $groom_father_last_name = '';
+    public string $groom_father_suffix = '';
+    public string $groom_father_citizenship = '';
+    public string $groom_father_residence = '';
+    // Groom Mother
+    public string $groom_mother_first_name = '';
+    public string $groom_mother_middle_name = '';
+    public string $groom_mother_last_name = '';
+    public string $groom_mother_suffix = '';
+    public string $groom_mother_citizenship = '';
+    public string $groom_mother_residence = '';
+    // Bride Personal Info
+    public string $bride_first_name = '';
+    public string $bride_middle_name = '';
+    public string $bride_last_name = '';
+    public string $bride_suffix = '';
+    public ?int $bride_age ;
+    public string $bride_date_of_birth = '';
+    public string $bride_place_of_birth = '';
+    public string $bride_sex = '';
+    public string $bride_citizenship = '';
+    public string $bride_residence = '';
+    public string $bride_religion = '';
+    public string $bride_civil_status = '';
+    // Bride Father
+    public string $bride_father_first_name = '';
+    public string $bride_father_middle_name = '';
+    public string $bride_father_last_name = '';
+    public string $bride_father_suffix = '';
+    public string $bride_father_citizenship = '';
+    public string $bride_father_residence = '';
+    // Bride Mother
+    public string $bride_mother_first_name = '';
+    public string $bride_mother_middle_name = '';
+    public string $bride_mother_last_name = '';
+    public string $bride_mother_suffix = '';
+    public string $bride_mother_citizenship = '';
+    public string $bride_mother_residence = '';
+    // Consent Section
+    public string $consent_person = '';
+    public string $consent_relationship = '';
+    public string $consent_citizenship = '';
+    public string $consent_residence = '';
 
     public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, ?string $reference_number = null): void
     {
@@ -173,7 +225,7 @@ new #[Title('Document Request')] class extends Component {
         }
 
         $this->updatedFatherIsUnknown($this->father_is_unknown);
-        $this->updatedSpouseIsUnknown($this->spouse_is_unknown);
+
         if ($this->service->title !== 'Death Certificate') {
             $this->updatedDeceasedIsUnknown($this->deceased_is_unknown);
         }
@@ -244,14 +296,6 @@ new #[Title('Document Request')] class extends Component {
         $this->mother_nationality = '';
         $this->mother_religion = '';
         $this->mother_contact_no = '';
-        $this->spouse_last_name = '';
-        $this->spouse_first_name = '';
-        $this->spouse_middle_name = '';
-        $this->spouse_suffix = '';
-        $this->spouse_birthdate = '';
-        $this->spouse_nationality = '';
-        $this->spouse_religion = '';
-        $this->spouse_contact_no = '';
         $this->government_id_type = '';
         $this->government_id_image_path = null;
         // Clear death certificate fields
@@ -305,28 +349,6 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
-    public function updatedSpouseIsUnknown(bool $value): void
-    {
-        if ($value) {
-            $this->spouse_last_name = 'N/A';
-            $this->spouse_first_name = 'N/A';
-            $this->spouse_middle_name = 'N/A';
-            $this->spouse_suffix = 'N/A';
-            $this->spouse_birthdate = '0001-01-01';
-            $this->spouse_nationality = 'N/A';
-            $this->spouse_religion = 'N/A';
-            $this->spouse_contact_no = 'N/A';
-        } else {
-            $this->spouse_last_name = '';
-            $this->spouse_first_name = '';
-            $this->spouse_middle_name = '';
-            $this->spouse_suffix = '';
-            $this->spouse_birthdate = '';
-            $this->spouse_nationality = '';
-            $this->spouse_religion = '';
-            $this->spouse_contact_no = '';
-        }
-    }
 
     public function updatedDeceasedIsUnknown(bool $value): void
     {
@@ -372,7 +394,7 @@ new #[Title('Document Request')] class extends Component {
                 break;
             case 3:
                 $this->isLoading = true;
-                if ($this->service->title === 'Death Certificate') {
+                if ($this->service->slug === 'death-certificate') {
                     $rules = [
                         'deceased_last_name' => 'required|string|max:255',
                         'deceased_first_name' => 'required|string|max:255',
@@ -382,6 +404,8 @@ new #[Title('Document Request')] class extends Component {
                         'death_place' => 'required|string|max:255',
                         'relationship_to_deceased' => 'required|in:Spouse,Child,Parent,Sibling,Grandchild,Grandparent,Other Relative,Legal Representative,Other',
                     ];
+                } elseif ($this->service->slug === 'marriage-certificate') {
+                    $rules = $this->marriageLicenseRules();
                 } else {
                     $rules = [
                         'first_name' => 'required|string|max:255',
@@ -403,7 +427,7 @@ new #[Title('Document Request')] class extends Component {
                         'zip_code' => 'required|string|max:10',
                     ];
 
-                    if (($this->to_whom === 'someone_else' || $this->requiresFamilyInfo()) && $this->service->title !== 'Death Certificate') {
+                    if (($this->to_whom === 'someone_else' || $this->requiresFamilyInfo()) && $this->service->slug !== 'death-certificate') {
                         if (!$this->father_is_unknown) {
                             $rules = array_merge($rules, [
                                 'father_last_name' => 'required|string|max:255',
@@ -427,22 +451,11 @@ new #[Title('Document Request')] class extends Component {
                             'mother_religion' => 'required|string|max:255',
                             'mother_contact_no' => 'required|string|max:20',
                         ]);
-
-                        if ($this->service->title === 'Certificate of No Marriage (CENOMAR)' || $this->service->title === 'Marriage Certificate' && $this->to_whom !== 'myself' && !$this->spouse_is_unknown) {
-                            $rules = array_merge($rules, [
-                                'spouse_last_name' => 'required|string|max:255',
-                                'spouse_first_name' => 'required|string|max:255',
-                                'spouse_middle_name' => 'required|string|max:255',
-                                'spouse_suffix' => 'nullable|string|max:10',
-                                'spouse_birthdate' => 'nullable|date',
-                                'spouse_nationality' => 'required|string|max:255',
-                                'spouse_religion' => 'required|string|max:255',
-                                'spouse_contact_no' => 'required|string|max:20',
-                            ]);
-                        }
                     }
                 }
+
                 $this->validate($rules);
+                $this->fillMarriageCertificateData();
                 $this->fillFamilyDefaults();
                 $this->initializeContactInfo();
                 break;
@@ -457,7 +470,7 @@ new #[Title('Document Request')] class extends Component {
                 break;
             case 5:
                 $this->isLoading = true;
-                if ($this->service->title === 'Death Certificate') {
+                if ($this->service->slug === 'death-certificate') {
                     $this->validate([
                         'last_name' => 'required|string|max:255',
                         'first_name' => 'required|string|max:255',
@@ -534,32 +547,6 @@ new #[Title('Document Request')] class extends Component {
             $this->mother_contact_no = 'N/A';
         }
 
-        // Spouse Information - check each field individually
-        if (empty($this->spouse_last_name)) {
-            $this->spouse_last_name = 'N/A';
-        }
-        if (empty($this->spouse_first_name)) {
-            $this->spouse_first_name = 'N/A';
-        }
-        if (empty($this->spouse_middle_name)) {
-            $this->spouse_middle_name = 'N/A';
-        }
-        if (empty($this->spouse_suffix)) {
-            $this->spouse_suffix = 'N/A';
-        }
-        if (empty($this->spouse_birthdate)) {
-            $this->spouse_birthdate = '0001-01-01';
-        }
-        if (empty($this->spouse_nationality)) {
-            $this->spouse_nationality = 'N/A';
-        }
-        if (empty($this->spouse_religion)) {
-            $this->spouse_religion = 'N/A';
-        }
-        if (empty($this->spouse_contact_no)) {
-            $this->spouse_contact_no = 'N/A';
-        }
-
         // Death Certificate fields - check each field individually
         if (empty($this->deceased_last_name)) {
             $this->deceased_last_name = 'N/A';
@@ -584,11 +571,82 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+    private function fillMarriageCertificateData(): void
+    {
+        // Set sensible defaults for marriage certificate request fields if empty
+
+        // Groom Information
+        $this->groom_first_name = $this->groom_first_name ?: 'N/A';
+        $this->groom_middle_name = $this->groom_middle_name ?: 'N/A';
+        $this->groom_last_name = $this->groom_last_name ?: 'N/A';
+        $this->groom_suffix = $this->groom_suffix ?: 'N/A';
+        $this->groom_age = $this->groom_age ?? 0;
+        $this->groom_date_of_birth = $this->groom_date_of_birth ?: '0001-01-01';
+        $this->groom_place_of_birth = $this->groom_place_of_birth ?: 'N/A';
+        $this->groom_sex = $this->groom_sex ?: 'Male';
+        $this->groom_citizenship = $this->groom_citizenship ?: 'N/A';
+        $this->groom_residence = $this->groom_residence ?: 'N/A';
+        $this->groom_religion = $this->groom_religion ?: 'N/A';
+        $this->groom_civil_status = $this->groom_civil_status ?: 'N/A';
+
+        // Groom's Father Information
+        $this->groom_father_first_name = $this->groom_father_first_name ?: 'N/A';
+        $this->groom_father_middle_name = $this->groom_father_middle_name ?: 'N/A';
+        $this->groom_father_last_name = $this->groom_father_last_name ?: 'N/A';
+        $this->groom_father_suffix = $this->groom_father_suffix ?: 'N/A';
+        $this->groom_father_citizenship = $this->groom_father_citizenship ?: 'N/A';
+        $this->groom_father_residence = $this->groom_father_residence ?: 'N/A';
+
+        // Groom's Mother Information
+        $this->groom_mother_first_name = $this->groom_mother_first_name ?: 'N/A';
+        $this->groom_mother_middle_name = $this->groom_mother_middle_name ?: 'N/A';
+        $this->groom_mother_last_name = $this->groom_mother_last_name ?: 'N/A';
+        $this->groom_mother_suffix = $this->groom_mother_suffix ?: 'N/A';
+        $this->groom_mother_citizenship = $this->groom_mother_citizenship ?: 'N/A';
+        $this->groom_mother_residence = $this->groom_mother_residence ?: 'N/A';
+
+        // Bride Information
+        $this->bride_first_name = $this->bride_first_name ?: 'N/A';
+        $this->bride_middle_name = $this->bride_middle_name ?: 'N/A';
+        $this->bride_last_name = $this->bride_last_name ?: 'N/A';
+        $this->bride_suffix = $this->bride_suffix ?: 'N/A';
+        $this->bride_age = $this->bride_age ?? 0;
+        $this->bride_date_of_birth = $this->bride_date_of_birth ?: '0001-01-01';
+        $this->bride_place_of_birth = $this->bride_place_of_birth ?: 'N/A';
+        $this->bride_sex = $this->bride_sex ?: 'Female';
+        $this->bride_citizenship = $this->bride_citizenship ?: 'N/A';
+        $this->bride_residence = $this->bride_residence ?: 'N/A';
+        $this->bride_religion = $this->bride_religion ?: 'N/A';
+        $this->bride_civil_status = $this->bride_civil_status ?: 'N/A';
+
+        // Bride's Father Information
+        $this->bride_father_first_name = $this->bride_father_first_name ?: 'N/A';
+        $this->bride_father_middle_name = $this->bride_father_middle_name ?: 'N/A';
+        $this->bride_father_last_name = $this->bride_father_last_name ?: 'N/A';
+        $this->bride_father_suffix = $this->bride_father_suffix ?: 'N/A';
+        $this->bride_father_citizenship = $this->bride_father_citizenship ?: 'N/A';
+        $this->bride_father_residence = $this->bride_father_residence ?: 'N/A';
+
+        // Bride's Mother Information
+        $this->bride_mother_first_name = $this->bride_mother_first_name ?: 'N/A';
+        $this->bride_mother_middle_name = $this->bride_mother_middle_name ?: 'N/A';
+        $this->bride_mother_last_name = $this->bride_mother_last_name ?: 'N/A';
+        $this->bride_mother_suffix = $this->bride_mother_suffix ?: 'N/A';
+        $this->bride_mother_citizenship = $this->bride_mother_citizenship ?: 'N/A';
+        $this->bride_mother_residence = $this->bride_mother_residence ?: 'N/A';
+
+        // Consent Section (if applicable)
+        $this->consent_person = $this->consent_person ?: 'N/A';
+        $this->consent_relationship = $this->consent_relationship ?: 'N/A';
+        $this->consent_citizenship = $this->consent_citizenship ?: 'N/A';
+        $this->consent_residence = $this->consent_residence ?: 'N/A';
+    }
+
     // Check if the service requires family information
     private function requiresFamilyInfo(): bool
     {
-        $familyRequiredServices = ['Birth Certificate', 'Marriage Certificate', 'Certificate of No Marriage (CENOMAR)'];
-        return in_array($this->service->title, $familyRequiredServices);
+        $familyRequiredServices = ['birth-certificate', 'marriage-certificate'];
+        return in_array($this->service->slug, $familyRequiredServices);
     }
 
     public function previousStep(): void
@@ -634,75 +692,125 @@ new #[Title('Document Request')] class extends Component {
                 'request_for' => $this->to_whom === 'myself' ? 'myself' : 'someone_else',
             ];
 
-            // Personal Information
+            // If Marriage License, use modular fields
+            
+                $detailsData = array_merge($detailsData, [
+                    // Groom
+                    'groom_first_name' => $this->groom_first_name,
+                    'groom_middle_name' => $this->groom_middle_name,
+                    'groom_last_name' => $this->groom_last_name,
+                    'groom_suffix' => $this->groom_suffix,
+                     'groom_age' => $this->groom_age ?? null,
+                    'groom_date_of_birth' => $this->groom_date_of_birth,
+                    'groom_place_of_birth' => $this->groom_place_of_birth,
+                    'groom_sex' => $this->groom_sex,
+                    'groom_citizenship' => $this->groom_citizenship,
+                    'groom_residence' => $this->groom_residence,
+                    'groom_religion' => $this->groom_religion,
+                    'groom_civil_status' => $this->groom_civil_status,
+                    // Groom Father
+                    'groom_father_first_name' => $this->groom_father_first_name,
+                    'groom_father_middle_name' => $this->groom_father_middle_name,
+                    'groom_father_last_name' => $this->groom_father_last_name,
+                    'groom_father_suffix' => $this->groom_father_suffix,
+                    'groom_father_citizenship' => $this->groom_father_citizenship,
+                    'groom_father_residence' => $this->groom_father_residence,
+                    // Groom Mother
+                    'groom_mother_first_name' => $this->groom_mother_first_name,
+                    'groom_mother_middle_name' => $this->groom_mother_middle_name,
+                    'groom_mother_last_name' => $this->groom_mother_last_name,
+                    'groom_mother_suffix' => $this->groom_mother_suffix,
+                    'groom_mother_citizenship' => $this->groom_mother_citizenship,
+                    'groom_mother_residence' => $this->groom_mother_residence,
+                    // Bride
+                    'bride_first_name' => $this->bride_first_name,
+                    'bride_middle_name' => $this->bride_middle_name,
+                    'bride_last_name' => $this->bride_last_name,
+                    'bride_suffix' => $this->bride_suffix,
+                    'bride_age' => $this->bride_age ?? null,
+                    'bride_date_of_birth' => $this->bride_date_of_birth,
+                    'bride_place_of_birth' => $this->bride_place_of_birth,
+                    'bride_sex' => $this->bride_sex,
+                    'bride_citizenship' => $this->bride_citizenship,
+                    'bride_residence' => $this->bride_residence,
+                    'bride_religion' => $this->bride_religion,
+                    'bride_civil_status' => $this->bride_civil_status,
+                    // Bride Father
+                    'bride_father_first_name' => $this->bride_father_first_name,
+                    'bride_father_middle_name' => $this->bride_father_middle_name,
+                    'bride_father_last_name' => $this->bride_father_last_name,
+                    'bride_father_suffix' => $this->bride_father_suffix,
+                    'bride_father_citizenship' => $this->bride_father_citizenship,
+                    'bride_father_residence' => $this->bride_father_residence,
+                    // Bride Mother
+                    'bride_mother_first_name' => $this->bride_mother_first_name,
+                    'bride_mother_middle_name' => $this->bride_mother_middle_name,
+                    'bride_mother_last_name' => $this->bride_mother_last_name,
+                    'bride_mother_suffix' => $this->bride_mother_suffix,
+                    'bride_mother_citizenship' => $this->bride_mother_citizenship,
+                    'bride_mother_residence' => $this->bride_mother_residence,
+                    // Consent Section
+                    'consent_person' => $this->consent_person,
+                    'consent_relationship' => $this->consent_relationship,
+                    'consent_citizenship' => $this->consent_citizenship,
+                    'consent_residence' => $this->consent_residence,
+                ]);
+           
+                // Existing logic for other document types
+                $detailsData = array_merge($detailsData, [
+                    // Personal Information
+                    'last_name' => $this->last_name,
+                    'first_name' => $this->first_name,
+                    'middle_name' => $this->middle_name,
+                    'suffix' => $this->suffix,
+                    'email' => $this->email,
+                    'contact_no' => $this->phone,
+                    'sex_at_birth' => $this->sex_at_birth,
+                    'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
+                    'place_of_birth' => $this->place_of_birth,
+                    'civil_status' => $this->civil_status,
+                    'religion' => $this->religion,
+                    'nationality' => $this->nationality,
+                    'government_id_type' => $this->government_id_type,
+                    'government_id_image_path' => $governmentIdImagePath,
+                    'address_type' => $this->address_type,
+                    'address_line_1' => $this->address_line_1,
+                    'address_line_2' => $this->address_line_2,
+                    'region' => $this->region,
+                    'province' => $this->province,
+                    'city' => $this->city,
+                    'barangay' => $this->barangay,
+                    'street' => $this->street,
+                    'zip_code' => $this->zip_code,
 
-            $detailsData = array_merge($detailsData, [
-                'last_name' => $this->last_name,
-                'first_name' => $this->first_name,
-                'middle_name' => $this->middle_name,
-                'suffix' => $this->suffix,
-                'email' => $this->email,
-                'contact_no' => $this->phone,
-                'sex_at_birth' => $this->sex_at_birth,
-                'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
-                'place_of_birth' => $this->place_of_birth,
-                'civil_status' => $this->civil_status,
-                'religion' => $this->religion,
-                'nationality' => $this->nationality,
-                'government_id_type' => $this->government_id_type,
-                'government_id_image_path' => $governmentIdImagePath,
-                'address_type' => $this->address_type,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'region' => $this->region,
-                'province' => $this->province,
-                'city' => $this->city,
-                'barangay' => $this->barangay,
-                'street' => $this->street,
-                'zip_code' => $this->zip_code,
+                    'father_last_name' => $this->father_last_name,
+                    'father_first_name' => $this->father_first_name,
+                    'father_middle_name' => $this->father_middle_name,
+                    'father_suffix' => $this->father_suffix,
+                    'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
+                    'father_nationality' => $this->father_nationality,
+                    'father_religion' => $this->father_religion,
+                    'father_contact_no' => $this->father_contact_no,
+                    'mother_last_name' => $this->mother_last_name,
+                    'mother_first_name' => $this->mother_first_name,
+                    'mother_middle_name' => $this->mother_middle_name,
+                    'mother_suffix' => $this->mother_suffix,
+                    'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
+                    'mother_nationality' => $this->mother_nationality,
+                    'mother_religion' => $this->mother_religion,
+                    'mother_contact_no' => $this->mother_contact_no,
 
-                'father_last_name' => $this->father_last_name,
-                'father_first_name' => $this->father_first_name,
-                'father_middle_name' => $this->father_middle_name,
-                'father_suffix' => $this->father_suffix,
-                'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
-                'father_nationality' => $this->father_nationality,
-                'father_religion' => $this->father_religion,
-                'father_contact_no' => $this->father_contact_no,
-                'mother_last_name' => $this->mother_last_name,
-                'mother_first_name' => $this->mother_first_name,
-                'mother_middle_name' => $this->mother_middle_name,
-                'mother_suffix' => $this->mother_suffix,
-                'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
-                'mother_nationality' => $this->mother_nationality,
-                'mother_religion' => $this->mother_religion,
-                'mother_contact_no' => $this->mother_contact_no,
+                    // Death Certificate specific fields
 
-
-                // Spouse Information
-
-                'spouse_last_name' => $this->spouse_last_name,
-                'spouse_first_name' => $this->spouse_first_name,
-                'spouse_middle_name' => $this->spouse_middle_name,
-                'spouse_suffix' => $this->spouse_suffix,
-                'spouse_birthdate' => $this->spouse_birthdate ? Carbon::parse($this->spouse_birthdate) : null,
-                'spouse_nationality' => $this->spouse_nationality,
-                'spouse_religion' => $this->spouse_religion,
-                'spouse_contact_no' => $this->spouse_contact_no,
-
-
-
-                // Death Certificate specific fields
-
-                'deceased_last_name' => $this->deceased_last_name,
-                'deceased_first_name' => $this->deceased_first_name,
-                'deceased_middle_name' => $this->deceased_middle_name,
-                'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
-                'death_time' => $this->death_time,
-                'death_place' => $this->death_place,
-                'relationship_to_deceased' => $this->relationship_to_deceased,
-            ]);
-
+                    'deceased_last_name' => $this->deceased_last_name,
+                    'deceased_first_name' => $this->deceased_first_name,
+                    'deceased_middle_name' => $this->deceased_middle_name,
+                    'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
+                    'death_time' => $this->death_time,
+                    'death_place' => $this->death_place,
+                    'relationship_to_deceased' => $this->relationship_to_deceased,
+                ]);
+            
 
             // Contact Information (for third-party requests)
 
@@ -713,8 +821,8 @@ new #[Title('Document Request')] class extends Component {
                 'contact_email' => $this->contact_email,
                 'contact_phone' => $this->contact_phone,
             ]);
-
             // Create the document request details
+
             DocumentRequestDetails::create($detailsData);
 
             // Store the document ID for the payment step
@@ -852,6 +960,72 @@ new #[Title('Document Request')] class extends Component {
 
         return null;
     }
+
+    // Sample validation rules for marriage license modular fields
+    public function marriageLicenseRules(): array
+    {
+        return [
+            // Groom
+            'groom_first_name' => 'required|string|max:255',
+            'groom_middle_name' => 'nullable|string|max:255',
+            'groom_last_name' => 'required|string|max:255',
+            'groom_suffix' => 'nullable|string|max:10',
+            'groom_age' => 'required|numeric|min:18',
+            'groom_date_of_birth' => 'required|date',
+            'groom_place_of_birth' => 'required|string|max:255',
+            'groom_sex' => 'required|in:Male,Female',
+            'groom_citizenship' => 'required|string|max:255',
+            'groom_residence' => 'required|string|max:255',
+            'groom_religion' => 'required|string|max:255',
+            'groom_civil_status' => 'required|string|max:50',
+            // Groom Father
+            'groom_father_first_name' => 'required|string|max:255',
+            'groom_father_middle_name' => 'nullable|string|max:255',
+            'groom_father_last_name' => 'required|string|max:255',
+            'groom_father_suffix' => 'nullable|string|max:10',
+            'groom_father_citizenship' => 'required|string|max:255',
+            'groom_father_residence' => 'required|string|max:255',
+            // Groom Mother
+            'groom_mother_first_name' => 'required|string|max:255',
+            'groom_mother_middle_name' => 'nullable|string|max:255',
+            'groom_mother_last_name' => 'required|string|max:255',
+            'groom_mother_suffix' => 'nullable|string|max:10',
+            'groom_mother_citizenship' => 'required|string|max:255',
+            'groom_mother_residence' => 'required|string|max:255',
+            // Bride
+            'bride_first_name' => 'required|string|max:255',
+            'bride_middle_name' => 'nullable|string|max:255',
+            'bride_last_name' => 'required|string|max:255',
+            'bride_suffix' => 'nullable|string|max:10',
+            'bride_age' => 'required|numeric|min:18',
+            'bride_date_of_birth' => 'required|date',
+            'bride_place_of_birth' => 'required|string|max:255',
+            'bride_sex' => 'required|in:Male,Female',
+            'bride_citizenship' => 'required|string|max:255',
+            'bride_residence' => 'required|string|max:255',
+            'bride_religion' => 'required|string|max:255',
+            'bride_civil_status' => 'required|string|max:50',
+            // Bride Father
+            'bride_father_first_name' => 'required|string|max:255',
+            'bride_father_middle_name' => 'nullable|string|max:255',
+            'bride_father_last_name' => 'required|string|max:255',
+            'bride_father_suffix' => 'nullable|string|max:10',
+            'bride_father_citizenship' => 'required|string|max:255',
+            'bride_father_residence' => 'required|string|max:255',
+            // Bride Mother
+            'bride_mother_first_name' => 'required|string|max:255',
+            'bride_mother_middle_name' => 'nullable|string|max:255',
+            'bride_mother_last_name' => 'required|string|max:255',
+            'bride_mother_suffix' => 'nullable|string|max:10',
+            'bride_mother_citizenship' => 'required|string|max:255',
+            'bride_mother_residence' => 'required|string|max:255',
+            // Consent Section (optional)
+            'consent_person' => 'nullable|string|max:255',
+            'consent_relationship' => 'nullable|string|max:255',
+            'consent_citizenship' => 'nullable|string|max:255',
+            'consent_residence' => 'nullable|string|max:255',
+        ];
+    }
 }; ?>
 
 
@@ -879,8 +1053,20 @@ new #[Title('Document Request')] class extends Component {
             </li>
             <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                 <div class="step-content">
-                    <div class="step-title">Personal Information</div>
-                    <div class="step-description text-sm text-gray-500">Your/Someone details</div>
+                    @php 
+                                                                    if ($this->service->slug === 'marriage-certificate') {
+                            $stepTitle = 'Marriage License';
+                            $stepDescription = 'Marriage License Information';
+                        } elseif ($this->service->slug === 'death-certificate') {
+                            $stepTitle = 'Death Certificate';
+                            $stepDescription = 'Death Certificate Information';
+                        } else {
+                            $stepTitle = 'Personal Information';
+                            $stepDescription = 'Your/Someone details';
+                        }
+                    @endphp
+                    <div class="step-title">{{ $stepTitle }}</div>
+                    <div class="step-description text-sm text-gray-500">{{ $stepDescription }}</div>
                 </div>
             </li>
             <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
@@ -890,34 +1076,33 @@ new #[Title('Document Request')] class extends Component {
                 </div>
             </li>
             <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
-                <div class="step-content">
+                    <div class="step-content">
                     <div class="step-title">Confirmation</div>
-                    <div class="step-description text-sm text-gray-500">Review & Submit</div>
+                        <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
-            </li>
+                </li>
             <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
-                <div class="step-content">
+                    <div class="step-content">
                     <div class="step-title">Payment</div>
                     <div class="step-description text-sm text-gray-500">Complete your transaction</div>
-                </div>
+                 </div>
             </li>
             <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Success</div>
-                    <div class="step-description text-sm text-gray-500">Done</div>
-                </div>
-            </li>
-        </ul>
-    </div>
-
+                <div class="step-description text-sm text-gray-500">Done</div>
+            </div>
+        </li>
+    </ul>
+</div>
     {{-- Stepper Content --}}
-    @if ($step == 1)
-        @include('livewire.documentrequest.components.document-request-steps.step1')
-    @elseif($step == 2)
-        @include('livewire.documentrequest.components.document-request-steps.step2')
-    @elseif($step == 3)
-        @include('livewire.documentrequest.components.document-request-steps.step3')
-    @elseif($step == 4)
+   @if ($step == 1)
+    @include('livewire.documentrequest.components.document-request-steps.step1')
+@elseif($step == 2)
+    @include('livewire.documentrequest.components.document-request-steps.step2')
+@elseif($step == 3)
+    @include('livewire.documentrequest.components.document-request-steps.step3')
+@elseif($step == 4)
         @include('livewire.documentrequest.components.document-request-steps.step4')
     @elseif($step == 5)
         @include('livewire.documentrequest.components.document-request-steps.step5')

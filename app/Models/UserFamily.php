@@ -26,15 +26,7 @@ class UserFamily extends Model
         'mother_birthdate',
         'mother_nationality',
         'mother_religion',
-        'mother_contact_no',
-        'spouse_last_name',
-        'spouse_first_name',
-        'spouse_middle_name',
-        'spouse_suffix',
-        'spouse_birthdate',
-        'spouse_nationality',
-        'spouse_religion',
-        'spouse_contact_no',
+        'mother_contact_no', 
     ];
 
     public function user()
@@ -57,8 +49,5 @@ class UserFamily extends Model
         return $this->mother_last_name . ' ' . $this->mother_first_name . ' ' . $this->mother_middle_name . ' ' . $this->mother_suffix;
     }
 
-    public function getSpouseNameAttribute()
-    {
-        return $this->spouse_last_name . ' ' . $this->spouse_first_name . ' ' . $this->spouse_middle_name . ' ' . $this->spouse_suffix;
-    }
+ 
 }

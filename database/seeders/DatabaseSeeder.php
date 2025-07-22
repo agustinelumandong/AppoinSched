@@ -28,7 +28,7 @@ class DatabaseSeeder extends Seeder
         $user1 = User::factory()->create([
             'first_name' => 'John',
             'last_name' => 'Doe',
-            'email' => 'john@test.com',
+            'email' => 'test@test.com',
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
@@ -81,15 +81,6 @@ class DatabaseSeeder extends Seeder
             'mother_nationality' => 'Filipino',
             'mother_religion' => 'Catholic',
             'mother_contact_no' => '09123456781',
-            // Spouse info (optional)
-            'spouse_last_name' => null,
-            'spouse_first_name' => null,
-            'spouse_middle_name' => null,
-            'spouse_suffix' => null,
-            'spouse_birthdate' => null,
-            'spouse_nationality' => null,
-            'spouse_religion' => null,
-            'spouse_contact_no' => null,
         ]);
 
         User::factory()->create([
@@ -99,7 +90,5 @@ class DatabaseSeeder extends Seeder
             'password' => Hash::make('password'),
             'email_verified_at' => now(),
         ]);
-
-
     }
 }

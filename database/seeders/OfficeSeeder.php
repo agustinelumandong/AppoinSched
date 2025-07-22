@@ -44,15 +44,7 @@ class OfficeSeeder extends Seeder
             'description' => 'Issued for the registration of deaths.',
             'price' => 150.00,
             'is_active' => 1,
-        ]);
-        $mcr->services()->create([
-            'office_id' => $mcr->id,
-            'title' => 'Certificate of No Marriage (CENOMAR)',
-            'slug' => Str::slug('Certificate of No Marriage'),
-            'description' => 'Issued for the registration of no marriages.',
-            'price' => 210.00,
-            'is_active' => 1,
-        ]);
+        ]); 
         $mcr->services()->create([
             'office_id' => $mcr->id,
             'title' => 'Appointment (MCR)',
@@ -66,15 +58,7 @@ class OfficeSeeder extends Seeder
             'name' => 'Business Permits and Licensing Section',
             'slug' => Str::slug('Business Permits and Licensing Section'),
             'description' => 'Handles business permits and special certifications.',
-        ]);
-        $bpls->services()->create([
-            'office_id' => $bpls->id,
-            'title' => 'Business Permit',
-            'slug' => Str::slug('Business Permit'),
-            'description' => 'Issued for the registration of business permits.',
-            'price' => 500.00,
-            'is_active' => 1,
-        ]);
+        ]); 
         $bpls->services()->create([
             'office_id' => $bpls->id,
             'title' => 'Special Permit',
@@ -82,15 +66,7 @@ class OfficeSeeder extends Seeder
             'description' => 'Application for special events or short-term businesses.',
             'price' => 300.00,
             'is_active' => 1,
-        ]);
-        $bpls->services()->create([
-            'office_id' => $bpls->id,
-            'title' => 'Burial Permit',
-            'slug' => Str::slug('Burial Permit'),
-            'description' => 'Permit required for burial arrangements.',
-            'price' => 100.00,
-            'is_active' => 1,
-        ]);
+        ]); 
         $bpls->services()->create([
             'office_id' => $bpls->id,
             'title' => 'Appointment (BPLS)',
@@ -104,15 +80,7 @@ class OfficeSeeder extends Seeder
             'name' => 'Municipal Treasurer’s Office',
             'slug' => Str::slug('Municipal Treasurer’s Office'),
             'description' => 'Handles all LGU-related payments and cashier services.',
-        ]);
-        $mto->services()->create([
-            'office_id' => $mto->id,
-            'title' => 'Tax',
-            'slug' => Str::slug('Tax'),
-            'description' => 'Payment for tax.',
-            'price' => 100.00,
-            'is_active' => 1,
-        ]);
+        ]); 
         $mto->services()->create([
             'office_id' => $mto->id,
             'title' => 'Appointment (MTO)',

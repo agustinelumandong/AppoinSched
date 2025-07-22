@@ -30,7 +30,11 @@
                 </button>
             @endif
         </div>
-        @if ($documentRequest->service->title !== 'Death Certificate')
+        @if ($documentRequest->service->title === 'Marriage Certificate')
+            @include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form', [
+                'documentRequest' => $documentRequest
+            ])
+        @elseif ($documentRequest->service->title !== 'Death Certificate')
                 <!-- Personal Identity Section -->
                 <div class="mb-8">
                     <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Identity</h3>
@@ -399,67 +403,6 @@
                                     <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
                                     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                         {{ $documentRequest->details->mother_contact_no ?? ($documentRequest->user->mother_contact_no ?? 'N/A') }}
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Spouse Information -->
-                        <div>
-                            <h4 class="text-sm font-medium text-gray-700 mb-3">Spouse's Information</h4>
-                            <div class="grid md:grid-cols-4 gap-6 mb-4">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_last_name ?? ($documentRequest->user->spouse_last_name ?? 'N/A') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_first_name ?? ($documentRequest->user->spouse_first_name ?? 'N/A') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_middle_name ?? ($documentRequest->user->spouse_middle_name ?? 'N/A') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_suffix ?? ($documentRequest->user->spouse_suffix ?? 'N/A') }}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="grid md:grid-cols-4 gap-6">
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ optional($documentRequest->details)->spouse_birthdate
-            ? \Carbon\Carbon::parse($documentRequest->details->spouse_birthdate)->format('M d, Y')
-            : (optional($documentRequest->user)->spouse_birthdate
-                ? \Carbon\Carbon::parse($documentRequest->user->spouse_birthdate)->format('M d, Y')
-                : 'N/A') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_nationality ?? ($documentRequest->user->spouse_nationality ?? 'N/A') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_religion ?? ($documentRequest->user->spouse_religion ?? 'N/A') }}
-                                    </p>
-                                </div>
-                                <div>
-                                    <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
-                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                        {{ $documentRequest->details->spouse_contact_no ?? ($documentRequest->user->spouse_contact_no ?? 'N/A') }}
                                     </p>
                                 </div>
                             </div>

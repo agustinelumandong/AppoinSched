@@ -55,16 +55,7 @@ new class extends Component {
     public string $mother_nationality = '';
     public string $mother_religion = '';
     public string $mother_contact_no = '';
-    public string $spouse_last_name = '';
-    public string $spouse_first_name = '';
-    public string $spouse_middle_name = '';
-    public string $spouse_suffix = 'N/A';
-    public string $spouse_birthdate = '';
-    public string $spouse_nationality = '';
-    public string $spouse_religion = '';
-    public string $spouse_contact_no = '';
     public bool $father_is_unknown = false;
-    public bool $spouse_is_unknown = false;
 
     public function mount()
     {
@@ -116,16 +107,7 @@ new class extends Component {
         $this->mother_birthdate = $this->userFamily->mother_birthdate ?? '';
         $this->mother_nationality = $this->userFamily->mother_nationality ?? '';
         $this->mother_religion = $this->userFamily->mother_religion ?? '';
-        $this->mother_contact_no = $this->userFamily->mother_contact_no ?? '';
-        // Family - Spouse
-        $this->spouse_last_name = $this->userFamily->spouse_last_name ?? '';
-        $this->spouse_first_name = $this->userFamily->spouse_first_name ?? '';
-        $this->spouse_middle_name = $this->userFamily->spouse_middle_name ?? '';
-        $this->spouse_suffix = $this->userFamily->spouse_suffix ?? 'N/A';
-        $this->spouse_birthdate = $this->userFamily->spouse_birthdate ?? '';
-        $this->spouse_nationality = $this->userFamily->spouse_nationality ?? '';
-        $this->spouse_religion = $this->userFamily->spouse_religion ?? '';
-        $this->spouse_contact_no = $this->userFamily->spouse_contact_no ?? '';
+        $this->mother_contact_no = $this->userFamily->mother_contact_no ?? ''; 
 
         // Set father_is_unknown if all father fields are N/A
         $this->father_is_unknown = (
@@ -137,16 +119,7 @@ new class extends Component {
             $this->father_religion === 'N/A' &&
             $this->father_contact_no === 'N/A'
         );
-        // Set spouse_is_unknown if all spouse fields are N/A
-        $this->spouse_is_unknown = (
-            $this->spouse_last_name === 'N/A' &&
-            $this->spouse_first_name === 'N/A' &&
-            $this->spouse_middle_name === 'N/A' &&
-            $this->spouse_suffix === 'N/A' &&
-            $this->spouse_nationality === 'N/A' &&
-            $this->spouse_religion === 'N/A' &&
-            $this->spouse_contact_no === 'N/A'
-        );
+         
     }
 
     public function updatePersonalInformation()
@@ -208,14 +181,7 @@ new class extends Component {
                 'mother_nationality' => ['required', 'string', 'max:100'],
                 'mother_religion' => ['required', 'string', 'max:100'],
                 'mother_contact_no' => ['required', 'string', 'max:20'],
-                'spouse_last_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
-                'spouse_first_name' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:255'],
-                'spouse_middle_name' => ['nullable', 'string', 'max:255'],
-                'spouse_suffix' => ['nullable', 'string', 'max:10'],
-                'spouse_birthdate' => ['nullable', 'date'],
-                'spouse_nationality' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
-                'spouse_religion' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:100'],
-                'spouse_contact_no' => [$this->spouse_is_unknown ? 'nullable' : 'string', 'max:20'],
+                 
             ]);
 
             // Check if required personal info fields are filled
@@ -335,14 +301,7 @@ new class extends Component {
                     'mother_nationality' => $this->mother_nationality ?: null,
                     'mother_religion' => $this->mother_religion ?: null,
                     'mother_contact_no' => $this->mother_contact_no ?: null,
-                    'spouse_last_name' => $this->spouse_last_name ?: null,
-                    'spouse_first_name' => $this->spouse_first_name ?: null,
-                    'spouse_middle_name' => $this->spouse_middle_name ?: null,
-                    'spouse_suffix' => $this->spouse_suffix ?? 'N/A',
-                    'spouse_birthdate' => $this->spouse_birthdate ?: null,
-                    'spouse_nationality' => $this->spouse_nationality ?: null,
-                    'spouse_religion' => $this->spouse_religion ?: null,
-                    'spouse_contact_no' => $this->spouse_contact_no ?: null,
+                     
                 ])
                 ->save();
 
@@ -395,28 +354,7 @@ new class extends Component {
         }
     }
 
-    public function updatedSpouseIsUnknown($value)
-    {
-        if ($value) {
-            $this->spouse_last_name = 'N/A';
-            $this->spouse_first_name = 'N/A';
-            $this->spouse_middle_name = 'N/A';
-            $this->spouse_suffix = 'N/A';
-            $this->spouse_birthdate = '';
-            $this->spouse_nationality = 'N/A';
-            $this->spouse_religion = 'N/A';
-            $this->spouse_contact_no = 'N/A';
-        } else {
-            $this->spouse_last_name = '';
-            $this->spouse_first_name = '';
-            $this->spouse_middle_name = '';
-            $this->spouse_suffix = 'N/A';
-            $this->spouse_birthdate = '';
-            $this->spouse_nationality = '';
-            $this->spouse_religion = '';
-            $this->spouse_contact_no = '';
-        }
-    }
+    
 
     public function getGovernmentIdImageUrl()
     {
@@ -843,15 +781,8 @@ new class extends Component {
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
-        <h4 class="text-lg font-bold mb-4">Spouse</h4>
-        <div class="form-control mb-2">
-            <label class="label cursor-pointer">
-                <span class="label-text">Spouse is Unknown</span>
-                <input type="checkbox" wire:model.live="spouse_is_unknown" class="checkbox" />
-            </label>
-        </div>
+        
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            @if($spouse_is_unknown)
                 <div class="flex flex-col md:col-span-3">
                     <label class="text-xs font-medium mb-1">Last Name</label>
                     <span class="flux-form-control w-full bg-gray-100">N/A</span>
@@ -868,81 +799,6 @@ new class extends Component {
                     <label class="text-xs font-medium mb-1">Suffix</label>
                     <span class="flux-form-control w-full bg-gray-100">N/A</span>
                 </div>
-            @else
-                <div class="flex flex-col md:col-span-3">
-                    <label for="spouse_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                    <input id="spouse_last_name" class="flux-form-control w-full" type="text" wire:model="spouse_last_name"
-                        placeholder="Last Name">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label for="spouse_first_name" class="text-xs font-medium mb-1">First Name</label>
-                    <input id="spouse_first_name" class="flux-form-control w-full" type="text"
-                        wire:model="spouse_first_name" placeholder="First Name">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label for="spouse_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
-                    <input id="spouse_middle_name" class="flux-form-control w-full" type="text"
-                        wire:model="spouse_middle_name" placeholder="Middle Name">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col md:col-span-1">
-                    <label for="spouse_suffix" class="text-xs font-medium mb-1">Suffix</label>
-                    <select id="spouse_suffix" class="flux-form-control w-full" wire:model="spouse_suffix">
-                        <option value="">Suffix</option>
-                        <option value="N/A">N/A</option>
-                        <option value="Jr.">Jr.</option>
-                        <option value="Sr.">Sr.</option>
-                    </select>
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-            @endif
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            @if($spouse_is_unknown)
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Spouse's Birthdate</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Spouse's Nationality</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Spouse's Religion</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Spouse's Contact No</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-            @else
-                <div class="flex flex-col">
-                    <label for="spouse_birthdate" class="text-xs font-medium mb-1">Spouse's Birthdate</label>
-                    <input id="spouse_birthdate" class="flux-form-control" type="date" wire:model="spouse_birthdate"
-                        placeholder="Spouse's Birthdate">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col">
-                    <label for="spouse_nationality" class="text-xs font-medium mb-1">Spouse's Nationality</label>
-                    <input id="spouse_nationality" class="flux-form-control" type="text" wire:model="spouse_nationality"
-                        placeholder="Spouse's Nationality">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col">
-                    <label for="spouse_religion" class="text-xs font-medium mb-1">Spouse's Religion</label>
-                    <input id="spouse_religion" class="flux-form-control" type="text" wire:model="spouse_religion"
-                        placeholder="Spouse's Religion">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col">
-                    <label for="spouse_contact_no" class="text-xs font-medium mb-1">Spouse's Contact No</label>
-                    <input id="spouse_contact_no" class="flux-form-control" type="text" wire:model="spouse_contact_no"
-                        placeholder="Spouse's Contact No">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-            @endif
         </div>
     </div>
 

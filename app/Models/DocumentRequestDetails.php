@@ -60,16 +60,7 @@ class DocumentRequestDetails extends Model
         'mother_nationality',
         'mother_religion',
         'mother_contact_no',
-
-        // Spouse's information
-        'spouse_last_name',
-        'spouse_first_name',
-        'spouse_middle_name',
-        'spouse_suffix',
-        'spouse_birthdate',
-        'spouse_nationality',
-        'spouse_religion',
-        'spouse_contact_no',
+ 
 
         // Death Certificate specific fields
         'deceased_last_name',
@@ -86,13 +77,71 @@ class DocumentRequestDetails extends Model
         'contact_middle_name',
         'contact_email',
         'contact_phone',
+
+        // Marriage License Modular Fields
+        // Groom Personal Info
+        'groom_first_name',
+        'groom_middle_name',
+        'groom_last_name',
+        'groom_suffix',
+        'groom_age',
+        'groom_date_of_birth',
+        'groom_place_of_birth',
+        'groom_sex',
+        'groom_citizenship',
+        'groom_residence',
+        'groom_religion',
+        'groom_civil_status',
+        // Groom Father
+        'groom_father_first_name',
+        'groom_father_middle_name',
+        'groom_father_last_name',
+        'groom_father_suffix',
+        'groom_father_citizenship',
+        'groom_father_residence',
+        // Groom Mother
+        'groom_mother_first_name',
+        'groom_mother_middle_name',
+        'groom_mother_last_name',
+        'groom_mother_citizenship',
+        'groom_mother_residence',
+        // Bride Personal Info
+        'bride_first_name',
+        'bride_middle_name',
+        'bride_last_name',
+        'bride_suffix',
+        'bride_age',
+        'bride_date_of_birth',
+        'bride_place_of_birth',
+        'bride_sex',
+        'bride_citizenship',
+        'bride_residence',
+        'bride_religion',
+        'bride_civil_status',
+        // Bride Father
+        'bride_father_first_name',
+        'bride_father_middle_name',
+        'bride_father_last_name',
+        'bride_father_suffix',
+        'bride_father_citizenship',
+        'bride_father_residence',
+        // Bride Mother
+        'bride_mother_first_name',
+        'bride_mother_middle_name',
+        'bride_mother_last_name',
+        'bride_mother_citizenship',
+        'bride_mother_residence',
+        // Consent Section
+        'consent_person',
+        'consent_relationship',
+        'consent_citizenship',
+        'consent_residence',
     ];
 
     protected $casts = [
         'date_of_birth' => 'date',
         'father_birthdate' => 'date',
-        'mother_birthdate' => 'date',
-        'spouse_birthdate' => 'date',
+        'mother_birthdate' => 'date', 
         'death_date' => 'date', // For death certificates
     ];
 
@@ -149,14 +198,7 @@ class DocumentRequestDetails extends Model
     {
         return trim("{$this->mother_first_name} {$this->mother_middle_name} {$this->mother_last_name}");
     }
-
-    /**
-     * Get spouse's full name
-     */
-    public function getSpouseFullNameAttribute(): string
-    {
-        return trim("{$this->spouse_first_name} {$this->spouse_middle_name} {$this->spouse_last_name}");
-    }
+ 
 
     /**
      * Get the full name of the deceased person (for death certificates)
