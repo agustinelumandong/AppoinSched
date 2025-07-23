@@ -8,6 +8,7 @@ use App\Models\User;
 use App\Models\PersonalInformation;
 use App\Models\UserAddresses;
 use App\Models\UserFamily;
+use App\Services\PhilippineLocationsService;
 
 new class extends Component {
     use WithFileUploads;
@@ -33,12 +34,7 @@ new class extends Component {
     public string $address_type = '';
     public string $address_line_1 = '';
     public string $address_line_2 = '';
-    public string $region = '';
-    public string $province = '';
-    public string $city = '';
-    public string $barangay = '';
-    public string $street = '';
-    public string $zip_code = '';
+
     public string $father_last_name = '';
     public string $father_first_name = '';
     public string $father_middle_name = '';
@@ -57,12 +53,56 @@ new class extends Component {
     public string $mother_contact_no = '';
     public bool $father_is_unknown = false;
 
-    public function mount()
+    public string $street = '';
+    public string $zip_code = '';
+
+    public string $region = '';
+    public string $province = '';
+    public string $city = '';
+    public string $barangay = '';
+
+    public array $regions = [];
+    public array $provinces = [];
+    public array $cities = [];
+    public array $barangays = [];
+
+    protected PhilippineLocationsService $locationsService;
+
+    public function mount(PhilippineLocationsService $locations)
     {
         $this->user = auth()->user();
-        $this->personalInformation = $this->user->personalInformation ?? new PersonalInformation(['user_id' => $this->user->id]);
-        $this->userAddresses = $this->user->userAddresses->first() ?? new UserAddresses(['personal_information_id' => $this->personalInformation->id]);
-        $this->userFamily = $this->user->userFamilies->first() ?? new UserFamily(['user_id' => $this->user->id]);
+
+        // Create PersonalInformation if it doesn't exist yet
+        if (!$this->user->personalInformation) {
+            $personalInfo = new PersonalInformation();
+            $personalInfo->user_id = $this->user->getKey();
+            $personalInfo->save();
+            $this->user->refresh();
+        }
+
+        $this->personalInformation = $this->user->personalInformation;
+
+        // Create UserAddresses if it doesn't exist yet
+        if (!$this->user->userAddresses || $this->user->userAddresses->isEmpty()) {
+            $userAddress = new UserAddresses();
+            $userAddress->personal_information_id = $this->personalInformation->getKey();
+            $userAddress->save();
+            $this->user->refresh();
+        }
+
+        $this->userAddresses = $this->user->userAddresses->first();
+
+        // Create UserFamily if it doesn't exist yet
+        if (!$this->user->userFamilies || $this->user->userFamilies->isEmpty()) {
+            $userFamily = new UserFamily();
+            $userFamily->user_id = $this->user->getKey();
+            $userFamily->save();
+            $this->user->refresh();
+        }
+
+        $this->userFamily = $this->user->userFamilies->first();
+
+        $this->regions = $locations->getRegions();
 
         // User
         $this->last_name = $this->user->last_name ?? '';
@@ -107,19 +147,106 @@ new class extends Component {
         $this->mother_birthdate = $this->userFamily->mother_birthdate ?? '';
         $this->mother_nationality = $this->userFamily->mother_nationality ?? '';
         $this->mother_religion = $this->userFamily->mother_religion ?? '';
-        $this->mother_contact_no = $this->userFamily->mother_contact_no ?? ''; 
+        $this->mother_contact_no = $this->userFamily->mother_contact_no ?? '';
 
         // Set father_is_unknown if all father fields are N/A
-        $this->father_is_unknown = (
-            $this->father_last_name === 'N/A' &&
-            $this->father_first_name === 'N/A' &&
-            $this->father_middle_name === 'N/A' &&
-            $this->father_suffix === 'N/A' &&
-            $this->father_nationality === 'N/A' &&
-            $this->father_religion === 'N/A' &&
-            $this->father_contact_no === 'N/A'
-        );
-         
+        $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
+
+        // Pre-populate dependent dropdowns if values exist
+        if ($this->region) {
+            $this->provinces = $locations->getProvinces($this->region);
+        }
+        if ($this->region && $this->province) {
+            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        }
+        if ($this->region && $this->province && $this->city) {
+            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        }
+
+        $this->regions = $locations->getRegions();
+
+        // User
+        $this->last_name = $this->user->last_name ?? '';
+        $this->first_name = $this->user->first_name ?? '';
+        $this->middle_name = $this->user->middle_name ?? '';
+        $this->email = $this->user->email ?? '';
+        $this->contact_no = $this->personalInformation->contact_no ?? '';
+        // Personal Information
+        $this->suffix = $this->personalInformation->suffix ?? 'N/A';
+        $this->sex_at_birth = $this->personalInformation->sex_at_birth ?? '';
+        $this->date_of_birth = $this->personalInformation->date_of_birth ?? '';
+        $this->place_of_birth = $this->personalInformation->place_of_birth ?? '';
+        $this->civil_status = $this->personalInformation->civil_status ?? 'Single';
+        $this->religion = $this->personalInformation->religion ?? '';
+        $this->nationality = $this->personalInformation->nationality ?? 'Filipino';
+        $this->government_id_type = $this->personalInformation->government_id_type ?? '';
+        // Note: government_id_image_path is handled as a file upload, not a string
+        // Address
+        $this->address_type = $this->userAddresses->address_type ?? 'Permanent';
+        $this->address_line_1 = $this->userAddresses->address_line_1 ?? '';
+        $this->address_line_2 = $this->userAddresses->address_line_2 ?? '';
+        $this->region = $this->userAddresses->region ?? '';
+        $this->province = $this->userAddresses->province ?? '';
+        $this->city = $this->userAddresses->city ?? '';
+        $this->barangay = $this->userAddresses->barangay ?? '';
+        // $this->street = $this->userAddresses->street ?? '';
+        $this->zip_code = $this->userAddresses->zip_code ?? '';
+        // Family - Father
+        $this->father_last_name = $this->userFamily->father_last_name ?? '';
+        $this->father_first_name = $this->userFamily->father_first_name ?? '';
+        $this->father_middle_name = $this->userFamily->father_middle_name ?? '';
+        $this->father_suffix = $this->userFamily->father_suffix ?? 'N/A';
+        $this->father_birthdate = $this->userFamily->father_birthdate ?? '';
+        $this->father_nationality = $this->userFamily->father_nationality ?? '';
+        $this->father_religion = $this->userFamily->father_religion ?? '';
+        $this->father_contact_no = $this->userFamily->father_contact_no ?? '';
+        // Family - Mother
+        $this->mother_last_name = $this->userFamily->mother_last_name ?? '';
+        $this->mother_first_name = $this->userFamily->mother_first_name ?? '';
+        $this->mother_middle_name = $this->userFamily->mother_middle_name ?? '';
+        $this->mother_suffix = $this->userFamily->mother_suffix ?? 'N/A';
+        $this->mother_birthdate = $this->userFamily->mother_birthdate ?? '';
+        $this->mother_nationality = $this->userFamily->mother_nationality ?? '';
+        $this->mother_religion = $this->userFamily->mother_religion ?? '';
+        $this->mother_contact_no = $this->userFamily->mother_contact_no ?? '';
+
+        // Set father_is_unknown if all father fields are N/A
+        $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
+
+        // Pre-populate dependent dropdowns if values exist
+        if ($this->region) {
+            $this->provinces = $locations->getProvinces($this->region);
+        }
+        if ($this->region && $this->province) {
+            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        }
+        if ($this->region && $this->province && $this->city) {
+            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        }
+    }
+
+    public function updatedRegion(PhilippineLocationsService $locations)
+    {
+        $this->provinces = $locations->getProvinces($this->region);
+        $this->province = '';
+        $this->cities = [];
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedProvince(PhilippineLocationsService $locations)
+    {
+        $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedCity(PhilippineLocationsService $locations)
+    {
+        $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        $this->barangay = '';
     }
 
     public function updatePersonalInformation()
@@ -181,28 +308,15 @@ new class extends Component {
                 'mother_nationality' => ['required', 'string', 'max:100'],
                 'mother_religion' => ['required', 'string', 'max:100'],
                 'mother_contact_no' => ['required', 'string', 'max:20'],
-                 
             ]);
 
             // Check if required personal info fields are filled
             $missingFields = [];
-            $requiredPersonalFields = [
-                'sex_at_birth',
-                'date_of_birth',
-                'place_of_birth',
-                'civil_status',
-                'religion',
-                'nationality',
-                'government_id_type',
-                'government_id_image_path',
-            ];
+            $requiredPersonalFields = ['sex_at_birth', 'date_of_birth', 'place_of_birth', 'civil_status', 'religion', 'nationality', 'government_id_type', 'government_id_image_path'];
 
             foreach ($requiredPersonalFields as $field) {
                 // Special handling for government_id_image_path: skip if already present in DB
-                if (
-                    $field === 'government_id_image_path'
-                    && !empty(optional($this->personalInformation)->government_id_image_path)
-                ) {
+                if ($field === 'government_id_image_path' && !empty(optional($this->personalInformation)->government_id_image_path)) {
                     continue;
                 }
                 if (empty($this->{$field})) {
@@ -225,31 +339,22 @@ new class extends Component {
                 ])
                 ->save();
 
+            // Handle government ID image upload
+            $governmentIdImagePath = null;
+            $currentImagePath = $this->personalInformation->getAttribute('government_id_image_path') ?? null;
 
-            if (!empty(optional($this->personalInformation)->government_id_image_path)) {
-                if ($this->government_id_image_path !== $this->personalInformation->government_id_image_path) {
-                    $governmentIdImagePath = $this->government_id_image_path->storeAs(
-                        'government-ids',
-                        $this->user->id . '_' . $this->government_id_image_path->getClientOriginalName(),
-                        'public'
-                    );
-                } else {
-                    $governmentIdImagePath = $this->personalInformation->government_id_image_path;
-                }
-            } elseif ($this->government_id_image_path) {
-                $governmentIdImagePath = $this->government_id_image_path->storeAs(
-                    'government-ids',
-                    $this->user->id . '_' . $this->government_id_image_path->getClientOriginalName(),
-                    'public'
-                );
-            } else {
-                $governmentIdImagePath = null;
+            if (!empty($currentImagePath) && !is_object($this->government_id_image_path)) {
+                // Keep the existing image
+                $governmentIdImagePath = $currentImagePath;
+            } elseif (is_object($this->government_id_image_path)) {
+                // Upload the new image
+                $governmentIdImagePath = $this->government_id_image_path->storeAs('government-ids', $this->user->getKey() . '_' . $this->government_id_image_path->getClientOriginalName(), 'public');
             }
 
             // Update Personal Information
             $this->personalInformation
                 ->fill([
-                    'user_id' => $this->user->id,
+                    'user_id' => $this->user->getKey(),
                     'suffix' => $this->suffix ?? 'N/A',
                     'contact_no' => $this->contact_no ?: null,
                     'sex_at_birth' => $this->sex_at_birth ?: null,
@@ -266,8 +371,7 @@ new class extends Component {
             // Update User Addresses
             $this->userAddresses
                 ->fill([
-                    // 'user_id' => $this->user->id,
-                    'personal_information_id' => $this->personalInformation->id,
+                    'personal_information_id' => $this->personalInformation->getKey(),
                     'address_type' => $this->address_type ?? 'Permanent',
                     'address_line_1' => $this->address_line_1 ?: null,
                     'address_line_2' => $this->address_line_2 ?: null,
@@ -283,8 +387,8 @@ new class extends Component {
             // Update User Family
             $this->userFamily
                 ->fill([
-                    'user_id' => $this->user->id,
-                    'personal_information_id' => $this->personalInformation->id,
+                    'user_id' => $this->user->getKey(),
+                    'personal_information_id' => $this->personalInformation->getKey(),
                     'father_last_name' => $this->father_last_name ?: null,
                     'father_first_name' => $this->father_first_name ?: null,
                     'father_middle_name' => $this->father_middle_name ?: null,
@@ -301,14 +405,10 @@ new class extends Component {
                     'mother_nationality' => $this->mother_nationality ?: null,
                     'mother_religion' => $this->mother_religion ?: null,
                     'mother_contact_no' => $this->mother_contact_no ?: null,
-                     
                 ])
                 ->save();
 
             session()->flash('success', 'All information updated!');
-
-
-
         } catch (\Illuminate\Validation\ValidationException $e) {
             $messages = $e->validator->errors()->all();
             session()->flash('error', 'Validation failed: ' . implode(' ', $messages));
@@ -354,12 +454,10 @@ new class extends Component {
         }
     }
 
-    
-
     public function getGovernmentIdImageUrl()
     {
-        if ($this->personalInformation->government_id_image_path) {
-            return asset('storage/' . $this->personalInformation->government_id_image_path);
+        if ($this->personalInformation && !empty($this->personalInformation->getAttribute('government_id_image_path'))) {
+            return asset('storage/' . $this->personalInformation->getAttribute('government_id_image_path'));
         }
         return null;
     }
@@ -525,7 +623,8 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col">
                 <label for="religion" class="text-xs font-medium mb-1">Religion</label>
-                <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
+                <input id="religion" class="flux-form-control" type="text" wire:model="religion"
+                    placeholder="Religion">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -566,7 +665,7 @@ new class extends Component {
                 @error('government_id_image_path')
                     <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
                 @enderror
-                @if($this->getGovernmentIdImageUrl())
+                @if ($this->getGovernmentIdImageUrl())
                     <div class="mt-2">
                         <p class="text-xs text-gray-600 mb-1">Current ID Image:</p>
                         <img src="{{ $this->getGovernmentIdImageUrl() }}" alt="Government ID"
@@ -602,28 +701,50 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex flex-col">
                 <label for="region" class="text-xs font-medium mb-1">Region</label>
-                <input id="region" class="flux-form-control" type="text" wire:model="region" placeholder="Region">
+                <select id="region" class="flux-form-control" wire:model.live="region">
+                    <option value="">Select Region</option>
+                    @foreach ($regions as $region)
+                        <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="flex flex-col">
                 <label for="province" class="text-xs font-medium mb-1">Province</label>
-                <input id="province" class="flux-form-control" type="text" wire:model="province" placeholder="Province">
+                <select id="province" class="flux-form-control" wire:model.live="province">
+                    <option value="">Select Province</option>
+                    @foreach ($provinces as $provinceKey => $provinceName)
+                        <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="flex flex-col">
                 <label for="city" class="text-xs font-medium mb-1">City</label>
-                <input id="city" class="flux-form-control" type="text" wire:model="city" placeholder="City">
+                <select id="city" class="flux-form-control" wire:model.live="city">
+                    <option value="">Select City</option>
+                    @foreach ($cities as $cityKey => $cityName)
+                        <option value="{{ $cityKey }}">{{ $cityName }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="flex flex-col">
                 <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
-                <input id="barangay" class="flux-form-control" type="text" wire:model="barangay" placeholder="Barangay">
+                <select id="barangay" class="flux-form-control" wire:model.live="barangay">
+                    <option value="">Select Barangay</option>
+                    @foreach ($barangays as $barangay)
+                        <option value="{{ $barangay }}">{{ $barangay }}</option>
+                    @endforeach
+                </select>
             </div>
             <div class="flex flex-col">
                 <label for="street" class="text-xs font-medium mb-1">Street</label>
-                <input id="street" class="flux-form-control" type="text" wire:model="street" placeholder="Street">
+                <input id="street" class="flux-form-control" type="text" wire:model="street"
+                    placeholder="Street">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
+                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code"
+                    placeholder="Zip Code">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
@@ -640,7 +761,7 @@ new class extends Component {
             </label>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            @if($father_is_unknown)
+            @if ($father_is_unknown)
                 <div class="flex flex-col md:col-span-3">
                     <label class="text-xs font-medium mb-1">Last Name</label>
                     <span class="flux-form-control w-full bg-gray-100">N/A</span>
@@ -660,8 +781,8 @@ new class extends Component {
             @else
                 <div class="flex flex-col md:col-span-3">
                     <label for="father_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                    <input id="father_last_name" class="flux-form-control w-full" type="text" wire:model="father_last_name"
-                        placeholder="Last Name">
+                    <input id="father_last_name" class="flux-form-control w-full" type="text"
+                        wire:model="father_last_name" placeholder="Last Name">
                 </div>
                 <div class="flex flex-col md:col-span-3">
                     <label for="father_first_name" class="text-xs font-medium mb-1">First Name</label>
@@ -690,7 +811,7 @@ new class extends Component {
             @endif
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            @if($father_is_unknown)
+            @if ($father_is_unknown)
                 <div class="flex flex-col">
                     <label class="text-xs font-medium mb-1">Father's Birthdate</label>
                     <span class="flux-form-control bg-gray-100">N/A</span>
@@ -710,25 +831,25 @@ new class extends Component {
             @else
                 <div class="flex flex-col">
                     <label for="father_birthdate" class="text-xs font-medium mb-1">Father's Birthdate</label>
-                    <input id="father_birthdate" class="flux-form-control" type="date" wire:model="father_birthdate"
-                        placeholder="Father's Birthdate">
+                    <input id="father_birthdate" class="flux-form-control" type="date"
+                        wire:model="father_birthdate" placeholder="Father's Birthdate">
                 </div>
                 <div class="flex flex-col">
                     <label for="father_nationality" class="text-xs font-medium mb-1">Father's Nationality</label>
-                    <input id="father_nationality" class="flux-form-control" type="text" wire:model="father_nationality"
-                        placeholder="Father's Nationality">
+                    <input id="father_nationality" class="flux-form-control" type="text"
+                        wire:model="father_nationality" placeholder="Father's Nationality">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
                 <div class="flex flex-col">
                     <label for="father_religion" class="text-xs font-medium mb-1">Father's Religion</label>
-                    <input id="father_religion" class="flux-form-control" type="text" wire:model="father_religion"
-                        placeholder="Father's Religion">
+                    <input id="father_religion" class="flux-form-control" type="text"
+                        wire:model="father_religion" placeholder="Father's Religion">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
                 <div class="flex flex-col">
                     <label for="father_contact_no" class="text-xs font-medium mb-1">Father's Contact No</label>
-                    <input id="father_contact_no" class="flux-form-control" type="text" wire:model="father_contact_no"
-                        placeholder="Father's Contact No">
+                    <input id="father_contact_no" class="flux-form-control" type="text"
+                        wire:model="father_contact_no" placeholder="Father's Contact No">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
             @endif
@@ -737,8 +858,8 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
             <div class="flex flex-col md:col-span-3">
                 <label for="mother_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="mother_last_name" class="flux-form-control w-full" type="text" wire:model="mother_last_name"
-                    placeholder="Last Name">
+                <input id="mother_last_name" class="flux-form-control w-full" type="text"
+                    wire:model="mother_last_name" placeholder="Last Name">
             </div>
             <div class="flex flex-col md:col-span-3">
                 <label for="mother_first_name" class="text-xs font-medium mb-1">First Name</label>
@@ -773,8 +894,8 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="mother_nationality" class="text-xs font-medium mb-1">Mother's Nationality</label>
-                <input id="mother_nationality" class="flux-form-control" type="text" wire:model="mother_nationality"
-                    placeholder="Mother's Nationality">
+                <input id="mother_nationality" class="flux-form-control" type="text"
+                    wire:model="mother_nationality" placeholder="Mother's Nationality">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -785,30 +906,30 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="mother_contact_no" class="text-xs font-medium mb-1">Mother's Contact No</label>
-                <input id="mother_contact_no" class="flux-form-control" type="text" wire:model="mother_contact_no"
-                    placeholder="Mother's Contact No">
+                <input id="mother_contact_no" class="flux-form-control" type="text"
+                    wire:model="mother_contact_no" placeholder="Mother's Contact No">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-                <div class="flex flex-col md:col-span-3">
-                    <label class="text-xs font-medium mb-1">Last Name</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label class="text-xs font-medium mb-1">First Name</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label class="text-xs font-medium mb-1">Middle Name</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col md:col-span-1">
-                    <label class="text-xs font-medium mb-1">Suffix</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-        </div>
+
+        {{-- <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
+            <div class="flex flex-col md:col-span-3">
+                <label class="text-xs font-medium mb-1">Last Name</label>
+                <span class="flux-form-control w-full bg-gray-100">N/A</span>
+            </div>
+            <div class="flex flex-col md:col-span-3">
+                <label class="text-xs font-medium mb-1">First Name</label>
+                <span class="flux-form-control w-full bg-gray-100">N/A</span>
+            </div>
+            <div class="flex flex-col md:col-span-3">
+                <label class="text-xs font-medium mb-1">Middle Name</label>
+                <span class="flux-form-control w-full bg-gray-100">N/A</span>
+            </div>
+            <div class="flex flex-col md:col-span-1">
+                <label class="text-xs font-medium mb-1">Suffix</label>
+                <span class="flux-form-control w-full bg-gray-100">N/A</span>
+            </div>
+        </div> --}}
     </div>
 
     {{-- Save Button --}}

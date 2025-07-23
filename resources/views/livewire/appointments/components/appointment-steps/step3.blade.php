@@ -21,28 +21,34 @@
 
       <div class="flex flex-row gap-2 w-full mb-4">
         @if($editPersonDetails === false)
-      <button type="button" class="btn-flux btn-flux-primary" wire:click="editPersonDetailsBtn">Edit</button>
+      <button type="button" class="flux-btn flux-btn-primary" wire:click="editPersonDetailsBtn">Edit</button>
     @else
-      <button type="button" class="btn-flux btn-flux-primary" wire:click="lockPersonDetailsBtn">Lock</button>
+      <button type="button" class="flux-btn flux-btn-primary" wire:click="lockPersonDetailsBtn">Lock</button>
     @endif
       </div>
 
       <div class="flex flex-col gap-2 w-full" wire:loading.remove>
         <div class="flex flex-row gap-2 w-full">
           <div class="w-full">
-            <input type="text" placeholder="Last Name" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="last_name"
+            <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
+            <input type="text" placeholder="Last Name"
+              class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="last_name"
               @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('last_name') <span class="text-red-500">{{ $message }}</span> @enderror
           </div>
 
           <div class="w-full">
-            <input type="text" placeholder="First Name" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="first_name"
+            <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
+            <input type="text" placeholder="First Name"
+              class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="first_name"
               @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('first_name') <span class="text-red-500">{{ $message }}</span> @enderror
           </div>
 
           <div class="w-full">
-            <input type="text" placeholder="Middle Name" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="middle_name"
+            <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
+            <input type="text" placeholder="Middle Name"
+              class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="middle_name"
               @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('middle_name') <span class="text-red-500">{{ $message }}</span> @enderror
           </div>
@@ -50,47 +56,114 @@
 
         <div class="flex flex-row gap-2 w-full">
           <div class=" w-full">
-            <input type="email" placeholder="Email" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="email" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+            <label for="email" class="text-xs font-medium mb-1">Email</label>
+            <input type="email" placeholder="Email"
+              class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="email"
+              @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('email')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
           </div>
 
           <div class="w-full">
-            <input type="tel" placeholder="Phone" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="phone" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+            <label for="phone" class="text-xs font-medium mb-1">Phone</label>
+            <input type="tel" placeholder="Phone"
+              class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="phone"
+              @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('phone')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
           </div>
         </div>
 
+
+        {{-- <div class="w-full">
+          <input type="text" placeholder="City"
+            class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="city"
+            @if($to_whom==='myself' && $editPersonDetails===false) disabled @endif />
+          @error('city')
+          <span class="text-red-500">{{ $message }}</span>
+          @enderror
+        </div>
+
         <div class="w-full">
-          <input type="text" placeholder="Address" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="address"
+          <input type="text" placeholder="State"
+            class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="state"
+            @if($to_whom==='myself' ) disabled @elseif($editPersonDetails===false) @endif />
+          @error('state')
+          <span class="text-red-500">{{ $message }}</span>
+          @enderror
+        </div> --}}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="flex flex-col">
+            <label for="region" class="text-xs font-medium mb-1">Region</label>
+            <select id="region" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
+              wire:model.live="region" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              <option value="">Select Region</option>
+              @foreach ($regions as $region)
+          <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
+        @endforeach
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="province" class="text-xs font-medium mb-1">Province</label>
+            <select id="province" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
+              wire:model.live="province" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              <option value="">Select Province</option>
+              @foreach ($provinces as $provinceKey => $provinceName)
+          <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
+        @endforeach
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="city" class="text-xs font-medium mb-1">City</label>
+            <select id="city" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
+              wire:model.live="city" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              <option value="">Select City</option>
+              @foreach ($cities as $cityKey => $cityName)
+          <option value="{{ $cityKey }}">{{ $cityName }}</option>
+        @endforeach
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
+            <select id="barangay" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
+              wire:model.live="barangay" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              <option value="">Select Barangay</option>
+              @foreach ($barangays as $barangay)
+          <option value="{{ $barangay }}">{{ $barangay }}</option>
+        @endforeach
+            </select>
+          </div>
+          <div class="flex flex-col">
+            <label for="street" class="text-xs font-medium mb-1">Street</label>
+            <input id="street" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
+              type="text" wire:model="street" placeholder="Street" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+            <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+          </div>
+          <div class="flex flex-col">
+            <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
+            <input id="zip_code" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
+              type="text" wire:model="zip_code" placeholder="Zip Code" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+            <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+          </div>
+        </div>
+
+        {{-- <div class="w-full">
+          <input type="text" placeholder="Zip Code"
+            class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="zip_code"
+            @if($to_whom==='myself' && $editPersonDetails===false) disabled @endif>
+          @error('zip_code')
+          <span class="text-red-500">{{ $message }}</span>
+          @enderror
+        </div> --}}
+
+        <div class="w-full">
+          <label for="address" class="text-xs font-medium mb-1">Address</label>
+          <input type="text" placeholder="Address"
+            class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="address"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
           @error('address')
-        <span class="text-red-500">{{ $message }}</span>
-      @enderror
-        </div>
-
-        <div class="w-full">
-          <input type="text" placeholder="City" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="city" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
-          @error('city')
-        <span class="text-red-500">{{ $message }}</span>
-      @enderror
-        </div>
-
-        <div class="w-full">
-            <input type="text" placeholder="State" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="state" @if($to_whom === 'myself')
-    disabled @elseif($editPersonDetails === false) @endif />
-          @error('state')
-        <span class="text-red-500">{{ $message }}</span>
-      @enderror
-        </div>
-
-        <div class="w-full">
-          <input type="text" placeholder="Zip Code" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="zip_code"
-            @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
-          @error('zip_code')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
         </div>

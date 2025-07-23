@@ -23,6 +23,7 @@ use App\Notifications\RequestEventNotification;
 use App\Enums\RequestNotificationEvent;
 use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
+use App\Services\PhilippineLocationsService;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -33,10 +34,7 @@ new #[Title('Appointment')] class extends Component {
     public string $last_name = '';
     public string $email = '';
     public string $phone = '';
-    public string $address = '';
-    public string $city = '';
-    public string $state = '';
-    public string $zip_code = '';
+
     public string $message = '';
     public ?int $appointmentId = null;
     public bool $isLoading = false;
@@ -54,9 +52,24 @@ new #[Title('Appointment')] class extends Component {
     public User $staff;
 
     public ?Appointments $appointment = null;
-    
 
-    public function mount(Offices $office, Services $service, ?string $reference_number = null): void
+    public string $address = '';
+
+    public string $street = '';
+    public string $zip_code = '';
+
+    public string $region = '';
+    public string $province = '';
+    public string $city = '';
+    public string $barangay = '';
+
+    public array $regions = [];
+    public array $provinces = [];
+    public array $cities = [];
+    public array $barangays = [];
+
+
+    public function mount(Offices $office, Services $service, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
@@ -66,6 +79,20 @@ new #[Title('Appointment')] class extends Component {
         if ($reference_number) {
             $this->reference_number = $reference_number;
         }
+
+        // Pre-populate dependent dropdowns if values exist
+        if ($this->region) {
+            $this->provinces = $locations->getProvinces($this->region);
+        }
+        if ($this->region && $this->province) {
+            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        }
+        if ($this->region && $this->province && $this->city) {
+            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        }
+
+        $this->regions = $locations->getRegions();
+
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making an appointment.');
@@ -107,8 +134,11 @@ new #[Title('Appointment')] class extends Component {
         $this->email = '';
         $this->phone = '';
         $this->address = '';
+        $this->region = '';
+        $this->province = '';
         $this->city = '';
-        $this->state = '';
+        $this->barangay = '';
+        $this->street = '';
         $this->zip_code = '';
     }
 
@@ -146,8 +176,11 @@ new #[Title('Appointment')] class extends Component {
                     'email' => 'string|required|email',
                     'phone' => 'string|required|max:25|regex:/^[\+]?[0-9\s\-\(\)]+$/',
                     'address' => 'string|required',
+                    'region' => 'string|required',
+                    'province' => 'string|required',
                     'city' => 'string|required',
-                    'state' => 'string|required',
+                    'barangay' => 'string|required',
+                    'street' => 'string|required',
                     'zip_code' => 'string|required|max:10|regex:/^[0-9\-]+$/',
                 ]);
                 break;
@@ -205,8 +238,11 @@ new #[Title('Appointment')] class extends Component {
                 'email' => 'required|email|max:255',
                 'phone' => 'required|string|max:25|regex:/^[\+]?[0-9\s\-\(\)]+$/',
                 'address' => 'required|string|max:255',
+                'region' => 'required|string|max:100',
+                'province' => 'required|string|max:100',
                 'city' => 'required|string|max:100',
-                'state' => 'required|string|max:100',
+                'barangay' => 'required|string|max:100',
+                'street' => 'required|string|max:100',
                 'zip_code' => 'required|string|max:10|regex:/^[0-9\-]+$/',
                 'selectedDate' => 'required|date|after_or_equal:today',
                 'selectedTime' => 'required|string',
@@ -247,8 +283,11 @@ new #[Title('Appointment')] class extends Component {
                     'email' => $this->email,
                     'phone' => $this->phone,
                     'address' => $this->address,
+                    'region' => $this->region,
+                    'province' => $this->province,
                     'city' => $this->city,
-                    'state' => $this->state,
+                    'barangay' => $this->barangay,
+                    'street' => $this->street,
                     'zip_code' => $this->zip_code,
                     'purpose' => $this->purpose,
                     'notes' => $appointment->notes,
@@ -425,6 +464,30 @@ new #[Title('Appointment')] class extends Component {
             Log::error('Error sending appointment slip email: ' . $e->getMessage());
             session()->flash('error', 'Failed to send appointment slip. Please try again.');
         }
+    }
+
+    public function updatedRegion(PhilippineLocationsService $locations)
+    {
+        $this->provinces = $locations->getProvinces($this->region);
+        $this->province = '';
+        $this->cities = [];
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedProvince(PhilippineLocationsService $locations)
+    {
+        $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedCity(PhilippineLocationsService $locations)
+    {
+        $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        $this->barangay = '';
     }
 }; ?>
 

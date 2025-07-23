@@ -21,6 +21,7 @@ use App\Enums\RequestNotificationEvent;
 use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
 use App\Models\User;
+use App\Services\PhilippineLocationsService;
 
 new #[Title('Document Request')] class extends Component {
     use WithFileUploads;
@@ -36,11 +37,7 @@ new #[Title('Document Request')] class extends Component {
     public string $middle_name = '';
     public string $email = '';
     public string $phone = '';
-    public string $address = '';
-    public string $city = '';
-    public string $state = '';
-    public string $zip = '';
-    public string $country = '';
+
     public string $suffix = '';
     public string $father_first_name = '';
     public string $father_middle_name = '';
@@ -68,11 +65,7 @@ new #[Title('Document Request')] class extends Component {
     public string $address_type = 'Permanent';
     public string $address_line_1 = '';
     public string $address_line_2 = '';
-    public string $region = '';
-    public string $province = '';
-    public string $barangay = '';
-    public string $street = '';
-    public string $zip_code = '';
+   
     public string $government_id_type = '';
     public mixed $government_id_image_path = null;
     public mixed $government_id_image_file = null;
@@ -197,7 +190,24 @@ new #[Title('Document Request')] class extends Component {
 
     public bool $editPersonDetails = false;
 
-    public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, ?string $reference_number = null): void
+    // Address Information
+    public string $address = '';
+    public string $region = '';
+    public string $province = '';
+    public string $city = '';
+    public string $barangay = '';
+    public string $street = '';
+    public string $zip_code = '';
+    public string $country = '';
+
+    public array $regions = [];
+    public array $provinces = [];
+    public array $cities = [];
+    public array $barangays = [];
+
+   
+
+    public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
@@ -205,7 +215,17 @@ new #[Title('Document Request')] class extends Component {
         $this->userFamilies = $userFamilies;
         $this->userAddresses = $userAddresses;
         $this->editPersonDetails = false;
-
+// Pre-populate dependent dropdowns if values exist
+if ($this->region) {
+            $this->provinces = $locations->getProvinces($this->region);
+        }
+        if ($this->region && $this->province) {
+            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        }
+        if ($this->region && $this->province && $this->city) {
+            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        }
+        $this->regions = $locations->getRegions();
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making a document request.');
@@ -262,6 +282,29 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+    public function updatedRegion(PhilippineLocationsService $locations)
+    {
+        $this->provinces = $locations->getProvinces($this->region);
+        $this->province = '';
+        $this->cities = [];
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedProvince(PhilippineLocationsService $locations)
+    {
+        $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedCity(PhilippineLocationsService $locations)
+    {
+        $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        $this->barangay = '';
+    }   
     public function populateUserData(): void
     {
         $userData = auth()->user()->getDocumentRequestFormData();
