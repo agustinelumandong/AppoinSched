@@ -1,5 +1,7 @@
 <div class="px-5 py-2 mt-5">
     <div class="flex flex-col gap-4">
+
+
         {{-- Personal Information Section --}}
         @if($this->service->slug !== 'marriage-certificate' && $this->service->slug !== 'death-certificate')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.personal-information')

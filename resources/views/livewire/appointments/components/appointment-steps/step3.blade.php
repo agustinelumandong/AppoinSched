@@ -19,34 +19,45 @@
         <p class="text-gray-600">Loading...</p>
       </div>
 
+      <div class="flex flex-row gap-2 w-full mb-4">
+        @if($editPersonDetails === false)
+      <button type="button" class="btn-flux btn-flux-primary" wire:click="editPersonDetailsBtn">Edit</button>
+    @else
+      <button type="button" class="btn-flux btn-flux-primary" wire:click="lockPersonDetailsBtn">Lock</button>
+    @endif
+      </div>
+
       <div class="flex flex-col gap-2 w-full" wire:loading.remove>
         <div class="flex flex-row gap-2 w-full">
           <div class="w-full">
-            <input type="text" placeholder="Last Name" class="flux-form-control" wire:model="last_name" />
+            <input type="text" placeholder="Last Name" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="last_name"
+              @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('last_name') <span class="text-red-500">{{ $message }}</span> @enderror
           </div>
 
           <div class="w-full">
-            <input type="text" placeholder="First Name" class="flux-form-control" wire:model="first_name" />
+            <input type="text" placeholder="First Name" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="first_name"
+              @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('first_name') <span class="text-red-500">{{ $message }}</span> @enderror
           </div>
 
           <div class="w-full">
-            <input type="text" placeholder="Middle Name" class="flux-form-control" wire:model="middle_name" />
+            <input type="text" placeholder="Middle Name" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="middle_name"
+              @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('middle_name') <span class="text-red-500">{{ $message }}</span> @enderror
           </div>
         </div>
 
         <div class="flex flex-row gap-2 w-full">
           <div class=" w-full">
-            <input type="email" placeholder="Email" class="flux-form-control" wire:model="email" />
+            <input type="email" placeholder="Email" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="email" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('email')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
           </div>
 
           <div class="w-full">
-            <input type="tel" placeholder="Phone" class="flux-form-control" wire:model="phone" />
+            <input type="tel" placeholder="Phone" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="phone" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('phone')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
@@ -54,28 +65,31 @@
         </div>
 
         <div class="w-full">
-          <input type="text" placeholder="Address" class="flux-form-control" wire:model="address" />
+          <input type="text" placeholder="Address" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="address"
+            @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
           @error('address')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
         </div>
 
         <div class="w-full">
-          <input type="text" placeholder="City" class="flux-form-control" wire:model="city" />
+          <input type="text" placeholder="City" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="city" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
           @error('city')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
         </div>
 
         <div class="w-full">
-          <input type="text" placeholder="State" class="flux-form-control" wire:model="state" />
+            <input type="text" placeholder="State" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="state" @if($to_whom === 'myself')
+    disabled @elseif($editPersonDetails === false) @endif />
           @error('state')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
         </div>
 
         <div class="w-full">
-          <input type="text" placeholder="Zip Code" class="flux-form-control" wire:model="zip_code" />
+          <input type="text" placeholder="Zip Code" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="zip_code"
+            @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('zip_code')
         <span class="text-red-500">{{ $message }}</span>
       @enderror

@@ -80,6 +80,7 @@ new #[Title('Document Request')] class extends Component {
     public string $payment_reference = '';
 
     public bool $father_is_unknown = false;
+    public bool $mother_is_unknown = false;
     public bool $deceased_is_unknown = true;
 
     // Death Certificate specific fields
@@ -194,6 +195,8 @@ new #[Title('Document Request')] class extends Component {
     public string $consent_citizenship = '';
     public string $consent_residence = '';
 
+    public bool $editPersonDetails = false;
+
     public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, ?string $reference_number = null): void
     {
         $this->office = $office;
@@ -201,6 +204,7 @@ new #[Title('Document Request')] class extends Component {
         $this->personalInformation = $personalInformation;
         $this->userFamilies = $userFamilies;
         $this->userAddresses = $userAddresses;
+        $this->editPersonDetails = false;
 
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
@@ -247,7 +251,7 @@ new #[Title('Document Request')] class extends Component {
         }
 
         $this->updatedFatherIsUnknown($this->father_is_unknown);
-
+        $this->updatedMotherIsUnknown($this->mother_is_unknown);
         if ($this->service->title !== 'Death Certificate') {
             $this->updatedDeceasedIsUnknown($this->deceased_is_unknown);
         }
@@ -377,6 +381,29 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+    public function updatedMotherIsUnknown(bool $value): void
+    {
+        if ($value) {
+            $this->mother_last_name = 'N/A';
+            $this->mother_first_name = 'N/A';
+            $this->mother_middle_name = 'N/A';
+            $this->mother_suffix = 'N/A';
+            $this->mother_birthdate = '0001-01-01';
+            $this->mother_nationality = 'N/A';
+            $this->mother_religion = 'N/A';
+            $this->mother_contact_no = 'N/A';
+        } else {
+            $this->mother_last_name = '';
+            $this->mother_first_name = '';
+            $this->mother_middle_name = '';
+            $this->mother_suffix = '';
+            $this->mother_birthdate = '';
+            $this->mother_nationality = '';
+            $this->mother_religion = '';
+            $this->mother_contact_no = '';
+        }
+    }
+
 
     public function updatedDeceasedIsUnknown(bool $value): void
     {
@@ -480,7 +507,7 @@ new #[Title('Document Request')] class extends Component {
                     ];
 
                     if (($this->to_whom === 'someone_else' || $this->requiresFamilyInfo()) && $this->service->slug !== 'death-certificate') {
-                        if (!$this->father_is_unknown) {
+                        if (!$this->father_is_unknown && !$this->mother_is_unknown) {
                             $rules = array_merge($rules, [
                                 'father_last_name' => 'required|string|max:255',
                                 'father_first_name' => 'required|string|max:255',
@@ -491,18 +518,19 @@ new #[Title('Document Request')] class extends Component {
                                 'father_religion' => 'required|string|max:255',
                                 'father_contact_no' => 'required|string|max:20',
                             ]);
-                        }
+                        
 
-                        $rules = array_merge($rules, [
-                            'mother_last_name' => 'required|string|max:255',
-                            'mother_first_name' => 'required|string|max:255',
-                            'mother_middle_name' => 'required|string|max:255',
-                            'mother_suffix' => 'nullable|string|max:10',
-                            'mother_birthdate' => 'nullable|date',
-                            'mother_nationality' => 'required|string|max:255',
-                            'mother_religion' => 'required|string|max:255',
-                            'mother_contact_no' => 'required|string|max:20',
-                        ]);
+                            $rules = array_merge($rules, [
+                                'mother_last_name' => 'required|string|max:255',
+                                'mother_first_name' => 'required|string|max:255',
+                                'mother_middle_name' => 'required|string|max:255',
+                                'mother_suffix' => 'nullable|string|max:10',
+                                'mother_birthdate' => 'nullable|date',
+                                'mother_nationality' => 'required|string|max:255',
+                                'mother_religion' => 'required|string|max:255',
+                                'mother_contact_no' => 'required|string|max:20',
+                            ]);
+                        }
                     }
                 }
 
@@ -995,6 +1023,16 @@ new #[Title('Document Request')] class extends Component {
         } finally {
             $this->isLoading = false;
         }
+    }
+
+    public function editPersonDetailsBtn()
+    {
+        $this->editPersonDetails = true;
+    }
+    
+    public function lockPersonDetailsBtn()
+    {
+        $this->editPersonDetails = false;
     }
 
     public function completePayment()

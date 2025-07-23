@@ -42,6 +42,8 @@ new #[Title('Appointment')] class extends Component {
     public bool $isLoading = false;
     public ?string $reference_number = null;
 
+    public bool $editPersonDetails = false;
+
     public ?int $id = null;
 
     public ?string $selectedDate = null;
@@ -52,12 +54,14 @@ new #[Title('Appointment')] class extends Component {
     public User $staff;
 
     public ?Appointments $appointment = null;
+    
 
     public function mount(Offices $office, Services $service, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
         $this->id = auth()->user()->id;
+        $this->editPersonDetails = false;
         // Set the reference_number if provided
         if ($reference_number) {
             $this->reference_number = $reference_number;
@@ -106,6 +110,16 @@ new #[Title('Appointment')] class extends Component {
         $this->city = '';
         $this->state = '';
         $this->zip_code = '';
+    }
+
+    public function editPersonDetailsBtn()
+    {
+        $this->editPersonDetails = true;
+    }
+
+    public function lockPersonDetailsBtn()
+    {
+        $this->editPersonDetails = false;
     }
 
     public function nextStep()
