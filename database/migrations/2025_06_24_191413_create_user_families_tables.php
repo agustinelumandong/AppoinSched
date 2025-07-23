@@ -33,16 +33,7 @@ return new class extends Migration {
             $table->string('mother_nationality')->nullable();
             $table->string('mother_religion')->nullable();
             $table->string('mother_contact_no', 20)->nullable();
-
-            // Spouse's Information (nullable if unmarried)
-            $table->string('spouse_last_name')->nullable();
-            $table->string('spouse_first_name')->nullable();
-            $table->string('spouse_middle_name')->nullable();
-            $table->enum('spouse_suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
-            $table->date('spouse_birthdate')->nullable();
-            $table->string('spouse_nationality')->nullable();
-            $table->string('spouse_religion')->nullable();
-            $table->string('spouse_contact_no', 20)->nullable();
+ 
             $table->timestamps();
         });
     }

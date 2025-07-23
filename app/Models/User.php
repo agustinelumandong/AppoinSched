@@ -253,16 +253,7 @@ class User extends Authenticatable
             'mother_birthdate' => $userFamily?->mother_birthdate instanceof \Carbon\Carbon ? $userFamily->mother_birthdate->format('Y-m-d') : ($userFamily?->mother_birthdate ?? ''),
             'mother_nationality' => $userFamily?->mother_nationality ?? '',
             'mother_religion' => $userFamily?->mother_religion ?? '',
-            'mother_contact_no' => $userFamily?->mother_contact_no ?? '',
-
-            'spouse_last_name' => $userFamily?->spouse_last_name ?? '',
-            'spouse_first_name' => $userFamily?->spouse_first_name ?? '',
-            'spouse_middle_name' => $userFamily?->spouse_middle_name ?? '',
-            'spouse_suffix' => $userFamily?->spouse_suffix ?? 'N/A',
-            'spouse_birthdate' => $userFamily?->spouse_birthdate instanceof \Carbon\Carbon ? $userFamily->spouse_birthdate->format('Y-m-d') : ($userFamily?->spouse_birthdate ?? ''),
-            'spouse_nationality' => $userFamily?->spouse_nationality ?? '',
-            'spouse_religion' => $userFamily?->spouse_religion ?? '',
-            'spouse_contact_no' => $userFamily?->spouse_contact_no ?? '',
+            'mother_contact_no' => $userFamily?->mother_contact_no ?? '', 
         ];
     }
 

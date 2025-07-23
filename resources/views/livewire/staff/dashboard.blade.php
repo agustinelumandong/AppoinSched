@@ -237,7 +237,7 @@ new class extends Component {
                                                             {{ $documentRequest->user?->last_name ?? '' }}
                                                         </td>
                                                         <td>
-                                                            {{ $documentRequest->service?->name ?? 'N/A' }}
+                                                            {{ $documentRequest->service?->title ?? 'N/A' }}
                                                         </td>
                                                         <td>
                                                             {{ \Illuminate\Support\Carbon::parse($documentRequest->booking_date)->format('M d, Y') }}
