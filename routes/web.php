@@ -45,9 +45,12 @@ Route::middleware(['auth'])->group(function () {
 
     // Staff, Admin, and SuperAdmin routes
     Route::middleware(['role:MCR-staff,MTO-staff,BPLS-staff,admin,super-admin'])->group(function () {
+
+
         Volt::route('staff/dashboard', 'staff.dashboard')->name('staff.dashboard');
         Volt::route('staff/appointments', 'staff.appointments')->name('staff.appointments');
         Volt::route('staff/documents', 'staff.documents')->name('staff.documents');
+        Volt::route('staff/services', 'staff.services')->name('staff.services');
         Volt::route('admin/view/document-request/{id}', 'documentrequest.view-document-request')->name('admin.view-document-request');
     });
 
