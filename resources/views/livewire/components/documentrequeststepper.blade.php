@@ -205,7 +205,7 @@ new #[Title('Document Request')] class extends Component {
     public array $cities = [];
     public array $barangays = [];
 
-   
+    public string $serviceSelected = '';
 
     public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
@@ -215,8 +215,8 @@ new #[Title('Document Request')] class extends Component {
         $this->userFamilies = $userFamilies;
         $this->userAddresses = $userAddresses;
         $this->editPersonDetails = false;
-// Pre-populate dependent dropdowns if values exist
-if ($this->region) {
+        // Pre-populate dependent dropdowns if values exist
+        if ($this->region) {
             $this->provinces = $locations->getProvinces($this->region);
         }
         if ($this->region && $this->province) {
@@ -241,6 +241,7 @@ if ($this->region) {
                 ->first();
             if ($existingRequest) {
                 $this->id = $existingRequest->id;
+                $this->service = $existingRequest->service;
                 $this->reference_number = $existingRequest->reference_number;
                 $this->to_whom = $existingRequest->to_whom;
                 $this->purpose = $existingRequest->purpose;
@@ -249,9 +250,9 @@ if ($this->region) {
                 $this->payment_status = $existingRequest->payment_status ?? '';
                 // Set step based on payment status
                 if ($existingRequest->payment_status === 'unpaid') {
-                    $this->step = 6;
-                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
                     $this->step = 7;
+                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
+                    $this->step = 8;
                 } else {
                     $this->step = 1; // fallback
                 }
@@ -280,6 +281,13 @@ if ($this->region) {
         if ($this->to_whom === 'myself') {
             $this->populateUserData();
         }
+    }
+
+
+    public function updatedServiceSelected($value)
+    {
+        $this->service = Services::where('slug', $value)->first();
+        $this->serviceSelected = $value;
     }
 
     public function updatedRegion(PhilippineLocationsService $locations)
@@ -475,6 +483,12 @@ if ($this->region) {
             case 1:
                 $this->isLoading = true;
                 $this->validate([
+                    'serviceSelected' => 'required',
+                ]);
+                break;
+            case 2:
+                $this->isLoading = true;
+                $this->validate([
                     'to_whom' => 'required',
                     'relationship' => $this->to_whom === 'someone_else'
                         ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
@@ -484,13 +498,13 @@ if ($this->region) {
                     $this->reference_number = 'DOC-' . strtoupper(Str::random(10));
                 } while (DocumentRequest::where('reference_number', $this->reference_number)->exists());
                 break;
-            case 2:
+            case 3:
                 $this->isLoading = true;
                 $this->validate([
                     'purpose' => 'required',
                 ]);
                 break;
-            case 3:
+            case 4:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
                     $rules = [
@@ -582,7 +596,7 @@ if ($this->region) {
                 $this->fillFamilyDefaults();
                 $this->initializeContactInfo();
                 break;
-            case 4:
+            case 5:
                 $this->isLoading = true;
                 $this->validate([
                     'contact_first_name' => 'required|string|max:255',
@@ -591,7 +605,7 @@ if ($this->region) {
                     'contact_phone' => 'required|string|max:20',
                 ]);
                 break;
-            case 5:
+            case 6:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
                     $this->validate([
@@ -1058,7 +1072,7 @@ if ($this->region) {
             session()->flash('success', 'Document request submitted successfully!');
 
             // Move to payment step instead of redirecting
-            $this->step = 6;
+            $this->step = 7;
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Document Request Submission Error: ' . $e->getMessage());
@@ -1151,7 +1165,7 @@ if ($this->region) {
             }
 
             // Move to success page
-            $this->step = 7;
+            $this->step = 8;
         } catch (\Exception $e) {
             Log::error('Payment Processing Error: ' . $e->getMessage());
             session()->flash('error', 'Payment processing failed: ' . $e->getMessage());
@@ -1238,6 +1252,13 @@ if ($this->region) {
             'consent_residence' => 'nullable|string|max:255',
         ];
     }
+
+    public function with()
+    {
+        return [
+            'services' => $this->office->services()->where('is_active', 1)->get(),
+        ];
+    }
 }; ?>
 
 
@@ -1245,7 +1266,7 @@ if ($this->region) {
 
 
 
-    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request a {{ $this->service->title }}
+    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request a Document
     </h1>
 
     {{-- Stepper Header --}}
@@ -1253,20 +1274,29 @@ if ($this->region) {
         <ul class="steps steps-horizontal w-full">
             <li class="step {{ $step >= 1 ? 'step-info' : '' }}">
                 <div class="step-content">
+                    <div class="step-title">Service</div>
+                    <div class="step-description text-sm text-gray-500">Select a service</div>
+                </div>
+                
+            </li>
+            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">To Whom?</div>
                     <div class="step-description text-sm text-gray-500">For Yourself or Someone Else?</div>
                 </div>
+                
             </li>
-            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Purpose Request</div>
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
+                
             </li>
-            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
                 <div class="step-content">
                     @php 
-                                                                    if ($this->service->slug === 'marriage-certificate') {
+                        if ($this->service->slug === 'marriage-certificate') {
                             $stepTitle = 'Marriage License';
                             $stepDescription = 'Marriage License Information';
                         } elseif ($this->service->slug === 'death-certificate') {
@@ -1280,47 +1310,99 @@ if ($this->region) {
                     <div class="step-title">{{ $stepTitle }}</div>
                     <div class="step-description text-sm text-gray-500">{{ $stepDescription }}</div>
                 </div>
+                
             </li>
-            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
-                </div>
-            </li>
-            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
-                    <div class="step-content">
+                </div>    
+             </li>
+            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Confirmation</div>
                         <div class="step-description text-sm text-gray-500">Review & Submit</div>
-                </div>
-                </li>
-            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
-                    <div class="step-content">
+                </div>   
+            </li>
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Payment</div>
                     <div class="step-description text-sm text-gray-500">Complete your transaction</div>
                  </div>
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Success</div>
-                <div class="step-description text-sm text-gray-500">Done</div>
-            </div>
-        </li>
+                    <div class="step-description text-sm text-gray-500">Done</div>
+                </div>
+            </li>
+         
     </ul>
 </div>
     {{-- Stepper Content --}}
    @if ($step == 1)
-    @include('livewire.documentrequest.components.document-request-steps.step1')
-@elseif($step == 2)
-    @include('livewire.documentrequest.components.document-request-steps.step2')
-@elseif($step == 3)
-    @include('livewire.documentrequest.components.document-request-steps.step3')
-@elseif($step == 4)
-        @include('livewire.documentrequest.components.document-request-steps.step4')
+    <div class="px-5 py-2 mt-5">
+        <div class="flex flex-col gap-4">
+            <div>
+                <div class="header mb-4">
+                    <h3 class="text-xl font-semibold text-base-content">Select a Service</h3>
+                    <div class="flex items-center gap-2 text-sm text-base-content/70">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Please select a service</span>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div wire:loading.delay class="text-center ">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                    <p class="text-gray-600">Loading...</p>
+                </div>
+
+                <div class="flex flex-col gap-2 w-full" wire:loading.remove>
+                    @foreach ($services as $service)
+                        <input
+                            type="radio"
+                            id="{{ $service->slug }}"
+                            name="service"
+                            value="{{ $service->slug }}"
+                            wire:model.live="serviceSelected"
+                            hidden
+                        />
+                        <label
+                            for="{{ $service->slug }}"
+                            class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2"
+                        >
+                            {{ $service->title }}
+                        </label>
+                    @endforeach
+                </div>
+
+                
+
+                <footer class="my-6 flex justify-end gap-2">
+                    {{-- <button class="btn btn-ghost" wire:click="previousStep">Previous</button> --}}
+                    <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+    @elseif($step == 2)
+        @include('livewire.documentrequest.components.document-request-steps.step1')
+    @elseif($step == 3)
+        @include('livewire.documentrequest.components.document-request-steps.step2')
+    @elseif($step == 4)
+        @include('livewire.documentrequest.components.document-request-steps.step3')
     @elseif($step == 5)
-        @include('livewire.documentrequest.components.document-request-steps.step5')
+        @include('livewire.documentrequest.components.document-request-steps.step4')
     @elseif($step == 6)
-        @include('livewire.documentrequest.components.document-request-steps.step6')
+        @include('livewire.documentrequest.components.document-request-steps.step5')
     @elseif($step == 7)
+        @include('livewire.documentrequest.components.document-request-steps.step6')
+    @elseif($step == 8)
         @include('livewire.documentrequest.components.document-request-steps.step7')
     @endif
 </div>

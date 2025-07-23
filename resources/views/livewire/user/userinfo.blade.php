@@ -51,7 +51,6 @@ new class extends Component {
     public string $mother_nationality = '';
     public string $mother_religion = '';
     public string $mother_contact_no = '';
-    public bool $father_is_unknown = false;
 
     public string $street = '';
     public string $zip_code = '';
@@ -65,6 +64,9 @@ new class extends Component {
     public array $provinces = [];
     public array $cities = [];
     public array $barangays = [];
+
+    public bool $father_is_unknown = false;
+    public bool $mother_is_unknown = false; 
 
     protected PhilippineLocationsService $locationsService;
 
@@ -151,6 +153,7 @@ new class extends Component {
 
         // Set father_is_unknown if all father fields are N/A
         $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
+        $this->mother_is_unknown = $this->mother_last_name === 'N/A' && $this->mother_first_name === 'N/A' && $this->mother_middle_name === 'N/A' && $this->mother_suffix === 'N/A' && $this->mother_nationality === 'N/A' && $this->mother_religion === 'N/A' && $this->mother_contact_no === 'N/A';
 
         // Pre-populate dependent dropdowns if values exist
         if ($this->region) {
@@ -212,7 +215,7 @@ new class extends Component {
 
         // Set father_is_unknown if all father fields are N/A
         $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
-
+        $this->mother_is_unknown = $this->mother_last_name === 'N/A' && $this->mother_first_name === 'N/A' && $this->mother_middle_name === 'N/A' && $this->mother_suffix === 'N/A' && $this->mother_nationality === 'N/A' && $this->mother_religion === 'N/A' && $this->mother_contact_no === 'N/A';
         // Pre-populate dependent dropdowns if values exist
         if ($this->region) {
             $this->provinces = $locations->getProvinces($this->region);
@@ -300,14 +303,14 @@ new class extends Component {
                 'father_nationality' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
                 'father_religion' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
                 'father_contact_no' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
-                'mother_last_name' => ['required', 'string', 'max:255'],
-                'mother_first_name' => ['required', 'string', 'max:255'],
+                'mother_last_name' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
+                'mother_first_name' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
                 'mother_middle_name' => ['nullable', 'string', 'max:255'],
                 'mother_suffix' => ['nullable', 'string', 'max:10'],
                 'mother_birthdate' => ['nullable', 'date'],
-                'mother_nationality' => ['required', 'string', 'max:100'],
-                'mother_religion' => ['required', 'string', 'max:100'],
-                'mother_contact_no' => ['required', 'string', 'max:20'],
+                'mother_nationality' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
+                'mother_religion' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
+                'mother_contact_no' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
             ]);
 
             // Check if required personal info fields are filled
@@ -438,7 +441,7 @@ new class extends Component {
             $this->father_first_name = 'N/A';
             $this->father_middle_name = 'N/A';
             $this->father_suffix = 'N/A';
-            $this->father_birthdate = '';
+            $this->father_birthdate = '0001-01-01';
             $this->father_nationality = 'N/A';
             $this->father_religion = 'N/A';
             $this->father_contact_no = 'N/A';
@@ -447,10 +450,33 @@ new class extends Component {
             $this->father_first_name = '';
             $this->father_middle_name = '';
             $this->father_suffix = 'N/A';
-            $this->father_birthdate = '';
+            $this->father_birthdate = '0001-01-01';
             $this->father_nationality = '';
             $this->father_religion = '';
             $this->father_contact_no = '';
+        }
+    }
+
+    public function updatedMotherIsUnknown($value)
+    {
+        if ($value) {
+            $this->mother_last_name = 'N/A';
+            $this->mother_first_name = 'N/A';
+            $this->mother_middle_name = 'N/A';
+            $this->mother_suffix = 'N/A';
+            $this->mother_birthdate = '0001-01-01';
+            $this->mother_nationality = 'N/A';
+            $this->mother_religion = 'N/A';
+            $this->mother_contact_no = 'N/A';
+        } else {
+            $this->mother_last_name = '';
+            $this->mother_first_name = '';
+            $this->mother_middle_name = '';
+            $this->mother_suffix = 'N/A';
+            $this->mother_birthdate = '0001-01-01';
+            $this->mother_nationality = '';
+            $this->mother_religion = '';
+            $this->mother_contact_no = '';
         }
     }
 
@@ -623,8 +649,7 @@ new class extends Component {
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div class="flex flex-col">
                 <label for="religion" class="text-xs font-medium mb-1">Religion</label>
-                <input id="religion" class="flux-form-control" type="text" wire:model="religion"
-                    placeholder="Religion">
+                <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
@@ -737,14 +762,12 @@ new class extends Component {
             </div>
             <div class="flex flex-col">
                 <label for="street" class="text-xs font-medium mb-1">Street</label>
-                <input id="street" class="flux-form-control" type="text" wire:model="street"
-                    placeholder="Street">
+                <input id="street" class="flux-form-control" type="text" wire:model="street" placeholder="Street">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code"
-                    placeholder="Zip Code">
+                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
         </div>
@@ -753,183 +776,137 @@ new class extends Component {
     <!-- Family Information -->
     <div class="flux-card p-6">
         <h2 class="text-xl font-bold mb-4">Family Information</h2>
-        <h4 class="text-lg font-bold mb-4">Father</h4>
-        <div class="form-control mb-2">
-            <label class="label cursor-pointer">
+        <div>
+            <h5 class="text-md font-bold mb-4">Father</h5>
+            <div class="form-control ">
+              <label class="label cursor-pointer">
                 <span class="label-text">Father is Unknown</span>
-                <input type="checkbox" wire:model.live="father_is_unknown" class="checkbox" />
-            </label>
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            @if ($father_is_unknown)
-                <div class="flex flex-col md:col-span-3">
-                    <label class="text-xs font-medium mb-1">Last Name</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label class="text-xs font-medium mb-1">First Name</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label class="text-xs font-medium mb-1">Middle Name</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col md:col-span-1">
-                    <label class="text-xs font-medium mb-1">Suffix</label>
-                    <span class="flux-form-control w-full bg-gray-100">N/A</span>
-                </div>
-            @else
-                <div class="flex flex-col md:col-span-3">
-                    <label for="father_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                    <input id="father_last_name" class="flux-form-control w-full" type="text"
-                        wire:model="father_last_name" placeholder="Last Name">
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label for="father_first_name" class="text-xs font-medium mb-1">First Name</label>
-                    <input id="father_first_name" class="flux-form-control w-full" type="text"
-                        wire:model="father_first_name" placeholder="First Name">
-                </div>
-                <div class="flex flex-col md:col-span-3">
-                    <label for="father_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
-                    <input id="father_middle_name" class="flux-form-control w-full" type="text"
-                        wire:model="father_middle_name" placeholder="Middle Name">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col md:col-span-1">
-                    <label for="father_suffix" class="text-xs font-medium mb-1">Suffix</label>
-                    <select id="father_suffix" class="flux-form-control w-full" wire:model="father_suffix">
-                        <option value="">Suffix</option>
-                        <option value="N/A">N/A</option>
-                        <option value="Jr.">Jr.</option>
-                        <option value="Sr.">Sr.</option>
-                        <option value="I">I</option>
-                        <option value="II">II</option>
-                        <option value="III">III</option>
-                    </select>
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-            @endif
-        </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            @if ($father_is_unknown)
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Father's Birthdate</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Father's Nationality</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Father's Religion</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-                <div class="flex flex-col">
-                    <label class="text-xs font-medium mb-1">Father's Contact No</label>
-                    <span class="flux-form-control bg-gray-100">N/A</span>
-                </div>
-            @else
-                <div class="flex flex-col">
-                    <label for="father_birthdate" class="text-xs font-medium mb-1">Father's Birthdate</label>
-                    <input id="father_birthdate" class="flux-form-control" type="date"
-                        wire:model="father_birthdate" placeholder="Father's Birthdate">
-                </div>
-                <div class="flex flex-col">
-                    <label for="father_nationality" class="text-xs font-medium mb-1">Father's Nationality</label>
-                    <input id="father_nationality" class="flux-form-control" type="text"
-                        wire:model="father_nationality" placeholder="Father's Nationality">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col">
-                    <label for="father_religion" class="text-xs font-medium mb-1">Father's Religion</label>
-                    <input id="father_religion" class="flux-form-control" type="text"
-                        wire:model="father_religion" placeholder="Father's Religion">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-                <div class="flex flex-col">
-                    <label for="father_contact_no" class="text-xs font-medium mb-1">Father's Contact No</label>
-                    <input id="father_contact_no" class="flux-form-control" type="text"
-                        wire:model="father_contact_no" placeholder="Father's Contact No">
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-                </div>
-            @endif
-        </div>
-        <h4 class="text-lg font-bold mb-4">Mother</h4>
-        <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            <div class="flex flex-col md:col-span-3">
-                <label for="mother_last_name" class="text-xs font-medium mb-1">Last Name</label>
-                <input id="mother_last_name" class="flux-form-control w-full" type="text"
-                    wire:model="mother_last_name" placeholder="Last Name">
+                <input type="checkbox" wire:model.live="father_is_unknown"
+                  class="checkbox" />
+              </label>
             </div>
-            <div class="flex flex-col md:col-span-3">
-                <label for="mother_first_name" class="text-xs font-medium mb-1">First Name</label>
-                <input id="mother_first_name" class="flux-form-control w-full" type="text"
-                    wire:model="mother_first_name" placeholder="First Name">
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label for="mother_middle_name" class="text-xs font-medium mb-1">Middle Name</label>
-                <input id="mother_middle_name" class="flux-form-control w-full" type="text"
-                    wire:model="mother_middle_name" placeholder="Middle Name">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col md:col-span-1">
-                <label for="mother_suffix" class="text-xs font-medium mb-1">Suffix</label>
-                <select id="mother_suffix" class="flux-form-control w-full" wire:model="mother_suffix">
-                    <option value="">Suffix</option>
-                    <option value="N/A">N/A</option>
-                    <option value="Jr.">Jr.</option>
-                    <option value="Sr.">Sr.</option>
-                    <option value="I">I</option>
-                    <option value="II">II</option>
-                    <option value="III">III</option>
+            <div class="flex flex-row md:flex-col gap-4 mb-4">
+              <div class="w-full md:w-1/3">
+                <label for="father_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                <input class="flux-form-control md:col-span-3 w-full"
+                  type="text" wire:model="father_last_name" placeholder="Last Name" name="father_last_name"
+                  id="father_last_name" required {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+              <div class="w-full md:w-1/3">
+                <label for="father_first_name" class="block text-xs font-medium mb-1">First Name</label>
+                <input class="flux-form-control md:col-span-3 w-full"
+                  type="text" wire:model="father_first_name" placeholder="First Name" name="father_first_name"
+                  id="father_first_name" required {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+              <div class="w-full md:w-1/3">
+                <label for="father_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                <input class="flux-form-control md:col-span-3 w-full"
+                  type="text" wire:model="father_middle_name" placeholder="Middle Name" name="father_middle_name"
+                  id="father_middle_name" required {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+              <div class="w-1/7">
+                <label for="father_suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                <select class="flux-form-control md:col-span-1 w-full"
+                  wire:model="father_suffix" name="father_suffix" id="father_suffix" {{ $father_is_unknown ? 'disabled' : '' }}
+                  >
+                  <option value="">Suffix</option>
+                  <option value="N/A">N/A</option>
+                  <option value="Jr.">Jr.</option>
+                  <option value="Sr.">Sr.</option>
+                  <option value="I">I</option>
+                  <option value="II">II</option>
+                  <option value="III">III</option>
                 </select>
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                @error('father_suffix')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+            </div>
+            <div class="flex flex-row md:flex-col gap-4 mb-4">
+              <div class="w-full md:w-1/3">
+                <label for="father_birthdate" class="block text-xs font-medium mb-1">Date of Birth</label>
+                <input class="flux-form-control" type="date"
+                  wire:model="father_birthdate" name="father_birthdate" id="father_birthdate" {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+              <div class="w-full md:w-1/3">
+                <label for="father_nationality" class="block text-xs font-medium mb-1">Nationality</label>
+                <input class="flux-form-control" type="text"
+                  wire:model="father_nationality" placeholder="Nationality" name="father_nationality" id="father_nationality"
+                  required {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+              <div class="w-full md:w-1/3">
+                <label for="father_religion" class="block text-xs font-medium mb-1">Religion</label>
+                <input class="flux-form-control" type="text"
+                  wire:model="father_religion" placeholder="Religion" name="father_religion" id="father_religion" required {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+              <div class="w-full md:w-1/3">
+                <label for="father_contact_no" class="block text-xs font-medium mb-1">Contact No.</label>
+                    <input class="flux-form-control" type="text"
+                  wire:model="father_contact_no" placeholder="Contact Number" name="father_contact_no" id="father_contact_no"
+                  required {{ $father_is_unknown ? 'disabled' : '' }} >
+                @error('father_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+              </div>
+            </div>
+          </div>
+        <div>
+            <h5 class="text-md font-bold mb-4">Mother</h5>
+            <div class="form-control">
+                <label class="label cursor-pointer">
+                    <span class="label-text">Mother is Unknown</span>
+                    <input type="checkbox" wire:model.live="mother_is_unknown" class="checkbox" />
+                </label>    
+            </div>
+            <div class="flex flex-row md:flex-col gap-4 mb-4">
+                <div class="w-full md:w-1/3">
+                    <label for="mother_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                    <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_last_name"
+                        placeholder="Last Name" name="mother_last_name" id="mother_last_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
+                <div class="w-full md:w-1/3">
+                    <label for="mother_first_name" class="block text-xs font-medium mb-1">First Name</label>
+                    <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_first_name"
+                        placeholder="First Name" name="mother_first_name" id="mother_first_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
+                <div class="w-full md:w-1/3">
+                    <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                    <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_middle_name"
+                        placeholder="Middle Name" name="mother_middle_name" id="mother_middle_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
+            </div>
+            <div class="flex flex-row md:flex-col gap-4 mb-4">
+                <div class="w-full md:w-1/3">
+                    <label for="mother_birthdate" class="block text-xs font-medium mb-1">Mother's Birthdate</label>
+                    <input class="flux-form-control " type="date" wire:model="mother_birthdate"
+                        placeholder="Mother's Birthdate" name="mother_birthdate" id="mother_birthdate" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
+                <div class="w-full md:w-1/3">
+                    <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's Nationality</label>
+                    <input class="flux-form-control " type="text" wire:model="mother_nationality"
+                        placeholder="Mother's Nationality" name="mother_nationality" id="mother_nationality" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
+                <div class="w-full md:w-1/3">
+                    <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's Religion</label>
+                    <input class="flux-form-control " type="text" wire:model="mother_religion"
+                        placeholder="Mother's Religion" name="mother_religion" id="mother_religion" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
+                <div class="w-full md:w-1/3">
+                    <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's Contact No</label>
+                    <input class="flux-form-control     " type="text" wire:model="mother_contact_no"
+                        placeholder="Mother's Contact No" name="mother_contact_no" id="mother_contact_no" {{ $mother_is_unknown ? 'disabled' : '' }}>
+                    @error('mother_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                </div>
             </div>
         </div>
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-            <div class="flex flex-col">
-                <label for="mother_birthdate" class="text-xs font-medium mb-1">Mother's Birthdate</label>
-                <input id="mother_birthdate" class="flux-form-control" type="date" wire:model="mother_birthdate"
-                    placeholder="Mother's Birthdate">
-            </div>
-            <div class="flex flex-col">
-                <label for="mother_nationality" class="text-xs font-medium mb-1">Mother's Nationality</label>
-                <input id="mother_nationality" class="flux-form-control" type="text"
-                    wire:model="mother_nationality" placeholder="Mother's Nationality">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="mother_religion" class="text-xs font-medium mb-1">Mother's Religion</label>
-                <input id="mother_religion" class="flux-form-control" type="text" wire:model="mother_religion"
-                    placeholder="Mother's Religion">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-            <div class="flex flex-col">
-                <label for="mother_contact_no" class="text-xs font-medium mb-1">Mother's Contact No</label>
-                <input id="mother_contact_no" class="flux-form-control" type="text"
-                    wire:model="mother_contact_no" placeholder="Mother's Contact No">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            </div>
-        </div>
-
-        {{-- <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
-            <div class="flex flex-col md:col-span-3">
-                <label class="text-xs font-medium mb-1">Last Name</label>
-                <span class="flux-form-control w-full bg-gray-100">N/A</span>
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label class="text-xs font-medium mb-1">First Name</label>
-                <span class="flux-form-control w-full bg-gray-100">N/A</span>
-            </div>
-            <div class="flex flex-col md:col-span-3">
-                <label class="text-xs font-medium mb-1">Middle Name</label>
-                <span class="flux-form-control w-full bg-gray-100">N/A</span>
-            </div>
-            <div class="flex flex-col md:col-span-1">
-                <label class="text-xs font-medium mb-1">Suffix</label>
-                <span class="flux-form-control w-full bg-gray-100">N/A</span>
-            </div>
-        </div> --}}
     </div>
 
     {{-- Save Button --}}
