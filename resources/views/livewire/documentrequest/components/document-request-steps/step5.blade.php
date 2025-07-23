@@ -57,6 +57,50 @@
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form')
         @elseif ($service->slug === 'death-certificate')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.death-information')
+            <div class="flux-card p-6 mt-4">
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Deceased Details</h3>
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div><span class="font-semibold">Sex:</span> {{ $deceased_sex }}</div>
+                    <div><span class="font-semibold">Religion:</span> {{ $deceased_religion }}</div>
+                    <div><span class="font-semibold">Age:</span> {{ $deceased_age }}</div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div><span class="font-semibold">Place of Birth:</span> {{ $deceased_place_of_birth }}</div>
+                    <div><span class="font-semibold">Date of Birth:</span> {{ $deceased_date_of_birth }}</div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div><span class="font-semibold">Civil Status:</span> {{ $deceased_civil_status }}</div>
+                    <div><span class="font-semibold">Residence:</span> {{ $deceased_residence }}</div>
+                </div>
+                <div class="mb-4"><span class="font-semibold">Occupation:</span> {{ $deceased_occupation }}</div>
+                <h4 class="font-semibold mt-4 mb-2">Father's Name</h4>
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div>{{ $deceased_father_last_name }}</div>
+                    <div>{{ $deceased_father_first_name }}</div>
+                    <div>{{ $deceased_father_middle_name }}</div>
+                </div>
+                <h4 class="font-semibold mt-4 mb-2">Mother's Name</h4>
+                <div class="grid md:grid-cols-3 gap-4 mb-4">
+                    <div>{{ $deceased_mother_last_name }}</div>
+                    <div>{{ $deceased_mother_first_name }}</div>
+                    <div>{{ $deceased_mother_middle_name }}</div>
+                </div>
+                <h4 class="font-semibold mt-4 mb-2">Burial Details</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div><span class="font-semibold">Cemetery Name:</span> {{ $burial_cemetery_name }}</div>
+                    <div><span class="font-semibold">Cemetery Address:</span> {{ $burial_cemetery_address }}</div>
+                </div>
+                <h4 class="font-semibold mt-4 mb-2">Informant's Declaration</h4>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div><span class="font-semibold">Name:</span> {{ $informant_name }}</div>
+                    <div><span class="font-semibold">Address:</span> {{ $informant_address }}</div>
+                </div>
+                <div class="grid md:grid-cols-2 gap-4 mb-4">
+                    <div><span class="font-semibold">Relationship:</span> {{ $informant_relationship }}</div>
+                    <div><span class="font-semibold">Contact No:</span> {{ $informant_contact_no }}</div>
+                </div>
+
+            </div>
         @else
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.personal-information')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.address-information')

@@ -71,6 +71,14 @@ return new class extends Migration {
             $table->string('deceased_last_name', 100)->nullable();
             $table->string('deceased_first_name', 100)->nullable();
             $table->string('deceased_middle_name', 100)->nullable();
+            $table->enum('deceased_sex', ['Male', 'Female'])->nullable();
+            $table->string('deceased_religion', 100)->nullable();
+            $table->unsignedTinyInteger('deceased_age')->nullable();
+            $table->string('deceased_place_of_birth', 150)->nullable();
+            $table->date('deceased_date_of_birth')->nullable();
+            $table->enum('deceased_civil_status', ['Single', 'Married', 'Widowed', 'Divorced', 'Separated'])->nullable();
+            $table->string('deceased_residence', 255)->nullable();
+            $table->string('deceased_occupation', 100)->nullable();
             $table->date('death_date')->nullable();
             $table->time('death_time')->nullable();
             $table->string('death_place', 150)->nullable();
@@ -86,6 +94,21 @@ return new class extends Migration {
                 'Other',
                 'N/A'
             ])->nullable();
+            // Deceased's parents
+            $table->string('deceased_father_last_name', 100)->nullable();
+            $table->string('deceased_father_first_name', 100)->nullable();
+            $table->string('deceased_father_middle_name', 100)->nullable();
+            $table->string('deceased_mother_last_name', 100)->nullable();
+            $table->string('deceased_mother_first_name', 100)->nullable();
+            $table->string('deceased_mother_middle_name', 100)->nullable();
+            // Burial details
+            $table->string('burial_cemetery_name', 150)->nullable();
+            $table->string('burial_cemetery_address', 255)->nullable();
+            // Informant's declaration
+            $table->string('informant_name', 100)->nullable();
+            $table->string('informant_address', 255)->nullable();
+            $table->string('informant_relationship', 100)->nullable();
+            $table->string('informant_contact_no', 50)->nullable();
 
             // Marriage License Modular Fields
             // Groom Personal Info
