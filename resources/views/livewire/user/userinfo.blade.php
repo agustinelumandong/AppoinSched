@@ -475,6 +475,9 @@ new class extends Component {
                     <option value="N/A">N/A</option>
                     <option value="Jr.">Jr.</option>
                     <option value="Sr.">Sr.</option>
+                    <option value="I">I</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
                 </select>
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
@@ -678,6 +681,9 @@ new class extends Component {
                         <option value="N/A">N/A</option>
                         <option value="Jr.">Jr.</option>
                         <option value="Sr.">Sr.</option>
+                        <option value="I">I</option>
+                        <option value="II">II</option>
+                        <option value="III">III</option>
                     </select>
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
@@ -752,6 +758,9 @@ new class extends Component {
                     <option value="N/A">N/A</option>
                     <option value="Jr.">Jr.</option>
                     <option value="Sr.">Sr.</option>
+                    <option value="I">I</option>
+                    <option value="II">II</option>
+                    <option value="III">III</option>
                 </select>
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>

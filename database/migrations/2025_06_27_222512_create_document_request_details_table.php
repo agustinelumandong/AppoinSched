@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->string('last_name', 100);
             $table->string('first_name', 100);
             $table->string('middle_name', 100)->nullable();
-            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->string('email', 150);
             $table->string('contact_no', 50)->nullable();
             $table->string('contact_first_name', 100)->nullable();
@@ -52,7 +52,7 @@ return new class extends Migration {
             $table->string('father_last_name', 100)->nullable();
             $table->string('father_first_name', 100)->nullable();
             $table->string('father_middle_name', 100)->nullable();
-            $table->enum('father_suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('father_suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->date('father_birthdate')->nullable();
             $table->string('father_nationality', 100)->nullable();
             $table->string('father_religion', 100)->nullable();
@@ -61,7 +61,7 @@ return new class extends Migration {
             $table->string('mother_last_name', 100)->nullable();
             $table->string('mother_first_name', 100)->nullable();
             $table->string('mother_middle_name', 100)->nullable();
-            $table->enum('mother_suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('mother_suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->date('mother_birthdate')->nullable();
             $table->string('mother_nationality', 100)->nullable();
             $table->string('mother_religion', 100)->nullable();

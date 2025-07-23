@@ -42,6 +42,9 @@
           <option value="N/A">N/A</option>
           <option value="Jr.">Jr.</option>
           <option value="Sr.">Sr.</option>
+          <option value="I">I</option>
+          <option value="II">II</option>
+          <option value="III">III</option>
         </select>
         @error('father_suffix')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
       </div>
