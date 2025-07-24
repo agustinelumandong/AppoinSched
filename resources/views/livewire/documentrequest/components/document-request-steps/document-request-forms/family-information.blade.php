@@ -1,4 +1,14 @@
 <div class="flux-card p-6" wire:loading.remove>
+  @if($to_whom === 'someone_else')
+    <div class="alert alert-info flex items-center gap-2 mb-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span>Please provide the complete information for the person you're requesting the document for.</span>
+    <span>If a field is not applicable, you may enter <span class="font-semibold">"N/A"</span>.</span>
+    </div>
+  @endif
   <h4 class="text-lg font-bold mb-4">Family Information</h4>
   {{-- Father --}}
   <div>
@@ -18,6 +28,7 @@
           type="text" wire:model="father_last_name" placeholder="Last Name" name="father_last_name"
           id="father_last_name" required {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('father_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="father_first_name" class="block text-xs font-medium mb-1">First Name</label>
@@ -25,6 +36,7 @@
           type="text" wire:model="father_first_name" placeholder="First Name" name="father_first_name"
           id="father_first_name" required {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('father_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="father_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
@@ -32,6 +44,7 @@
           type="text" wire:model="father_middle_name" placeholder="Middle Name" name="father_middle_name"
           id="father_middle_name" required {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('father_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-1/7">
         <label for="father_suffix" class="block text-xs font-medium mb-1">Suffix</label>
@@ -47,6 +60,7 @@
           <option value="III">III</option>
         </select>
         @error('father_suffix')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
     </div>
     <div class="flex flex-row md:flex-col gap-4 mb-4">
@@ -55,6 +69,7 @@
         <input class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" type="date"
           wire:model="father_birthdate" name="father_birthdate" id="father_birthdate" {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('father_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="father_nationality" class="block text-xs font-medium mb-1">Nationality</label>
@@ -63,6 +78,7 @@
           required {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false)
       disabled @endif>
         @error('father_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="father_religion" class="block text-xs font-medium mb-1">Religion</label>
@@ -70,6 +86,7 @@
           wire:model="father_religion" placeholder="Religion" name="father_religion" id="father_religion" required {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false) disabled
       @endif>
         @error('father_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="father_contact_no" class="block text-xs font-medium mb-1">Contact No.</label>
@@ -78,6 +95,7 @@
           required {{ $father_is_unknown ? 'disabled' : '' }} @if($to_whom === 'myself' && $editPersonDetails === false)
       disabled @endif>
         @error('father_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
     </div>
   </div>
@@ -91,6 +109,7 @@
           class="checkbox @if($editPersonDetails === false) bg-gray-100 @endif" @if($editPersonDetails === false) disabled
       @endif />
       </label>
+      <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
     </div>
     <div class="flex flex-row md:flex-col gap-4 mb-4">
       <div class="w-full md:w-1/3">
@@ -99,6 +118,7 @@
           type="text" wire:model="mother_last_name" placeholder="Last Name" name="mother_last_name"
           id="mother_last_name" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Required</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="mother_first_name" class="block text-xs font-medium mb-1">First Name</label>
@@ -106,6 +126,7 @@
           type="text" wire:model="mother_first_name" placeholder="First Name" name="mother_first_name"
           id="mother_first_name" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
@@ -113,6 +134,7 @@
           type="text" wire:model="mother_middle_name" placeholder="Middle Name" name="mother_middle_name"
           id="mother_middle_name" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
     </div>
     <div class="flex flex-row md:flex-col gap-4 mb-4">
@@ -122,6 +144,7 @@
           wire:model="mother_birthdate" placeholder="Mother's Birthdate" name="mother_birthdate" id="mother_birthdate"
           @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's Nationality</label>
@@ -129,6 +152,7 @@
           wire:model="mother_nationality" placeholder="Mother's Nationality" name="mother_nationality"
           id="mother_nationality" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's Religion</label>
@@ -136,6 +160,7 @@
           wire:model="mother_religion" placeholder="Mother's Religion" name="mother_religion" id="mother_religion"
           @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
         <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's Contact No</label>
@@ -143,6 +168,7 @@
           wire:model="mother_contact_no" placeholder="Mother's Contact No" name="mother_contact_no"
           id="mother_contact_no" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
         @error('mother_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+        <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
     </div>
   </div>

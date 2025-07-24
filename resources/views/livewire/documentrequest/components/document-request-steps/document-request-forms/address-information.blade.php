@@ -1,4 +1,13 @@
 <div class="flux-card p-6" wire:loading.remove>
+  @if($to_whom === 'someone_else')
+    <div class="alert alert-info flex items-center gap-2 mb-2">
+    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+    </svg>
+    <span>Please provide the complete address for the person you're requesting the document for.</span>
+    </div>
+  @endif
   <h4 class="text-lg font-bold mb-4">Address Information</h4>
   <div>
     <label for="address_type" class="block text-xs font-medium mb-1">Address Type</label>
@@ -9,6 +18,7 @@
       <option value="Temporary">Temporary</option>
     </select>
     @error('address_type')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+    <span class="text-xs text-gray-500 mt-1">Required</span>
   </div>
   <div>
     <label for="address_line_1" class="block text-xs font-medium mb-1">Address Line 1</label>
@@ -16,6 +26,7 @@
       wire:model="address_line_1" name="address_line_1" placeholder="Address Line 1" id="address_line_1"
       @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
     @error('address_line_1')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+    <span class="text-xs text-gray-500 mt-1">Required</span>
   </div>
   <div>
     <label for="address_line_2" class="block text-xs font-medium mb-1">Address Line 2</label>
@@ -23,6 +34,7 @@
       wire:model="address_line_2" name="address_line_2" placeholder="Address Line 2" id="address_line_2"
       @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
     @error('address_line_2')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
   </div>
   <div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -72,6 +84,7 @@
           wire:model="street" placeholder="Street" @if($to_whom === 'myself' && $editPersonDetails === false) disabled
       @endif>
         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+        <span class="text-xs text-gray-500 mt-1">Required</span>
       </div>
       <div class="flex flex-col">
         <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
@@ -79,6 +92,7 @@
           wire:model="zip_code" placeholder="Zip Code" @if($to_whom === 'myself' && $editPersonDetails === false) disabled
       @endif>
         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+        <span class="text-xs text-gray-500 mt-1">Required</span>
       </div>
     </div>
   </div>

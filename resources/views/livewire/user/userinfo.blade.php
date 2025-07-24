@@ -585,11 +585,13 @@ new class extends Component {
                 <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
                 <input id="last_name" class="flux-form-control w-full" type="text" wire:model="last_name"
                     placeholder="Last Name">
+                    <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col md:col-span-3">
                 <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
                 <input id="first_name" class="flux-form-control w-full" type="text" wire:model="first_name"
                     placeholder="First Name">
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col md:col-span-3">
                 <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
@@ -615,11 +617,13 @@ new class extends Component {
             <div class="flex flex-col">
                 <label for="email" class="text-xs font-medium mb-1">Email</label>
                 <input id="email" class="flux-form-control" type="email" wire:model="email" placeholder="Email">
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="contact_no" class="text-xs font-medium mb-1">Contact No</label>
                 <input id="contact_no" class="flux-form-control" type="text" wire:model="contact_no"
                     placeholder="Contact No">
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="sex_at_birth" class="text-xs font-medium mb-1">Sex at Birth</label>
@@ -628,16 +632,19 @@ new class extends Component {
                     <option value="Male">Male</option>
                     <option value="Female">Female</option>
                 </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="date_of_birth" class="text-xs font-medium mb-1">Date of Birth</label>
                 <input id="date_of_birth" class="flux-form-control" type="date" wire:model="date_of_birth"
                     placeholder="Date of Birth">
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="place_of_birth" class="text-xs font-medium mb-1">Place of Birth</label>
                 <input id="place_of_birth" class="flux-form-control" type="text" wire:model="place_of_birth"
                     placeholder="Place of Birth">
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="civil_status" class="text-xs font-medium mb-1">Civil Status</label>
@@ -649,6 +656,7 @@ new class extends Component {
                     <option value="Divorced">Divorced</option>
                     <option value="Separated">Separated</option>
                 </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -656,12 +664,14 @@ new class extends Component {
                 <label for="religion" class="text-xs font-medium mb-1">Religion</label>
                 <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="nationality" class="text-xs font-medium mb-1">Nationality</label>
                 <input id="nationality" class="flux-form-control" type="text" wire:model="nationality"
                     placeholder="Nationality">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -685,6 +695,7 @@ new class extends Component {
                 @error('government_id_type')
                     <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
                 @enderror
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
 
             <div class="flex flex-col">
@@ -702,6 +713,7 @@ new class extends Component {
                             class="w-32 h-20 object-cover border rounded">
                     </div>
                 @endif
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
     </div>
@@ -721,6 +733,7 @@ new class extends Component {
             <label for="address_line_1" class="text-xs font-medium mb-1">Address Line 1</label>
             <input id="address_line_1" class="flux-form-control" type="text" wire:model="address_line_1"
                 placeholder="Address Line 1">
+            <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col mb-4">
             <label for="address_line_2" class="text-xs font-medium mb-1">Address Line 2</label>
@@ -737,6 +750,7 @@ new class extends Component {
                         <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
                     @endforeach
                 </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="province" class="text-xs font-medium mb-1">Province</label>
@@ -746,6 +760,7 @@ new class extends Component {
                         <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
                     @endforeach
                 </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="city" class="text-xs font-medium mb-1">City</label>
@@ -755,6 +770,7 @@ new class extends Component {
                         <option value="{{ $cityKey }}">{{ $cityName }}</option>
                     @endforeach
                 </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
@@ -764,6 +780,7 @@ new class extends Component {
                         <option value="{{ $barangay }}">{{ $barangay }}</option>
                     @endforeach
                 </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
                 <label for="street" class="text-xs font-medium mb-1">Street</label>
@@ -773,7 +790,7 @@ new class extends Component {
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
                 <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
     </div>
@@ -789,6 +806,7 @@ new class extends Component {
                 <input type="checkbox" wire:model.live="father_is_unknown"
                   class="checkbox" />
               </label>
+              
             </div>
             <div class="flex flex-row md:flex-col gap-4 mb-4">
               <div class="w-full md:w-1/3">
@@ -797,6 +815,7 @@ new class extends Component {
                   type="text" wire:model="father_last_name" placeholder="Last Name" name="father_last_name"
                   id="father_last_name" required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
               </div>
               <div class="w-full md:w-1/3">
                 <label for="father_first_name" class="block text-xs font-medium mb-1">First Name</label>
@@ -804,6 +823,7 @@ new class extends Component {
                   type="text" wire:model="father_first_name" placeholder="First Name" name="father_first_name"
                   id="father_first_name" required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Required</span>
               </div>
               <div class="w-full md:w-1/3">
                 <label for="father_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
@@ -811,6 +831,7 @@ new class extends Component {
                   type="text" wire:model="father_middle_name" placeholder="Middle Name" name="father_middle_name"
                   id="father_middle_name" required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
               </div>
               <div class="w-1/7">
                 <label for="father_suffix" class="block text-xs font-medium mb-1">Suffix</label>
@@ -826,6 +847,7 @@ new class extends Component {
                   <option value="III">III</option>
                 </select>
                 @error('father_suffix')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
               </div>
             </div>
             <div class="flex flex-row md:flex-col gap-4 mb-4">
@@ -834,6 +856,7 @@ new class extends Component {
                 <input class="flux-form-control" type="date"
                   wire:model="father_birthdate" name="father_birthdate" id="father_birthdate" {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Required</span>
               </div>
               <div class="w-full md:w-1/3">
                 <label for="father_nationality" class="block text-xs font-medium mb-1">Nationality</label>
@@ -841,12 +864,14 @@ new class extends Component {
                   wire:model="father_nationality" placeholder="Nationality" name="father_nationality" id="father_nationality"
                   required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
               </div>
               <div class="w-full md:w-1/3">
                 <label for="father_religion" class="block text-xs font-medium mb-1">Religion</label>
                 <input class="flux-form-control" type="text"
                   wire:model="father_religion" placeholder="Religion" name="father_religion" id="father_religion" required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
               </div>
               <div class="w-full md:w-1/3">
                 <label for="father_contact_no" class="block text-xs font-medium mb-1">Contact No.</label>
@@ -854,7 +879,7 @@ new class extends Component {
                   wire:model="father_contact_no" placeholder="Contact Number" name="father_contact_no" id="father_contact_no"
                   required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-              </div>
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>              </div>
             </div>
           </div>
         <div>
@@ -871,18 +896,19 @@ new class extends Component {
                     <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_last_name"
                         placeholder="Last Name" name="mother_last_name" id="mother_last_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_first_name" class="block text-xs font-medium mb-1">First Name</label>
                     <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_first_name"
                         placeholder="First Name" name="mother_first_name" id="mother_first_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
                     <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_middle_name"
                         placeholder="Middle Name" name="mother_middle_name" id="mother_middle_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 </div>
             </div>
             <div class="flex flex-row md:flex-col gap-4 mb-4">
@@ -891,24 +917,27 @@ new class extends Component {
                     <input class="flux-form-control " type="date" wire:model="mother_birthdate"
                         placeholder="Mother's Birthdate" name="mother_birthdate" id="mother_birthdate" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's Nationality</label>
                     <input class="flux-form-control " type="text" wire:model="mother_nationality"
                         placeholder="Mother's Nationality" name="mother_nationality" id="mother_nationality" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's Religion</label>
                     <input class="flux-form-control " type="text" wire:model="mother_religion"
                         placeholder="Mother's Religion" name="mother_religion" id="mother_religion" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's Contact No</label>
                     <input class="flux-form-control     " type="text" wire:model="mother_contact_no"
                         placeholder="Mother's Contact No" name="mother_contact_no" id="mother_contact_no" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
                 </div>
             </div>
         </div>

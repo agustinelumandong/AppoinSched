@@ -45,6 +45,7 @@
               class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="last_name"
               @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('last_name') <span class="text-red-500">{{ $message }}</span> @enderror
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
 
           <div class="w-full">
@@ -53,6 +54,7 @@
               class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="first_name"
               @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('first_name') <span class="text-red-500">{{ $message }}</span> @enderror
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
 
           <div class="w-full">
@@ -61,6 +63,7 @@
               class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" wire:model="middle_name"
               @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
             @error('middle_name') <span class="text-red-500">{{ $message }}</span> @enderror
+            <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
           </div>
         </div>
 
@@ -73,6 +76,7 @@
             @error('email')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
 
           <div class="w-full">
@@ -83,6 +87,7 @@
             @error('phone')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
         </div>
 
@@ -114,6 +119,7 @@
           <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
         @endforeach
             </select>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="province" class="text-xs font-medium mb-1">Province</label>
@@ -124,6 +130,7 @@
           <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
         @endforeach
             </select>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="city" class="text-xs font-medium mb-1">City</label>
@@ -134,6 +141,7 @@
           <option value="{{ $cityKey }}">{{ $cityName }}</option>
         @endforeach
             </select>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
@@ -144,18 +152,21 @@
           <option value="{{ $barangay }}">{{ $barangay }}</option>
         @endforeach
             </select>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="street" class="text-xs font-medium mb-1">Street</label>
             <input id="street" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
               type="text" wire:model="street" placeholder="Street" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
             <input id="zip_code" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
               type="text" wire:model="zip_code" placeholder="Zip Code" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
         </div>
 
@@ -176,6 +187,7 @@
           @error('address')
         <span class="text-red-500">{{ $message }}</span>
       @enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
 
         <footer class="my-6 flex justify-end gap-2">

@@ -29,13 +29,13 @@
     <span>If a field is not applicable, you may enter <span class="font-semibold">"N/A"</span>.</span>
   </div>
   @if($to_whom === 'someone_else')
-  <div class="alert alert-info flex items-center gap-2 mb-2">
+    <div class="alert alert-info flex items-center gap-2 mb-2">
     <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
     </svg>
     <span>Please bring a valid ID and ensure the requester is present.</span>
-  </div>
+    </div>
   @endif
   <!-- Auto-fill Information Message -->
   @if ($to_whom === 'myself')
@@ -74,6 +74,7 @@
             type="text" wire:model="last_name" placeholder="Last Name" name="last_name" id="last_name"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="w-full md:w-1/3">
           <label for="first_name" class="block text-xs font-medium mb-1">First Name</label>
@@ -81,6 +82,7 @@
             type="text" wire:model="first_name" placeholder="First Name" name="first_name" id="first_name"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="w-full md:w-1/3">
           <label for="middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
@@ -88,6 +90,7 @@
             type="text" wire:model="middle_name" placeholder="Middle Name" name="middle_name" id="middle_name"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
         <div class="w-1/7">
           <label for="suffix" class="block text-xs font-medium mb-1">Suffix</label>
@@ -103,6 +106,7 @@
             <option value="III">III</option>
           </select>
           @error('suffix')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -111,12 +115,14 @@
           <input class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" name="email"
             type="email" wire:model="email" placeholder="Email" id="email" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('email')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div>
           <label for="phone" class="block text-xs font-medium mb-1">Contact No</label>
           <input class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" type="text" name="phone"
             wire:model="phone" placeholder="Contact No" id="phone" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('phone')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div>
           <label for="sex_at_birth" class="block text-xs font-medium mb-1">Sex at Birth</label>
@@ -128,6 +134,7 @@
             <option value="Female">Female</option>
           </select>
           @error('sex_at_birth')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
@@ -137,6 +144,7 @@
             wire:model="date_of_birth" placeholder="Date of Birth" name="date_of_birth" id="date_of_birth"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('date_of_birth')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div>
           <label for="place_of_birth" class="block text-xs font-medium mb-1">Place of Birth</label>
@@ -144,6 +152,7 @@
             wire:model="place_of_birth" placeholder="Place of Birth" name="place_of_birth" id="place_of_birth"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('place_of_birth')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div>
           <label for="civil_status" class="block text-xs font-medium mb-1">Civil Status</label>
@@ -157,6 +166,7 @@
             <option value="Separated">Separated</option>
           </select>
           @error('civil_status')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -165,6 +175,7 @@
           <input class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" type="text"
             wire:model="religion" placeholder="Religion" name="religion" id="religion" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
         <div>
           <label for="nationality" class="block text-xs font-medium mb-1">Nationality</label>
@@ -172,6 +183,7 @@
             wire:model="nationality" placeholder="Nationality" name="nationality" id="nationality"
             @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           @error('nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
       </div>
       <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
@@ -193,12 +205,14 @@
             <option value="Other">Other</option>
           </select>
           @error('government_id_type')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
+          <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div>
           <label for="government_id_image_file" class="block text-xs font-medium mb-1">Government ID Image</label>
           <input class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" type="file"
             wire:model="government_id_image_file" name="government_id_image_file" id="government_id_image_file"
             accept="image/*" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+          <span class="text-xs text-gray-500 mt-1">Required</span>
           <span class="text-xs text-gray-500 mt-1">Upload a clear image of your government ID (Max 2MB)</span>
           @error('government_id_image_file')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
           <!-- Show existing file if available -->
