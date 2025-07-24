@@ -36,7 +36,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $user->assignRole('client');
         Auth::login($user);
 
-        $this->redirectIntended(route('dashboard', absolute: false));
+        $this->redirectIntended(route('verification.notice', absolute: false));
+        // $this->redirectIntended(route('dashboard', absolute: false));
     }
 }; ?>
 
