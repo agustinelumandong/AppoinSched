@@ -110,11 +110,7 @@
           @enderror
         </div> --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="col-span-3 flex items-center mb-2">
-            <input type="checkbox" id="same_as_personal_address" wire:model="same_as_personal_address"
-              class="checkbox checkbox-primary mr-2" />
-            <label for="same_as_personal_address" class="text-sm">Same as personal address</label>
-          </div>
+      
           <div class="flex flex-col">
             <label for="region" class="text-xs font-medium mb-1">Region</label>
             <select id="region" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
