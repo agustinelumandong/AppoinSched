@@ -133,7 +133,7 @@
       <div class="row">
         <div class="col label">Service:</div>
         <div class="col value">{{ $service->title }}</div>
-      </div> 
+      </div>
       <div class="row">
         <div class="col label">Purpose:</div>
         <div class="col value">{{ $purpose }}</div>
@@ -173,8 +173,8 @@
         <div class="col value">{{ $city }}</div>
       </div>
       <div class="row">
-        <div class="col label">State/Province:</div>
-        <div class="col value">{{ $state }}</div>
+        <div class="col label">Province:</div>
+        <div class="col value">{{ $province }}</div>
       </div>
       <div class="row">
         <div class="col label">ZIP Code:</div>

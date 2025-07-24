@@ -16,7 +16,7 @@ return new class extends Migration {
             $table->foreignId('user_id')->constrained('users')->onDelete('cascade');
 
             // Basic Information
-            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->date('date_of_birth')->nullable();
             $table->string('place_of_birth')->nullable();
             $table->enum('sex_at_birth', ['Male', 'Female'])->nullable();

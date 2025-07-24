@@ -20,7 +20,7 @@ return new class extends Migration {
             $table->string('last_name', 100);
             $table->string('first_name', 100);
             $table->string('middle_name', 100)->nullable();
-            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->string('email', 150);
             $table->string('contact_no', 50)->nullable();
             $table->string('contact_first_name', 100)->nullable();
@@ -48,11 +48,20 @@ return new class extends Migration {
             $table->string('street', 100)->nullable();
             $table->string('zip_code', 20)->nullable();
 
+            // Temporary Address
+            $table->enum('temporary_address_type', ['Permanent', 'Temporary'])->nullable();
+            $table->string('temporary_address_line_1', 150)->nullable();
+            $table->string('temporary_address_line_2', 150)->nullable();
+            $table->string('temporary_region', 100)->nullable();
+            $table->string('temporary_province', 100)->nullable();
+            $table->string('temporary_city', 100)->nullable();
+            $table->string('temporary_barangay', 100)->nullable();
+
             // Family Information
             $table->string('father_last_name', 100)->nullable();
             $table->string('father_first_name', 100)->nullable();
             $table->string('father_middle_name', 100)->nullable();
-            $table->enum('father_suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('father_suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->date('father_birthdate')->nullable();
             $table->string('father_nationality', 100)->nullable();
             $table->string('father_religion', 100)->nullable();
@@ -61,7 +70,7 @@ return new class extends Migration {
             $table->string('mother_last_name', 100)->nullable();
             $table->string('mother_first_name', 100)->nullable();
             $table->string('mother_middle_name', 100)->nullable();
-            $table->enum('mother_suffix', ['N/A', 'Jr.', 'Sr.'])->nullable();
+            $table->enum('mother_suffix', ['N/A', 'Jr.', 'Sr.', 'I', 'II', 'III'])->nullable();
             $table->date('mother_birthdate')->nullable();
             $table->string('mother_nationality', 100)->nullable();
             $table->string('mother_religion', 100)->nullable();

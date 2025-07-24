@@ -23,8 +23,11 @@ class AppointmentDetails extends Model
     'email',
     'phone',
     'address',
+    'region',
+    'province',
     'city',
-    'state',
+    'barangay',
+    'street',
     'zip_code',
 
     // Additional fields

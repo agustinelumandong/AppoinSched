@@ -45,9 +45,13 @@ Route::middleware(['auth'])->group(function () {
 
     // Staff, Admin, and SuperAdmin routes
     Route::middleware(['role:MCR-staff,MTO-staff,BPLS-staff,admin,super-admin'])->group(function () {
+
+
         Volt::route('staff/dashboard', 'staff.dashboard')->name('staff.dashboard');
         Volt::route('staff/appointments', 'staff.appointments')->name('staff.appointments');
         Volt::route('staff/documents', 'staff.documents')->name('staff.documents');
+        Volt::route('staff/services', 'staff.services')->name('staff.services');
+        Volt::route('staff/reports', 'staff.reports')->name('staff.reports');
         Volt::route('admin/view/document-request/{id}', 'documentrequest.view-document-request')->name('admin.view-document-request');
     });
 
@@ -58,8 +62,10 @@ Route::middleware(['auth'])->group(function () {
         Volt::route('client/documents', 'client.documents')->name('client.documents');
         Volt::route('admin/offices/{office:slug}', 'offices.show')->name('offices.show');
         Volt::route('admin/offices/{office:slug}/services', 'offices.services')->name('offices.services');
-        Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
-        Volt::route('offices/{office:slug}/services/{service:slug}', 'offices.appointmentbooking')->name('offices.service.appointment');
+        // Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
+        Volt::route('admin/offices/{office:slug}/services/request', 'offices.request')->name('offices.service.request');
+        // Volt::route('offices/{office:slug}/services/{service:slug}', 'offices.appointmentbooking')->name('offices.service.appointment');
+        Volt::route('offices/{office:slug}/services/appointment', 'offices.appointmentbooking')->name('offices.service.appointment');
     });
 
     // Testing route (remove in production)

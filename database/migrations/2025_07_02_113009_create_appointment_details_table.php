@@ -26,8 +26,11 @@ return new class extends Migration {
             $table->string('government_id_image_path')->nullable();
             // Address information
             $table->string('address')->nullable();
+            $table->string('region')->nullable();
+            $table->string('province')->nullable();
             $table->string('city')->nullable();
-            $table->string('state')->nullable();
+            $table->string('barangay')->nullable();
+            $table->string('street')->nullable();
             $table->string('zip_code', 10)->nullable();
             // Additional fields if needed
             $table->string('purpose')->nullable();

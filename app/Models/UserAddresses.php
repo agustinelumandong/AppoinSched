@@ -8,7 +8,7 @@ class UserAddresses extends Model
 {
     protected $table = 'user_addresses';
 
-    protected $fillable = [ 
+    protected $fillable = [
         'personal_information_id',
         'address_type',
         'address_line_1',
@@ -19,6 +19,17 @@ class UserAddresses extends Model
         'barangay',
         'street',
         'zip_code',
+
+        // Temporary Address
+        'temporary_address_type',
+        'temporary_address_line_1',
+        'temporary_address_line_2',
+        'temporary_region',
+        'temporary_province',
+        'temporary_city',
+        'temporary_barangay',
+        'temporary_street',
+        'temporary_zip_code',
     ];
 
     public function user()

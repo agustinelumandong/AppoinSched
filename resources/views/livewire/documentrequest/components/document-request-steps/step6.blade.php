@@ -37,12 +37,13 @@
           <div class="space-y-4">
             <div>
               <label class="block text-sm font-medium text-gray-600 mb-1">Service</label>
-              <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $service->title }}</p>
+              <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $this->service->title }}
+              </p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-600 mb-1">Amount</label>
               <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline font-semibold">
-                ₱{{ number_format($service->price, 2) }}</p>
+                ₱{{ number_format($this->service->price, 2) }}</p>
             </div>
             <div>
               <label class="block text-sm font-medium text-gray-600 mb-1">Reference Number</label>

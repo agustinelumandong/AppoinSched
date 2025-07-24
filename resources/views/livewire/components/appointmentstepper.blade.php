@@ -23,6 +23,7 @@ use App\Notifications\RequestEventNotification;
 use App\Enums\RequestNotificationEvent;
 use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
+use App\Services\PhilippineLocationsService;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -33,14 +34,14 @@ new #[Title('Appointment')] class extends Component {
     public string $last_name = '';
     public string $email = '';
     public string $phone = '';
-    public string $address = '';
-    public string $city = '';
-    public string $state = '';
-    public string $zip_code = '';
+
     public string $message = '';
     public ?int $appointmentId = null;
     public bool $isLoading = false;
     public ?string $reference_number = null;
+
+    public bool $editPersonDetails = false;
+    public bool $same_as_personal_address = false;
 
     public ?int $id = null;
 
@@ -53,15 +54,50 @@ new #[Title('Appointment')] class extends Component {
 
     public ?Appointments $appointment = null;
 
-    public function mount(Offices $office, Services $service, ?string $reference_number = null): void
+    public string $address = '';
+
+    public string $street = '';
+    public string $zip_code = '';
+
+    public string $region = '';
+    public string $province = '';
+    public string $city = '';
+    public string $barangay = '';
+
+    public array $regions = [];
+    public array $provinces = [];
+    public array $cities = [];
+    public array $barangays = [];
+
+    public string $serviceSelected = '';
+
+
+
+
+    public function mount(Offices $office, Services $service, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
         $this->id = auth()->user()->id;
+        $this->editPersonDetails = false;
         // Set the reference_number if provided
         if ($reference_number) {
             $this->reference_number = $reference_number;
         }
+
+        // Pre-populate dependent dropdowns if values exist
+        if ($this->region) {
+            $this->provinces = $locations->getProvinces($this->region);
+        }
+        if ($this->region && $this->province) {
+            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        }
+        if ($this->region && $this->province && $this->city) {
+            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        }
+
+        $this->regions = $locations->getRegions();
+
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making an appointment.');
@@ -103,9 +139,43 @@ new #[Title('Appointment')] class extends Component {
         $this->email = '';
         $this->phone = '';
         $this->address = '';
+        $this->region = '';
+        $this->province = '';
         $this->city = '';
-        $this->state = '';
+        $this->barangay = '';
+        $this->street = '';
         $this->zip_code = '';
+    }
+
+    // public function updatedSameAsPersonalAddress($value)
+    // {
+    //     if ($value) {
+    //         $user = auth()->user();
+    //         $address = $user->userAddresses->first();
+    //         $this->region = $address->region ?? '';
+    //         $this->province = $address->province ?? '';
+    //         $this->city = $address->city ?? '';
+    //         $this->barangay = $address->barangay ?? '';
+    //         $this->street = $address->street ?? '';
+    //         $this->zip_code = $address->zip_code ?? '';
+    //     } else {
+    //         $this->region = '';
+    //         $this->province = '';
+    //         $this->city = '';
+    //         $this->barangay = '';
+    //         $this->street = '';
+    //         $this->zip_code = '';
+    //     }
+    // }
+
+    public function editPersonDetailsBtn()
+    {
+        $this->editPersonDetails = true;
+    }
+
+    public function lockPersonDetailsBtn()
+    {
+        $this->editPersonDetails = false;
     }
 
     public function nextStep()
@@ -114,16 +184,22 @@ new #[Title('Appointment')] class extends Component {
             case 1:
                 $this->isLoading = true;
                 $this->validate([
-                    'to_whom' => 'required',
+                    'serviceSelected' => 'required',
                 ]);
                 break;
             case 2:
                 $this->isLoading = true;
                 $this->validate([
-                    'purpose' => 'required',
+                    'to_whom' => 'required',
                 ]);
                 break;
             case 3:
+                $this->isLoading = true;
+                $this->validate([
+                    'purpose' => 'required',
+                ]);
+                break;
+            case 4:
                 $this->isLoading = true;
                 $this->validate([
                     'first_name' => 'string|required',
@@ -132,23 +208,26 @@ new #[Title('Appointment')] class extends Component {
                     'email' => 'string|required|email',
                     'phone' => 'string|required|max:25|regex:/^[\+]?[0-9\s\-\(\)]+$/',
                     'address' => 'string|required',
+                    'region' => 'string|required',
+                    'province' => 'string|required',
                     'city' => 'string|required',
-                    'state' => 'string|required',
+                    'barangay' => 'string|required',
+                    'street' => 'string|required',
                     'zip_code' => 'string|required|max:10|regex:/^[0-9\-]+$/',
                 ]);
                 break;
-            case 4:
+            case 5:
                 $this->isLoading = true;
                 $this->validate([
                     'selectedDate' => 'required|date|after_or_equal:today',
                     'selectedTime' => 'required|string',
                 ]);
                 break;
-            case 5:
+            case 6:
                 $this->isLoading = true;
                 // No additional validation needed - just confirmation step
                 break;
-            case 6:
+            case 7:
                 $this->isLoading = true;
                 break;
         }
@@ -191,8 +270,11 @@ new #[Title('Appointment')] class extends Component {
                 'email' => 'required|email|max:255',
                 'phone' => 'required|string|max:25|regex:/^[\+]?[0-9\s\-\(\)]+$/',
                 'address' => 'required|string|max:255',
+                'region' => 'required|string|max:100',
+                'province' => 'required|string|max:100',
                 'city' => 'required|string|max:100',
-                'state' => 'required|string|max:100',
+                'barangay' => 'required|string|max:100',
+                'street' => 'required|string|max:100',
                 'zip_code' => 'required|string|max:10|regex:/^[0-9\-]+$/',
                 'selectedDate' => 'required|date|after_or_equal:today',
                 'selectedTime' => 'required|string',
@@ -233,8 +315,11 @@ new #[Title('Appointment')] class extends Component {
                     'email' => $this->email,
                     'phone' => $this->phone,
                     'address' => $this->address,
+                    'region' => $this->region,
+                    'province' => $this->province,
                     'city' => $this->city,
-                    'state' => $this->state,
+                    'barangay' => $this->barangay,
+                    'street' => $this->street,
                     'zip_code' => $this->zip_code,
                     'purpose' => $this->purpose,
                     'notes' => $appointment->notes,
@@ -297,7 +382,7 @@ new #[Title('Appointment')] class extends Component {
                 $this->reference_number = $reference_number;
 
                 // Move to step 7 instead of resetting
-                $this->step = 7;
+                $this->step = 8;
 
                 // Clear cache and update UI
                 $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";
@@ -412,6 +497,43 @@ new #[Title('Appointment')] class extends Component {
             session()->flash('error', 'Failed to send appointment slip. Please try again.');
         }
     }
+
+    public function updatedRegion(PhilippineLocationsService $locations)
+    {
+        $this->provinces = $locations->getProvinces($this->region);
+        $this->province = '';
+        $this->cities = [];
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedProvince(PhilippineLocationsService $locations)
+    {
+        $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedCity(PhilippineLocationsService $locations)
+    {
+        $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        $this->barangay = '';
+    }
+
+    public function updatedServiceSelected($value)
+    {
+        $this->service = Services::where('slug', $value)->first();
+        $this->serviceSelected = $value;
+    }
+
+    public function with()
+    {
+        return [
+            'services' => Services::where('office_id', $this->office->id)->get(),
+        ];
+    }
 }; ?>
 
 <div class="card shadow-xl border-none border-gray-200" style="border-radius: 1rem;">
@@ -427,41 +549,47 @@ new #[Title('Appointment')] class extends Component {
         <ul class="steps steps-horizontal w-full">
             <li class="step {{ $step >= 1 ? 'step-info' : '' }}">
                 <div class="step-content">
+                    <div class="step-title">Service</div>
+                    <div class="step-description text-sm text-gray-500">Select a service</div>
+                </div>
+            </li>
+            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">To Whom?</div>
                     <div class="step-description text-sm text-gray-500">For Yourself or Someone Else?</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Purpose Request</div>
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Personal Information</div>
                     <div class="step-description text-sm text-gray-500">Your/Someone details</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Date & Time</div>
                     <div class="step-description text-sm text-gray-500">Schedule</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Confirmation</div>
                     <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Appointment Slip</div>
                     <div class="step-description text-sm text-gray-500">Save Your Details</div>
@@ -472,18 +600,60 @@ new #[Title('Appointment')] class extends Component {
 
     {{-- Stepper Content --}}
     @if ($step == 1)
+        <div class="px-5 py-2 mt-5">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <div class="header mb-4">
+                        <h3 class="text-xl font-semibold text-base-content">Select a Service</h3>
+                        <div class="flex items-center gap-2 text-sm text-base-content/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Please select a service</span>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div wire:loading.delay class="text-center ">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+
+                    <div class="flex flex-col gap-2 w-full" wire:loading.remove>
+                        @foreach ($services as $service)
+                            <input type="radio" id="{{ $service->slug }}" name="service" value="{{ $service->slug }}"
+                                wire:model.live="serviceSelected" hidden />
+                            <label for="{{ $service->slug }}"
+                                class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2">
+                                {{ $service->title }}
+                            </label>
+                        @endforeach
+                    </div>
+
+
+
+                    <footer class="my-6 flex justify-end gap-2">
+                        {{-- <button class="btn btn-ghost" wire:click="previousStep">Previous</button> --}}
+                        <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    @elseif ($step == 2)
         @include('livewire.appointments.components.appointment-steps.step1')
-    @elseif($step == 2)
-        @include('livewire.appointments.components.appointment-steps.step2')
     @elseif($step == 3)
-        @include('livewire.appointments.components.appointment-steps.step3')
+        @include('livewire.appointments.components.appointment-steps.step2')
     @elseif($step == 4)
-        @include('livewire.appointments.components.appointment-steps.step4')
+        @include('livewire.appointments.components.appointment-steps.step3')
     @elseif($step == 5)
-        @include('livewire.appointments.components.appointment-steps.step5')
+        @include('livewire.appointments.components.appointment-steps.step4')
     @elseif($step == 6)
-        @include('livewire.appointments.components.appointment-steps.step6')
+        @include('livewire.appointments.components.appointment-steps.step5')
     @elseif($step == 7)
+        @include('livewire.appointments.components.appointment-steps.step6')
+    @elseif($step == 8)
         @include('livewire.appointments.components.appointment-steps.step7')
     @endif
 </div>

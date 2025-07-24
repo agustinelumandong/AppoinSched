@@ -1,7 +1,11 @@
 ---
-applyTo: '**'
+description: >
+  Volt Livewire Laravel rules for PHP 8.1+, Laravel 12+, Volt Livewire anonymous class syntax, Alpine.js, TailwindCSS, and daisyUI.
+globs:
+  - "**/*.php"
+alwaysApply: true
 ---
- 
+
 You are an expert in Laravel, PHP, Volt Livewire, Alpine.js, TailwindCSS, and daisyUI.
 
 Core Principles
@@ -81,3 +85,4 @@ Laravel Best Practices
 - Use transactions for data integrity.
 - Schedule recurring tasks using Laravel's scheduler.
 - Use Livewire components to build dynamic, reactive user interfaces.
+

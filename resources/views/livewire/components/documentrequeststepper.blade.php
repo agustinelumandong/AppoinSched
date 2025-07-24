@@ -21,6 +21,7 @@ use App\Enums\RequestNotificationEvent;
 use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
 use App\Models\User;
+use App\Services\PhilippineLocationsService;
 
 new #[Title('Document Request')] class extends Component {
     use WithFileUploads;
@@ -36,11 +37,7 @@ new #[Title('Document Request')] class extends Component {
     public string $middle_name = '';
     public string $email = '';
     public string $phone = '';
-    public string $address = '';
-    public string $city = '';
-    public string $state = '';
-    public string $zip = '';
-    public string $country = '';
+
     public string $suffix = '';
     public string $father_first_name = '';
     public string $father_middle_name = '';
@@ -68,11 +65,7 @@ new #[Title('Document Request')] class extends Component {
     public string $address_type = 'Permanent';
     public string $address_line_1 = '';
     public string $address_line_2 = '';
-    public string $region = '';
-    public string $province = '';
-    public string $barangay = '';
-    public string $street = '';
-    public string $zip_code = '';
+   
     public string $government_id_type = '';
     public mixed $government_id_image_path = null;
     public mixed $government_id_image_file = null;
@@ -80,7 +73,9 @@ new #[Title('Document Request')] class extends Component {
     public string $payment_reference = '';
 
     public bool $father_is_unknown = false;
+    public bool $mother_is_unknown = false;
     public bool $deceased_is_unknown = true;
+    public bool $same_as_personal_address = false;
 
     // Death Certificate specific fields
     public string $deceased_last_name = '';
@@ -194,14 +189,55 @@ new #[Title('Document Request')] class extends Component {
     public string $consent_citizenship = '';
     public string $consent_residence = '';
 
-    public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, ?string $reference_number = null): void
+    public bool $editPersonDetails = false;
+
+    // Address Information
+    public string $address = '';
+    public string $region = '';
+    public string $province = '';
+    public string $city = '';
+    public string $barangay = '';
+    public string $street = '';
+    public string $zip_code = '';
+    public string $country = '';
+
+    // Temporary address properties
+    // public string $temporary_address_type = '';
+    // public string $temporary_address_line_1 = '';
+    // public string $temporary_address_line_2 = '';
+    // public string $temporary_region = '';
+    // public string $temporary_province = '';
+    // public string $temporary_city = '';
+    // public string $temporary_barangay = '';
+    // public string $temporary_street = '';
+    // public string $temporary_zip_code = '';
+
+    public array $regions = [];
+    public array $provinces = [];
+    public array $cities = [];
+    public array $barangays = [];
+
+    public string $serviceSelected = '';
+
+    public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
         $this->office = $office;
         $this->service = $service;
         $this->personalInformation = $personalInformation;
         $this->userFamilies = $userFamilies;
         $this->userAddresses = $userAddresses;
-
+        $this->editPersonDetails = false;
+        // Pre-populate dependent dropdowns if values exist
+        if ($this->region) {
+            $this->provinces = $locations->getProvinces($this->region);
+        }
+        if ($this->region && $this->province) {
+            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        }
+        if ($this->region && $this->province && $this->city) {
+            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        }
+        $this->regions = $locations->getRegions();
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making a document request.');
@@ -217,6 +253,7 @@ new #[Title('Document Request')] class extends Component {
                 ->first();
             if ($existingRequest) {
                 $this->id = $existingRequest->id;
+                $this->service = $existingRequest->service;
                 $this->reference_number = $existingRequest->reference_number;
                 $this->to_whom = $existingRequest->to_whom;
                 $this->purpose = $existingRequest->purpose;
@@ -225,9 +262,9 @@ new #[Title('Document Request')] class extends Component {
                 $this->payment_status = $existingRequest->payment_status ?? '';
                 // Set step based on payment status
                 if ($existingRequest->payment_status === 'unpaid') {
-                    $this->step = 6;
-                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
                     $this->step = 7;
+                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
+                    $this->step = 8;
                 } else {
                     $this->step = 1; // fallback
                 }
@@ -247,7 +284,7 @@ new #[Title('Document Request')] class extends Component {
         }
 
         $this->updatedFatherIsUnknown($this->father_is_unknown);
-
+        $this->updatedMotherIsUnknown($this->mother_is_unknown);
         if ($this->service->title !== 'Death Certificate') {
             $this->updatedDeceasedIsUnknown($this->deceased_is_unknown);
         }
@@ -258,6 +295,36 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+
+    public function updatedServiceSelected($value)
+    {
+        $this->service = Services::where('slug', $value)->first();
+        $this->serviceSelected = $value;
+    }
+
+    public function updatedRegion(PhilippineLocationsService $locations)
+    {
+        $this->provinces = $locations->getProvinces($this->region);
+        $this->province = '';
+        $this->cities = [];
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedProvince(PhilippineLocationsService $locations)
+    {
+        $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        $this->city = '';
+        $this->barangays = [];
+        $this->barangay = '';
+    }
+
+    public function updatedCity(PhilippineLocationsService $locations)
+    {
+        $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        $this->barangay = '';
+    }   
     public function populateUserData(): void
     {
         $userData = auth()->user()->getDocumentRequestFormData();
@@ -336,6 +403,33 @@ new #[Title('Document Request')] class extends Component {
         $this->deceased_civil_status = '';
     }
 
+    public function updatedSameAsPersonalAddress($value)
+    {
+        if ($value) {
+            $user = auth()->user();
+            $address = $user->userAddresses->first();
+            $this->address_type = $address->address_type ?? 'Permanent';
+            $this->address_line_1 = $address->address_line_1 ?? '';
+            $this->address_line_2 = $address->address_line_2 ?? '';
+            $this->region = $address->region ?? '';
+            $this->province = $address->province ?? '';
+            $this->city = $address->city ?? '';
+            $this->barangay = $address->barangay ?? '';
+            $this->street = $address->street ?? '';
+            $this->zip_code = $address->zip_code ?? '';
+        } else {
+            $this->address_type = '';
+            $this->address_line_1 = '';
+            $this->address_line_2 = '';
+            $this->region = '';
+            $this->province = '';
+            $this->city = '';
+            $this->barangay = '';
+            $this->street = '';
+            $this->zip_code = '';
+        }
+    }
+
     public function initializeContactInfo(): void
     {
         if ($this->to_whom === 'myself') {
@@ -377,6 +471,29 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+    public function updatedMotherIsUnknown(bool $value): void
+    {
+        if ($value) {
+            $this->mother_last_name = 'N/A';
+            $this->mother_first_name = 'N/A';
+            $this->mother_middle_name = 'N/A';
+            $this->mother_suffix = 'N/A';
+            $this->mother_birthdate = '0001-01-01';
+            $this->mother_nationality = 'N/A';
+            $this->mother_religion = 'N/A';
+            $this->mother_contact_no = 'N/A';
+        } else {
+            $this->mother_last_name = '';
+            $this->mother_first_name = '';
+            $this->mother_middle_name = '';
+            $this->mother_suffix = '';
+            $this->mother_birthdate = '';
+            $this->mother_nationality = '';
+            $this->mother_religion = '';
+            $this->mother_contact_no = '';
+        }
+    }
+
 
     public function updatedDeceasedIsUnknown(bool $value): void
     {
@@ -405,6 +522,12 @@ new #[Title('Document Request')] class extends Component {
             case 1:
                 $this->isLoading = true;
                 $this->validate([
+                    'serviceSelected' => 'required',
+                ]);
+                break;
+            case 2:
+                $this->isLoading = true;
+                $this->validate([
                     'to_whom' => 'required',
                     'relationship' => $this->to_whom === 'someone_else'
                         ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
@@ -414,13 +537,13 @@ new #[Title('Document Request')] class extends Component {
                     $this->reference_number = 'DOC-' . strtoupper(Str::random(10));
                 } while (DocumentRequest::where('reference_number', $this->reference_number)->exists());
                 break;
-            case 2:
+            case 3:
                 $this->isLoading = true;
                 $this->validate([
                     'purpose' => 'required',
                 ]);
                 break;
-            case 3:
+            case 4:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
                     $rules = [
@@ -477,10 +600,20 @@ new #[Title('Document Request')] class extends Component {
                         'city' => 'required|string|max:255',
                         'barangay' => 'required|string|max:255',
                         'zip_code' => 'required|string|max:10',
+
+                        // 'temporary_address_type' => 'required|in:Permanent,Temporary',
+                        // 'temporary_address_line_1' => 'required|string|max:255',
+                        // 'temporary_address_line_2' => 'required|string|max:255',
+                        // 'temporary_region' => 'required|string|max:255',
+                        // 'temporary_province' => 'required|string|max:255',
+                        // 'temporary_city' => 'required|string|max:255',
+                        // 'temporary_barangay' => 'required|string|max:255',
+                        // 'temporary_street' => 'required|string|max:255',
+                        // 'temporary_zip_code' => 'required|string|max:10',
                     ];
 
                     if (($this->to_whom === 'someone_else' || $this->requiresFamilyInfo()) && $this->service->slug !== 'death-certificate') {
-                        if (!$this->father_is_unknown) {
+                        if (!$this->father_is_unknown && !$this->mother_is_unknown) {
                             $rules = array_merge($rules, [
                                 'father_last_name' => 'required|string|max:255',
                                 'father_first_name' => 'required|string|max:255',
@@ -491,18 +624,19 @@ new #[Title('Document Request')] class extends Component {
                                 'father_religion' => 'required|string|max:255',
                                 'father_contact_no' => 'required|string|max:20',
                             ]);
-                        }
+                        
 
-                        $rules = array_merge($rules, [
-                            'mother_last_name' => 'required|string|max:255',
-                            'mother_first_name' => 'required|string|max:255',
-                            'mother_middle_name' => 'required|string|max:255',
-                            'mother_suffix' => 'nullable|string|max:10',
-                            'mother_birthdate' => 'nullable|date',
-                            'mother_nationality' => 'required|string|max:255',
-                            'mother_religion' => 'required|string|max:255',
-                            'mother_contact_no' => 'required|string|max:20',
-                        ]);
+                            $rules = array_merge($rules, [
+                                'mother_last_name' => 'required|string|max:255',
+                                'mother_first_name' => 'required|string|max:255',
+                                'mother_middle_name' => 'required|string|max:255',
+                                'mother_suffix' => 'nullable|string|max:10',
+                                'mother_birthdate' => 'nullable|date',
+                                'mother_nationality' => 'required|string|max:255',
+                                'mother_religion' => 'required|string|max:255',
+                                'mother_contact_no' => 'required|string|max:20',
+                            ]);
+                        }
                     }
                 }
 
@@ -511,7 +645,7 @@ new #[Title('Document Request')] class extends Component {
                 $this->fillFamilyDefaults();
                 $this->initializeContactInfo();
                 break;
-            case 4:
+            case 5:
                 $this->isLoading = true;
                 $this->validate([
                     'contact_first_name' => 'required|string|max:255',
@@ -520,7 +654,7 @@ new #[Title('Document Request')] class extends Component {
                     'contact_phone' => 'required|string|max:20',
                 ]);
                 break;
-            case 5:
+            case 6:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
                     $this->validate([
@@ -895,6 +1029,17 @@ new #[Title('Document Request')] class extends Component {
                     'street' => $this->street,
                     'zip_code' => $this->zip_code,
 
+                    // 
+                    // 'temporary_address_type' => $this->temporary_address_type,
+                    // 'temporary_address_line_1' => $this->temporary_address_line_1,
+                    // 'temporary_address_line_2' => $this->temporary_address_line_2,
+                    // 'temporary_region' => $this->temporary_region,
+                    // 'temporary_province' => $this->temporary_province,
+                    // 'temporary_city' => $this->temporary_city,
+                    // 'temporary_barangay' => $this->temporary_barangay,
+                    // 'temporary_street' => $this->temporary_street,
+                    // 'temporary_zip_code' => $this->temporary_zip_code,
+
                     'father_last_name' => $this->father_last_name,
                     'father_first_name' => $this->father_first_name,
                     'father_middle_name' => $this->father_middle_name,
@@ -987,7 +1132,7 @@ new #[Title('Document Request')] class extends Component {
             session()->flash('success', 'Document request submitted successfully!');
 
             // Move to payment step instead of redirecting
-            $this->step = 6;
+            $this->step = 7;
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Document Request Submission Error: ' . $e->getMessage());
@@ -995,6 +1140,16 @@ new #[Title('Document Request')] class extends Component {
         } finally {
             $this->isLoading = false;
         }
+    }
+
+    public function editPersonDetailsBtn()
+    {
+        $this->editPersonDetails = true;
+    }
+    
+    public function lockPersonDetailsBtn()
+    {
+        $this->editPersonDetails = false;
     }
 
     public function completePayment()
@@ -1070,7 +1225,7 @@ new #[Title('Document Request')] class extends Component {
             }
 
             // Move to success page
-            $this->step = 7;
+            $this->step = 8;
         } catch (\Exception $e) {
             Log::error('Payment Processing Error: ' . $e->getMessage());
             session()->flash('error', 'Payment processing failed: ' . $e->getMessage());
@@ -1157,6 +1312,13 @@ new #[Title('Document Request')] class extends Component {
             'consent_residence' => 'nullable|string|max:255',
         ];
     }
+
+    public function with()
+    {
+        return [
+            'services' => $this->office->services()->where('is_active', 1)->get(),
+        ];
+    }
 }; ?>
 
 
@@ -1164,7 +1326,7 @@ new #[Title('Document Request')] class extends Component {
 
 
 
-    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request a {{ $this->service->title }}
+    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request a Document
     </h1>
 
     {{-- Stepper Header --}}
@@ -1172,20 +1334,29 @@ new #[Title('Document Request')] class extends Component {
         <ul class="steps steps-horizontal w-full">
             <li class="step {{ $step >= 1 ? 'step-info' : '' }}">
                 <div class="step-content">
+                    <div class="step-title">Service</div>
+                    <div class="step-description text-sm text-gray-500">Select a service</div>
+                </div>
+                
+            </li>
+            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">To Whom?</div>
                     <div class="step-description text-sm text-gray-500">For Yourself or Someone Else?</div>
                 </div>
+                
             </li>
-            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Purpose Request</div>
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
+                
             </li>
-            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
                 <div class="step-content">
                     @php 
-                                                                    if ($this->service->slug === 'marriage-certificate') {
+                        if ($this->service->slug === 'marriage-certificate') {
                             $stepTitle = 'Marriage License';
                             $stepDescription = 'Marriage License Information';
                         } elseif ($this->service->slug === 'death-certificate') {
@@ -1199,47 +1370,99 @@ new #[Title('Document Request')] class extends Component {
                     <div class="step-title">{{ $stepTitle }}</div>
                     <div class="step-description text-sm text-gray-500">{{ $stepDescription }}</div>
                 </div>
+                
             </li>
-            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
-                </div>
-            </li>
-            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
-                    <div class="step-content">
+                </div>    
+             </li>
+            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Confirmation</div>
                         <div class="step-description text-sm text-gray-500">Review & Submit</div>
-                </div>
-                </li>
-            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
-                    <div class="step-content">
+                </div>   
+            </li>
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Payment</div>
                     <div class="step-description text-sm text-gray-500">Complete your transaction</div>
                  </div>
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Success</div>
-                <div class="step-description text-sm text-gray-500">Done</div>
-            </div>
-        </li>
+                    <div class="step-description text-sm text-gray-500">Done</div>
+                </div>
+            </li>
+         
     </ul>
 </div>
     {{-- Stepper Content --}}
    @if ($step == 1)
-    @include('livewire.documentrequest.components.document-request-steps.step1')
-@elseif($step == 2)
-    @include('livewire.documentrequest.components.document-request-steps.step2')
-@elseif($step == 3)
-    @include('livewire.documentrequest.components.document-request-steps.step3')
-@elseif($step == 4)
-        @include('livewire.documentrequest.components.document-request-steps.step4')
+    <div class="px-5 py-2 mt-5">
+        <div class="flex flex-col gap-4">
+            <div>
+                <div class="header mb-4">
+                    <h3 class="text-xl font-semibold text-base-content">Select a Service</h3>
+                    <div class="flex items-center gap-2 text-sm text-base-content/70">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <span>Please select a service</span>
+                    </div>
+                </div>
+
+                <!-- Loading State -->
+                <div wire:loading.delay class="text-center ">
+                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                    <p class="text-gray-600">Loading...</p>
+                </div>
+
+                <div class="flex flex-col gap-2 w-full" wire:loading.remove>
+                    @foreach ($services as $service)
+                        <input
+                            type="radio"
+                            id="{{ $service->slug }}"
+                            name="service"
+                            value="{{ $service->slug }}"
+                            wire:model.live="serviceSelected"
+                            hidden
+                        />
+                        <label
+                            for="{{ $service->slug }}"
+                            class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2"
+                        >
+                            {{ $service->title }}
+                        </label>
+                    @endforeach
+                </div>
+
+                
+
+                <footer class="my-6 flex justify-end gap-2">
+                    {{-- <button class="btn btn-ghost" wire:click="previousStep">Previous</button> --}}
+                    <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                </footer>
+            </div>
+        </div>
+    </div>
+    @elseif($step == 2)
+        @include('livewire.documentrequest.components.document-request-steps.step1')
+    @elseif($step == 3)
+        @include('livewire.documentrequest.components.document-request-steps.step2')
+    @elseif($step == 4)
+        @include('livewire.documentrequest.components.document-request-steps.step3')
     @elseif($step == 5)
-        @include('livewire.documentrequest.components.document-request-steps.step5')
+        @include('livewire.documentrequest.components.document-request-steps.step4')
     @elseif($step == 6)
-        @include('livewire.documentrequest.components.document-request-steps.step6')
+        @include('livewire.documentrequest.components.document-request-steps.step5')
     @elseif($step == 7)
+        @include('livewire.documentrequest.components.document-request-steps.step6')
+    @elseif($step == 8)
         @include('livewire.documentrequest.components.document-request-steps.step7')
     @endif
 </div>

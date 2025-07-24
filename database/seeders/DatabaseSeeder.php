@@ -53,9 +53,9 @@ class DatabaseSeeder extends Seeder
             'address_line_1' => '123 Main St',
             'address_line_2' => 'Apt 4B',
             'region' => 'Region IV-A',
-            'province' => 'Anytown',
-            'city' => 'Anytown',
-            'barangay' => 'Barangay Uno',
+            'province' => 'Batangas',
+            'city' => 'Batangas City',
+            'barangay' => 'Barangay 1',
             'street' => 'Main St',
             'zip_code' => '12345',
         ]);

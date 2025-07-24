@@ -36,7 +36,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
         $user->assignRole('client');
         Auth::login($user);
 
-        $this->redirectIntended(route('dashboard', absolute: false));
+        $this->redirectIntended(route('verification.notice', absolute: false));
+        // $this->redirectIntended(route('dashboard', absolute: false));
     }
 }; ?>
 
@@ -51,7 +52,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <flux:input wire:model="first_name" :label="__('First name')" type="text" required autocomplete="name"
             :placeholder="__('First name')" />
 
-        <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" required autocomplete="name"
+        <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" autocomplete="name"
             :placeholder="__('Middle name')" />
 
         <flux:input wire:model="last_name" :label="__('Last name')" type="text" required autocomplete="name"

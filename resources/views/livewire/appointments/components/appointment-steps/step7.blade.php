@@ -71,7 +71,7 @@
             <p><span class="font-medium">Phone:</span> {{ $phone }}</p>
             <p><span class="font-medium">Address:</span> {{ $address }}</p>
             <p><span class="font-medium">City:</span> {{ $city }}</p>
-            <p><span class="font-medium">State/Province:</span> {{ $state }}</p>
+            <p><span class="font-medium">Province:</span> {{ $province }}</p>
             <p><span class="font-medium">ZIP Code:</span> {{ $zip_code }}</p>
           </div>
         </div>

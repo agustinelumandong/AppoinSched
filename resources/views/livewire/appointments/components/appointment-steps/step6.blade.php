@@ -88,8 +88,8 @@
             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $city }}</p>
           </div>
           <div>
-            <label class="block text-sm font-medium text-gray-600 mb-1">State/Province</label>
-            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $state }}</p>
+            <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
+            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $province }}</p>
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-600 mb-1">ZIP Code</label>

@@ -165,7 +165,18 @@
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Process Documents'), 14) }}
                 </flux:navlist.item>
+                <flux:navlist.item icon="cog-6-tooth" :href="route('staff.services')"
+                    :current="request()->routeIs('staff.services')" wire:navigate
+                    class="text-decoration-none text-black truncate">
+                    {{ Str::limit(__('Services Management'), 14) }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="chart-bar" :href="route('staff.reports')"
+                    :current="request()->routeIs('staff.reports')" wire:navigate
+                    class="text-decoration-none text-black truncate">
+                    {{ Str::limit(__('Staff Reports'), 14) }}
+                </flux:navlist.item>
             </flux:navlist.group>
+
             @endhasrole
 
             {{-- Admin Navigation --}}

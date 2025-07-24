@@ -13,6 +13,7 @@
                 </div>
             </div>
 
+
             <!-- Loading State -->
             <div wire:loading.delay class="text-center ">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
@@ -35,7 +36,7 @@
                 @if ($this->service->title === 'Death Certificate')
                                 <?php
                     $to_whom = 'someone_else';
-                                                                                    ?>
+                                                                                                                                                                                    ?>
                                 <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom" hidden
                                     disabled />
                                 <label for="myself"
@@ -73,7 +74,6 @@
                     </div>
 
                     <?php    $relationship = $relationship ?? ''; ?>
-
                     <div class="flex flex-col gap-2 w-full">
                         <input type="radio" id="my_father" name="relationship" value="my_father"
                             wire:model.live="relationship" hidden />
@@ -118,7 +118,7 @@
             @endif
 
             <footer class="my-6 flex justify-end gap-2">
-                {{-- <button class="btn btn-ghost" wire:click="previousStep">Previous</button> --}}
+                <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
                 <button class="btn btn-primary" wire:click="nextStep">Next</button>
             </footer>
         </div>
