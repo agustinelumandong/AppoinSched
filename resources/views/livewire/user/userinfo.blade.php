@@ -35,6 +35,25 @@ new class extends Component {
     public string $address_line_1 = '';
     public string $address_line_2 = '';
 
+    // Temporary address properties
+    public string $temporary_address_type = '';
+    public string $temporary_address_line_1 = '';
+    public string $temporary_address_line_2 = '';
+    public string $temporary_region = '';
+    public string $temporary_province = '';
+    public string $temporary_city = '';
+    public string $temporary_barangay = '';
+    public string $temporary_street = '';
+    public string $temporary_zip_code = '';
+
+    // Temporary address dropdowns
+    public array $temporary_provinces = [];
+    public array $temporary_cities = [];
+    public array $temporary_barangays = [];
+
+    // Checkbox for auto-fill
+    public bool $same_as_permanent = false;
+
     public string $father_last_name = '';
     public string $father_first_name = '';
     public string $father_middle_name = '';
@@ -132,6 +151,18 @@ new class extends Component {
         $this->barangay = $this->userAddresses->barangay ?? '';
         // $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
+
+        // Temporary Address - initialize with empty values
+        $this->temporary_address_type = '';
+        $this->temporary_address_line_1 = '';
+        $this->temporary_address_line_2 = '';
+        $this->temporary_region = '';
+        $this->temporary_province = '';
+        $this->temporary_city = '';
+        $this->temporary_barangay = '';
+        $this->temporary_street = '';
+        $this->temporary_zip_code = '';
+
         // Family - Father
         $this->father_last_name = $this->userFamily->father_last_name ?? '';
         $this->father_first_name = $this->userFamily->father_first_name ?? '';
@@ -192,8 +223,18 @@ new class extends Component {
         $this->province = $this->userAddresses->province ?? '';
         $this->city = $this->userAddresses->city ?? '';
         $this->barangay = $this->userAddresses->barangay ?? '';
-        // $this->street = $this->userAddresses->street ?? '';
+        $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
+        // Temporary Address
+        $this->temporary_address_type = $this->userAddresses->temporary_address_type ?? 'Temporary';
+        $this->temporary_address_line_1 = $this->userAddresses->temporary_address_line_1 ?? '';
+        $this->temporary_address_line_2 = $this->userAddresses->temporary_address_line_2 ?? '';
+        $this->temporary_region = $this->userAddresses->temporary_region ?? '';
+        $this->temporary_province = $this->userAddresses->temporary_province ?? '';
+        $this->temporary_city = $this->userAddresses->temporary_city ?? '';
+        $this->temporary_barangay = $this->userAddresses->temporary_barangay ?? '';
+        $this->temporary_street = $this->userAddresses->temporary_street ?? '';
+        $this->temporary_zip_code = $this->userAddresses->temporary_zip_code ?? '';
         // Family - Father
         $this->father_last_name = $this->userFamily->father_last_name ?? '';
         $this->father_first_name = $this->userFamily->father_first_name ?? '';
@@ -252,6 +293,72 @@ new class extends Component {
         $this->barangay = '';
     }
 
+    // Temporary address update methods
+    public function updatedTempRegion(PhilippineLocationsService $locations)
+    {
+        $this->temporary_provinces = $locations->getProvinces($this->temporary_region);
+        $this->temporary_province = '';
+        $this->temporary_cities = [];
+        $this->temporary_city = '';
+        $this->temporary_barangays = [];
+        $this->temporary_barangay = '';
+    }
+
+    public function updatedTempProvince(PhilippineLocationsService $locations)
+    {
+        $this->temporary_cities = $locations->getMunicipalities($this->temporary_region, $this->temporary_province);
+        $this->temporary_city = '';
+        $this->temporary_barangays = [];
+        $this->temporary_barangay = '';
+    }
+
+    public function updatedTempCity(PhilippineLocationsService $locations)
+    {
+        $this->temporary_barangays = $locations->getBarangays($this->temporary_region, $this->temporary_province, $this->temporary_city);
+        $this->temporary_barangay = '';
+    }
+
+    // Auto-fill temporary address from permanent address
+    public function updatedSameAsPermanent($value)
+    {
+        if ($value) {
+            $this->temporary_address_type = 'Temporary';
+            $this->temporary_address_line_1 = $this->address_line_1;
+            $this->temporary_address_line_2 = $this->address_line_2;
+            $this->temporary_region = $this->region;
+            $this->temporary_province = $this->province;
+            $this->temporary_city = $this->city;
+            $this->temporary_barangay = $this->barangay;
+            $this->temporary_street = $this->street;
+            $this->temporary_zip_code = $this->zip_code;
+            
+            // Update temporary address dropdowns
+            if ($this->temporary_region) {
+                $this->temporary_provinces = app(PhilippineLocationsService::class)->getProvinces($this->temporary_region);
+            }
+            if ($this->temporary_region && $this->temporary_province) {
+                $this->temporary_cities = app(PhilippineLocationsService::class)->getMunicipalities($this->temporary_region, $this->temporary_province);
+            }
+            if ($this->temporary_region && $this->temporary_province && $this->temporary_city) {
+                $this->temporary_barangays = app(PhilippineLocationsService::class)->getBarangays($this->temporary_region, $this->temporary_province, $this->temporary_city);
+            }
+        } else {
+            // Clear temporary address fields
+            $this->temporary_address_type = '';
+            $this->temporary_address_line_1 = '';
+            $this->temporary_address_line_2 = '';
+            $this->temporary_region = '';
+                $this->temporary_province = '';
+            $this->temporary_city = '';
+            $this->temporary_barangay = '';
+            $this->temporary_street = '';
+            $this->temporary_zip_code = '';
+            $this->temporary_provinces = [];
+            $this->temporary_cities = [];
+            $this->temporary_barangays = [];
+        }
+    }
+
     public function updatePersonalInformation()
     {
         $this->personalInformation->save();
@@ -293,7 +400,7 @@ new class extends Component {
                 'province' => ['required', 'string', 'max:100'],
                 'city' => ['required', 'string', 'max:100'],
                 'barangay' => ['required', 'string', 'max:100'],
-                // 'street' => ['nullable', 'string', 'max:255'],
+                'street' => ['nullable', 'string', 'max:255'],
                 'zip_code' => ['nullable', 'string', 'max:20'],
                 'father_last_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
                 'father_first_name' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
@@ -311,6 +418,15 @@ new class extends Component {
                 'mother_nationality' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
                 'mother_religion' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
                 'mother_contact_no' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
+                'temporary_address_type' => ['nullable', 'string', 'max:50'],
+                'temporary_address_line_1' => ['nullable', 'string', 'max:255'],
+                'temporary_address_line_2' => ['nullable', 'string', 'max:255'],
+                'temporary_region' => ['nullable', 'string', 'max:100'],
+                'temporary_province' => ['nullable', 'string', 'max:100'],
+                'temporary_city' => ['nullable', 'string', 'max:100'],
+                'temporary_barangay' => ['nullable', 'string', 'max:100'],
+                'temporary_street' => ['nullable', 'string', 'max:255'],
+                'temporary_zip_code' => ['nullable', 'string', 'max:20'],
             ]);
 
             // Check if required personal info fields are filled
@@ -382,10 +498,39 @@ new class extends Component {
                     'province' => $this->province ?: null,
                     'city' => $this->city ?: null,
                     'barangay' => $this->barangay ?: null,
-                    // 'street' => $this->street ?: null,
+                    'street' => $this->street ?: null,
                     'zip_code' => $this->zip_code ?: null,
                 ])
                 ->save();
+
+            // Save Temporary Address as a separate record
+            if (
+                $this->temporary_address_line_1 ||
+                $this->temporary_address_line_2 ||
+                $this->temporary_region ||
+                $this->temporary_province ||
+                $this->temporary_city ||
+                $this->temporary_barangay ||
+                $this->temporary_street ||
+                $this->temporary_zip_code
+            ) {
+                 UserAddresses::updateOrCreate(
+                    [
+                        'personal_information_id' => $this->personalInformation->getKey(),
+                        'address_type' => 'Temporary',
+                    ],
+                    [
+                        'address_line_1' => $this->temporary_address_line_1 ?: null,
+                        'address_line_2' => $this->temporary_address_line_2 ?: null,
+                        'region' => $this->temporary_region ?: null,
+                        'province' => $this->temporary_province ?: null,
+                        'city' => $this->temporary_city ?: null,
+                        'barangay' => $this->temporary_barangay ?: null,
+                        'street' => $this->temporary_street ?: null,
+                        'zip_code' => $this->temporary_zip_code ?: null,
+                    ]
+                );
+            }
 
             // Update User Family
             $this->userFamily
@@ -718,15 +863,14 @@ new class extends Component {
         </div>
     </div>
 
-    <!-- Address Information -->
+    <!-- Permanent Address Information -->
     <div class="flux-card p-6">
-        <h2 class="text-xl font-bold mb-4">Address</h2>
+        <h2 class="text-xl font-bold mb-4">Permanent Address</h2>
         <div class="flex flex-col mb-4">
             <label for="address_type" class="text-xs font-medium mb-1">Address Type</label>
             <select id="address_type" class="flux-form-control" wire:model="address_type">
                 <option value="">Address Type</option>
                 <option value="Permanent">Permanent</option>
-                <option value="Temporary">Temporary</option>
             </select>
         </div>
         <div class="flex flex-col mb-4">
@@ -790,6 +934,91 @@ new class extends Component {
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
                 <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
+                <span class="text-xs text-gray-500 mt-1">Required</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Temporary Address Information -->
+    <div class="flux-card p-6">
+        <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">Temporary Address</h2>
+            <div class="form-control">
+                <label class="label cursor-pointer">
+                    <span class="label-text text-sm">Same as Permanent Address</span>
+                    <input type="checkbox" wire:model.live="same_as_permanent" class="checkbox checkbox-primary" />
+                </label>
+            </div>
+        </div>
+        
+        <div class="flex flex-col mb-4">
+            <label for="temp_address_type" class="text-xs font-medium mb-1">Address Type</label>
+            <select id="temp_address_type" class="flux-form-control" wire:model="temporary_address_type" {{ $same_as_permanent ? 'disabled' : '' }}>
+                <option value="">Address Type</option>
+                <option value="Temporary">Temporary</option>
+            </select>
+        </div>
+        <div class="flex flex-col mb-4">
+            <label for="temp_address_line_1" class="text-xs font-medium mb-1">Address Line 1</label>
+            <input id="temp_address_line_1" class="flux-form-control" type="text" wire:model="temporary_address_line_1"
+                placeholder="Address Line 1" {{ $same_as_permanent ? 'disabled' : '' }}>
+            <span class="text-xs text-gray-500 mt-1">Required</span>
+        </div>
+        <div class="flex flex-col mb-4">
+            <label for="temp_address_line_2" class="text-xs font-medium mb-1">Address Line 2</label>
+            <input id="temp_address_line_2" class="flux-form-control" type="text" wire:model="temporary_address_line_2"
+                placeholder="Address Line 2" {{ $same_as_permanent ? 'disabled' : '' }}>
+            <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="flex flex-col">
+                <label for="temp_region" class="text-xs font-medium mb-1">Region</label>
+                <select id="temp_region" class="flux-form-control" wire:model.live="temporary_region" {{ $same_as_permanent ? 'disabled' : '' }}>
+                    <option value="">Select Region</option>
+                    @foreach ($regions as $region)
+                        <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
+                    @endforeach
+                </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
+            </div>
+            <div class="flex flex-col">
+                <label for="temp_province" class="text-xs font-medium mb-1">Province</label>
+                <select id="temp_province" class="flux-form-control" wire:model.live="temporary_province" {{ $same_as_permanent ? 'disabled' : '' }}>
+                    <option value="">Select Province</option>
+                    @foreach ($provinces as $provinceKey => $provinceName)
+                        <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
+                    @endforeach
+                </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
+            </div>
+            <div class="flex flex-col">
+                <label for="temp_city" class="text-xs font-medium mb-1">City</label>
+                <select id="temp_city" class="flux-form-control" wire:model.live="temporary_city" {{ $same_as_permanent ? 'disabled' : '' }}>
+                    <option value="">Select City</option>
+                    @foreach ($cities as $cityKey => $cityName)
+                        <option value="{{ $cityKey }}">{{ $cityName }}</option>
+                    @endforeach
+                </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
+            </div>
+            <div class="flex flex-col">
+                <label for="temp_barangay" class="text-xs font-medium mb-1">Barangay</label>
+                <select id="temp_barangay" class="flux-form-control" wire:model.live="temporary_barangay" {{ $same_as_permanent ? 'disabled' : '' }}>
+                    <option value="">Select Barangay</option>
+                    @foreach ($barangays as $barangay)
+                        <option value="{{ $barangay }}">{{ $barangay }}</option>
+                    @endforeach
+                </select>
+                <span class="text-xs text-gray-500 mt-1">Required</span>
+            </div>
+            <div class="flex flex-col">
+                <label for="temp_street" class="text-xs font-medium mb-1">Street</label>
+                <input id="temp_street" class="flux-form-control" type="text" wire:model="temporary_street" placeholder="Street" {{ $same_as_permanent ? 'disabled' : '' }}>
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
+            </div>
+            <div class="flex flex-col">
+                <label for="temp_zip_code" class="text-xs font-medium mb-1">Zip Code</label>
+                <input id="temp_zip_code" class="flux-form-control" type="text" wire:model="temporary_zip_code" placeholder="Zip Code" {{ $same_as_permanent ? 'disabled' : '' }}>
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
@@ -879,9 +1108,10 @@ new class extends Component {
                   wire:model="father_contact_no" placeholder="Contact Number" name="father_contact_no" id="father_contact_no"
                   required {{ $father_is_unknown ? 'disabled' : '' }} >
                 @error('father_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>              </div>
+                <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>              
             </div>
           </div>
+        </div>
         <div>
             <h5 class="text-md font-bold mb-4">Mother</h5>
             <div class="form-control">
@@ -896,52 +1126,57 @@ new class extends Component {
                     <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_last_name"
                         placeholder="Last Name" name="mother_last_name" id="mother_last_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
+                </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_first_name" class="block text-xs font-medium mb-1">First Name</label>
                     <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_first_name"
                         placeholder="First Name" name="mother_first_name" id="mother_first_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
+                </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
                     <input class="flux-form-control md:col-span-3 w-full " type="text" wire:model="mother_middle_name"
                         placeholder="Middle Name" name="mother_middle_name" id="mother_middle_name" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
                 </div>
             </div>
+        </div>
             <div class="flex flex-row md:flex-col gap-4 mb-4">
                 <div class="w-full md:w-1/3">
                     <label for="mother_birthdate" class="block text-xs font-medium mb-1">Mother's Birthdate</label>
                     <input class="flux-form-control " type="date" wire:model="mother_birthdate"
                         placeholder="Mother's Birthdate" name="mother_birthdate" id="mother_birthdate" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_birthdate')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
+                </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's Nationality</label>
                     <input class="flux-form-control " type="text" wire:model="mother_nationality"
                         placeholder="Mother's Nationality" name="mother_nationality" id="mother_nationality" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_nationality')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
                 </div>
+               
                 <div class="w-full md:w-1/3">
                     <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's Religion</label>
                     <input class="flux-form-control " type="text" wire:model="mother_religion"
                         placeholder="Mother's Religion" name="mother_religion" id="mother_religion" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_religion')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
+                 
                 </div>
                 <div class="w-full md:w-1/3">
                     <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's Contact No</label>
                     <input class="flux-form-control     " type="text" wire:model="mother_contact_no"
                         placeholder="Mother's Contact No" name="mother_contact_no" id="mother_contact_no" {{ $mother_is_unknown ? 'disabled' : '' }}>
                     @error('mother_contact_no')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                </div>
+                    <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>                
                 </div>
             </div>
         </div>
-    </div>
 
     {{-- Save Button --}}
     <div class="flex justify-end">

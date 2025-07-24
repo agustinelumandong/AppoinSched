@@ -26,7 +26,7 @@ class Offices extends Model
         return 'slug';
     }
 
-    public function service()
+    public function services()
     {
         return $this->hasMany(Services::class, 'office_id');
     }

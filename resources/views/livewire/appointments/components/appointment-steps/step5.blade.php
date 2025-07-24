@@ -37,7 +37,7 @@
             </div>
             <div>
               <label class=" font-medium text-sm">Location:</label>
-              <p class="text-base-content">{{ $city }}, {{ $state }}
+              <p class="text-base-content">{{ $city }}, {{ $province }}
                 {{ $zip_code }}
               </p>
             </div>

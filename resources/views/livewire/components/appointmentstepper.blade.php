@@ -41,6 +41,7 @@ new #[Title('Appointment')] class extends Component {
     public ?string $reference_number = null;
 
     public bool $editPersonDetails = false;
+    public bool $same_as_personal_address = false;
 
     public ?int $id = null;
 
@@ -69,6 +70,8 @@ new #[Title('Appointment')] class extends Component {
     public array $barangays = [];
 
     public string $serviceSelected = '';
+
+
 
 
     public function mount(Offices $office, Services $service, PhilippineLocationsService $locations, ?string $reference_number = null): void
@@ -143,6 +146,27 @@ new #[Title('Appointment')] class extends Component {
         $this->street = '';
         $this->zip_code = '';
     }
+
+    // public function updatedSameAsPersonalAddress($value)
+    // {
+    //     if ($value) {
+    //         $user = auth()->user();
+    //         $address = $user->userAddresses->first();
+    //         $this->region = $address->region ?? '';
+    //         $this->province = $address->province ?? '';
+    //         $this->city = $address->city ?? '';
+    //         $this->barangay = $address->barangay ?? '';
+    //         $this->street = $address->street ?? '';
+    //         $this->zip_code = $address->zip_code ?? '';
+    //     } else {
+    //         $this->region = '';
+    //         $this->province = '';
+    //         $this->city = '';
+    //         $this->barangay = '';
+    //         $this->street = '';
+    //         $this->zip_code = '';
+    //     }
+    // }
 
     public function editPersonDetailsBtn()
     {
@@ -358,7 +382,7 @@ new #[Title('Appointment')] class extends Component {
                 $this->reference_number = $reference_number;
 
                 // Move to step 7 instead of resetting
-                $this->step = 7;
+                $this->step = 8;
 
                 // Clear cache and update UI
                 $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";

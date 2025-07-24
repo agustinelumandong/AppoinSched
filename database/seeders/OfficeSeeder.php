@@ -44,21 +44,21 @@ class OfficeSeeder extends Seeder
             'description' => 'Issued for the registration of deaths.',
             'price' => 150.00,
             'is_active' => 1,
-        ]); 
-        $mcr->services()->create([
-            'office_id' => $mcr->id,
-            'title' => 'Appointment (MCR)',
-            'slug' => 'appointment-mcr',
-            'description' => 'Appointment for the registration of births, marriages, and deaths.',
-            'price' => 0.00,
-            'is_active' => 1,
         ]);
+        // $mcr->service()->create([
+        //     'office_id' => $mcr->id,
+        //     'title' => 'Appointment (MCR)',
+        //     'slug' => 'appointment-mcr',
+        //     'description' => 'Appointment for the registration of births, marriages, and deaths.',
+        //     'price' => 0.00,
+        //     'is_active' => 1,
+        // ]);
 
         $bpls = Offices::create([
             'name' => 'Business Permits and Licensing Section',
             'slug' => Str::slug('Business Permits and Licensing Section'),
             'description' => 'Handles business permits and special certifications.',
-        ]); 
+        ]);
         $bpls->services()->create([
             'office_id' => $bpls->id,
             'title' => 'Special Permit',
@@ -66,29 +66,29 @@ class OfficeSeeder extends Seeder
             'description' => 'Application for special events or short-term businesses.',
             'price' => 300.00,
             'is_active' => 1,
-        ]); 
-        $bpls->services()->create([
-            'office_id' => $bpls->id,
-            'title' => 'Appointment (BPLS)',
-            'slug' => 'appointment-bpls',
-            'description' => 'Appointment for the registration of business permits, special permits, and burial permits.',
-            'price' => 0.00,
-            'is_active' => 1,
         ]);
+        // $bpls->service()->create([
+        //     'office_id' => $bpls->id,
+        //     'title' => 'Appointment (BPLS)',
+        //     'slug' => 'appointment-bpls',
+        //     'description' => 'Appointment for the registration of business permits, special permits, and burial permits.',
+        //     'price' => 0.00,
+        //     'is_active' => 1,
+        // ]);
         // --- MTO Office ---
         $mto = Offices::create([
             'name' => 'Municipal Treasurer’s Office',
             'slug' => Str::slug('Municipal Treasurer’s Office'),
             'description' => 'Handles all LGU-related payments and cashier services.',
-        ]); 
-        $mto->services()->create([
-            'office_id' => $mto->id,
-            'title' => 'Appointment (MTO)',
-            'slug' => 'appointment-mto',
-            'description' => 'Appointment for the payment of taxes.',
-            'price' => 0.00,
-            'is_active' => 1,
         ]);
+        // $mto->services()->create([
+        //     'office_id' => $mto->id,
+        //     'title' => 'Appointment (MTO)',
+        //     'slug' => 'appointment-mto',
+        //     'description' => 'Appointment for the payment of taxes.',
+        //     'price' => 0.00,
+        //     'is_active' => 1,
+        // ]);
     }
 
 

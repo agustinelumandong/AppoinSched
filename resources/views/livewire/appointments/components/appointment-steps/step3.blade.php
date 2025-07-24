@@ -110,10 +110,16 @@
           @enderror
         </div> --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="col-span-3 flex items-center mb-2">
+            <input type="checkbox" id="same_as_personal_address" wire:model="same_as_personal_address"
+              class="checkbox checkbox-primary mr-2" />
+            <label for="same_as_personal_address" class="text-sm">Same as personal address</label>
+          </div>
           <div class="flex flex-col">
             <label for="region" class="text-xs font-medium mb-1">Region</label>
             <select id="region" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
-              wire:model.live="region" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              wire:model.live="region" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+              @if($same_as_personal_address) disabled @endif>
               <option value="">Select Region</option>
               @foreach ($regions as $region)
           <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
@@ -124,7 +130,8 @@
           <div class="flex flex-col">
             <label for="province" class="text-xs font-medium mb-1">Province</label>
             <select id="province" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
-              wire:model.live="province" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              wire:model.live="province" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+              @if($same_as_personal_address) disabled @endif>
               <option value="">Select Province</option>
               @foreach ($provinces as $provinceKey => $provinceName)
           <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
@@ -135,7 +142,8 @@
           <div class="flex flex-col">
             <label for="city" class="text-xs font-medium mb-1">City</label>
             <select id="city" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
-              wire:model.live="city" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              wire:model.live="city" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+              @if($same_as_personal_address) disabled @endif>
               <option value="">Select City</option>
               @foreach ($cities as $cityKey => $cityName)
           <option value="{{ $cityKey }}">{{ $cityName }}</option>
@@ -146,7 +154,8 @@
           <div class="flex flex-col">
             <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
             <select id="barangay" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
-              wire:model.live="barangay" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              wire:model.live="barangay" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+              @if($same_as_personal_address) disabled @endif>
               <option value="">Select Barangay</option>
               @foreach ($barangays as $barangay)
           <option value="{{ $barangay }}">{{ $barangay }}</option>
@@ -157,14 +166,14 @@
           <div class="flex flex-col">
             <label for="street" class="text-xs font-medium mb-1">Street</label>
             <input id="street" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
-              type="text" wire:model="street" placeholder="Street" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              type="text" wire:model="street" placeholder="Street" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if($same_as_personal_address) disabled @endif>
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
             <input id="zip_code" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
-              type="text" wire:model="zip_code" placeholder="Zip Code" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+              type="text" wire:model="zip_code" placeholder="Zip Code" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if($same_as_personal_address) disabled @endif>
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>

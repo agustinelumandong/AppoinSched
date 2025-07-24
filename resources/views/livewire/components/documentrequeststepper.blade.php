@@ -75,6 +75,7 @@ new #[Title('Document Request')] class extends Component {
     public bool $father_is_unknown = false;
     public bool $mother_is_unknown = false;
     public bool $deceased_is_unknown = true;
+    public bool $same_as_personal_address = false;
 
     // Death Certificate specific fields
     public string $deceased_last_name = '';
@@ -199,6 +200,17 @@ new #[Title('Document Request')] class extends Component {
     public string $street = '';
     public string $zip_code = '';
     public string $country = '';
+
+    // Temporary address properties
+    // public string $temporary_address_type = '';
+    // public string $temporary_address_line_1 = '';
+    // public string $temporary_address_line_2 = '';
+    // public string $temporary_region = '';
+    // public string $temporary_province = '';
+    // public string $temporary_city = '';
+    // public string $temporary_barangay = '';
+    // public string $temporary_street = '';
+    // public string $temporary_zip_code = '';
 
     public array $regions = [];
     public array $provinces = [];
@@ -391,6 +403,33 @@ new #[Title('Document Request')] class extends Component {
         $this->deceased_civil_status = '';
     }
 
+    public function updatedSameAsPersonalAddress($value)
+    {
+        if ($value) {
+            $user = auth()->user();
+            $address = $user->userAddresses->first();
+            $this->address_type = $address->address_type ?? 'Permanent';
+            $this->address_line_1 = $address->address_line_1 ?? '';
+            $this->address_line_2 = $address->address_line_2 ?? '';
+            $this->region = $address->region ?? '';
+            $this->province = $address->province ?? '';
+            $this->city = $address->city ?? '';
+            $this->barangay = $address->barangay ?? '';
+            $this->street = $address->street ?? '';
+            $this->zip_code = $address->zip_code ?? '';
+        } else {
+            $this->address_type = '';
+            $this->address_line_1 = '';
+            $this->address_line_2 = '';
+            $this->region = '';
+            $this->province = '';
+            $this->city = '';
+            $this->barangay = '';
+            $this->street = '';
+            $this->zip_code = '';
+        }
+    }
+
     public function initializeContactInfo(): void
     {
         if ($this->to_whom === 'myself') {
@@ -561,6 +600,16 @@ new #[Title('Document Request')] class extends Component {
                         'city' => 'required|string|max:255',
                         'barangay' => 'required|string|max:255',
                         'zip_code' => 'required|string|max:10',
+
+                        // 'temporary_address_type' => 'required|in:Permanent,Temporary',
+                        // 'temporary_address_line_1' => 'required|string|max:255',
+                        // 'temporary_address_line_2' => 'required|string|max:255',
+                        // 'temporary_region' => 'required|string|max:255',
+                        // 'temporary_province' => 'required|string|max:255',
+                        // 'temporary_city' => 'required|string|max:255',
+                        // 'temporary_barangay' => 'required|string|max:255',
+                        // 'temporary_street' => 'required|string|max:255',
+                        // 'temporary_zip_code' => 'required|string|max:10',
                     ];
 
                     if (($this->to_whom === 'someone_else' || $this->requiresFamilyInfo()) && $this->service->slug !== 'death-certificate') {
@@ -979,6 +1028,17 @@ new #[Title('Document Request')] class extends Component {
                     'barangay' => $this->barangay,
                     'street' => $this->street,
                     'zip_code' => $this->zip_code,
+
+                    // 
+                    // 'temporary_address_type' => $this->temporary_address_type,
+                    // 'temporary_address_line_1' => $this->temporary_address_line_1,
+                    // 'temporary_address_line_2' => $this->temporary_address_line_2,
+                    // 'temporary_region' => $this->temporary_region,
+                    // 'temporary_province' => $this->temporary_province,
+                    // 'temporary_city' => $this->temporary_city,
+                    // 'temporary_barangay' => $this->temporary_barangay,
+                    // 'temporary_street' => $this->temporary_street,
+                    // 'temporary_zip_code' => $this->temporary_zip_code,
 
                     'father_last_name' => $this->father_last_name,
                     'father_first_name' => $this->father_first_name,

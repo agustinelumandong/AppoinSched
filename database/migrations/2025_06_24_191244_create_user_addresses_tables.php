@@ -23,6 +23,17 @@ return new class extends Migration {
             $table->string('barangay')->nullable();
             $table->string('street')->nullable();
             $table->string('zip_code')->nullable();
+
+            // Temporary Address
+            $table->string('temporary_address_line_1')->nullable();
+            $table->string('temporary_address_line_2')->nullable();
+            $table->string('temporary_region')->nullable();
+            $table->string('temporary_province')->nullable();
+            $table->string('temporary_city')->nullable();
+            $table->string('temporary_barangay')->nullable();
+            $table->string('temporary_street')->nullable();
+            $table->string('temporary_zip_code')->nullable();
+
             $table->timestamps();
         });
     }

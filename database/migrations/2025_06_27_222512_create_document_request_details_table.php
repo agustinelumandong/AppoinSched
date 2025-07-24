@@ -48,6 +48,15 @@ return new class extends Migration {
             $table->string('street', 100)->nullable();
             $table->string('zip_code', 20)->nullable();
 
+            // Temporary Address
+            $table->enum('temporary_address_type', ['Permanent', 'Temporary'])->nullable();
+            $table->string('temporary_address_line_1', 150)->nullable();
+            $table->string('temporary_address_line_2', 150)->nullable();
+            $table->string('temporary_region', 100)->nullable();
+            $table->string('temporary_province', 100)->nullable();
+            $table->string('temporary_city', 100)->nullable();
+            $table->string('temporary_barangay', 100)->nullable();
+
             // Family Information
             $table->string('father_last_name', 100)->nullable();
             $table->string('father_first_name', 100)->nullable();

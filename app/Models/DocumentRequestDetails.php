@@ -41,6 +41,16 @@ class DocumentRequestDetails extends Model
         'street',
         'zip_code',
 
+        // Temporary Address
+        'temporary_address_line_1',
+        'temporary_address_line_2',
+        'temporary_region',
+        'temporary_province',
+        'temporary_city',
+        'temporary_barangay',
+        'temporary_street',
+        'temporary_zip_code',
+
         // Father's information
         'father_last_name',
         'father_first_name',
@@ -60,7 +70,7 @@ class DocumentRequestDetails extends Model
         'mother_nationality',
         'mother_religion',
         'mother_contact_no',
- 
+
 
         // Death Certificate specific fields
         'deceased_last_name',
@@ -164,7 +174,7 @@ class DocumentRequestDetails extends Model
     protected $casts = [
         'date_of_birth' => 'date',
         'father_birthdate' => 'date',
-        'mother_birthdate' => 'date', 
+        'mother_birthdate' => 'date',
         'death_date' => 'date', // For death certificates
         'deceased_date_of_birth' => 'date',
         'deceased_age' => 'integer',
@@ -223,7 +233,7 @@ class DocumentRequestDetails extends Model
     {
         return trim("{$this->mother_first_name} {$this->mother_middle_name} {$this->mother_last_name}");
     }
- 
+
 
     /**
      * Get the full name of the deceased person (for death certificates)

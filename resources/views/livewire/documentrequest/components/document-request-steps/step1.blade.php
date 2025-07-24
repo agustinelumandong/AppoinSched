@@ -12,7 +12,7 @@
                     <span>Please select who this document request is for</span>
                 </div>
             </div>
-            <h1>Halo : {{ var_dump($this->service->slug) }}</h1>
+
 
             <!-- Loading State -->
             <div wire:loading.delay class="text-center ">
@@ -36,7 +36,7 @@
                 @if ($this->service->title === 'Death Certificate')
                                 <?php
                     $to_whom = 'someone_else';
-                                                                                                                                                                    ?>
+                                                                                                                                                                                    ?>
                                 <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom" hidden
                                     disabled />
                                 <label for="myself"
