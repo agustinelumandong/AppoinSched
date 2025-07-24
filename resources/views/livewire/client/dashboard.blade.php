@@ -41,7 +41,7 @@ new class extends Component {
 
 <div title="Client Dashboard">
 
-
+    @include('components.alert')
 
     <div class="space-y-6">
         <div class="flex justify-between items-center">
