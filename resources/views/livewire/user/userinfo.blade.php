@@ -411,7 +411,12 @@ new class extends Component {
                 ])
                 ->save();
 
-            session()->flash('success', 'All information updated!');
+
+            if ($this->user->hasCompleteProfile()) {
+                session()->flash('success', 'All information updated!');
+                redirect()->route('client.dashboard');
+            }
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             $messages = $e->validator->errors()->all();
             session()->flash('error', 'Validation failed: ' . implode(' ', $messages));

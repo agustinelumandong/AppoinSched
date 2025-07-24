@@ -787,14 +787,7 @@
     </div>
 
     <!-- Remarks Input -->
-    <div class="flux-card p-6 mb-6">
-        <div class="flex items-center space-x-2 mb-4">
-            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Remarks</h4>
-            <span class="text-sm text-gray-500">(Optional)</span>
-        </div>
-        <textarea wire:model="remarks" class="flux-form-control w-full h-24 resize-none"
-            placeholder="Add any remarks or notes about this request..."></textarea>
-    </div>
+    
 
     <!-- Document Request Status -->
     <div class="flux-card p-6 mb-6">
@@ -895,6 +888,17 @@
                  
             </div>
         </div>
+
+        
+    </div>
+
+    <div class="flux-card p-6 mb-6">
+        <div class="flex items-center space-x-2 mb-4">
+            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Remarks</h4>
+            <span class="text-sm text-gray-500">(Optional)</span>
+        </div>
+        <textarea wire:model="remarks" class="flux-form-control w-full h-24 resize-none"
+            placeholder="Add any remarks or notes about this request..."></textarea>
     </div>
 
     <!-- Navigation -->
