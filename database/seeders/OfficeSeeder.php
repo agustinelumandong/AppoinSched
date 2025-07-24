@@ -81,14 +81,14 @@ class OfficeSeeder extends Seeder
             'slug' => Str::slug('Municipal Treasurer’s Office'),
             'description' => 'Handles all LGU-related payments and cashier services.',
         ]);
-        // $mto->services()->create([
-        //     'office_id' => $mto->id,
-        //     'title' => 'Appointment (MTO)',
-        //     'slug' => 'appointment-mto',
-        //     'description' => 'Appointment for the payment of taxes.',
-        //     'price' => 0.00,
-        //     'is_active' => 1,
-        // ]);
+        $mto->services()->create([
+            'office_id' => $mto->id,
+            'title' => 'Appointment (MTO)',
+            'slug' => 'appointment-mto',
+            'description' => 'Appointment for the payment of taxes.',
+            'price' => 0.00,
+            'is_active' => 1,
+        ]);
     }
 
 

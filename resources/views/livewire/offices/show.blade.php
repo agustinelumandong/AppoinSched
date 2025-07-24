@@ -133,66 +133,68 @@ new #[Title('Office Details')] class extends Component {
                 @endif
 
 
-                @forelse($services as $service)
-                    @php
-                        $isAppointment = $service->slug === 'appointment-mto' || $service->slug === 'appointment-mcr' || $service->slug === 'appointment-bpls';
-                        $isDocumentRequest = $service->slug === 'document-request-mto' || $service->slug === 'document-request-mcr' || $service->slug === 'document-request-bpls' || $service->slug === 'document-request-bpls';
+                {{-- @forelse($services as $service)
+                @php
+                $isAppointment = $service->slug === 'appointment-mto' || $service->slug === 'appointment-mcr' ||
+                $service->slug === 'appointment-bpls';
+                $isDocumentRequest = $service->slug === 'document-request-mto' || $service->slug ===
+                'document-request-mcr' || $service->slug === 'document-request-bpls' || $service->slug ===
+                'document-request-bpls';
 
-                        $requestRoute = $isAppointment ? 'offices.service.appointment' : 'offices.service.request';
-                    @endphp
-                    {{-- Service Card --}}
+                $requestRoute = $isAppointment ? 'offices.service.appointment' : 'offices.service.request';
+                @endphp
+                {{-- Service Card --}}
 
-                    <a href="{{ route($requestRoute, ['office' => $office->slug, 'service' => $service->slug]) }}"
-                        class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
-                        id="office-{{ $service->id }}">
-                        <div class="absolute" style="top: -50px; right: -80px;">
-                            @php
-                                $logo = $service->office->logo;
-                                if (!empty($logo)) {
-                                    $logo = asset('storage/offices/' . $service->office->logo);
-                                }
-                                if ($service->office->slug === 'municipal-civil-registrar') {
-                                    $logo = asset('images/MCR_logo.jpg');
-                                } elseif ($service->office->slug === 'municipal-treasurers-office') {
-                                    $logo = asset('images/MTO_logo.jpg');
-                                } elseif ($service->office->slug === 'business-permits-and-licensing-section') {
-                                    $logo = asset('images/BPLS_logo.jpg');
-                                }
-                            @endphp
-                            <img src="{{ $logo }}" alt="{{ $service->title }} Logo" class="rounded-full"
-                                style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
-                        </div>
-                        {{-- Header --}}
-                        <header class="flex flex-col ">
-                            <h3 class="text-lg font-bold  text-decoration-none text-black ">
-                                {{ $service->title }}
-                            </h3>
-                            <p class="text-sm text-gray-500  text-decoration-none text-black ">
-                                {{ Str::limit($service->description, 100, '...') }}
-                            </p>
-                            <p class="text-sm text-gray-800 font-bold  text-decoration-none text-black">
-                                ₱{{ number_format($service->price, 2) }}
-                            </p>
-                        </header>
-                        {{-- Footer --}}
-                        <footer class="flex items-center justify-between pt-10">
-                            <span
-                                class="text-blue-50 hover:text-blue-700  text-decoration-none  flux-btn flux-btn-primary">Request
-                                Document</span>
-                        </footer>
-                    </a>
+                {{-- <a href="{{ route($requestRoute, ['office' => $office->slug, 'service' => $service->slug]) }}"
+                    class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
+                    id="office-{{ $service->id }}">
+                    <div class="absolute" style="top: -50px; right: -80px;">
+                        @php
+                        $logo = $service->office->logo;
+                        if (!empty($logo)) {
+                        $logo = asset('storage/offices/' . $service->office->logo);
+                        }
+                        if ($service->office->slug === 'municipal-civil-registrar') {
+                        $logo = asset('images/MCR_logo.jpg');
+                        } elseif ($service->office->slug === 'municipal-treasurers-office') {
+                        $logo = asset('images/MTO_logo.jpg');
+                        } elseif ($service->office->slug === 'business-permits-and-licensing-section') {
+                        $logo = asset('images/BPLS_logo.jpg');
+                        }
+                        @endphp
+                        <img src="{{ $logo }}" alt="{{ $service->title }} Logo" class="rounded-full"
+                            style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
+                    </div>
+                    {{-- Header
+                    <header class="flex flex-col ">
+                        <h3 class="text-lg font-bold  text-decoration-none text-black ">
+                            {{ $service->title }}
+                        </h3>
+                        <p class="text-sm text-gray-500  text-decoration-none text-black ">
+                            {{ Str::limit($service->description, 100, '...') }}
+                        </p>
+                        <p class="text-sm text-gray-800 font-bold  text-decoration-none text-black">
+                            ₱{{ number_format($service->price, 2) }}
+                        </p>
+                    </header>
+                    <footer class="flex items-center justify-between pt-10">
+                        <span
+                            class="text-blue-50 hover:text-blue-700  text-decoration-none  flux-btn flux-btn-primary">Request
+                            Document</span>
+                    </footer>
+                </a>
 
                 @empty
-                    <div class="col-12">
-                        <div class="alert alert-info">
-                            <i class="bi bi-info-circle me-2"></i>
-                            No services available for this office yet.
-                        </div>
+                <div class="col-12">
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        No services available for this office yet.
                     </div>
+                </div>
                 @endforelse
             </div>
         </div>
-    </div>
+    </div> --}}
 
 
 
