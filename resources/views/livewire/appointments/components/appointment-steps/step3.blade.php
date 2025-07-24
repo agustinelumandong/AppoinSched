@@ -19,6 +19,16 @@
         <p class="text-gray-600">Loading...</p>
       </div>
 
+      @if($to_whom === 'someone_else')
+      <div class="alert alert-info flex items-center gap-2 mb-2">
+      <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-5 h-5" fill="none" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+      </svg>
+      <span>Please bring a valid ID and ensure the requester is present.</span>
+      </div>
+    @endif
+
       <div class="flex flex-row gap-2 w-full mb-4">
         @if($editPersonDetails === false)
       <button type="button" class="flux-btn flux-btn-primary" wire:click="editPersonDetailsBtn">Edit</button>
