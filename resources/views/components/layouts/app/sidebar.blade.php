@@ -170,6 +170,11 @@
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Services Management'), 14) }}
                 </flux:navlist.item>
+                <flux:navlist.item icon="chart-bar" :href="route('staff.reports')"
+                    :current="request()->routeIs('staff.reports')" wire:navigate
+                    class="text-decoration-none text-black truncate">
+                    {{ Str::limit(__('Staff Reports'), 14) }}
+                </flux:navlist.item>
             </flux:navlist.group>
 
             @endhasrole
