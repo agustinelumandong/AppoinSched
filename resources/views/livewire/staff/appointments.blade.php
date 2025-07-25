@@ -330,65 +330,67 @@ new class extends Component {
                 </thead>
                 <tbody>
                     @forelse($appointments as $appointment)
-                                        <tr>
-                                            <td>{{ $appointment->reference_number }}</td>
-                                            <td>
-                                                <div class="flex items-center">
-                                                    <div class="flex-shrink-0 h-10 w-10">
-                                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                                            <span class="text-sm font-medium text-gray-700">
-                                                                {{ $appointment->user->initials() }}
-                                                            </span>
-                                                        </div>
-                                                    </div>
-                                                    <div class="ml-4">
-                                                        <div class="text-sm font-medium text-gray-900">
-                                                            {{ $appointment->user->name }}
-                                                        </div>
-                                                        <div class="text-sm text-gray-500">
-                                                            {{ $appointment->user->email }}
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? '' }}</div>
-                                            </td>
-                                            <td>
-                                                <span class="flux-badge flux-badge-{{ $appointment->status == 'completed' ? 'success' : ($appointment->status == 'cancelled' ? 'danger' : 'warning') }}">
-                                                    {{ ucfirst($appointment->status) }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="text-sm text-gray-900">
-                                                    {{  Carbon::parse($appointment->booking_date)->format('M d, Y') }}
-                                                </div>
-                                                <div class="text-sm text-gray-500">
-                                                    {{  Carbon::parse($appointment->booking_time)->format('h:i A') }}
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <div class="d-flex gap-2">
+                        <tr>
+                            <td>{{ $appointment->reference_number }}</td>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="flex-shrink-0 h-10 w-10">
+                                        <div
+                                            class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                            <span class="text-sm font-medium text-gray-700">
+                                                {{ $appointment->user->initials() }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="ml-4">
+                                        <div class="text-sm font-medium text-gray-900">
+                                            {{ $appointment->user->name }}
+                                        </div>
+                                        <div class="text-sm text-gray-500">
+                                            {{ $appointment->user->email }}
+                                        </div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? '' }}</div>
+                            </td>
+                            <td>
+                                <span
+                                    class="flux-badge flux-badge-{{ $appointment->status == 'completed' ? 'success' : ($appointment->status == 'cancelled' ? 'danger' : 'warning') }}">
+                                    {{ ucfirst($appointment->status) }}
+                                </span>
+                            </td>
+                            <td>
+                                <div class="text-sm text-gray-900">
+                                    {{ Carbon::parse($appointment->booking_date)->format('M d, Y') }}
+                                </div>
+                                <div class="text-sm text-gray-500">
+                                    {{ Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-2">
 
-                                                    <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
-                                                        class="flux-btn flux-btn-outline btn-sm">
-                                                        <i class="bi bi-eye me-1"></i>View
-                                                    </button>
-                                                    {{-- <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
+                                    <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
+                                        class="flux-btn flux-btn-outline btn-sm">
+                                        <i class="bi bi-eye me-1"></i>View
+                                    </button>
+                                    {{-- <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
                                                         class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
                                                         <i class="bi bi-pencil me-1"></i>Edit
                                                     </button> --}}
-                                                    <button wire:click="completeAppointment({{ $appointment->id }})"
-                                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                                        <i class="bi bi-check-circle me-1"></i>Complete
-                                                    </button>
-                                                    <button wire:click="cancelAppointment({{ $appointment->id }})"
-                                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                                        <i class="bi bi-x-circle me-1"></i>Cancel
-                                                    </button>
-                                                </div>
-                                            </td>
-                                        </tr>
+                                    <button wire:click="completeAppointment({{ $appointment->id }})"
+                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
+                                        <i class="bi bi-check-circle me-1"></i>Complete
+                                    </button>
+                                    <button wire:click="cancelAppointment({{ $appointment->id }})"
+                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
+                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="text-center py-8">
