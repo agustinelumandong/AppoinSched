@@ -19,7 +19,7 @@
 }
 
 #auth-background {
-    background-image: url('C:\laragon\www\AppoinSched\public\images\MUNICIPAL_HALL.jpg');
+    background-image: url('/images/MUNICIPAL_HALL.jpg');
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
