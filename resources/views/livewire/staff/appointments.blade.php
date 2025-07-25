@@ -217,6 +217,22 @@ new class extends Component {
         return null;
     }
 
+    public function completeAppointment(int $id): void
+    {
+        $appointment = Appointments::findOrFail($id);
+        $appointment->status = 'completed';
+        $appointment->save();
+        session()->flash('success', 'Appointment completed successfully');
+    }
+
+    public function cancelAppointment(int $id): void
+    {
+        $appointment = Appointments::findOrFail($id);
+        $appointment->status = 'cancelled';
+        $appointment->save();
+        session()->flash('success', 'Appointment cancelled successfully');
+    }
+
     public function with(): array
     {
         $query = Appointments::with(['user', 'office', 'service'])
@@ -288,7 +304,7 @@ new class extends Component {
             <div class="flex-1">
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
                 <input type="text" id="search" wire:model.live="search" class="form-control"
-                    placeholder="Search by status, notes, or names...">
+                    placeholder="Search by reference number, client, or service...">
             </div>
             <div class="flex gap-2">
                 <button wire:click="searchs" class="btn btn-primary">
@@ -303,7 +319,7 @@ new class extends Component {
         <div class="overflow-x-auto">
             <table class="table flux-table w-full">
                 <thead>
-                    <tr> 
+                    <tr>
                         <th>Reference Number</th>
                         <th>Client</th>
                         <th>Service</th>
@@ -314,65 +330,65 @@ new class extends Component {
                 </thead>
                 <tbody>
                     @forelse($appointments as $appointment)
-                        <tr>
-                            <td>{{ $appointment->reference_number }}</td>
-                            <td>
-                                <div class="flex items-center">
-                                    <div class="flex-shrink-0 h-10 w-10">
-                                        <div
-                                            class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                                            <span class="text-sm font-medium text-gray-700">
-                                                {{ $appointment->user->initials() }}
-                                            </span>
-                                        </div>
-                                    </div>
-                                    <div class="ml-4">
-                                        <div class="text-sm font-medium text-gray-900">
-                                            {{ $appointment->user->name }}
-                                        </div>
-                                        <div class="text-sm text-gray-500">
-                                            {{ $appointment->user->email }}
-                                        </div>
-                                    </div>
-                                </div>  
-                            </td>
-                            <td>
-                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? '' }}</div>
-                            </td>
-                            <td>
-                                <span
-                                    class="flux-badge flux-badge-{{ match ($appointment->status) {
-                                        'pending' => 'warning',
-                                        'approved' => 'success',
-                                        'rejected' => 'danger',
-                                        'completed' => 'success',
-                                        default => 'light',
-                                    } }}">
-                                    {{ ucfirst($appointment->status) }}
-                                </span>
-                            </td>
-                            <td>
-                                <div class="text-sm text-gray-900">
-                                    {{  Carbon::parse($appointment->booking_date)->format('M d, Y') }}
-                                </div>
-                                <div class="text-sm text-gray-500">
-                                    {{  Carbon::parse($appointment->booking_time)->format('h:i A') }}
-                                </div>
-                            </td>
-                            <td>
-                                <div class="d-flex gap-2">
-                                    
-                                    <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
-                                        class="flux-btn flux-btn-outline btn-sm">
-                                        <i class="bi bi-eye me-1"></i>View
-                                    </button>
-                                    <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
-                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                        <i class="bi bi-pencil me-1"></i>Edit
-                                    </button>
-                                </div> 
-                            </td>
-                        </tr>
+                                        <tr>
+                                            <td>{{ $appointment->reference_number }}</td>
+                                            <td>
+                                                <div class="flex items-center">
+                                                    <div class="flex-shrink-0 h-10 w-10">
+                                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                                            <span class="text-sm font-medium text-gray-700">
+                                                                {{ $appointment->user->initials() }}
+                                                            </span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="ml-4">
+                                                        <div class="text-sm font-medium text-gray-900">
+                                                            {{ $appointment->user->name }}
+                                                        </div>
+                                                        <div class="text-sm text-gray-500">
+                                                            {{ $appointment->user->email }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? '' }}</div>
+                                            </td>
+                                            <td>
+                                                <span class="flux-badge flux-badge-{{ $appointment->status == 'completed' ? 'success' : ($appointment->status == 'cancelled' ? 'danger' : 'warning') }}">
+                                                    {{ ucfirst($appointment->status) }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                <div class="text-sm text-gray-900">
+                                                    {{  Carbon::parse($appointment->booking_date)->format('M d, Y') }}
+                                                </div>
+                                                <div class="text-sm text-gray-500">
+                                                    {{  Carbon::parse($appointment->booking_time)->format('h:i A') }}
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div class="d-flex gap-2">
+
+                                                    <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
+                                                        class="flux-btn flux-btn-outline btn-sm">
+                                                        <i class="bi bi-eye me-1"></i>View
+                                                    </button>
+                                                    {{-- <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
+                                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
+                                                        <i class="bi bi-pencil me-1"></i>Edit
+                                                    </button> --}}
+                                                    <button wire:click="completeAppointment({{ $appointment->id }})"
+                                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
+                                                        <i class="bi bi-check-circle me-1"></i>Complete
+                                                    </button>
+                                                    <button wire:click="cancelAppointment({{ $appointment->id }})"
+                                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
+                                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
                     @empty
                         <tr>
                             <td colspan="8" class="text-center py-8">
