@@ -228,6 +228,19 @@ new #[Title('Document Request')] class extends Component {
         $this->userAddresses = $userAddresses;
         $this->editPersonDetails = false;
         // Pre-populate dependent dropdowns if values exist
+
+ // Initialize user and userAddresses like userinfo.blade.php
+    $this->user = auth()->user();
+        $this->userAddresses = $this->user->userAddresses->first();
+
+        $this->address = $this->userAddresses->address_line_1 ?? '';
+        $this->region = $this->userAddresses->region ?? '';
+        $this->province = $this->userAddresses->province ?? '';
+        $this->city = $this->userAddresses->city ?? '';
+        $this->barangay = $this->userAddresses->barangay ?? '';
+        $this->street = $this->userAddresses->street ?? '';
+        $this->zip_code = $this->userAddresses->zip_code ?? '';
+
         if ($this->region) {
             $this->provinces = $locations->getProvinces($this->region);
         }

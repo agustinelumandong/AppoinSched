@@ -110,7 +110,6 @@
           @enderror
         </div> --}}
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      
           <div class="flex flex-col">
             <label for="region" class="text-xs font-medium mb-1">Region</label>
             <select id="region" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
@@ -164,13 +163,11 @@
             <input id="street" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
               type="text" wire:model="street" placeholder="Street" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if($same_as_personal_address) disabled @endif>
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
-            <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
           <div class="flex flex-col">
             <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
             <input id="zip_code" class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif"
               type="text" wire:model="zip_code" placeholder="Zip Code" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if($same_as_personal_address) disabled @endif>
-            <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             <span class="text-xs text-gray-500 mt-1">Required</span>
           </div>
         </div>
