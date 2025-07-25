@@ -32,6 +32,14 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->redirect('/', navigate: true);
     }
+
+    public function login()
+    {
+        $user = Auth::user();
+        $user->email_verified_at = now();
+        $user->save();
+        $this->redirect(route('login', absolute: false), navigate: true);
+    }
 }; ?>
 
 <div class="mt-4 flex flex-col gap-6">
@@ -53,5 +61,13 @@ new #[Layout('components.layouts.auth')] class extends Component {
         <flux:link class="text-sm cursor-pointer" wire:click="logout">
             {{ __('Log out') }}
         </flux:link>
+
+        <p class="text-sm text-gray-500">
+            {{ __('This is for testing only, Click Login to get verified') }}
+            <flux:link class="text-sm cursor-pointer" wire:click="login">
+                {{ __('Login') }}
+            </flux:link>
+        </p>
+
     </div>
 </div>

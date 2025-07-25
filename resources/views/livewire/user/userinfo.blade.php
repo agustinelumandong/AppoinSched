@@ -117,6 +117,7 @@ new class extends Component {
         if (!$this->user->userFamilies || $this->user->userFamilies->isEmpty()) {
             $userFamily = new UserFamily();
             $userFamily->user_id = $this->user->getKey();
+            $userFamily->personal_information_id = $this->personalInformation->getKey();
             $userFamily->save();
             $this->user->refresh();
         }
