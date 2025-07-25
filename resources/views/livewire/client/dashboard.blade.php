@@ -136,7 +136,7 @@ new class extends Component {
             </div>
 
             {{-- Appointments Calendar --}}
-            <div class="container-fluid mx-auto px-4 py-8">
+            <div class="  py-8">
                 <div class="mb-6">
                     <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h4>
                     <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff

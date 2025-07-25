@@ -36,8 +36,11 @@ class AppointmentSlipController extends Controller
       'email' => $details->email,
       'phone' => $details->phone,
       'address' => $details->address,
+      'region' => $details->region,
+      'province' => $details->province,
       'city' => $details->city,
-      'state' => $details->state,
+      'barangay' => $details->barangay,
+      'street' => $details->street,
       'zip_code' => $details->zip_code,
     ];
 

@@ -1,22 +1,27 @@
 <div class="PersonalInformation">
-  <div class="header mb-4">
-    <h3 class="text-xl font-semibold text-base-content">Personal Information</h3>
-    <div class="flex items-center gap-2 text-sm text-base-content/70">
-      <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-      </svg>
-      <span>Please provide complete personal information</span>
+  <div class="header mb-4 flex flex-row justify-between items-center">
+    <div>
+      <h3 class="text-xl font-semibold text-base-content">Personal Information</h3>
+      <div class="flex items-center gap-2 text-sm text-base-content/70">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        <span>Please provide complete personal information</span>
+      </div>
+
     </div>
+    <div class="flex flex-row gap-2 mb-4">
+      @if($editPersonDetails === false)
+      <button type="button" class="flux-btn flux-btn-primary" wire:click="editPersonDetailsBtn">Edit</button>
+    @else
+      <button type="button" class="flux-btn flux-btn-primary" wire:click="lockPersonDetailsBtn">Lock</button>
+    @endif
+    </div>
+
   </div>
 
-  <div class="flex flex-row gap-2 w-full mb-4">
-    @if($editPersonDetails === false)
-    <button type="button" class="btn-flux btn-flux-primary" wire:click="editPersonDetailsBtn">Edit</button>
-  @else
-    <button type="button" class="btn-flux btn-flux-primary" wire:click="lockPersonDetailsBtn">Lock</button>
-  @endif
-  </div>
+
 
 
 

@@ -27,7 +27,7 @@ new #[Title('Dashboard')] class extends Component {
     <h1>Dashboard</h1>
     <p class="text-gray-600 text-sm">Welcome to your dashboard. Here you can manage your offices and services.</p>
 
-    <div class="container-fluid mx-auto px-4 py-8">
+    <div class=" py-8">
         <div class="mb-6">
             <h1 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
             <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff</p>

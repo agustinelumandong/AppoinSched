@@ -253,7 +253,7 @@ class User extends Authenticatable
             'mother_birthdate' => $userFamily?->mother_birthdate instanceof \Carbon\Carbon ? $userFamily->mother_birthdate->format('Y-m-d') : ($userFamily?->mother_birthdate ?? ''),
             'mother_nationality' => $userFamily?->mother_nationality ?? '',
             'mother_religion' => $userFamily?->mother_religion ?? '',
-            'mother_contact_no' => $userFamily?->mother_contact_no ?? '', 
+            'mother_contact_no' => $userFamily?->mother_contact_no ?? '',
         ];
     }
 
@@ -263,7 +263,7 @@ class User extends Authenticatable
     public function getAppointmentFormData(): array
     {
         $personalInfo = $this->personalInformation;
-        $userAddress = $this->userAddresses->first();
+        $userAddress = $this->userAddresses->where('address_type', 'Permanent')->first();
 
         return [
             // Basic info
@@ -273,10 +273,13 @@ class User extends Authenticatable
             'email' => $this->email ?? '',
             'phone' => $personalInfo?->contact_no ?? '',
 
-            // Address Information (basic)
+            // Address Information (basic) 
             'address' => $userAddress?->address_line_1 ?? '',
+            'region' => $userAddress?->region ?? '',
+            'province' => $userAddress?->province ?? '',
             'city' => $userAddress?->city ?? '',
-            'state' => $userAddress?->province ?? '',
+            'barangay' => $userAddress?->barangay ?? '',
+            'street' => $userAddress?->street ?? '',
             'zip_code' => $userAddress?->zip_code ?? '',
         ];
     }
