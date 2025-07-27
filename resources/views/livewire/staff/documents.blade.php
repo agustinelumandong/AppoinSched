@@ -298,6 +298,9 @@ new class extends Component {
                             'approved' => 'success',
                             'rejected' => 'danger',
                             'completed' => 'success',
+                            'in-progress' => 'warning',
+                            'ready-for-pickup' => 'success',
+                            'cancelled' => 'danger',
                             default => 'light',
                         } }}">
                                                     {{ ucfirst($documentRequest->status) }}
@@ -311,7 +314,7 @@ new class extends Component {
                                             <td>
                                                 <div class="d-flex gap-2">
                                                     <a href="{{ route('admin.view-document-request', Crypt::encryptString($documentRequest->id)) }}"
-                                                        wire:navigate class="flux-btn flux-btn-outline btn-sm" title="View Details">
+                                                        wire:navigate class="flux-btn btn-sm flux-btn-primary" title="View Details">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
                                                 </div>
