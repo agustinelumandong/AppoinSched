@@ -44,7 +44,7 @@ class DatabaseSeeder extends Seeder
             'nationality' => 'Filipino',
             'contact_no' => '09123456789',
             'government_id_type' => 'SSS',
-            'government_id_image_path' => 'ids/sss.png',
+            'government_id_image_path' => 'ids/sss.pdf',
         ]);
 
         $user1->userAddresses()->create([

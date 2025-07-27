@@ -21,9 +21,9 @@ return new class extends Migration {
             $table->string('suffix')->nullable();
             $table->string('email')->nullable();
             $table->string('phone')->nullable();
-            $table->string('sex')->nullable(); 
+            $table->string('sex')->nullable();
             $table->string('government_id_type')->nullable();
-            $table->string('government_id_image_path')->nullable();
+            $table->string('government_id_image_path')->nullable(); // Stores PDF file path
             // Address information
             $table->string('address')->nullable();
             $table->string('region')->nullable();

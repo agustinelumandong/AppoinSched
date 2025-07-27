@@ -213,19 +213,21 @@
           <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div>
-          <label for="government_id_image_file" class="block text-xs font-medium mb-1">Government ID Image</label>
+          <label for="government_id_image_file" class="block text-xs font-medium mb-1">Government ID PDF</label>
           <input class="flux-form-control @if($editPersonDetails === false) bg-gray-100 @endif" type="file"
             wire:model="government_id_image_file" name="government_id_image_file" id="government_id_image_file"
-            accept="image/*" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+            accept=".pdf" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
           <span class="text-xs text-gray-500 mt-1">Required</span>
-          <span class="text-xs text-gray-500 mt-1">Upload a clear image of your government ID (Max 2MB)</span>
+          <span class="text-xs text-gray-500 mt-1">Upload a PDF copy of your government ID (Max 5MB)</span>
           @error('government_id_image_file')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
           <!-- Show existing file if available -->
           @if($this->government_id_image_path && !$this->government_id_image_file)
         <div class="mt-2">
-        <p class="text-xs text-gray-600 mb-1">Current ID Image:</p>
-        <img src="{{ asset('storage/' . $this->government_id_image_path) }}" alt="Government ID"
-          class="w-32 h-20 object-cover border rounded">
+        <p class="text-xs text-gray-600 mb-1">Current ID PDF:</p>
+        <a href="{{ asset('storage/' . $this->government_id_image_path) }}" target="_blank"
+          class="text-blue-600 hover:text-blue-800 text-xs">
+          View PDF Document
+        </a>
         <p class="text-xs text-gray-500 mt-1">File: {{ basename($this->government_id_image_path) }}</p>
         </div>
       @endif
@@ -233,8 +235,10 @@
           @if($this->government_id_image_file)
         <div class="mt-2">
         <p class="text-xs text-gray-600 mb-1">New Upload:</p>
-        <img src="{{ $this->government_id_image_file->temporaryUrl() }}" alt="New Government ID"
-          class="w-32 h-20 object-cover border rounded">
+        <a href="{{ $this->government_id_image_file->temporaryUrl() }}" target="_blank"
+          class="text-blue-600 hover:text-blue-800 text-xs">
+          View PDF Document
+        </a>
         <p class="text-xs text-gray-500 mt-1">File: {{ $this->government_id_image_file->getClientOriginalName() }}
         </p>
         </div>
