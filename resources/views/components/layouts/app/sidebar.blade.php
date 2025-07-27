@@ -46,9 +46,10 @@
 
                 <flux:menu.separator />
 
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                <form method="POST" action="{{ route('logout') }}" class="w-full" id="logout-form-mobile">
                     @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle" class="w-full">
+                    <flux:menu.item as="button" type="button" icon="arrow-right-start-on-rectangle" class="w-full"
+                        x-on:click="$dispatch('open-modal-logout-confirmation')">
                         {{ __('Log Out') }}
                     </flux:menu.item>
                 </form>
@@ -110,10 +111,11 @@
 
                 <flux:menu.separator />
 
-                <form method="POST" action="{{ route('logout') }}" class="w-full">
+                <form method="POST" action="{{ route('logout') }}" class="w-full" id="logout-form-desktop">
                     @csrf
-                    <flux:menu.item as="button" type="submit" icon="arrow-right-start-on-rectangle"
-                        class="w-full text-decoration-none text-black">
+                    <flux:menu.item as="button" type="button" icon="arrow-right-start-on-rectangle"
+                        class="w-full text-decoration-none text-black"
+                        x-on:click="$dispatch('open-modal-logout-confirmation')">
                         {{ __('Log Out') }}
                     </flux:menu.item>
                 </form>
@@ -391,6 +393,31 @@
     @livewireScripts
     @fluxScripts
     @stack('scripts')
+
+    <!-- Logout Confirmation Modal -->
+    <x-modal id="logout-confirmation" title="Confirm Logout" size="max-w-md">
+        <div class="flex items-center">
+            <div class="flex-shrink-0">
+                <i class="bi bi-exclamation-triangle text-yellow-500 text-2xl"></i>
+            </div>
+            <div class="ml-3">
+                <p class="text-lg text-gray-700">
+                    Are you sure you want to log out?
+                </p>
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <button type="button" class="btn-sm flux-btn flux-btn-outline" x-data
+                x-on:click="$dispatch('close-modal-logout-confirmation')" style="margin-right:12px">
+                Cancel
+            </button>
+            <button type="button" class="btn-sm flux-btn flux-btn-danger" x-data
+                x-on:click="$dispatch('close-modal-logout-confirmation'); (document.getElementById('logout-form-mobile') || document.getElementById('logout-form-desktop')).submit()">
+                Logout
+            </button>
+        </x-slot>
+    </x-modal>
 </body>
 
 </html>
