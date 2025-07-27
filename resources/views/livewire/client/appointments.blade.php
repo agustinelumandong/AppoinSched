@@ -277,9 +277,9 @@ new class extends Component {
         Reschedule
         </button>
       @endif
-          <button class="flux-btn btn-sm flux-btn-outline"
+          <button class="flux-btn btn-sm flux-btn-primary"
             wire:click="showAppointmentDetails({{ $appointment->id }})">
-            View Details
+            <i class="bi bi-eye"></i>
           </button>
           </div>
         </td>
