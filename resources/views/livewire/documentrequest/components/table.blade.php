@@ -90,7 +90,7 @@
                             <td>
                                 <div class="d-flex gap-2">
                                     <a href="{{ route('admin.view-document-request', Crypt::encryptString($documentRequest->id)) }}"
-                                        wire:navigate class="flux-btn flux-btn-outline btn-sm" title="View Details">
+                                        wire:navigate class="flux-btn flux-btn-primary btn-sm" title="View Details">
                                         <i class="bi bi-eye"></i>
                                     </a>
                                 </div>

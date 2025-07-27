@@ -13,13 +13,11 @@
             <table class="table flux-table mb-0">
                 <thead>
                     <tr>
-                        <th>Office</th>
                         <th>Title</th>
-                        <th>Slug</th>
+                        <th>Office</th>
                         <th>Description</th>
                         <th>Price</th>
                         <th>Status</th>
-                        <th>Created</th>
                         <th>Updated</th>
                         <th>Actions</th>
                     </tr>
@@ -28,13 +26,10 @@
                     @forelse($services as $service)
                         <tr>
                             <td>
-                                <p class="fw-semibold">{{ $service->office->name ?? 'N/A' }}</p>
-                            </td>
-                            <td>
                                 <p class="fw-semibold ">{{ $service->title ?? 'N/A' }}</p>
                             </td>
                             <td>
-                                <p class="fw-semibold">{{ $service->slug ?? 'N/A' }}</p>
+                                <p class="fw-semibold">{{ $service->office->name ?? 'N/A' }}</p>
                             </td>
                             <td>
                                 <p class="fw-semibold">{{ $service->description ?? 'N/A' }}</p>
@@ -48,14 +43,11 @@
                                 </span>
                             </td>
                             <td>
-                                <p class="fw-semibold">{{ $service->created_at?->format('M d, Y') }}</p>
-                            </td>
-                            <td>
                                 <p class="fw-semibold">{{ $service->updated_at?->format('M d, Y') }}</p>
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                    <button class="flux-btn flux-btn-primary btn-sm"
                                         wire:click="openEditServiceModal({{ $service->id }})">
                                         <i class="bi bi-pencil"></i>
 

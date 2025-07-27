@@ -16,8 +16,8 @@
                         <th>Client</th>
                         <th>Office</th>
                         <th>Service</th>
-                        <th>Date&Time</th>
                         <th>Notes</th>
+                        <th>Date&Time</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -36,6 +36,9 @@
                                 <p class="fw-semibold">{{ $appointment->service?->title ?? 'N/A' }}</p>
                             </td>
                             <td>
+                                <p class="fw-semibold">{{ $appointment->notes ?? 'N/A' }}</p>
+                            </td>
+                            <td>
                                 <div class="text-sm text-gray-900">
                                     {{ \Carbon\Carbon::parse($appointment->booking_date)->format('M d, Y') }}
                                 </div>
@@ -44,18 +47,15 @@
                                 </div>
                             </td>
                             <td>
-                                <p class="fw-semibold">{{ $appointment->notes ?? 'N/A' }}</p>
-                            </td>
-                            <td>
                                 <div class="d-flex gap-2">
-                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                    <button class="flux-btn flux-btn-primary btn-sm"
                                         wire:click="openShowAppointmentModal({{ $appointment->id }})" title="View Details">
                                         <i class="bi bi-eye"></i>
                                     </button>
-                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                    {{-- <button class="flux-btn flux-btn-success btn-sm"
                                         wire:click="openEditAppointmentModal({{ $appointment->id }})" title="Edit">
                                         <i class="bi bi-pencil"></i>
-                                    </button>
+                                    </button> --}}
                                 </div>
                             </td>
                         </tr>
