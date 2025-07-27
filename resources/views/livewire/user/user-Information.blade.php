@@ -124,7 +124,7 @@
             <label for="government_id_image_path" class="text-xs font-medium mb-1">Government ID PDF</label>
             <input id="government_id_image_path" class="flux-form-control" type="file"
                 wire:model="government_id_image_path" accept=".pdf" required>
-            <span class="text-xs text-gray-500 mt-1">Upload a PDF copy of your government ID (Max 5MB)</span>
+            <span class="text-xs text-gray-500 mt-1">Please upload a PDF file showing both the front and back of your government-issued ID (maximum size: 5MB).</span>
             @error('government_id_image_path')
                 <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
             @enderror
