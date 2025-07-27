@@ -74,7 +74,7 @@ new class extends Component {
     </div>
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
       <div class="bg-white rounded-lg shadow">
-        <div class="p-6 border-b border-gray-200">
+        <div class="p-6 border-b border-gray-200 bg-blue-100">
           <h3 class="text-lg font-semibold text-gray-900">Recent Users</h3>
         </div>
         <div class="p-6">
@@ -101,8 +101,8 @@ new class extends Component {
         </div>
       </div>
       <div class="bg-white rounded-lg shadow">
-        <div class="p-6 border-b border-gray-200">
-          <h3 class="text-lg font-semibold text-gray-900">Recent Appointments</h3>
+        <div class="p-6 border-b border-gray-200 bg-green-100">
+          <h3 class="text-lg font-semibold text-gray-900 ">Recent Appointments</h3>
         </div>
         <div class="p-6">
           <div class="space-y-4">
@@ -113,15 +113,17 @@ new class extends Component {
                 {{ $appointment->user->last_name }}
               </p>
               <p class="text-sm text-gray-500">{{ $appointment->office->name ?? 'N/A' }} -
-                {{ $appointment->service->name ?? 'N/A' }}
+                {{ $appointment->service->title ?? 'N/A' }}
               </p>
               </div>
               <div class="text-right">
               <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-              @if($appointment->status === 'pending') bg-yellow-100 text-yellow-800
-          @elseif($appointment->status === 'approved') bg-green-100 text-green-800
-          @elseif($appointment->status === 'cancelled') bg-red-100 text-red-800
-          @else bg-gray-100 text-gray-800 @endif">
+              {{ 
+                $appointment->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                ($appointment->status === 'approved' ? 'bg-green-100 text-green-800' :
+                ($appointment->status === 'cancelled' ? 'bg-red-100 text-red-800' :
+                ($appointment->status === 'completed' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800')))
+              }}">
                 {{ ucfirst($appointment->status) }}
               </span>
               <p class="text-xs text-gray-500 mt-1">{{ $appointment->booking_date }}</p>
