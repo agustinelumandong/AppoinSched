@@ -84,8 +84,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="flex flex-col">
             <label for="religion" class="text-xs font-medium mb-1">Religion</label>
-            <input id="religion" class="flux-form-control" type="text" wire:model="religion"
-                placeholder="Religion">
+            <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
@@ -122,18 +121,20 @@
         </div>
 
         <div class="flex flex-col">
-            <label for="government_id_image_path" class="text-xs font-medium mb-1">Government ID Image</label>
+            <label for="government_id_image_path" class="text-xs font-medium mb-1">Government ID PDF</label>
             <input id="government_id_image_path" class="flux-form-control" type="file"
-                wire:model="government_id_image_path" accept="image/*" required>
-            <span class="text-xs text-gray-500 mt-1">Upload a clear image of your government ID (Max 2MB)</span>
+                wire:model="government_id_image_path" accept=".pdf" required>
+            <span class="text-xs text-gray-500 mt-1">Upload a PDF copy of your government ID (Max 5MB)</span>
             @error('government_id_image_path')
                 <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
             @enderror
             @if ($this->getGovernmentIdImageUrl())
                 <div class="mt-2">
-                    <p class="text-xs text-gray-600 mb-1">Current ID Image:</p>
-                    <img src="{{ $this->getGovernmentIdImageUrl() }}" alt="Government ID"
-                        class="w-32 h-20 object-cover border rounded">
+                    <p class="text-xs text-gray-600 mb-1">Current ID PDF:</p>
+                    <a href="{{ $this->getGovernmentIdImageUrl() }}" target="_blank"
+                        class="text-blue-600 hover:text-blue-800 text-xs">
+                        View PDF Document
+                    </a>
                 </div>
             @endif
             <span class="text-xs text-gray-500 mt-1">Required</span>

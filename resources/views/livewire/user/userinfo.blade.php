@@ -141,7 +141,7 @@ new class extends Component {
         $this->religion = $this->personalInformation->religion ?? '';
         $this->nationality = $this->personalInformation->nationality ?? 'Filipino';
         $this->government_id_type = $this->personalInformation->government_id_type ?? '';
-        // Note: government_id_image_path is handled as a file upload, not a string
+        // Note: government_id_image_path is handled as a PDF file upload, not a string
         // Address
         $this->address_type = $this->userAddresses->address_type ?? 'Permanent';
         $this->address_line_1 = $this->userAddresses->address_line_1 ?? '';
@@ -185,27 +185,27 @@ new class extends Component {
 
         // Set father_is_unknown if all father fields are N/A
         $this->father_is_unknown = $this->father_last_name === 'N/A'
-                                && $this->father_first_name === 'N/A'
-                                && $this->father_middle_name === 'N/A'
-                                && $this->father_suffix === 'N/A'
-                                && $this->father_nationality === 'N/A'
-                                && $this->father_religion === 'N/A'
-                                && $this->father_contact_no === 'N/A';
+            && $this->father_first_name === 'N/A'
+            && $this->father_middle_name === 'N/A'
+            && $this->father_suffix === 'N/A'
+            && $this->father_nationality === 'N/A'
+            && $this->father_religion === 'N/A'
+            && $this->father_contact_no === 'N/A';
         $this->mother_is_unknown = $this->mother_last_name === 'N/A'
-                                && $this->mother_first_name === 'N/A'
-                                && $this->mother_middle_name === 'N/A'
-                                && $this->mother_suffix === 'N/A'
-                                && $this->mother_nationality === 'N/A'
-                                && $this->mother_religion === 'N/A'
-                                && $this->mother_contact_no === 'N/A';
+            && $this->mother_first_name === 'N/A'
+            && $this->mother_middle_name === 'N/A'
+            && $this->mother_suffix === 'N/A'
+            && $this->mother_nationality === 'N/A'
+            && $this->mother_religion === 'N/A'
+            && $this->mother_contact_no === 'N/A';
         $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1
-                                && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2
-                                && $this->userAddresses->temporary_region === $this->userAddresses->region
-                                && $this->userAddresses->temporary_province === $this->userAddresses->province
-                                && $this->userAddresses->temporary_city === $this->userAddresses->city
-                                && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay
-                                && $this->userAddresses->temporary_street === $this->userAddresses->street
-                                && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
+            && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2
+            && $this->userAddresses->temporary_region === $this->userAddresses->region
+            && $this->userAddresses->temporary_province === $this->userAddresses->province
+            && $this->userAddresses->temporary_city === $this->userAddresses->city
+            && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay
+            && $this->userAddresses->temporary_street === $this->userAddresses->street
+            && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
 
 
         // Pre-populate dependent dropdowns if values exist
@@ -236,7 +236,7 @@ new class extends Component {
         $this->religion = $this->personalInformation->religion ?? '';
         $this->nationality = $this->personalInformation->nationality ?? 'Filipino';
         $this->government_id_type = $this->personalInformation->government_id_type ?? '';
-        // Note: government_id_image_path is handled as a file upload, not a string
+        // Note: government_id_image_path is handled as a PDF file upload, not a string
         // Address
         $this->address_type = $this->userAddresses->address_type ?? 'Permanent';
         $this->address_line_1 = $this->userAddresses->address_line_1 ?? '';
@@ -278,27 +278,27 @@ new class extends Component {
 
         // Set father_is_unknown if all father fields are N/A
         $this->father_is_unknown = $this->father_last_name === 'N/A'
-                                && $this->father_first_name === 'N/A'
-                                && $this->father_middle_name === 'N/A'
-                                && $this->father_suffix === 'N/A'
-                                && $this->father_nationality === 'N/A'
-                                && $this->father_religion === 'N/A'
-                                && $this->father_contact_no === 'N/A';
+            && $this->father_first_name === 'N/A'
+            && $this->father_middle_name === 'N/A'
+            && $this->father_suffix === 'N/A'
+            && $this->father_nationality === 'N/A'
+            && $this->father_religion === 'N/A'
+            && $this->father_contact_no === 'N/A';
         $this->mother_is_unknown = $this->mother_last_name === 'N/A'
-                                && $this->mother_first_name === 'N/A'
-                                && $this->mother_middle_name === 'N/A'
-                                && $this->mother_suffix === 'N/A'
-                                && $this->mother_nationality === 'N/A'
-                                && $this->mother_religion === 'N/A'
-                                && $this->mother_contact_no === 'N/A';
+            && $this->mother_first_name === 'N/A'
+            && $this->mother_middle_name === 'N/A'
+            && $this->mother_suffix === 'N/A'
+            && $this->mother_nationality === 'N/A'
+            && $this->mother_religion === 'N/A'
+            && $this->mother_contact_no === 'N/A';
         $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1
-                                && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2
-                                && $this->userAddresses->temporary_region === $this->userAddresses->region
-                                && $this->userAddresses->temporary_province === $this->userAddresses->province
-                                && $this->userAddresses->temporary_city === $this->userAddresses->city
-                                && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay
-                                && $this->userAddresses->temporary_street === $this->userAddresses->street
-                                && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
+            && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2
+            && $this->userAddresses->temporary_region === $this->userAddresses->region
+            && $this->userAddresses->temporary_province === $this->userAddresses->province
+            && $this->userAddresses->temporary_city === $this->userAddresses->city
+            && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay
+            && $this->userAddresses->temporary_street === $this->userAddresses->street
+            && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
 
 
         // Pre-populate dependent dropdowns if values exist
@@ -436,7 +436,7 @@ new class extends Component {
                 'religion' => ['required', 'string', 'max:100'],
                 'nationality' => ['required', 'string', 'max:100'],
                 'government_id_type' => ['nullable', 'string', 'max:100'],
-                'government_id_image_path' => ['nullable', 'image', 'max:2048'], // 2MB max
+                'government_id_image_path' => ['nullable', 'file', 'mimes:pdf', 'max:5120'], // 5MB max for PDF
 
                 'address_type' => ['required', 'string', 'max:50'],
                 'address_line_1' => ['required', 'string', 'max:255'],
@@ -505,15 +505,15 @@ new class extends Component {
                 ])
                 ->save();
 
-            // Handle government ID image upload
+            // Handle government ID PDF upload
             $governmentIdImagePath = null;
             $currentImagePath = $this->personalInformation->getAttribute('government_id_image_path') ?? null;
 
             if (!empty($currentImagePath) && !is_object($this->government_id_image_path)) {
-                // Keep the existing image
+                // Keep the existing PDF
                 $governmentIdImagePath = $currentImagePath;
             } elseif (is_object($this->government_id_image_path)) {
-                // Upload the new image
+                // Upload the new PDF
                 $governmentIdImagePath = $this->government_id_image_path->storeAs('government-ids', $this->user->getKey() . '_' . $this->government_id_image_path->getClientOriginalName(), 'public');
             }
 
@@ -538,7 +538,7 @@ new class extends Component {
             $this->userAddresses
                 ->fill([
                     'personal_information_id' => $this->personalInformation->getKey(),
-                    'address_type' =>  'Permanent',
+                    'address_type' => 'Permanent',
                     'address_line_1' => $this->address_line_1 ?: null,
                     'address_line_2' => $this->address_line_2 ?: null,
                     'region' => $this->region ?: null,
@@ -549,7 +549,7 @@ new class extends Component {
                     'zip_code' => $this->zip_code ?: null,
 
                     // Temporary Address
-                    'temporary_address_type' =>  'Temporary',
+                    'temporary_address_type' => 'Temporary',
                     'temporary_address_line_1' => $this->temporary_address_line_1 ?: 'null',
                     'temporary_address_line_2' => $this->temporary_address_line_2 ?: 'null',
                     'temporary_region' => $this->temporary_region ?: 'null',

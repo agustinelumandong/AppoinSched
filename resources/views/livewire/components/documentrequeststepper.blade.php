@@ -605,7 +605,7 @@ new #[Title('Document Request')] class extends Component {
                         'civil_status' => 'required|in:Single,Married,Widowed,Divorced,Separated',
                         'nationality' => 'required|string|max:255',
                         'government_id_type' => 'nullable|string|max:100',
-                        'government_id_image_file' => 'nullable|image|max:2048', // 2MB max
+                        'government_id_image_file' => 'nullable|file|mimes:pdf|max:5120', // 5MB max for PDF
                         'address_type' => 'required|in:Permanent,Temporary',
                         'address_line_1' => 'required|string|max:255',
                         'region' => 'required|string|max:255',
@@ -938,7 +938,7 @@ new #[Title('Document Request')] class extends Component {
                 'payment_status' => 'unpaid', // Set initial payment status
             ]);
 
-            // Handle file upload for government ID image
+            // Handle file upload for government ID PDF
             $governmentIdImagePath = $this->government_id_image_path; // Keep existing path if no new upload
             if ($this->government_id_image_file) {
                 // New file uploaded, store it
