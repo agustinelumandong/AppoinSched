@@ -34,7 +34,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/',
             ],
         ], [
-            'password.regex' => 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.',
+            'password.regex' => 'Password must be at least 8 characters long and include both lowercase and uppercase letters, a number, and a special character.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);

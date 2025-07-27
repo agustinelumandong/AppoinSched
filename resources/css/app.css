@@ -17,10 +17,3 @@
 @plugin "daisyui" {
     include: steps;
 }
-
-#auth-background {
-    background-image: url('/images/MUNICIPAL_HALL.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-}
