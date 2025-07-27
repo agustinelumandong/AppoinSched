@@ -335,8 +335,7 @@ new class extends Component {
                             <td>
                                 <div class="flex items-center">
                                     <div class="flex-shrink-0 h-10 w-10">
-                                        <div
-                                            class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
+                                        <div class="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                                             <span class="text-sm font-medium text-gray-700">
                                                 {{ $appointment->user->initials() }}
                                             </span>
@@ -371,22 +370,21 @@ new class extends Component {
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-
-                                    <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
-                                        class="flux-btn flux-btn-outline btn-sm">
-                                        <i class="bi bi-eye me-1"></i>View
-                                    </button>
                                     {{-- <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
-                                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                                        <i class="bi bi-pencil me-1"></i>Edit
-                                                    </button> --}}
-                                    <button wire:click="completeAppointment({{ $appointment->id }})"
                                         class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                        <i class="bi bi-check-circle me-1"></i>Complete
+                                        <i class="bi bi-pencil me-1"></i>Edit
+                                    </button> --}}
+                                    <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
+                                        class="flux-btn btn-sm flux-btn-primary">
+                                        <i class="bi bi-eye me-1"></i>
+                                    </button>
+                                    <button wire:click="completeAppointment({{ $appointment->id }})"
+                                        class="flux-btn btn-sm flux-btn-success">
+                                        <i class="bi bi-check-circle me-1"></i>
                                     </button>
                                     <button wire:click="cancelAppointment({{ $appointment->id }})"
-                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                        <i class="bi bi-x-circle me-1"></i>Cancel
+                                        class="flux-btn btn-sm flux-btn-danger">
+                                        <i class="bi bi-trash me-1"></i>
                                     </button>
                                 </div>
                             </td>

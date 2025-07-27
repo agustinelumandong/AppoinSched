@@ -226,6 +226,16 @@ new class extends Component {
                     <option value="custom">Custom Range</option>
                 </select>
             </div>
+            <div class="mt-4 flex gap-2">
+                <button type="button" wire:click="exportToCsv" class="flux-btn flux-btn-success text-sm"
+                    style="font-size: 12px;">
+                    <i class="bi bi-file-earmark-spreadsheet mr-1"></i> Export to CSV
+                </button>
+                <button type="button" wire:click="exportToPdf" class="flux-btn flux-btn-danger text-sm"
+                    style="font-size: 12px;">
+                    <i class="bi bi-file-earmark-pdf mr-1"></i> Export to PDF
+                </button>
+            </div>
         </div>
         @if ($isCustomRange)
             <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -244,14 +254,7 @@ new class extends Component {
                 </div>
             </div>
         @endif
-        <div class="mt-4 flex gap-2">
-            <button type="button" wire:click="exportToCsv" class="flux-btn flux-btn-outline">
-                <i class="bi bi-file-earmark-spreadsheet mr-1"></i> Export to CSV
-            </button>
-            <button type="button" wire:click="exportToPdf" class="flux-btn flux-btn-outline">
-                <i class="bi bi-file-earmark-pdf mr-1"></i> Export to PDF
-            </button>
-        </div>
+
     </div>
     <div class="flux-card p-6">
         <div class="overflow-x-auto">
@@ -278,26 +281,28 @@ new class extends Component {
                                 $groupedByStatus = collect($serviceItems)->groupBy('status');
                             @endphp
                             @foreach ($groupedByStatus as $status => $statusItems)
-                                <tr>
-                                    <td>{{ $period }}</td>
-                                    <td>{{ $serviceName ?? 'N/A' }}</td>
-                                    <td>
-                                        <span
-                                            class="flux-badge {{ match ($status) {
-                                                'pending' => 'flux-badge-warning',
-                                                'approved' => 'flux-badge-success',
-                                                'completed' => 'flux-badge-info',
-                                                'cancelled' => 'flux-badge-danger',
-                                                'rejected' => 'flux-badge-danger',
-                                                'in-progress' => 'flux-badge-primary',
-                                                'ready-for-pickup' => 'flux-badge-success',
-                                                default => 'flux-badge-light',
-                                            } }}">
-                                            {{ ucfirst($status) }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $statusItems->count() }}</td>
-                                </tr>
+                                        <tr>
+                                            <td>{{ $period }}</td>
+                                            <td>{{ $serviceName ?? 'N/A' }}</td>
+                                            <td>
+                                                <span class="flux-badge {{ match ($status) {
+                                                            'pending' => 'flux-badge-warning',
+                                                            'approved' => 'flux-badge-success',
+                                                            'completed' => 'flux-badge-info',
+                                                            'cancelled' => 'flux-badge-danger',
+                                                            'rejected' => 'flux-badge-danger',
+                                                            'in-progress' => 'flux-badge-info',
+                                                            'ready-for-pickup' => 'flux-badge-success',
+                                                            'paid' => 'flux-badge-success',
+                                                            'unpaid' => 'flux-badge-danger',
+                                                            'On-going' => 'flux-badge-warning',
+                                                            default => 'flux-badge-warning',
+                                                        } }}">
+                                                    {{ ucfirst($status) }}
+                                                </span>
+                                            </td>
+                                            <td>{{ $statusItems->count() }}</td>
+                                        </tr>
                             @endforeach
                         @endforeach
                     @empty

@@ -25,16 +25,31 @@ new class extends Component {
             'recentAppointments' => Appointments::with(['user', 'office', 'service'])
                 ->where('office_id', $this->getOfficeIdForStaff())
                 ->latest()
-                ->take(5)
+                ->get(),
+            'approvedAppointments' => Appointments::with(['user', 'office', 'service'])
+                ->where('office_id', $this->getOfficeIdForStaff())
+                ->latest()
+                ->get(),
+            'pendingAppointments' => Appointments::with(['user', 'office', 'service'])
+                ->where('office_id', $this->getOfficeIdForStaff())
+                ->where('status', 'pending')
                 ->get(),
             'recentDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
                 ->where('office_id', $this->getOfficeIdForStaff())
                 ->latest()
                 ->take(5)
                 ->get(),
-            'todayAppointments' => Appointments::with(['user', 'office', 'service'])
+            'pendingDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
                 ->where('office_id', $this->getOfficeIdForStaff())
-                ->where('booking_date', today())
+                ->where('status', 'pending')
+                ->get(),
+            'approvedDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
+                ->where('office_id', $this->getOfficeIdForStaff())
+                ->where('status', 'approved')
+                ->get(),
+            'rejectedDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
+                ->where('office_id', $this->getOfficeIdForStaff())
+                ->where('status', 'rejected')
                 ->get(),
         ];
     }
@@ -90,7 +105,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Today's Appointments</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $todayAppointments->count() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $approvedAppointments->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -104,7 +119,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Pending Reviews</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $recentAppointments->count() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $pendingAppointments->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -121,7 +136,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Pending Document Requests</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $recentDocumentRequests->count() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $pendingDocumentRequests->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -135,7 +150,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Approved Document Requests</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $recentDocumentRequests->count() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $approvedDocumentRequests->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -149,7 +164,7 @@ new class extends Component {
                     </div>
                     <div class="ml-4">
                         <p class="text-sm font-medium text-gray-600">Rejected Document Requests</p>
-                        <p class="text-2xl font-semibold text-gray-900">{{ $recentDocumentRequests->count() }}</p>
+                        <p class="text-2xl font-semibold text-gray-900">{{ $rejectedDocumentRequests->count() }}</p>
                     </div>
                 </div>
             </div>
@@ -164,10 +179,10 @@ new class extends Component {
         </div>
 
         <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-6 border-b border-gray-200 bg-blue-100">
                 <h3 class="text-lg font-semibold text-gray-900">Recent Appointments</h3>
             </div>
-            <div class="p-6">
+            <div>
                 <div class="overflow-x-auto">
                     <table class="flux-table w-full">
                         <thead>
@@ -186,7 +201,7 @@ new class extends Component {
                                                             {{ $appointment->user?->last_name ?? '' }}
                                                         </td>
                                                         <td>
-                                                            {{ $appointment->service?->name ?? 'N/A' }}
+                                                            {{ $appointment->service?->title ?? 'N/A' }}
                                                         </td>
                                                         <td>
                                                             {{ \Illuminate\Support\Carbon::parse($appointment->booking_date)->format('M d, Y') }}
@@ -216,10 +231,10 @@ new class extends Component {
             </div>
         </div>
         <div class="bg-white rounded-lg shadow">
-            <div class="p-6 border-b border-gray-200">
+            <div class="p-6 border-b border-gray-200 bg-green-100">
                 <h3 class="text-lg font-semibold text-gray-900">Recent Document Requests</h3>
             </div>
-            <div class="p-6">
+            <div>
                 <div class="overflow-x-auto">
                     <table class="flux-table w-full">
                         <thead>

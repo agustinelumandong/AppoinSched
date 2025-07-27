@@ -228,10 +228,12 @@ new class extends Component {
           </span>
         </td>
         <td>
-          <button wire:click="openEditServiceModal({{ $service->id }})" class="btn btn-sm btn-primary"><i
-            class="bi bi-pencil"></i></button>
-          <button wire:click="openDeleteServiceModal({{ $service->id }})" class="btn btn-sm btn-danger"><i
-            class="bi bi-trash"></i></button>
+          <button wire:click="openEditServiceModal({{ $service->id }})" class="flux-btn btn-sm flux-btn-primary">
+          <i class="bi bi-pencil"></i>
+          </button>
+          <button wire:click="openDeleteServiceModal({{ $service->id }})" class="flux-btn btn-sm flux-btn-danger">
+          <i class="bi bi-trash"></i>
+          </button>
         </td>
         </tr>
       @empty
