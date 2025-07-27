@@ -51,8 +51,15 @@ new class extends Component {
             </div>
         </div>
 
-        <div class="mb-6">
-            <h4 class="text-3xl font-bold text-gray-900">Available Offices</h4>
+        <div class="mb-1 flex flex-row gap-4">
+            <div class="w-1/3">
+                <h4 class="text-3xl font-bold text-gray-900">Available Offices</h4>
+            </div>
+            <div class="w-full">
+                <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h4>
+                <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff
+                </p>
+            </div>
         </div>
 
         @if (!$hasCompleteProfile)
@@ -85,65 +92,64 @@ new class extends Component {
                 </div>
             </div>
         @else
-            {{-- Offices --}}
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-                @forelse ($offices as $office)
-                    <a href="{{ route('offices.show', $office->slug) }}"
-                        class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
-                        id="office-{{ $office->id }}">
-                        <div class="absolute" style="top: -50px; right: -80px;">
-                            @php
-                                $logo = $office->logo;
-                                if (!empty($logo)) {
-                                    $logo = asset('storage/offices/' . $office->logo);
-                                }
-                                if ($office->slug === 'municipal-civil-registrar') {
-                                    $logo = asset('images/MCR_logo.jpg');
-                                } elseif ($office->slug === 'municipal-treasurers-office') {
-                                    $logo = asset('images/MTO_logo.jpg');
-                                } elseif ($office->slug === 'business-permits-and-licensing-section') {
-                                    $logo = asset('images/BPLS_logo.jpg');
-                                }
-                            @endphp
-                            <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
-                                style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
-                        </div>
-                        {{-- Header --}}
-                        <header class="flex flex-col ">
-                            <div class="flex items-center justify-between">
-                                <h5 class="text-lg font-bold   text-decoration-none text-black">{{ $office->name }}</h5>
-                                {{-- <p class="text-lg   text-decoration-none text-black">{{ $office->services->count() }}
-                                    Services
-                                </p> --}}
+            <div class="flex flex-row w-full gap-4">
+                {{-- Offices --}}
+                <div class="grid grid-cols-1 gap-4 w-1/3">
+                    @forelse ($offices as $office)
+                        <a href="{{ route('offices.show', $office->slug) }}"
+                            class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
+                            id="office-{{ $office->id }}" style="height: fit-content;">
+                            <div class="absolute" style="top: -50px; right: -80px;">
+                                @php
+                                    $logo = $office->logo;
+                                    if (!empty($logo)) {
+                                        $logo = asset('storage/offices/' . $office->logo);
+                                    }
+                                    if ($office->slug === 'municipal-civil-registrar') {
+                                        $logo = asset('images/MCR_logo.jpg');
+                                    } elseif ($office->slug === 'municipal-treasurers-office') {
+                                        $logo = asset('images/MTO_logo.jpg');
+                                    } elseif ($office->slug === 'business-permits-and-licensing-section') {
+                                        $logo = asset('images/BPLS_logo.jpg');
+                                    }
+                                @endphp
+                                <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
+                                    style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
                             </div>
-                            <p class="text-sm text-gray-500 mt-2   text-decoration-none text-black">
-                                {{ $office->description }}
-                            </p>
-                        </header>
-                        {{-- Footer --}}
-                        <footer class="flex items-center justify-between pt-10">
-                            <span class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
-                                Office</span>
-                        </footer>
-                    </a>
-                @empty
-                    <div class="flux-card p-4 bg-red-50 border-red-200 shadow-lg rounded-lg">
-                        <p class="text-gray-500">No offices found</p>
-                        <p class="text-sm text-gray-500">You don't have any offices yet. Please create one to get
-                            started.</p>
-                    </div>
-                @endforelse
+                            {{-- Header --}}
+                            <header class="flex flex-col ">
+                                <div class="flex items-center justify-between">
+                                    <h5 class="text-lg font-bold   text-decoration-none text-black">{{ $office->name }}</h5>
+                                    {{-- <p class="text-lg   text-decoration-none text-black">{{ $office->services->count() }}
+                                        Services
+                                    </p> --}}
+                                </div>
+                                <p class="text-sm text-gray-500 mt-2   text-decoration-none text-black">
+                                    {{ $office->description }}
+                                </p>
+                            </header>
+                            {{-- Footer --}}
+                            <footer class="flex items-center justify-between pt-10">
+                                <span
+                                    class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
+                                    Office</span>
+                            </footer>
+                        </a>
+                    @empty
+                        <div class="flux-card p-4 bg-red-50 border-red-200 shadow-lg rounded-lg">
+                            <p class="text-gray-500">No offices found</p>
+                            <p class="text-sm text-gray-500">You don't have any offices yet. Please create one to get
+                                started.</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                {{-- Appointments Calendar --}}
+                <div class=" w-full">
+                    <livewire:components.full-calendar />
+                </div>
             </div>
 
-            {{-- Appointments Calendar --}}
-            <div class="  py-8">
-                <div class="mb-6">
-                    <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h4>
-                    <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff
-                    </p>
-                </div>
-                <livewire:components.full-calendar />
-            </div>
         @endif
 
         {{-- Recent Appointments --}}
