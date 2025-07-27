@@ -26,7 +26,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'middle_name' => ['nullable', 'string', 'max:255'],
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'password' => [
+                'required',
+                'string',
+                'confirmed',
+                'min:8',
+                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/',
+            ],
+        ], [
+            'password.regex' => 'Password must be at least 8 characters long and include an uppercase letter, a number, and a special character.',
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
