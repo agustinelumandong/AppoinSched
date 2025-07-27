@@ -15,7 +15,6 @@
                     <tr>
                         <th>Logo</th>
                         <th>Name</th>
-                        <th>Slug</th>
                         <th>Description</th>
                         <th>Created</th>
                         <th>Updated</th>
@@ -33,9 +32,6 @@
                                 <p class="fw-semibold">{{ $office->name ?? 'N/A' }}</p>
                             </td>
                             <td>
-                                <p class="fw-semibold ">{{ $office->slug ?? 'N/A' }}</p>
-                            </td>
-                            <td>
                                 <p class="fw-semibold">{{ $office->description ?? 'N/A' }}</p>
                             </td>
                             <td>
@@ -46,7 +42,7 @@
                             </td>
                             <td>
                                 <div class="action-buttons">
-                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                    <button class="flux-btn flux-btn-primary btn-sm"
                                         wire:click="openEditOfficeModal({{ $office->id }})">
                                         <i class="bi bi-pencil"></i>
 

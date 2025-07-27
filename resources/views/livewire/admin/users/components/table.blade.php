@@ -42,7 +42,7 @@
                           </td>
                           <td>
                               <div class="action-buttons">
-                                  <button class="flux-btn flux-btn-outline btn-sm"
+                                  <button class="flux-btn flux-btn-primary btn-sm"
                                       wire:click="openEditUserModal({{ $user->id }})">
                                       <i class="bi bi-pencil"></i>
 

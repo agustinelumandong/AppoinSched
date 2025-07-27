@@ -40,7 +40,7 @@
                             </td>
                             <td>
                                 <div class="action-buttons justify-content-end">
-                                    <button class="flux-btn flux-btn-outline btn-sm"
+                                    <button class="flux-btn flux-btn-primary btn-sm"
                                         wire:click="openEditRoleModal({{ $role->id }})">
                                         <i class="bi bi-pencil"></i>
 
