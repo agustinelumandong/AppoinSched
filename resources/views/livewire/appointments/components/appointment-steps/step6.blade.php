@@ -62,6 +62,73 @@
             </div>
         </div>
 
+        @if ($includeCertificates && count($certificates) > 0)
+            <!-- Certificate Requests -->
+            <div class="flux-card p-6">
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Certificate Requests
+                </h3>
+
+                @foreach ($certificates as $index => $certificate)
+                    <div class="mb-4 p-3 border border-gray-200 rounded-lg">
+                        <h4 class="font-medium text-gray-700 mb-2">Certificate #{{ $index + 1 }}</h4>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Certificate Type</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                    @switch($certificate['certificate_type'])
+                                        @case('birth_certificate')
+                                            Birth Certificate
+                                        @break
+
+                                        @case('death_certificate')
+                                            Death Certificate
+                                        @break
+
+                                        @case('marriage_certificate')
+                                            Marriage Certificate
+                                        @break
+
+                                        @case('cenomar')
+                                            CENOMAR
+                                        @break
+
+                                        @default
+                                            {{ $certificate['certificate_type'] }}
+                                    @endswitch
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Relationship</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                    {{ ucfirst($certificate['relationship']) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="grid md:grid-cols-3 gap-4 mt-2">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                    {{ $certificate['first_name'] }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                    {{ $certificate['middle_name'] ?? 'N/A' }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                    {{ $certificate['last_name'] }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+
         <!-- Personal Information -->
         <div class="flux-card p-6">
             <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Information</h3>
