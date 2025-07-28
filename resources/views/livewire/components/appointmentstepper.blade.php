@@ -25,6 +25,7 @@ use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
 use App\Services\PhilippineLocationsService;
 use App\Models\UserAddresses;
+use App\Models\DocumentRequestDetails;
 
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
@@ -35,6 +36,10 @@ new #[Title('Appointment')] class extends Component {
     public string $last_name = '';
     public string $email = '';
     public string $phone = '';
+
+    // Certificate request properties
+    public array $certificates = [];
+    public bool $includeCertificates = false;
 
     public string $message = '';
     public ?int $appointmentId = null;
@@ -90,6 +95,17 @@ new #[Title('Appointment')] class extends Component {
         // Initialize user and userAddresses like userinfo.blade.php
         $this->user = auth()->user();
         $this->userAddresses = $this->user->userAddresses->first();
+
+        // Initialize certificates array with one empty certificate
+        $this->certificates = [
+            [
+                'certificate_type' => '',
+                'relationship' => '',
+                'first_name' => '',
+                'last_name' => '',
+                'middle_name' => '',
+            ],
+        ];
 
         $this->address = $this->userAddresses->address_line_1 ?? '';
         $this->region = $this->userAddresses->region ?? '';
@@ -247,8 +263,26 @@ new #[Title('Appointment')] class extends Component {
                 $this->validate([
                     'purpose' => 'required',
                 ]);
+                // Skip the certificates step if includeCertificates is false
+                if (!$this->includeCertificates) {
+                    $this->step++; // Skip to next step
+                }
                 break;
             case 5:
+                $this->isLoading = true;
+                // Validate certificates if they are included
+                if ($this->includeCertificates) {
+                    foreach ($this->certificates as $index => $certificate) {
+                        $this->validate([
+                            "certificates.{$index}.certificate_type" => 'required',
+                            "certificates.{$index}.relationship" => 'required',
+                            "certificates.{$index}.first_name" => 'required|string',
+                            "certificates.{$index}.last_name" => 'required|string',
+                        ]);
+                    }
+                }
+                break;
+            case 6:
                 $this->isLoading = true;
                 $this->validate([
                     'first_name' => 'string|required',
@@ -261,22 +295,20 @@ new #[Title('Appointment')] class extends Component {
                     'province' => 'string|required',
                     'city' => 'string|required',
                     'barangay' => 'string|required',
-                    'street' => 'string|required',
                     'zip_code' => 'string|required|max:10|regex:/^[0-9\-]+$/',
-                ]);
-                break;
-            case 6:
-                $this->isLoading = true;
-                $this->validate([
-                    'selectedDate' => 'required|date|after_or_equal:today',
-                    'selectedTime' => 'required|string',
                 ]);
                 break;
             case 7:
                 $this->isLoading = true;
-                // No additional validation needed - just confirmation step
+                $this->validate([
+                    'selectedTime' => 'required|string',
+                ]);
                 break;
             case 8:
+                $this->isLoading = true;
+                // No additional validation needed - just confirmation step
+                break;
+            case 9:
                 $this->isLoading = true;
                 break;
         }
@@ -329,6 +361,18 @@ new #[Title('Appointment')] class extends Component {
                 'selectedTime' => 'required|string',
             ]);
 
+            // Validate certificates if included
+            if ($this->includeCertificates && count($this->certificates) > 0) {
+                foreach ($this->certificates as $index => $certificate) {
+                    $this->validate([
+                        "certificates.{$index}.certificate_type" => 'required',
+                        "certificates.{$index}.relationship" => 'required',
+                        "certificates.{$index}.first_name" => 'required|string',
+                        "certificates.{$index}.last_name" => 'required|string',
+                    ]);
+                }
+            }
+
             DB::beginTransaction();
 
             if (!empty($this->reference_number)) {
@@ -351,6 +395,7 @@ new #[Title('Appointment')] class extends Component {
                 'notes' => "Appointment for {$this->to_whom} - {$this->purpose}",
                 'reference_number' => $reference_number,
                 'status' => 'on-going',
+                'has_certificate_requests' => $this->includeCertificates && count($this->certificates) > 0,
             ]);
 
             // Only create details if appointment was created and the details table has the correct FK
@@ -385,9 +430,43 @@ new #[Title('Appointment')] class extends Component {
                 }
             }
 
+            // Process certificate requests if included
+            if ($this->includeCertificates && count($this->certificates) > 0) {
+                foreach ($this->certificates as $certificate) {
+                    $docRefNumber = 'DOC-' . strtoupper(Str::random(8));
+
+                    $documentRequest = DocumentRequest::create([
+                        'user_id' => $userId,
+                        'appointment_id' => $appointment->id,
+                        'office_id' => $this->office->id,
+                        'service_id' => $this->service->id,
+                        'status' => 'pending',
+                        'remarks' => "Certificate request for {$certificate['first_name']} {$certificate['last_name']}",
+                        // 'document_type' => $certificate['certificate_type'],
+                        'to_whom' => $this->to_whom,
+                        'purpose' => $this->purpose,
+                        'payment_status' => 'processing',
+                        'payment_reference' => $docRefNumber,
+                        'reference_number' => $docRefNumber,
+                        'created_at' => now(),
+                        'updated_at' => now(),
+                    ]);
+
+                    // Create document request details
+                    DocumentRequestDetails::create([
+                        'document_request_id' => $documentRequest->id,
+                        'first_name' => $certificate['first_name'],
+                        'middle_name' => $certificate['middle_name'] ?? '',
+                        'last_name' => $certificate['last_name'],
+                        'relationship' => $certificate['relationship'],
+                        'email' => auth()->user()->email,
+                        'request_for' => $this->to_whom ?? 'myself', 
+                    ]);
+                }
+            }
+
             DB::commit();
 
-            // Send notification to user
             auth()
                 ->user()
                 ->notify(
@@ -400,7 +479,6 @@ new #[Title('Appointment')] class extends Component {
                     ]),
                 );
 
-            // Send notification to staff
             $staffs = User::getStaffsByOfficeId($this->office->id);
             if ($staffs->count() > 0) {
                 foreach ($staffs as $staff) {
@@ -417,7 +495,6 @@ new #[Title('Appointment')] class extends Component {
                     );
                 }
             }
-            // Send appointment slip email
             auth()->user()->notify(new \App\Notifications\AppointmentSlipNotification($appointment));
 
             $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";
@@ -426,13 +503,10 @@ new #[Title('Appointment')] class extends Component {
             if ($appointment) {
                 Log::info('Appointment created successfully', ['appointment_id' => $appointment->id]);
 
-                // Store the reference number for use in step 7
                 $this->reference_number = $reference_number;
 
-                // Move to step 7 instead of resetting
-                $this->step = 9;
+                $this->step = 10;
 
-                // Clear cache and update UI
                 $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";
                 Cache::forget($cacheKey);
                 $this->dispatch('refresh-slots');
@@ -581,6 +655,35 @@ new #[Title('Appointment')] class extends Component {
         $this->serviceSelected = $value;
     }
 
+    // Certificate management methods
+    public function addCertificate(): void
+    {
+        $this->certificates[] = [
+            'certificate_type' => '',
+            'relationship' => '',
+            'first_name' => '',
+            'last_name' => '',
+            'middle_name' => '',
+        ];
+    }
+
+    public function removeCertificate(int $index): void
+    {
+        if (count($this->certificates) > 1) {
+            unset($this->certificates[$index]);
+            $this->certificates = array_values($this->certificates);
+        }
+    }
+
+    public function toggleCertificates(): void
+    {
+        $this->includeCertificates = !$this->includeCertificates;
+
+        if ($this->includeCertificates && empty($this->certificates)) {
+            $this->addCertificate();
+        }
+    }
+
     public function with()
     {
         return [
@@ -626,29 +729,35 @@ new #[Title('Appointment')] class extends Component {
             </li>
             <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
+                    <div class="step-title">Certificate Requests</div>
+                    <div class="step-description text-sm text-gray-500">Required documents</div>
+                </div>
+            </li>
+            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Personal Information</div>
                     <div class="step-description text-sm text-gray-500">Your/Someone details</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Date & Time</div>
                     <div class="step-description text-sm text-gray-500">Schedule</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 9 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Confirmation</div>
                     <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 9 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 10 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Appointment Slip</div>
                     <div class="step-description text-sm text-gray-500">Save Your Details</div>
@@ -729,8 +838,8 @@ new #[Title('Appointment')] class extends Component {
 
                     <div class="flex flex-col gap-2 w-full" wire:loading.remove>
                         @foreach ($services as $service)
-                            <input type="radio" id="{{ $service->slug }}" name="service" value="{{ $service->slug }}"
-                                wire:model.live="serviceSelected" hidden />
+                            <input type="radio" id="{{ $service->slug }}" name="service"
+                                value="{{ $service->slug }}" wire:model.live="serviceSelected" hidden />
                             <label for="{{ $service->slug }}"
                                 class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2">
                                 {{ $service->title }}
@@ -751,15 +860,17 @@ new #[Title('Appointment')] class extends Component {
         @include('livewire.appointments.components.appointment-steps.step1')
     @elseif($step == 4)
         @include('livewire.appointments.components.appointment-steps.step2')
-    @elseif($step == 5)
+    @elseif($step == 5 && $includeCertificates)
+        @include('livewire.appointments.components.appointment-steps.certificates-step')
+    @elseif(($step == 5 && !$includeCertificates) || $step == 6)
         @include('livewire.appointments.components.appointment-steps.step3')
-    @elseif($step == 6)
-        @include('livewire.appointments.components.appointment-steps.step4')
     @elseif($step == 7)
-        @include('livewire.appointments.components.appointment-steps.step5')
+        @include('livewire.appointments.components.appointment-steps.step4')
     @elseif($step == 8)
-        @include('livewire.appointments.components.appointment-steps.step6')
+        @include('livewire.appointments.components.appointment-steps.step5')
     @elseif($step == 9)
+        @include('livewire.appointments.components.appointment-steps.step6')
+    @elseif($step == 10)
         @include('livewire.appointments.components.appointment-steps.step7')
     @endif
 </div>

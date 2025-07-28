@@ -37,6 +37,8 @@ return new class extends Migration {
             $table->string('government_id_type', 100)->nullable();
             $table->string('government_id_image_path', 255)->nullable();
 
+            $table->string('relationship')->nullable()->default('N/A');
+
             // Address Information
             $table->enum('address_type', ['Permanent', 'Temporary'])->nullable();
             $table->string('address_line_1', 150)->nullable();
