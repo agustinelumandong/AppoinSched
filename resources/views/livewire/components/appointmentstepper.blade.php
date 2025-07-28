@@ -40,6 +40,7 @@ new #[Title('Appointment')] class extends Component {
     public ?int $appointmentId = null;
     public bool $isLoading = false;
     public ?string $reference_number = null;
+    public ?string $error = null;
 
     public bool $editPersonDetails = false;
     public bool $same_as_personal_address = false;
@@ -75,9 +76,6 @@ new #[Title('Appointment')] class extends Component {
     public string $serviceSelected = '';
     public bool $termsAccepted = false;
 
-
-
-
     public function mount(Offices $office, Services $service, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
         $this->office = $office;
@@ -101,7 +99,6 @@ new #[Title('Appointment')] class extends Component {
         $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
 
-
         // Pre-populate dependent dropdowns if values exist
         if ($this->region) {
             $this->provinces = $locations->getProvinces($this->region);
@@ -114,8 +111,6 @@ new #[Title('Appointment')] class extends Component {
         }
 
         $this->regions = $locations->getRegions();
-
-
 
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
@@ -309,7 +304,7 @@ new #[Title('Appointment')] class extends Component {
             // Check for scheduling conflicts
             if ($this->checkForConflicts()) {
                 Log::info('Conflict found, appointment not saved');
-                session()->flash('error', 'This time slot is already booked. Please select a different time.');
+                $this->error = 'This hour has reached the maximum of 5 appointments. Please select a different time.';
                 $this->isLoading = false;
                 return;
             }
@@ -380,7 +375,6 @@ new #[Title('Appointment')] class extends Component {
                 ]);
             }
 
-
             if (str_starts_with($reference_number, 'DOC')) {
                 $request = DocumentRequest::where('reference_number', $reference_number)->first();
                 if ($request) {
@@ -394,24 +388,24 @@ new #[Title('Appointment')] class extends Component {
             DB::commit();
 
             // Send notification to user
-            auth()->user()->notify(new RequestEventNotification(
-                RequestNotificationEvent::AppointmentScheduled,
-                [
-                    'date' => $this->selectedDate,
-                    'time' => $this->selectedTime,
-                    'location' => $this->office->name,
-                    'service' => $this->service->title,
-                    'reference_no' => $reference_number
-                ]
-            ));
+            auth()
+                ->user()
+                ->notify(
+                    new RequestEventNotification(RequestNotificationEvent::AppointmentScheduled, [
+                        'date' => $this->selectedDate,
+                        'time' => $this->selectedTime,
+                        'location' => $this->office->name,
+                        'service' => $this->service->title,
+                        'reference_no' => $reference_number,
+                    ]),
+                );
 
             // Send notification to staff
             $staffs = User::getStaffsByOfficeId($this->office->id);
             if ($staffs->count() > 0) {
                 foreach ($staffs as $staff) {
-                    $staff->notify(new AdminEventNotification(
-                        AdminNotificationEvent::UserAppointmentScheduled,
-                        [
+                    $staff->notify(
+                        new AdminEventNotification(AdminNotificationEvent::UserAppointmentScheduled, [
                             'reference_no' => $reference_number,
                             'date' => $this->selectedDate,
                             'time' => $this->selectedTime,
@@ -419,8 +413,8 @@ new #[Title('Appointment')] class extends Component {
                             'service' => $this->service->title,
                             'user' => auth()->user()->name,
                             'user_email' => auth()->user()->email,
-                        ]
-                    ));
+                        ]),
+                    );
                 }
             }
             // Send appointment slip email
@@ -500,23 +494,29 @@ new #[Title('Appointment')] class extends Component {
     private function checkForConflicts(): bool
     {
         try {
-            // Convert the selected time to 24-hour format for comparison
-            $timeToCheck = Carbon::parse($this->selectedTime)->format('H:i');
+            // Get hour from selected time
+            $hour = Carbon::parse($this->selectedTime)->format('H');
 
-            $conflict = Appointments::where('booking_date', $this->selectedDate)
-                ->where(function ($query) use ($timeToCheck) {
-                    $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
-                })
+            // Count appointments in the same hour (hourly limit is 5)
+            $hourlyLimit = 5; // Maximum appointments per hour
+
+            $hourlyCount = Appointments::where('booking_date', $this->selectedDate)
                 ->where('office_id', $this->office->id)
                 ->where('service_id', $this->service->id)
-                ->exists();
+                ->whereRaw('HOUR(booking_time) = ?', [$hour])
+                ->whereIn('status', ['on-going', 'completed'])
+                ->count();
 
-            Log::info('Checking for conflicts in stepper:', [
+            $conflict = $hourlyCount >= $hourlyLimit;
+
+            Log::info('Checking for hourly conflicts in stepper:', [
                 'date' => $this->selectedDate,
                 'time' => $this->selectedTime,
-                'time_to_check' => $timeToCheck,
+                'hour' => $hour,
                 'office_id' => $this->office->id,
                 'service_id' => $this->service->id,
+                'hourly_count' => $hourlyCount,
+                'hourly_limit' => $hourlyLimit,
                 'has_conflict' => $conflict,
             ]);
 
@@ -545,7 +545,6 @@ new #[Title('Appointment')] class extends Component {
             auth()->user()->notify(new \App\Notifications\AppointmentSlipNotification($appointment));
 
             session()->flash('success', 'Appointment slip has been sent to your email address.');
-
         } catch (\Exception $e) {
             Log::error('Error sending appointment slip email: ' . $e->getMessage());
             session()->flash('error', 'Failed to send appointment slip. Please try again.');
@@ -684,7 +683,8 @@ new #[Title('Appointment')] class extends Component {
                             <li>You agree to provide accurate and truthful information.</li>
                             <li>You acknowledge that the appointment details will be sent to the relevant staff.</li>
                             <li>You agree to the terms of service and privacy policy of this platform.</li>
-                            <li>You understand that appointment times may be subject to change based on staff availability.
+                            <li>You understand that appointment times may be subject to change based on staff
+                                availability.
                             </li>
                             <li>You agree to arrive on time for your scheduled appointment.</li>
                             <li>You acknowledge that failure to show up may affect future appointment scheduling.</li>
@@ -699,8 +699,8 @@ new #[Title('Appointment')] class extends Component {
                     </div>
 
                     <footer class="my-6 flex justify-end gap-2">
-                        <button class="btn btn-primary" wire:click="nextStep" @if(!$termsAccepted) disabled
-                        @endif>Next</button>
+                        <button class="btn btn-primary" wire:click="nextStep"
+                            @if (!$termsAccepted) disabled @endif>Next</button>
                     </footer>
                 </div>
             </div>
@@ -758,7 +758,6 @@ new #[Title('Appointment')] class extends Component {
     @elseif($step == 7)
         @include('livewire.appointments.components.appointment-steps.step5')
     @elseif($step == 8)
-
         @include('livewire.appointments.components.appointment-steps.step6')
     @elseif($step == 9)
         @include('livewire.appointments.components.appointment-steps.step7')
