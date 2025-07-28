@@ -219,6 +219,8 @@ new #[Title('Document Request')] class extends Component {
 
     public string $serviceSelected = '';
 
+    public bool $termsAccepted = false;
+
     public function mount(Offices $office, Services $service, PersonalInformation $personalInformation, UserFamily $userFamilies, UserAddresses $userAddresses, PhilippineLocationsService $locations, ?string $reference_number = null): void
     {
         $this->office = $office;
@@ -275,9 +277,9 @@ new #[Title('Document Request')] class extends Component {
                 $this->payment_status = $existingRequest->payment_status ?? '';
                 // Set step based on payment status
                 if ($existingRequest->payment_status === 'unpaid') {
-                    $this->step = 7;
-                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
                     $this->step = 8;
+                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
+                    $this->step = 9;
                 } else {
                     $this->step = 1; // fallback
                 }
@@ -308,6 +310,15 @@ new #[Title('Document Request')] class extends Component {
         }
     }
 
+    public function termsAccepted()
+    {
+        if ($this->termsAccepted) {
+            $this->step = 2;
+            $this->isLoading = true;
+        } else {
+            session()->flash('error', 'You must accept the terms and conditions to proceed.');
+        }
+    }
 
     public function updatedServiceSelected($value)
     {
@@ -532,13 +543,13 @@ new #[Title('Document Request')] class extends Component {
     public function nextStep()
     {
         switch ($this->step) {
-            case 1:
+            case 2:
                 $this->isLoading = true;
                 $this->validate([
                     'serviceSelected' => 'required',
                 ]);
                 break;
-            case 2:
+            case 3:
                 $this->isLoading = true;
                 $this->validate([
                     'to_whom' => 'required',
@@ -550,13 +561,13 @@ new #[Title('Document Request')] class extends Component {
                     $this->reference_number = 'DOC-' . strtoupper(Str::random(10));
                 } while (DocumentRequest::where('reference_number', $this->reference_number)->exists());
                 break;
-            case 3:
+            case 4:
                 $this->isLoading = true;
                 $this->validate([
                     'purpose' => 'required',
                 ]);
                 break;
-            case 4:
+            case 5:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
                     $rules = [
@@ -658,7 +669,7 @@ new #[Title('Document Request')] class extends Component {
                 $this->fillFamilyDefaults();
                 $this->initializeContactInfo();
                 break;
-            case 5:
+            case 6:
                 $this->isLoading = true;
                 $this->validate([
                     'contact_first_name' => 'required|string|max:255',
@@ -667,7 +678,7 @@ new #[Title('Document Request')] class extends Component {
                     'contact_phone' => 'required|string|max:20',
                 ]);
                 break;
-            case 6:
+            case 7:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
                     $this->validate([
@@ -1145,7 +1156,7 @@ new #[Title('Document Request')] class extends Component {
             session()->flash('success', 'Document request submitted successfully!');
 
             // Move to payment step instead of redirecting
-            $this->step = 7;
+            $this->step = 8;
         } catch (\Exception $e) {
             DB::rollBack();
             \Log::error('Document Request Submission Error: ' . $e->getMessage());
@@ -1238,7 +1249,7 @@ new #[Title('Document Request')] class extends Component {
             }
 
             // Move to success page
-            $this->step = 8;
+            $this->step = 9;
         } catch (\Exception $e) {
             Log::error('Payment Processing Error: ' . $e->getMessage());
             session()->flash('error', 'Payment processing failed: ' . $e->getMessage());
@@ -1347,26 +1358,32 @@ new #[Title('Document Request')] class extends Component {
         <ul class="steps steps-horizontal w-full">
             <li class="step {{ $step >= 1 ? 'step-info' : '' }}">
                 <div class="step-content">
+                    <div class="step-title">Accept Terms</div>
+                    <div class="step-description text-sm text-gray-500">Accept Terms and Conditions</div>
+                </div>
+            </li>
+            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Service</div>
                     <div class="step-description text-sm text-gray-500">Select a service</div>
                 </div>
                 
             </li>
-            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">To Whom?</div>
                     <div class="step-description text-sm text-gray-500">For Yourself or Someone Else?</div>
                 </div>
                 
             </li>
-            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Purpose Request</div>
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
                 
             </li>
-            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     @php 
                         if ($this->service->slug === 'marriage-certificate') {
@@ -1385,25 +1402,25 @@ new #[Title('Document Request')] class extends Component {
                 </div>
                 
             </li>
-            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
                 </div>    
              </li>
-            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Confirmation</div>
                         <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>   
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Payment</div>
                     <div class="step-description text-sm text-gray-500">Complete your transaction</div>
                  </div>
             </li>
-            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 9 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Success</div>
                     <div class="step-description text-sm text-gray-500">Done</div>
@@ -1414,6 +1431,51 @@ new #[Title('Document Request')] class extends Component {
 </div>
     {{-- Stepper Content --}}
    @if ($step == 1)
+        <div class="px-5 py-2 mt-5">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <div class="header mb-4">
+                        <h3 class="text-xl font-semibold text-base-content">Terms and Conditions</h3>
+                        <div class="flex items-center gap-2 text-sm text-base-content/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Please read and accept the terms and conditions.</span>
+                        </div>
+                    </div>
+
+                    <div class="terms-conditions-content mb-6">
+                        <p class="mb-4">By submitting this document request, you agree to the following terms and
+                            conditions:</p>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-base-content/80">
+                            <li>You are requesting a document for yourself or someone else.</li>
+                            <li>You understand that the document request is subject to verification and approval.</li>
+                            <li>You agree to provide accurate and truthful information.</li>
+                            <li>You acknowledge that the document request details will be sent to the relevant staff.</li>
+                            <li>You agree to the terms of service and privacy policy of this platform.</li>
+                            <li>You understand that document processing times may vary based on complexity.</li>
+                            <li>You agree to provide all required supporting documents.</li>
+                            <li>You acknowledge that incomplete information may delay processing.</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-center mb-6">
+                        <label for="termsAccepted" class="flex items-center cursor-pointer">
+                            <input type="checkbox" wire:model.live="termsAccepted" class="checkbox checkbox-sm">
+                            I accept the <a href="TERMS" class="text-blue-500">Terms and Conditions</a>
+                        </label>
+                    </div>
+
+                    <footer class="my-6 flex justify-end gap-2">
+                        <button class="btn btn-primary" wire:click="nextStep" @if(!$termsAccepted) disabled
+                        @endif>Next</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    @elseif($step == 2)
     <div class="px-5 py-2 mt-5">
         <div class="flex flex-col gap-4">
             <div>
@@ -1457,25 +1519,25 @@ new #[Title('Document Request')] class extends Component {
                 
 
                 <footer class="my-6 flex justify-end gap-2">
-                    {{-- <button class="btn btn-ghost" wire:click="previousStep">Previous</button> --}}
+                    <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
                     <button class="btn btn-primary" wire:click="nextStep">Next</button>
                 </footer>
             </div>
         </div>
     </div>
-    @elseif($step == 2)
-        @include('livewire.documentrequest.components.document-request-steps.step1')
     @elseif($step == 3)
-        @include('livewire.documentrequest.components.document-request-steps.step2')
+        @include('livewire.documentrequest.components.document-request-steps.step1')
     @elseif($step == 4)
-        @include('livewire.documentrequest.components.document-request-steps.step3')
+        @include('livewire.documentrequest.components.document-request-steps.step2')
     @elseif($step == 5)
-        @include('livewire.documentrequest.components.document-request-steps.step4')
+        @include('livewire.documentrequest.components.document-request-steps.step3')
     @elseif($step == 6)
-        @include('livewire.documentrequest.components.document-request-steps.step5')
+        @include('livewire.documentrequest.components.document-request-steps.step4')
     @elseif($step == 7)
-        @include('livewire.documentrequest.components.document-request-steps.step6')
+        @include('livewire.documentrequest.components.document-request-steps.step5')
     @elseif($step == 8)
+        @include('livewire.documentrequest.components.document-request-steps.step6')
+    @elseif($step == 9)
         @include('livewire.documentrequest.components.document-request-steps.step7')
     @endif
 </div>
