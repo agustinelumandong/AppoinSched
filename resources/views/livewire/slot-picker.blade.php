@@ -21,7 +21,8 @@ new class extends Component {
     public ?string $error = null;
 
     // Configuration - can be made configurable per office/service
-    public int $slotDuration = 30;
+    public int $maxSlotsPerHour = 5;
+    public int $slotDuration = 60;
     public string $startTime = '08:00';
     public string $endTime = '17:00';
     public string $lunchStart = '12:00';
@@ -32,22 +33,15 @@ new class extends Component {
         'selectedTime' => 'required|string',
     ];
 
-    public function mount(
-        int $officeId, 
-        ?int $serviceId = null, 
-        ?int $excludeAppointmentId = null, 
-        ?string $preSelectedDate = null, 
-        ?string $preSelectedTime = null,
-        ?string $selectedDate = null, 
-        ?string $selectedTime = null
-    ): void {
+    public function mount(int $officeId, ?int $serviceId = null, ?int $excludeAppointmentId = null, ?string $preSelectedDate = null, ?string $preSelectedTime = null, ?string $selectedDate = null, ?string $selectedTime = null): void
+    {
         try {
             $this->officeId = $officeId;
-            $this->serviceId = $serviceId; 
+            $this->serviceId = $serviceId;
             $this->excludeAppointmentId = $excludeAppointmentId;
 
             // Set pre-selected values if provided (for editing)
-            $this->selectedDate = $selectedDate ?? $preSelectedDate ?? Carbon::today()->format('Y-m-d');
+            $this->selectedDate = $selectedDate ?? ($preSelectedDate ?? Carbon::today()->format('Y-m-d'));
             $this->selectedTime = $selectedTime ?? $preSelectedTime;
 
             $this->generateTimeSlots();
@@ -71,10 +65,10 @@ new class extends Component {
                 $this->error = 'Cannot select weekend dates';
                 return;
             }
-            if ($selectedDate->isPast()) {
-                $this->error = 'Cannot select past dates';
-                return;
-            }
+            // if ($selectedDate->isPast()) {
+            //     $this->error = 'Cannot select past dates';
+            //     return;
+            // }
 
             $this->selectedDate = $selectedDate->format('Y-m-d');
             $this->selectedTime = null; // Reset time when date changes
@@ -85,7 +79,7 @@ new class extends Component {
             $this->error = 'Invalid date selected';
             Log::error('Date selection error: ' . $e->getMessage(), [
                 'date' => $date,
-                'office_id' => $this->officeId
+                'office_id' => $this->officeId,
             ]);
         }
     }
@@ -93,7 +87,7 @@ new class extends Component {
     public function selectTime(string $time): void
     {
         try {
-            if(Carbon::parse($this->selectedDate)->isWeekend()) {
+            if (Carbon::parse($this->selectedDate)->isWeekend()) {
                 $this->error = 'Cannot select weekend dates';
                 return;
             }
@@ -103,41 +97,48 @@ new class extends Component {
             }
 
             // Convert input time to 24-hour format for comparison
-            $timeToCheck = Carbon::parse($time)->format('H:i');
-            
-            // Check if the slot is available
-            $bookedSlots = $this->getBookedSlots();
-            $isBooked = in_array($timeToCheck, $bookedSlots);
+            // $timeToCheck = Carbon::parse($time)->format('H:i');
 
-            Log::info('Attempting to select time:', [
-                'time' => $time,
-                'time_to_check' => $timeToCheck,
-                'is_booked' => $isBooked,
-                'booked_slots' => $bookedSlots,
-                'current_appointment_id' => $this->excludeAppointmentId
-            ]);
+            // Check hourly capacity instead of exact time slot
+            $hourlyCount = $this->getHourlyBookingCount($time);
 
-            if ($isBooked) {
-                $this->error = 'This time slot is already booked';
+            if ($hourlyCount >= $this->maxSlotsPerHour) {
+                $this->error = 'This hour slot is fully booked (5/5 appointments). Please select another time.';
                 return;
             }
 
+            // Check if the slot is available
+            // $bookedSlots = $this->getBookedSlots();
+            // $isBooked = in_array($timeToCheck, $bookedSlots);
+
+            // Log::info('Attempting to select time:', [
+            //     'time' => $time,
+            //     'time_to_check' => $timeToCheck,
+            //     'is_booked' => $isBooked,
+            //     'booked_slots' => $bookedSlots,
+            //     'current_appointment_id' => $this->excludeAppointmentId
+            // ]);
+
+            // if ($isBooked) {
+            //     $this->error = 'This time slot is already booked';
+            //     return;
+            // }
+
             $this->selectedTime = $time;
             $this->error = null;
-
             $this->dispatchSelectionUpdate();
 
-            Log::info('Time slot selected successfully', [
-                'date' => $this->selectedDate,
-                'time' => $this->selectedTime,
-                'office_id' => $this->officeId,
-                'service_id' => $this->serviceId
-            ]);
+            // Log::info('Time slot selected successfully', [
+            //     'date' => $this->selectedDate,
+            //     'time' => $this->selectedTime,
+            //     'office_id' => $this->officeId,
+            //     'service_id' => $this->serviceId
+            // ]);
         } catch (\Exception $e) {
             $this->error = 'Failed to select time slot';
             Log::error('Time selection error: ' . $e->getMessage(), [
                 'time' => $time,
-                'office_id' => $this->officeId
+                'office_id' => $this->officeId,
             ]);
         }
     }
@@ -166,7 +167,7 @@ new class extends Component {
             $this->availableSlots = [];
             Log::error('Date change error: ' . $e->getMessage(), [
                 'date' => $this->selectedDate,
-                'office_id' => $this->officeId
+                'office_id' => $this->officeId,
             ]);
         } finally {
             $this->isLoading = false;
@@ -183,7 +184,7 @@ new class extends Component {
         try {
             // Generate cache key based on parameters
             $cacheKey = $this->generateCacheKey();
-            
+
             // Try to get slots from cache first
             $slots = Cache::remember($cacheKey, now()->addMinutes(5), function () {
                 return $this->generateTimeSlotsFromScratch();
@@ -222,13 +223,11 @@ new class extends Component {
             $lunchStart = Carbon::parse($this->lunchStart);
             $lunchEnd = Carbon::parse($this->lunchEnd);
 
-            $bookedSlots = $this->getBookedSlots();
-
-            Log::info('Generating time slots:', [
+            Log::info('Generating hourly time slots:', [
                 'date' => $this->selectedDate,
-                'booked_slots' => $bookedSlots,
                 'start_time' => $this->startTime,
-                'end_time' => $this->endTime
+                'end_time' => $this->endTime,
+                'max_slots_per_hour' => $this->maxSlotsPerHour,
             ]);
 
             while ($currentTime->copy()->addMinutes($this->slotDuration) <= $endTime) {
@@ -239,31 +238,89 @@ new class extends Component {
                 }
 
                 $slotTime = $currentTime->format('H:i');
-                $endSlotTime = $currentTime->copy()->addMinutes($this->slotDuration);
-                $isAvailable = !in_array($slotTime, $bookedSlots);
-
-                Log::info('Processing slot:', [
-                    'time' => $slotTime,
-                    'is_available' => $isAvailable,
-                    'booked_slots' => $bookedSlots
-                ]);
+                $hourlyBookingCount = $this->getHourlyBookingCount($slotTime);
+                $remainingSlots = max(0, $this->maxSlotsPerHour - $hourlyBookingCount);
+                $isAvailable = $remainingSlots > 0;
+                $isPast = $this->isSlotInPast($slotTime);
 
                 $slots[] = [
                     'time' => $slotTime,
                     'display' => $currentTime->format('g:i A'),
-                    'range' => $currentTime->format('g:i A') . ' - ' . $endSlotTime->format('g:i A'),
-                    'available' => $isAvailable,
-                    'isPast' => $this->isSlotInPast($slotTime),
+                    'range' => $currentTime->format('g:i A') . ' - ' . $currentTime->copy()->addMinutes($this->slotDuration)->format('g:i A'),
+                    'available' => $isAvailable && !$isPast,
+                    'isPast' => $isPast,
+                    'booked_count' => $hourlyBookingCount,
+                    'remaining_slots' => $remainingSlots,
+                    'max_slots' => $this->maxSlotsPerHour,
+                    'is_full' => $hourlyBookingCount >= $this->maxSlotsPerHour,
+                    'status' => $this->getSlotStatus($hourlyBookingCount, $remainingSlots, $isPast),
                 ];
 
                 $currentTime->addMinutes($this->slotDuration);
             }
 
+            Log::info('Generated slots:', [
+                'total_slots' => count($slots),
+                'available_slots' => count(array_filter($slots, fn($slot) => $slot['available'])),
+            ]);
+
             return $slots;
         } catch (\Exception $e) {
-            Log::error('Error generating time slots from scratch: ' . $e->getMessage());
+            Log::error('Error generating hourly time slots: ' . $e->getMessage());
             return [];
         }
+    }
+
+    private function getHourlyBookingCount(string $slotTime): int
+    {
+        try {
+            $hour = Carbon::parse($slotTime)->format('H');
+
+            $count = Appointments::query()
+                ->where('booking_date', $this->selectedDate)
+                ->where('office_id', $this->officeId)
+                ->when($this->serviceId, function ($q) {
+                    return $q->where('service_id', $this->serviceId);
+                })
+                ->when($this->excludeAppointmentId, function ($q) {
+                    return $q->where('id', '!=', $this->excludeAppointmentId);
+                })
+                ->whereRaw('HOUR(booking_time) = ?', [$hour])
+                ->whereIn('status', ['on-going', 'completed'])
+                ->count();
+
+            Log::info('Hourly booking count:', [
+                'hour' => $hour,
+                'count' => $count,
+                'date' => $this->selectedDate,
+                'office_id' => $this->officeId,
+            ]);
+
+            return $count;
+        } catch (\Exception $e) {
+            Log::error('Error getting hourly booking count: ' . $e->getMessage(), [
+                'slot_time' => $slotTime,
+                'date' => $this->selectedDate,
+            ]);
+            return $this->maxSlotsPerHour; // Return max to prevent booking on error
+        }
+    }
+
+    private function getSlotStatus(int $bookedCount, int $remainingSlots, bool $isPast): string
+    {
+        if ($isPast) {
+            return 'past';
+        }
+
+        if ($bookedCount >= $this->maxSlotsPerHour) {
+            return 'full';
+        }
+
+        if ($remainingSlots <= 2) {
+            return 'almost_full';
+        }
+
+        return 'available';
     }
 
     private function getBookedSlots(): array
@@ -272,18 +329,20 @@ new class extends Component {
             $bookedSlots = Appointments::query()
                 ->where('booking_date', $this->selectedDate)
                 ->where('office_id', $this->officeId)
-                ->when($this->serviceId, function($q) {
+                ->when($this->serviceId, function ($q) {
                     return $q->where('service_id', $this->serviceId);
                 })
-                ->when($this->excludeAppointmentId, function($q) {
+                ->when($this->excludeAppointmentId, function ($q) {
                     return $q->where('id', '!=', $this->excludeAppointmentId);
                 })
                 ->get(['booking_time']);
 
-            $formattedSlots = $bookedSlots->map(function($appointment) {
-                // Ensure consistent 24-hour format
-                return Carbon::parse($appointment->booking_time)->format('H:i');
-            })->toArray();
+            $formattedSlots = $bookedSlots
+                ->map(function ($appointment) {
+                    // Ensure consistent 24-hour format
+                    return Carbon::parse($appointment->booking_time)->format('H:i');
+                })
+                ->toArray();
 
             Log::info('Booked slots found:', [
                 'date' => $this->selectedDate,
@@ -291,7 +350,7 @@ new class extends Component {
                 'service_id' => $this->serviceId,
                 'exclude_id' => $this->excludeAppointmentId,
                 'slots' => $formattedSlots,
-                'raw_slots' => $bookedSlots->pluck('booking_time')->toArray()
+                'raw_slots' => $bookedSlots->pluck('booking_time')->toArray(),
             ]);
 
             return $formattedSlots;
@@ -299,7 +358,7 @@ new class extends Component {
             Log::error('Error fetching booked slots: ' . $e->getMessage(), [
                 'date' => $this->selectedDate,
                 'office_id' => $this->officeId,
-                'service_id' => $this->serviceId
+                'service_id' => $this->serviceId,
             ]);
             return [];
         }
@@ -317,7 +376,7 @@ new class extends Component {
         } catch (\Exception $e) {
             Log::error('Error checking if slot is in past: ' . $e->getMessage(), [
                 'date' => $this->selectedDate,
-                'time' => $slotTime
+                'time' => $slotTime,
             ]);
             return true; // Default to true to prevent booking invalid slots
         }
@@ -347,144 +406,142 @@ new class extends Component {
     }
 }; ?>
 
-<div class="slot-picker-container" 
-    x-data="{
-        currentMonth: new Date().getMonth(),
-        currentYear: new Date().getFullYear(),
-        selectedDate: @entangle('selectedDate'),
-        calendar: [],
-        weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
+<div class="slot-picker-container" x-data="{
+    currentMonth: new Date().getMonth(),
+    currentYear: new Date().getFullYear(),
+    selectedDate: @entangle('selectedDate'),
+    calendar: [],
+    weekDays: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'],
 
-        init() {
-            // Initialize to the selected date's month if available
-            if (this.selectedDate) {
-                const [year, month] = this.selectedDate.split('-').map(Number);
-                this.currentYear = year;
-                this.currentMonth = month - 1; // Convert to 0-based month
-            }
-            this.generateCalendar();
-        },
-
-        previousMonth() {
-            this.currentMonth--;
-            if (this.currentMonth < 0) {
-                this.currentMonth = 11;
-                this.currentYear--;
-            }
-            this.generateCalendar();
-        },
-
-        nextMonth() {
-            this.currentMonth++;
-            if (this.currentMonth > 11) {
-                this.currentMonth = 0;
-                this.currentYear++;
-            }
-            this.generateCalendar();
-        },
-
-        selectDate(day, event) {
-            event.preventDefault();
-            event.stopPropagation();
-            const dateStr = `${this.currentYear}-${(this.currentMonth + 1).toString().padStart(2, '0')}-${day.number.toString().padStart(2, '0')}`;
-            this.$wire.selectDate(dateStr);
-            // Don't reset the calendar view after selection
-        },
-
-        generateCalendar() {
-            const firstDay = new Date(this.currentYear, this.currentMonth, 1);
-            const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
-            const startingDay = firstDay.getDay(); // Make Sunday = 0, Saturday = 6
-            const daysInMonth = lastDay.getDate();
-
-            let calendar = [];
-            let week = [];
-
-            // Add empty cells for days before the first day of the month
-            for (let i = 0; i < startingDay; i++) {
-                week.push(null);
-            }
-
-            // Add days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(this.currentYear, this.currentMonth, day);
-                const dayOfWeek = date.getDay();
-
-                week.push({ 
-                    number: day, 
-                    isWeekend: dayOfWeek === 0 || dayOfWeek === 6
-                });
-
-                if (week.length === 7) {
-                    calendar.push(week);
-                    week = [];
-                }
-            }
-
-            // Fill the last week with empty cells if needed
-            while (week.length < 7 && week.length > 0) {
-                week.push(null);
-            }
-            if (week.length > 0) {
-                calendar.push(week);
-            }
-
-            this.calendar = calendar;
-        },
-
-        getMonthName(month) {
-            return new Date(2000, month, 1).toLocaleString('default', { month: 'long' });
-        },
-
-        isSelectedDate(day) {
-            if (!this.selectedDate || !day) return false;
-            const [year, month, selectedDay] = this.selectedDate.split('-').map(Number);
-            return year === this.currentYear && month - 1 === this.currentMonth && selectedDay === day;
-        },
-
-        isToday(day) {
-            const today = new Date();
-            return today.getDate() === day &&
-                today.getMonth() === this.currentMonth &&
-                today.getFullYear() === this.currentYear;
-        },
-
-        isPastDate(day) {
-            const today = new Date();
-            const selectedDate = new Date(this.currentYear, this.currentMonth, day);
-            return selectedDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
-        },
-
-        isDayWeekend(day) {
-            const dayOfWeek = new Date(this.currentYear, this.currentMonth, day).getDay();
-            return dayOfWeek === 0 || dayOfWeek === 6;
-        },
-
-        getDateClasses(day) {
-            let classes = [];
-
-            if (this.isSelectedDate(day.number)) {
-                classes.push('bg-blue-500 text-white hover:bg-blue-600');
-            } else if (this.isToday(day.number)) {
-                classes.push('bg-blue-100 text-blue-600 hover:bg-blue-200');
-            } else if (!this.isPastDate(day.number) && !day.isWeekend) {
-                classes.push('text-gray-700 hover:bg-blue-50 hover:text-blue-600');
-            } else {
-                classes.push('text-gray-400 cursor-not-allowed opacity-50');
-            }
-
-            return classes.join(' ');
+    init() {
+        // Initialize to the selected date's month if available
+        if (this.selectedDate) {
+            const [year, month] = this.selectedDate.split('-').map(Number);
+            this.currentYear = year;
+            this.currentMonth = month - 1; // Convert to 0-based month
         }
-    }"
-    x-init="init()"
-    wire:key="slot-picker-{{ $officeId }}-{{ $excludeAppointmentId ?? 'new' }}"
-    @click.stop>
+        this.generateCalendar();
+    },
+
+    previousMonth() {
+        this.currentMonth--;
+        if (this.currentMonth < 0) {
+            this.currentMonth = 11;
+            this.currentYear--;
+        }
+        this.generateCalendar();
+    },
+
+    nextMonth() {
+        this.currentMonth++;
+        if (this.currentMonth > 11) {
+            this.currentMonth = 0;
+            this.currentYear++;
+        }
+        this.generateCalendar();
+    },
+
+    selectDate(day, event) {
+        event.preventDefault();
+        event.stopPropagation();
+        const dateStr = `${this.currentYear}-${(this.currentMonth + 1).toString().padStart(2, '0')}-${day.number.toString().padStart(2, '0')}`;
+        this.$wire.selectDate(dateStr);
+        // Don't reset the calendar view after selection
+    },
+
+    generateCalendar() {
+        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+        const startingDay = firstDay.getDay(); // Make Sunday = 0, Saturday = 6
+        const daysInMonth = lastDay.getDate();
+
+        let calendar = [];
+        let week = [];
+
+        // Add empty cells for days before the first day of the month
+        for (let i = 0; i < startingDay; i++) {
+            week.push(null);
+        }
+
+        // Add days of the month
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(this.currentYear, this.currentMonth, day);
+            const dayOfWeek = date.getDay();
+
+            week.push({
+                number: day,
+                isWeekend: dayOfWeek === 0 || dayOfWeek === 6
+            });
+
+            if (week.length === 7) {
+                calendar.push(week);
+                week = [];
+            }
+        }
+
+        // Fill the last week with empty cells if needed
+        while (week.length < 7 && week.length > 0) {
+            week.push(null);
+        }
+        if (week.length > 0) {
+            calendar.push(week);
+        }
+
+        this.calendar = calendar;
+    },
+
+    getMonthName(month) {
+        return new Date(2000, month, 1).toLocaleString('default', { month: 'long' });
+    },
+
+    isSelectedDate(day) {
+        if (!this.selectedDate || !day) return false;
+        const [year, month, selectedDay] = this.selectedDate.split('-').map(Number);
+        return year === this.currentYear && month - 1 === this.currentMonth && selectedDay === day;
+    },
+
+    isToday(day) {
+        const today = new Date();
+        return today.getDate() === day &&
+            today.getMonth() === this.currentMonth &&
+            today.getFullYear() === this.currentYear;
+    },
+
+    isPastDate(day) {
+        const today = new Date();
+        const selectedDate = new Date(this.currentYear, this.currentMonth, day);
+        return selectedDate < new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    },
+
+    isDayWeekend(day) {
+        const dayOfWeek = new Date(this.currentYear, this.currentMonth, day).getDay();
+        return dayOfWeek === 0 || dayOfWeek === 6;
+    },
+
+    getDateClasses(day) {
+        let classes = [];
+
+        if (this.isSelectedDate(day.number)) {
+            classes.push('bg-blue-500 text-white hover:bg-blue-600');
+        } else if (this.isToday(day.number)) {
+            classes.push('bg-blue-100 text-blue-600 hover:bg-blue-200');
+        } else if (!this.isPastDate(day.number) && !day.isWeekend) {
+            classes.push('text-gray-700 hover:bg-blue-50 hover:text-blue-600');
+        } else {
+            classes.push('text-gray-400 cursor-not-allowed opacity-50');
+        }
+
+        return classes.join(' ');
+    }
+}" x-init="init()"
+    wire:key="slot-picker-{{ $officeId }}-{{ $excludeAppointmentId ?? 'new' }}" @click.stop>
 
     <div class="grid lg:grid-cols-2 gap-6">
         <!-- Calendar Section -->
         <div class="bg-white rounded-lg border border-gray-200 p-6">
             <div class="flex items-center justify-between mb-4">
-                <button type="button" @click.stop="previousMonth()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                <button type="button" @click.stop="previousMonth()"
+                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7">
                         </path>
@@ -494,7 +551,8 @@ new class extends Component {
                 <h3 class="text-lg font-semibold text-gray-800" x-text="getMonthName(currentMonth) + ' ' + currentYear">
                 </h3>
 
-                <button type="button" @click.stop="nextMonth()" class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
+                <button type="button" @click.stop="nextMonth()"
+                    class="p-2 hover:bg-gray-100 rounded-lg transition-colors duration-200">
                     <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
@@ -515,7 +573,8 @@ new class extends Component {
                             <template x-if="day">
                                 <button type="button" @click="selectDate(day, $event)"
                                     class="w-full h-full flex items-center justify-center text-sm font-medium rounded-lg transition-all duration-200"
-                                    :class="getDateClasses(day)" :disabled="isPastDate(day.number) || day.isWeekend" x-text="day.number">
+                                    :class="getDateClasses(day)" :disabled="isPastDate(day.number) || day.isWeekend"
+                                    x-text="day.number">
                                 </button>
                             </template>
                             <template x-if="!day">
@@ -541,7 +600,7 @@ new class extends Component {
                         </svg>
                     </button>
                     <div class="text-sm text-gray-500">
-                        {{ $slotDuration }} min slots
+                        Maximum {{ $maxSlotsPerHour }} appointments per hour
                     </div>
                 </div>
             </div>
@@ -567,7 +626,7 @@ new class extends Component {
 
             <!-- Time Slots Display -->
             <div wire:loading.remove>
-                @if($selectedDate && Carbon::parse($selectedDate)->isWeekend())
+                @if ($selectedDate && Carbon::parse($selectedDate)->isWeekend())
                     <div class="text-center py-8">
                         <h4 class="text-lg font-medium text-gray-700 mb-2">Cannot select weekend dates</h4>
                         <p class="text-gray-500">Please select a different date.</p>
@@ -581,21 +640,20 @@ new class extends Component {
                                 </path>
                             </svg>
                             <span class="font-medium">
-                                {{ Carbon::parse($selectedDate)->format('F j, Y') }}  
-                                @if($selectedDate && $selectedTime)
-                                    at  {{ Carbon::parse($selectedTime)->format('g:i A') ?? '' }}
+                                {{ Carbon::parse($selectedDate)->format('F j, Y') }}
+                                @if ($selectedDate && $selectedTime)
+                                    at {{ Carbon::parse($selectedTime)->format('g:i A') ?? '' }}
                                 @endif
                             </span>
                         </div>
                     </div>
 
                     @if (count($availableSlots) > 0)
-                        <div class="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
+                        <div class="grid grid-cols-1 gap-2 max-h-96 overflow-y-auto">
                             @foreach ($availableSlots as $slot)
-                                <button type="button" 
-                                    wire:click.stop="selectTime('{{ $slot['time'] }}')"
-                                    class="p-3 text-left border rounded-lg transition-all duration-200 
-                                        {{ $selectedTime === $slot['time'] ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50' }} 
+                                <button type="button" wire:click.stop="selectTime('{{ $slot['time'] }}')"
+                                    class="p-3 text-left border rounded-lg transition-all duration-200
+                                        {{ $selectedTime === $slot['time'] ? 'border-blue-500 bg-blue-50 text-blue-700' : 'border-gray-200 text-gray-700 hover:border-blue-300 hover:bg-blue-50' }}
                                         {{ !$slot['available'] || $slot['isPast'] ? 'opacity-50 cursor-not-allowed bg-gray-50' : 'hover:shadow-sm' }}"
                                     {{ !$slot['available'] || $slot['isPast'] ? 'disabled' : '' }}>
                                     <div class="flex items-center justify-between">
@@ -607,10 +665,26 @@ new class extends Component {
                                             </svg>
                                             <span class="font-medium">{{ $slot['display'] }}</span>
                                         </div>
+
                                         @if (!$slot['available'])
-                                            <span class="text-xs text-red-500 font-medium">Booked</span>
+                                            <span class="text-xs text-red-500 font-medium">Fully Booked</span>
                                         @elseif ($slot['isPast'])
                                             <span class="text-xs text-gray-400">Past</span>
+                                        @else
+                                            <div class="flex items-center gap-2">
+                                                <div
+                                                    class="inline-flex items-center px-2 py-0.5 rounded text-xs
+                                                    {{ $slot['remaining_slots'] <= 2 ? 'bg-orange-100 text-orange-700' : 'bg-green-100 text-green-700' }}">
+                                                    <span
+                                                        class="font-medium">{{ $slot['remaining_slots'] }}/{{ $slot['max_slots'] }}</span>
+                                                    <span class="ml-1">slots left</span>
+                                                </div>
+
+                                                @if ($slot['remaining_slots'] <= 2)
+                                                    <span class="text-xs text-orange-500 font-medium">Almost
+                                                        full</span>
+                                                @endif
+                                            </div>
                                         @endif
                                     </div>
                                 </button>
@@ -624,7 +698,9 @@ new class extends Component {
                                     d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                             </svg>
                             <h4 class="text-lg font-medium text-gray-700 mb-2">No available slots</h4>
-                            <p class="text-gray-500">All time slots are booked for this date.</p>
+                            <p class="text-gray-500">All hourly time slots are fully booked for this date.</p>
+                            <p class="text-sm text-gray-500 mt-2">Each hour allows a maximum of {{ $maxSlotsPerHour }}
+                                appointments.</p>
                         </div>
                     @endif
                 @else

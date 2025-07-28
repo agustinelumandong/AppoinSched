@@ -6,9 +6,28 @@
     x-transition:leave-start="opacity-100 transform scale-100" x-transition:leave-end="opacity-0 transform scale-95">
     <form wire:submit.prevent="rescheduleAppointment">
         <div class="modal-body">
+            @if (session()->has('error'))
+                <div class="alert alert-danger d-flex align-items-center mb-4">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    <div>{{ session('error') }}</div>
+                </div>
+            @endif
+
             @if ($appointment)
                 <div class="mb-4">
                     <label class="form-label fw-semibold">Select New Date and Time</label>
+
+                    <div class="alert alert-info mb-3">
+                        <div class="d-flex">
+                            <i class="bi bi-info-circle-fill me-2 mt-1"></i>
+                            <div>
+                                <strong>Hourly Appointment System</strong>
+                                <p class="mb-0 small">Each hour can accommodate up to 5 appointments. Please select an
+                                    hour with available slots.</p>
+                            </div>
+                        </div>
+                    </div>
+
                     <div wire:key="reschedule-slot-picker-{{ $appointment->id }}-{{ now() }}">
                         @livewire(
                             'slot-picker',
@@ -48,7 +67,7 @@
                     <i class="bi bi-x-lg me-1"></i>Cancel
                 </button>
                 <button type="submit" class="btn btn-primary" wire:loading.attr="disabled"
-                    wire:click="rescheduleAppointment" @if(!$selectedDate || !$selectedTime) disabled @endif>
+                    wire:click="rescheduleAppointment" @if (!$selectedDate || !$selectedTime) disabled @endif>
                     <span wire:loading.remove>
                         <i class="bi bi-save me-1"></i>Confirm Reschedule
                     </span>
