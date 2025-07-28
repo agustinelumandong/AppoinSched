@@ -44,21 +44,12 @@ new class extends Component {
     @include('components.alert')
 
     <div class="space-y-6">
-        <div class="flex justify-between items-center">
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900">Welcome, {{ auth()->user()->first_name }}!</h1>
-                <p class="text-gray-600">Book appointments and manage your requests</p>
-            </div>
-        </div>
-
         <div class="mb-1 flex flex-row gap-4">
             <div class="w-1/3">
-                <h4 class="text-3xl font-bold text-gray-900">Available Offices</h4>
+                <h4 class="text-2xl font-bold text-gray-900">Available Offices</h4>
             </div>
             <div class="w-full">
-                <h4 class="text-3xl font-bold text-gray-900">Appointments Calendar</h4>
-                <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff
-                </p>
+                <h4 class="text-2xl font-bold text-gray-900">Appointments Calendar</h4> 
             </div>
         </div>
 
@@ -98,7 +89,7 @@ new class extends Component {
                     @forelse ($offices as $office)
                         <a href="{{ route('offices.show', $office->slug) }}"
                             class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
-                            id="office-{{ $office->id }}" style="height: fit-content;">
+                            id="office-{{ $office->id }}" style="height: 230px;">
                             <div class="absolute" style="top: -50px; right: -80px;">
                                 @php
                                     $logo = $office->logo;
