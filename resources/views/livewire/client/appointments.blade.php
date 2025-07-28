@@ -266,17 +266,19 @@ new class extends Component {
         <td class="px-6 py-4 whitespace-nowrap">
           <div class="d-flex gap-2">
           @if($appointment->status == 'on-going')
-        <button class="flux-btn btn-sm flux-btn-outline flux-btn-primary"
-        wire:click="cancelAppointment({{ $appointment->id }})">
-        Cancel
-        </button>
-      @endif
+            <button class="flux-btn btn-sm flux-btn-danger"
+              wire:click="cancelAppointment({{ $appointment->id }})"
+              title="Cancel Appointment">
+              <i class="bi bi-trash"></i>
+            </button>
+          @endif
           @if($appointment->status == 'on-going')
-        <button class="flux-btn btn-sm flux-btn-outline flux-btn-primary"
-        wire:click="openRescheduleModal({{ $appointment->id }})">
-        Reschedule
-        </button>
-      @endif
+            <button class="flux-btn btn-sm flux-btn-success"
+              wire:click="openRescheduleModal({{ $appointment->id }})"
+              title="Reschedule Appointment">
+              <i class="bi bi-calendar2-plus"></i>
+            </button>
+          @endif
           <button class="flux-btn btn-sm flux-btn-primary"
             wire:click="showAppointmentDetails({{ $appointment->id }})">
             <i class="bi bi-eye"></i>
