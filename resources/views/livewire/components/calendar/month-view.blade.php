@@ -10,13 +10,19 @@
   <!-- Calendar Grid -->
   <div class="calendar-grid">
     @foreach($calendarData['weeks'] ?? [] as $week)
-    <div class="grid grid-cols-7 border-b border-gray-100 last:border-b-0">
+    <div class="grid grid-cols-7 border-b border-gray-100 last:border-b-0" >
       @foreach($week as $day)
+      @php
+        $isClient = auth()->user()->hasRole('client');
+      @endphp
       <div class="calendar-day min-h-[120px] border-r border-gray-100 last:border-r-0 p-2
       {{ !$day['isCurrentMonth'] ? 'bg-gray-50' : '' }}
-      {{ $day['isToday'] ? 'bg-blue-50' : '' }}
-      hover:bg-gray-50 cursor-pointer transition-colors"
-      wire:click="selectDate('{{ $day['date']->format('Y-m-d') }}')">
+      {{ $day['isToday'] ? 'bg-blue-100' : '' }}
+      {{ $isClient ? 'cursor-default' : 'hover:bg-blue-100 cursor-pointer' }} transition-colors"
+      @unless($isClient)
+        wire:click="selectDate('{{ $day['date']->format('Y-m-d') }}')"
+      @endunless
+      >
       <!-- Date Number -->
       <div class="flex justify-between items-start mb-1">
       <span
@@ -30,7 +36,7 @@
       <div class="space-y-1">
 
       @foreach($day['appointments']->take(2) as $appointment)
-      <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer bg-blue-100 text-blue-800"
+      <div class="appointment-item text-xs p-1 rounded truncate cursor-pointer bg-blue-50 text-blue-800"
       title="{{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} - {{ $appointment->service->name ?? 'N/A' }}">
       {{ Carbon\Carbon::parse($appointment->booking_time)->format('g:i A') }} -
       {{ Str::limit($appointment->service->title ?? 'N/A', 15) }}
