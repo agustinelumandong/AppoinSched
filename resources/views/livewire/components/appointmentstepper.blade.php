@@ -73,6 +73,7 @@ new #[Title('Appointment')] class extends Component {
     public array $barangays = [];
 
     public string $serviceSelected = '';
+    public bool $termsAccepted = false;
 
 
 
@@ -136,6 +137,17 @@ new #[Title('Appointment')] class extends Component {
         $this->city = '';
         $this->barangays = [];
         $this->barangay = '';
+    }
+
+    public function termsAccepted()
+    {
+        if ($this->termsAccepted) {
+            $this->step = 2;
+            $this->isLoading = true;
+            $this->dispatch('refresh-slots');
+        } else {
+            session()->flash('error', 'You must accept the terms and conditions to proceed.');
+        }
     }
 
     public function updatedProvince(PhilippineLocationsService $locations)
@@ -223,25 +235,25 @@ new #[Title('Appointment')] class extends Component {
     public function nextStep()
     {
         switch ($this->step) {
-            case 1:
+            case 2:
                 $this->isLoading = true;
                 $this->validate([
                     'serviceSelected' => 'required',
                 ]);
                 break;
-            case 2:
+            case 3:
                 $this->isLoading = true;
                 $this->validate([
                     'to_whom' => 'required',
                 ]);
                 break;
-            case 3:
+            case 4:
                 $this->isLoading = true;
                 $this->validate([
                     'purpose' => 'required',
                 ]);
                 break;
-            case 4:
+            case 5:
                 $this->isLoading = true;
                 $this->validate([
                     'first_name' => 'string|required',
@@ -258,18 +270,18 @@ new #[Title('Appointment')] class extends Component {
                     'zip_code' => 'string|required|max:10|regex:/^[0-9\-]+$/',
                 ]);
                 break;
-            case 5:
+            case 6:
                 $this->isLoading = true;
                 $this->validate([
                     'selectedDate' => 'required|date|after_or_equal:today',
                     'selectedTime' => 'required|string',
                 ]);
                 break;
-            case 6:
+            case 7:
                 $this->isLoading = true;
                 // No additional validation needed - just confirmation step
                 break;
-            case 7:
+            case 8:
                 $this->isLoading = true;
                 break;
         }
@@ -424,7 +436,7 @@ new #[Title('Appointment')] class extends Component {
                 $this->reference_number = $reference_number;
 
                 // Move to step 7 instead of resetting
-                $this->step = 8;
+                $this->step = 9;
 
                 // Clear cache and update UI
                 $cacheKey = "time_slots_{$this->office->id}_{$this->service->id}_{$this->selectedDate}";
@@ -591,23 +603,29 @@ new #[Title('Appointment')] class extends Component {
         <ul class="steps steps-horizontal w-full">
             <li class="step {{ $step >= 1 ? 'step-info' : '' }}">
                 <div class="step-content">
+                    <div class="step-title">Accept Terms</div>
+                    <div class="step-description text-sm text-gray-500">Accept Terms and Conditions</div>
+                </div>
+            </li>
+            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+                <div class="step-content">
                     <div class="step-title">Service</div>
                     <div class="step-description text-sm text-gray-500">Select a service</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">To Whom?</div>
                     <div class="step-description text-sm text-gray-500">For Yourself or Someone Else?</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Purpose Request</div>
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Personal Information</div>
                     <div class="step-description text-sm text-gray-500">Your/Someone details</div>
@@ -619,19 +637,19 @@ new #[Title('Appointment')] class extends Component {
                     <div class="step-description text-sm text-gray-500">Schedule</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Confirmation</div>
                     <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 8 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= 9 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Appointment Slip</div>
                     <div class="step-description text-sm text-gray-500">Save Your Details</div>
@@ -642,6 +660,52 @@ new #[Title('Appointment')] class extends Component {
 
     {{-- Stepper Content --}}
     @if ($step == 1)
+        <div class="px-5 py-2 mt-5">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <div class="header mb-4">
+                        <h3 class="text-xl font-semibold text-base-content">Terms and Conditions</h3>
+                        <div class="flex items-center gap-2 text-sm text-base-content/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Please read and accept the terms and conditions.</span>
+                        </div>
+                    </div>
+
+                    <div class="terms-conditions-content mb-6">
+                        <p class="mb-4">By submitting this appointment request, you agree to the following terms and
+                            conditions:</p>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-base-content/80">
+                            <li>You are requesting an appointment for yourself or someone else.</li>
+                            <li>You understand that the appointment is subject to availability and confirmation.</li>
+                            <li>You agree to provide accurate and truthful information.</li>
+                            <li>You acknowledge that the appointment details will be sent to the relevant staff.</li>
+                            <li>You agree to the terms of service and privacy policy of this platform.</li>
+                            <li>You understand that appointment times may be subject to change based on staff availability.
+                            </li>
+                            <li>You agree to arrive on time for your scheduled appointment.</li>
+                            <li>You acknowledge that failure to show up may affect future appointment scheduling.</li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-center mb-6">
+                        <label for="termsAccepted" class="flex items-center cursor-pointer">
+                            <input type="checkbox" wire:model.live="termsAccepted" class="checkbox checkbox-sm">
+                            I accept the <a href="TERMS" class="text-blue-500">Terms and Conditions</a>
+                        </label>
+                    </div>
+
+                    <footer class="my-6 flex justify-end gap-2">
+                        <button class="btn btn-primary" wire:click="nextStep" @if(!$termsAccepted) disabled
+                        @endif>Next</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
+    @elseif ($step == 2)
         <div class="px-5 py-2 mt-5">
             <div class="flex flex-col gap-4">
                 <div>
@@ -683,19 +747,20 @@ new #[Title('Appointment')] class extends Component {
                 </div>
             </div>
         </div>
-    @elseif ($step == 2)
-        @include('livewire.appointments.components.appointment-steps.step1')
     @elseif($step == 3)
-        @include('livewire.appointments.components.appointment-steps.step2')
+        @include('livewire.appointments.components.appointment-steps.step1')
     @elseif($step == 4)
-        @include('livewire.appointments.components.appointment-steps.step3')
+        @include('livewire.appointments.components.appointment-steps.step2')
     @elseif($step == 5)
-        @include('livewire.appointments.components.appointment-steps.step4')
+        @include('livewire.appointments.components.appointment-steps.step3')
     @elseif($step == 6)
-        @include('livewire.appointments.components.appointment-steps.step5')
+        @include('livewire.appointments.components.appointment-steps.step4')
     @elseif($step == 7)
-        @include('livewire.appointments.components.appointment-steps.step6')
+        @include('livewire.appointments.components.appointment-steps.step5')
     @elseif($step == 8)
+
+        @include('livewire.appointments.components.appointment-steps.step6')
+    @elseif($step == 9)
         @include('livewire.appointments.components.appointment-steps.step7')
     @endif
 </div>
