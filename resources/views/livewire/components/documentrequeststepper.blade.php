@@ -668,6 +668,32 @@ new #[Title('Document Request')] class extends Component {
                 }
 
                 $this->validate($rules);
+                
+                // Add info redundancy validation for someone else
+                if ($this->to_whom === 'someone_else') {
+                    $currentUser = auth()->user();
+                    $userData = $currentUser->getAppointmentFormData();
+                    
+                    $isRedundant = true;
+                    
+                    // Compare names (case-insensitive)
+                    if (strtolower(trim($this->first_name)) !== strtolower(trim($userData['first_name'] ?? ''))) {
+                        $isRedundant = false;
+                    }
+                    if (strtolower(trim($this->last_name)) !== strtolower(trim($userData['last_name'] ?? ''))) {
+                        $isRedundant = false;
+                    }
+                    if (!empty($this->middle_name) && strtolower(trim($this->middle_name)) !== strtolower(trim($userData['middle_name'] ?? ''))) {
+                        $isRedundant = false;
+                    }
+                    
+                    if ($isRedundant) {
+                        $relationshipName = ucfirst($this->relationship);
+                        $this->addError('info_redundancy', "INFO REDUNDANCY: You are entering your own information for a document that is for {$relationshipName}. Please enter the correct information for {$relationshipName} instead of your own details.");
+                        return;
+                    }
+                }
+                
                 $this->fillMarriageCertificateData();
                 $this->fillFamilyDefaults();
                 $this->initializeContactInfo();
