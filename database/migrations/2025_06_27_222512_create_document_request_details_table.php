@@ -50,7 +50,7 @@ return new class extends Migration {
             $table->string('street', 100)->nullable();
             $table->string('zip_code', 20)->nullable();
 
-            // Temporary Address
+            // Present Address
             $table->enum('temporary_address_type', ['Permanent', 'Temporary'])->nullable();
             $table->string('temporary_address_line_1', 150)->nullable();
             $table->string('temporary_address_line_2', 150)->nullable();

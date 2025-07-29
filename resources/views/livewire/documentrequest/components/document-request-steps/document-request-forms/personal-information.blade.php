@@ -220,29 +220,7 @@
           <span class="text-xs text-gray-500 mt-1">Required</span>
           <span class="text-xs text-gray-500 mt-1">Upload a PDF copy of your government ID (Max 5MB)</span>
           @error('government_id_image_file')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
-          <!-- Show existing file if available -->
-          @if($this->government_id_image_path && !$this->government_id_image_file)
-        <div class="mt-2">
-        <p class="text-xs text-gray-600 mb-1">Current ID PDF:</p>
-        <a href="{{ asset('storage/' . $this->government_id_image_path) }}" target="_blank"
-          class="text-blue-600 hover:text-blue-800 text-xs">
-          View PDF Document
-        </a>
-        <p class="text-xs text-gray-500 mt-1">File: {{ basename($this->government_id_image_path) }}</p>
-        </div>
-      @endif
-          <!-- Show new uploaded file preview -->
-          @if($this->government_id_image_file)
-        <div class="mt-2">
-        <p class="text-xs text-gray-600 mb-1">New Upload:</p>
-        <a href="{{ $this->government_id_image_file->temporaryUrl() }}" target="_blank"
-          class="text-blue-600 hover:text-blue-800 text-xs">
-          View PDF Document
-        </a>
-        <p class="text-xs text-gray-500 mt-1">File: {{ $this->government_id_image_file->getClientOriginalName() }}
-        </p>
-        </div>
-      @endif
+
         </div>
       </div>
     </div>

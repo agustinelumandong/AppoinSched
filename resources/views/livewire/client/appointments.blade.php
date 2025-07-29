@@ -10,6 +10,7 @@ use Carbon\Carbon;
 use App\Models\User;
 use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
+use Illuminate\Support\Facades\Cache;
 
 new class extends Component {
     public ?Appointments $appointment = null;
@@ -31,7 +32,7 @@ new class extends Component {
     {
         return [
             'appointments' => Appointments::where('user_id', auth()->user()->id)
-                ->with(['office', 'service', 'appointmentDetails'])
+                ->with(['office', 'appointmentDetails'])
                 ->latest()
                 ->paginate(10),
         ];
@@ -39,7 +40,7 @@ new class extends Component {
 
     public function openRescheduleModal(int $id): void
     {
-        $appointment = Appointments::with(['office', 'service'])->findOrFail($id);
+        $appointment = Appointments::with(['office'])->findOrFail($id);
         $this->appointment = $appointment;
         $this->selectedDate = $appointment->booking_date?->format('Y-m-d');
         $this->selectedTime = $appointment->booking_time;
@@ -54,48 +55,32 @@ new class extends Component {
         }
 
         try {
-            $validated = $this->validate([
-                'selectedDate' => 'required|date|after_or_equal:today',
-                'selectedTime' => 'required|string',
-            ]);
-
             // Check for scheduling conflicts
-            $conflict = $this->checkForConflicts();
-            if ($conflict) {
+            if ($this->checkForConflicts()) {
+                Log::info('Conflict found, appointment not rescheduled');
                 session()->flash('error', 'This hour has reached the maximum of 5 appointments. Please select a different time.');
                 return;
             }
 
-            $updated = $this->appointment->update([
+            // Validate the data
+            $this->validate([
+                'selectedDate' => 'required|date|after_or_equal:today',
+                'selectedTime' => 'required|string',
+            ]);
+
+            $this->appointment->update([
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
             ]);
 
-            // Send notification to staff
-            $staffs = User::getStaffsByOfficeId($this->appointment->office_id);
-            if ($staffs->count() > 0) {
-                foreach ($staffs as $staff) {
-                    $staff->notify(
-                        new AdminEventNotification(AdminNotificationEvent::UserAppointmentRescheduled, [
-                            'reference_no' => $this->appointment->reference_number,
-                            'date' => $this->selectedDate,
-                            'time' => $this->selectedTime,
-                            'location' => $this->appointment->office->name,
-                            'service' => $this->appointment->service->title,
-                            'user' => auth()->user()->name,
-                            'user_email' => auth()->user()->email,
-                        ]),
-                    );
-                }
-            }
+            session()->flash('success', 'Appointment rescheduled successfully');
+            $this->dispatch('close-modal-reschedule-appointment');
+            $this->resetRescheduleData();
 
-            if ($updated) {
-                $this->resetRescheduleData();
-                $this->dispatch('close-modal-reschedule-appointment');
-                session()->flash('success', 'Appointment rescheduled successfully.');
-            } else {
-                session()->flash('error', 'Failed to reschedule appointment.');
-            }
+            // Clear cache for the updated date
+            $cacheKey = "time_slots_{$this->appointment->office_id}_{$this->selectedDate}";
+            Cache::forget($cacheKey);
+
         } catch (\Illuminate\Validation\ValidationException $e) {
             $errors = collect($e->errors())->flatten();
             session()->flash('error', 'Validation failed: ' . $errors->first());
@@ -118,7 +103,6 @@ new class extends Component {
             // Count appointments in the same hour
             $hourlyCount = Appointments::where('booking_date', $this->selectedDate)
                 ->where('office_id', $this->appointment->office_id)
-                ->where('service_id', $this->appointment->service_id)
                 ->where('id', '!=', $this->appointment->id)
                 ->whereRaw('HOUR(booking_time) = ?', [$hour])
                 ->whereIn('status', ['on-going', 'completed'])
@@ -131,7 +115,6 @@ new class extends Component {
                 'time' => $selectedTime,
                 'hour' => $hour,
                 'office_id' => $this->appointment->office_id,
-                'service_id' => $this->appointment->service_id,
                 'hourly_count' => $hourlyCount,
                 'hourly_limit' => $hourlyLimit,
                 'has_conflict' => $conflict,
@@ -153,7 +136,8 @@ new class extends Component {
 
     public function showAppointmentDetails(int $id): void
     {
-        $this->appointment = Appointments::with(['office', 'service'])->findOrFail($id);
+        $this->appointment = Appointments::with(['office', 'appointmentDetails'])
+            ->findOrFail($id);
         $this->dispatch('open-modal-show-appointment');
     }
 
@@ -181,7 +165,6 @@ new class extends Component {
                         'date' => $appointment->booking_date,
                         'time' => $appointment->booking_time,
                         'location' => $appointment->office->name,
-                        'service' => $appointment->service->title,
                         'user' => auth()->user()->name,
                         'user_email' => auth()->user()->email,
                     ]),
@@ -218,10 +201,6 @@ new class extends Component {
                             Office
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Service
-                        </th>
-
-                        <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                             Date
                         </th>
                         <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -246,11 +225,6 @@ new class extends Component {
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <div class="text-sm font-medium text-gray-900">
                                     {{ $appointment->office?->name ?? 'N/A' }}
-                                </div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm font-medium text-gray-900">
-                                    {{ $appointment->service?->title ?? 'N/A' }}
                                 </div>
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap">
@@ -283,8 +257,7 @@ new class extends Component {
                                 <div class="d-flex gap-2">
                                     @if ($appointment->status == 'on-going')
                                         <button class="flux-btn btn-sm flux-btn-danger"
-                                            wire:click="cancelAppointment({{ $appointment->id }})"
-                                            title="Cancel Appointment">
+                                            wire:click="cancelAppointment({{ $appointment->id }})" title="Cancel Appointment">
                                             <i class="bi bi-trash"></i>
                                         </button>
                                     @endif

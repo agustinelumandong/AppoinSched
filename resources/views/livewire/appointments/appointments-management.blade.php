@@ -20,7 +20,6 @@ new class extends Component {
     public ?Appointments $appointment = null;
     public $user = null;
     public $office = null;
-    public $service = null;
     public bool $showAppointmentModal = false;
 
     public function mount(): void
@@ -126,7 +125,6 @@ new class extends Component {
                     $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
                 })
                 ->where('office_id', $this->appointment->office_id)
-                ->where('service_id', $this->appointment->service_id)
                 ->where('id', '!=', $this->appointment->id)
                 ->exists();
 
@@ -135,7 +133,6 @@ new class extends Component {
                 'time' => $this->selectedTime,
                 'time_to_check' => $timeToCheck,
                 'office_id' => $this->appointment->office_id,
-                'service_id' => $this->appointment->service_id,
                 'appointment_id' => $this->appointment->id,
                 'has_conflict' => $conflict,
             ]);
@@ -158,12 +155,11 @@ new class extends Component {
 
     public function openShowAppointmentModal(int $id): void
     {
-        $appointment = Appointments::with(['user', 'office', 'service'])->findOrFail($id);
+        $appointment = Appointments::with(['user', 'office'])->findOrFail($id);
 
         $this->appointment = $appointment;
         $this->user = $appointment->user;
         $this->office = $appointment->office;
-        $this->service = $appointment->service;
         $this->showAppointmentModal = true;
         $this->dispatch('open-modal-show-appointment');
     }
@@ -179,14 +175,18 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'appointments' => Appointments::with('user', 'office', 'service')
-                ->where(function ($query) {
-                    $query
-                        ->where('notes', 'like', '%' . $this->search . '%')
-                        ->orWhereHas('user', fn($q) => $q->where('first_name', 'like', '%' . $this->search . '%'))
-                        ->orWhereHas('service', fn($q) => $q->where('title', 'like', '%' . $this->search . '%'));
+            'appointments' => Appointments::with(['user', 'office'])
+                ->when($this->search, function ($query) {
+                    $query->where(function ($q) {
+                        $q->whereHas('user', function ($userQuery) {
+                            $userQuery
+                                ->where('first_name', 'like', '%' . $this->search . '%')
+                                ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                                ->orWhere('reference_number', 'like', '%' . $this->search . '%');
+                        });
+                    });
                 })
-                ->orderBy('created_at', 'desc')
+                ->latest()
                 ->paginate(10),
         ];
     }

@@ -4,14 +4,14 @@
             <div class="header mb-4 flex flex-row justify-between items-center">
                 <div>
 
-                    <h3 class="text-xl font-semibold text-base-content">Your/Someone details</h3>
+                    <h3 class="text-xl font-semibold text-base-content">Your details</h3>
                     <div class="flex items-center gap-2 text-sm text-base-content/70">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Please provide your/someone details</span>
+                        <span>Please provide your details</span>
                     </div>
                 </div>
                 <div class="flex flex-row gap-2 mb-4">
@@ -25,6 +25,18 @@
                 </div>
             </div>
 
+            <!-- Info Redundancy Error -->
+            @error('info_redundancy')
+                <div class="alert alert-error mb-4">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 h-6 w-6" fill="none"
+                        viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <span>{{ $message }}</span>
+                </div>
+            @enderror
+
             <!-- Loading State -->
             <div wire:loading.delay class="text-center">
                 <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2">
@@ -32,26 +44,13 @@
                 <p class="text-gray-600">Loading...</p>
             </div>
 
-            @if ($to_whom === 'someone_else')
-                <div class="alert alert-info flex items-center gap-2 mb-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-5 h-5" fill="none"
-                        viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span>Please bring a valid ID and ensure the requester is present.</span>
-                </div>
-            @endif
-
-
-
             <div class="flex flex-col gap-2 w-full" wire:loading.remove>
                 <div class="flex flex-row gap-2 w-full">
                     <div class="w-full">
                         <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
                         <input type="text" placeholder="Last Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="last_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+                            wire:model="last_name" @if ($editPersonDetails === false) disabled @endif />
                         @error('last_name')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
@@ -62,7 +61,7 @@
                         <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
                         <input type="text" placeholder="First Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="first_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+                            wire:model="first_name" @if ($editPersonDetails === false) disabled @endif />
                         @error('first_name')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
@@ -73,7 +72,7 @@
                         <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
                         <input type="text" placeholder="Middle Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="middle_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+                            wire:model="middle_name" @if ($editPersonDetails === false) disabled @endif />
                         @error('middle_name')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
@@ -86,7 +85,7 @@
                         <label for="email" class="text-xs font-medium mb-1">Email</label>
                         <input type="email" placeholder="Email"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="email" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+                            wire:model="email" @if ($editPersonDetails === false) disabled @endif />
                         @error('email')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
@@ -97,7 +96,7 @@
                         <label for="phone" class="text-xs font-medium mb-1">Phone</label>
                         <input type="tel" placeholder="Phone"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="phone" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif />
+                            wire:model="phone" @if ($editPersonDetails === false) disabled @endif />
                         @error('phone')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror

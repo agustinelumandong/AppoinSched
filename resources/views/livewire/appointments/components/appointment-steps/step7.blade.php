@@ -2,7 +2,8 @@
     <div class="header mb-4">
         <h3 class="text-xl font-semibold text-base-content">Appointment Slip</h3>
         <div class="alert alert-success flex items-center gap-2 mb-2">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                     d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -54,7 +55,6 @@
                     <h3 class="text-md font-semibold text-gray-700">Appointment Details</h3>
                     <div class="mt-2 space-y-1">
                         <p><span class="font-medium">Office:</span> {{ $office->name }}</p>
-                        <p><span class="font-medium">Service:</span> {{ $service->title }}</p>
                         <p><span class="font-medium">Purpose:</span> {{ $purpose }}</p>
                         <p><span class="font-medium">Date:</span>
                             {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}
@@ -76,6 +76,39 @@
                     </div>
                 </div>
             </div>
+
+            @if ($includeCertificates && count($certificates) > 0)
+                <!-- Certificate Requests -->
+                <div class="border-t pt-4">
+                    <h3 class="text-md font-semibold text-gray-700 mb-3">Certificate Requests</h3>
+                    <div class="space-y-2">
+                        @foreach ($certificates as $index => $certificate)
+                            @php
+                                $toWhom = [
+                                    'myself' => 'SF',
+                                    'spouse' => 'SP',
+                                    'child' => 'CH',
+                                    'parent' => 'PA',
+                                    'sibling' => 'SI',
+                                    'other' => 'OT',
+                                ];
+
+                                $certificateTypeCodes = [
+                                    'birth_certificate' => 'BC',
+                                    'marriage_certificate' => 'MC',
+                                    'death_certificate' => 'DC',
+                                ];
+
+                                $certificateCode = $certificateTypeCodes[$certificate['certificate_type']] . ':' . $toWhom[$certificate['relationship']] . ' - ' . $first_name . ' ' . $last_name;
+                            @endphp
+                            <div class="flex items-center justify-between p-2 bg-gray-50 rounded border">
+                                <span class="font-medium text-sm">Certificate #{{ $index + 1 }}</span>
+                                <span class="font-mono text-sm font-bold text-gray-700">{{ $certificateCode }}</span>
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
 
             <!-- QR Code for verification -->
             <div class="flex justify-center my-4">
@@ -133,7 +166,7 @@
     @push('scripts')
         <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
         <script>
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', function () {
                 // Generate QR code with the appointment reference
                 new QRCode(document.getElementById("qrcode"), {
                     text: "{{ $reference_number }}",
@@ -142,7 +175,7 @@
                 });
 
                 // Print functionality - simple approach
-                document.getElementById('print-slip').addEventListener('click', function() {
+                document.getElementById('print-slip').addEventListener('click', function () {
                     window.print();
                 });
             });

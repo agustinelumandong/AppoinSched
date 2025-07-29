@@ -35,7 +35,7 @@ new class extends Component {
     public string $address_line_1 = '';
     public string $address_line_2 = '';
 
-    // Temporary address properties
+    // Present Address properties
     public string $temporary_address_type = 'Temporary';
     public string $temporary_address_line_1 = '';
     public string $temporary_address_line_2 = '';
@@ -46,7 +46,7 @@ new class extends Component {
     public string $temporary_street = '';
     public string $temporary_zip_code = '';
 
-    // Temporary address dropdowns
+    // Present Address dropdowns
     public array $temporary_provinces = [];
     public array $temporary_cities = [];
     public array $temporary_barangays = [];
@@ -153,7 +153,7 @@ new class extends Component {
         $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
 
-        // Temporary Address - initialize with empty values
+        // Present Address - initialize with empty values
         $this->temporary_address_type = $this->userAddresses->temporary_address_type ?? 'Temporary';
         $this->temporary_address_line_1 = $this->userAddresses->temporary_address_line_1 ?? '';
         $this->temporary_address_line_2 = $this->userAddresses->temporary_address_line_2 ?? '';
@@ -247,7 +247,7 @@ new class extends Component {
         $this->barangay = $this->userAddresses->barangay ?? '';
         $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
-        // Temporary Address
+        // Present Address
         $this->temporary_address_type = $this->userAddresses->temporary_address_type ?? 'Temporary';
         $this->temporary_address_line_1 = $this->userAddresses->temporary_address_line_1 ?? '';
         $this->temporary_address_line_2 = $this->userAddresses->temporary_address_line_2 ?? '';
@@ -337,7 +337,7 @@ new class extends Component {
         $this->barangay = '';
     }
 
-    // Temporary address update methods
+    // Present Address update methods
     public function updatedTempRegion(PhilippineLocationsService $locations)
     {
         $this->temporary_provinces = $locations->getProvinces($this->temporary_region);
@@ -362,7 +362,7 @@ new class extends Component {
         $this->temporary_barangay = '';
     }
 
-    // Auto-fill temporary address from permanent address
+    // Auto-fill Present Address from permanent address
     public function updatedSameAsPermanent($value)
     {
         if ($value) {
@@ -376,7 +376,7 @@ new class extends Component {
             $this->temporary_street = $this->street;
             $this->temporary_zip_code = $this->zip_code;
 
-            // Update temporary address dropdowns
+            // Update Present Address dropdowns
             if ($this->temporary_region) {
                 $this->temporary_provinces = app(PhilippineLocationsService::class)->getProvinces($this->temporary_region);
             }
@@ -387,7 +387,7 @@ new class extends Component {
                 $this->temporary_barangays = app(PhilippineLocationsService::class)->getBarangays($this->temporary_region, $this->temporary_province, $this->temporary_city);
             }
         } else {
-            // Clear temporary address fields
+            // Clear Present Address fields
             $this->temporary_address_type = '';
             $this->temporary_address_line_1 = '';
             $this->temporary_address_line_2 = '';
@@ -548,7 +548,7 @@ new class extends Component {
                     'street' => $this->street ?: null,
                     'zip_code' => $this->zip_code ?: null,
 
-                    // Temporary Address
+                    // Present Address
                     'temporary_address_type' => 'Temporary',
                     'temporary_address_line_1' => $this->temporary_address_line_1 ?: 'null',
                     'temporary_address_line_2' => $this->temporary_address_line_2 ?: 'null',
@@ -561,7 +561,7 @@ new class extends Component {
                 ])
                 ->save();
 
-            // Save Temporary Address as a separate record
+            // Save Present Address as a separate record
             if ($this->temporary_address_line_1 || $this->temporary_address_line_2 || $this->temporary_region || $this->temporary_province || $this->temporary_city || $this->temporary_barangay || $this->temporary_street || $this->temporary_zip_code) {
                 UserAddresses::updateOrCreate(
                     [

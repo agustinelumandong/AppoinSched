@@ -97,9 +97,8 @@ new class extends Component {
         $this->reportData = [];
 
         if ($this->selectedType === 'appointments') {
-            $query = Appointments::with(['office', 'service', 'user'])
+            $query = Appointments::with(['office', 'user'])
                 ->where('office_id', $officeId)
-                ->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
                 ->when($status, fn($q) => $q->where('status', $status));
             $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'booking_date');
             $results = $query->get();
@@ -286,18 +285,18 @@ new class extends Component {
                                             <td>{{ $serviceName ?? 'N/A' }}</td>
                                             <td>
                                                 <span class="flux-badge {{ match ($status) {
-                                                            'pending' => 'flux-badge-warning',
-                                                            'approved' => 'flux-badge-success',
-                                                            'completed' => 'flux-badge-info',
-                                                            'cancelled' => 'flux-badge-danger',
-                                                            'rejected' => 'flux-badge-danger',
-                                                            'in-progress' => 'flux-badge-info',
-                                                            'ready-for-pickup' => 'flux-badge-success',
-                                                            'paid' => 'flux-badge-success',
-                                                            'unpaid' => 'flux-badge-danger',
-                                                            'On-going' => 'flux-badge-warning',
-                                                            default => 'flux-badge-warning',
-                                                        } }}">
+                                    'pending' => 'flux-badge-warning',
+                                    'approved' => 'flux-badge-success',
+                                    'completed' => 'flux-badge-info',
+                                    'cancelled' => 'flux-badge-danger',
+                                    'rejected' => 'flux-badge-danger',
+                                    'in-progress' => 'flux-badge-info',
+                                    'ready-for-pickup' => 'flux-badge-success',
+                                    'paid' => 'flux-badge-success',
+                                    'unpaid' => 'flux-badge-danger',
+                                    'On-going' => 'flux-badge-warning',
+                                    default => 'flux-badge-warning',
+                                } }}">
                                                     {{ ucfirst($status) }}
                                                 </span>
                                             </td>
