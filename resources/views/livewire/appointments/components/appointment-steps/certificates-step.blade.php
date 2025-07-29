@@ -3,7 +3,6 @@
         'birth_certificate' => 'Birth Certificate',
         'death_certificate' => 'Death Certificate',
         'marriage_certificate' => 'Marriage Certificate',
-        'cenomar' => 'CENOMAR (Certificate of No Marriage)',
     ];
 
     $relationshipTypes = [
@@ -52,7 +51,7 @@
                                     @endif
                                 </div>
 
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div class="form-control">
                                         <label class="label">
                                             <span class="label-text">Certificate Type <span
@@ -86,7 +85,9 @@
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
+                                </div>
 
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div class="form-control">
                                         <label class="label">
                                             <span class="label-text">First Name <span
@@ -111,7 +112,7 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-control md:col-span-2">
+                                    <div class="form-control">
                                         <label class="label">
                                             <span class="label-text">Middle Name</span>
                                         </label>
@@ -130,9 +131,9 @@
                     </button>
                 </div>
 
-                <footer class="my-6 flex justify-between">
-                    <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                    <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                <footer class="my-6 flex justify-between" wire:loading.remove>
+                    <button class="flux-btn flux-btn-secondary" wire:click="previousStep">Previous</button>
+                    <button class="flux-btn flux-btn-primary" wire:click="nextStep">Next</button>
                 </footer>
             </div>
         </div>
