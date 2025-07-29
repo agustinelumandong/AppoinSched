@@ -1,3 +1,7 @@
+@php
+    $offices = App\Models\Offices::all();
+@endphp
+
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
@@ -128,15 +132,52 @@
     </header>
 
     <!-- Hero Section -->
-    <main class="hero-section py-52">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex flex-col lg:flex-row items-center justify-between gap-12">
-                <div class="text-center lg:text-left lg:w-full">
+    <main class="hero-section py-20">
+        <div class="max-w-7xl mx-auto px-4 ">
+            <div class="flex flex-col items-center justify-between gap-12">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <!-- MCRO -->
+                    <a href="{{ route('dashboard') }}" class="service-card flux-card p-8 text-center transition hover:shadow-xl hover:-translate-y-2 block">
+                        <div class="icon-wrapper">
+                            {{-- <i class="bi bi-person-vcard text-2xl"></i> --}}
+                            <img src="{{ asset('images/MCR_logo.jpg') }}" alt="MCRO" class="w-20 h-20 object-contain mx-auto">
+                        </div>
+                        <h5 class="text-xl font-semibold mb-3 text-gray-900">Municipal Civil Registrar</h5>
+                        <p class="service-description text-gray-600 mt-2">
+                            Handles birth certificates, marriage licenses, and other civil registry documents.
+                        </p>
+                    </a>
+
+                    <!-- BPLS -->
+                    <a href="{{ route('dashboard') }}" class="service-card flux-card p-8 text-center transition hover:shadow-xl hover:-translate-y-2 block">
+                        <div class="icon-wrapper">
+                            {{-- <i class="bi bi-briefcase-fill text-2xl"></i> --}}
+                            <img src="{{ asset('images/BPLS_logo.jpg') }}" alt="BPLS" class="w-20 h-20 object-contain mx-auto">
+                        </div>
+                        <h5 class="text-xl font-semibold mb-3 text-gray-900">Business Permit and Licensing Section</h5>
+                        <p class="service-description text-gray-600 mt-2">
+                            Assists with securing business permits, renewals, and compliance certificates.
+                        </p>
+                    </a>
+
+                    <!-- Treasurer -->
+                    <a href="{{ route('dashboard') }}" class="service-card flux-card p-8 text-center transition hover:shadow-xl hover:-translate-y-2 block">
+                        <div class="icon-wrapper">
+                            {{-- <i class="bi bi-cash-stack text-2xl"></i> --}}
+                            <img src="{{ asset('images/MTO_logo.jpg') }}" alt="MTO" class="w-20 h-20 object-contain mx-auto">
+                        </div>
+                        <h5 class="text-xl font-semibold mb-3 text-gray-900">Municipal Treasurer's Office</h5>
+                        <p class="service-description text-gray-600 mt-2">
+                            Responsible for tax payments, assessments, and other municipal financial services.
+                        </p>
+                    </a>
+                </div>
+                <div class="text-center lg:w-full w-full flex flex-col items-center justify-center">
 
                     <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
                         Book Your Municipal <br>Appointment Online
                     </h1>
-                    <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto lg:mx-0">
+                    <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto lg:mx-0 text-center">
                         Access government services faster and easier with our new digital scheduling system.
                         Set up your appointment today.
                     </p>

@@ -162,30 +162,6 @@
                         </p>
                     </div>
                 </div>
-                <div class="grid md:grid-cols-1 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Address</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $address }}
-                        </p>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">City</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $city }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $province }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">ZIP Code</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $zip_code }}
-                        </p>
-                    </div>
-                </div>
             </div>
         </div>
 
@@ -219,11 +195,13 @@
         </div>
     </div>
 
-    <footer class="my-6 flex justify-end gap-2">
-        <button class="btn btn-ghost" wire:click="previousStep" wire:loading.attr="disabled">Previous</button>
-        <button class="btn btn-primary" wire:click="submitAppointment" wire:loading.attr="disabled">
+    <footer class="my-6 flex justify-between" wire:loading.remove>
+        <button class="flux-btn flux-btn-secondary" wire:click="previousStep"
+            wire:loading.attr="disabled">Previous</button>
+        <button class="flux-btn flux-btn-primary" wire:click="submitAppointment" wire:loading.attr="disabled">
             <span wire:loading wire:target="submitAppointment" class="loading loading-spinner"></span>
             Submit
         </button>
     </footer>
+
 </div>

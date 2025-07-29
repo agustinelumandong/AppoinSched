@@ -1,1 +1,1 @@
-<img src="{{ asset('images/LGU_logo.png') }}" alt="App Logo" class="app-logo-icon">
+<img src="{{ asset('images/LGU_logo.png') }}" alt="App Logo" class="app-logo-icon" style="width: 64px; height: 64px;">

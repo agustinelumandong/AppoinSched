@@ -23,14 +23,17 @@
                 <input type="radio" id="consultation" name="purpose" value="consultation" wire:model.live="purpose"
                     hidden />
                 <label for="consultation"
-                    class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'consultation' ? 'flux-btn-active-primary' : '' }} p-2">Consultation</label>
+                    class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'consultation' ? 'flux-btn-active-primary' : '' }} p-2">Consultation
+                </label>
                 <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose"
-                    hidden /> <label for="follow_up"
+                    hidden />
+                <label for="follow_up"
                     class="flux-input-primary  flux-btn cursor-pointer {{ $purpose === 'follow_up' ? 'flux-btn-active-primary' : '' }} p-2">Follow
-                    Up</label>
+                    Up
+                </label>
             </div>
 
-            <div class="form-control mt-6">
+            <div class="form-control mt-6" wire:loading.remove>
                 <label class="cursor-pointer label justify-start gap-4">
                     <input type="checkbox" wire:model.live="includeCertificates" class="checkbox checkbox-primary" />
                     <span class="label-text">I need to request certificates with this appointment</span>
@@ -39,9 +42,9 @@
                     or CENOMAR</p>
             </div>
 
-            <footer class="my-6 flex justify-end gap-2">
-                <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                <button class="btn btn-primary" wire:click="nextStep">Next</button>
+            <footer class="my-6 flex justify-between" wire:loading.remove>
+                <button class="flux-btn flux-btn-secondary" wire:click="previousStep">Previous</button>
+                <button class="flux-btn flux-btn-primary" wire:click="nextStep">Next</button>
             </footer>
         </div>
     </div>

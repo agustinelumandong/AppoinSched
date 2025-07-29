@@ -23,9 +23,7 @@ new class extends Component {
                 ->latest()
                 ->take(5)
                 ->get(),
-            'upcomingAppointments' => Appointments::where('user_id', $user->id)
-                ->where('booking_date', '>=', today())
-                ->count(),
+            'upcomingAppointments' => Appointments::where('user_id', $user->id)->where('booking_date', '>=', today())->count(),
             'totalAppointments' => Appointments::where('user_id', $user->id)->count(),
             'offices' => Offices::take(6)->get(),
             // 'offices' => Offices::orderBy('created_at', 'DESC')->get(),
@@ -45,11 +43,8 @@ new class extends Component {
 
     <div class="space-y-6">
         <div class="mb-1 flex flex-row gap-4">
-            <div class="w-1/3">
-                <h4 class="text-2xl font-bold text-gray-900">Available Offices</h4>
-            </div>
             <div class="w-full">
-                <h4 class="text-2xl font-bold text-gray-900">Appointments Calendar</h4> 
+                <h4 class="text-2xl font-bold text-gray-900">Available Offices</h4>
             </div>
         </div>
 
@@ -83,12 +78,12 @@ new class extends Component {
                 </div>
             </div>
         @else
-            <div class="flex flex-row w-full gap-4">
+            <div class="flex flex-col w-full gap-4">
                 {{-- Offices --}}
-                <div class="grid grid-cols-1 gap-4 w-1/3">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     @forelse ($offices as $office)
                         <a href="{{ route('offices.show', $office->slug) }}"
-                            class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
+                            class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:-translate-y-2 transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-black"
                             id="office-{{ $office->id }}" style="height: 230px;">
                             <div class="absolute" style="top: -50px; right: -80px;">
                                 @php
@@ -108,34 +103,32 @@ new class extends Component {
                                     style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
                             </div>
                             {{-- Header --}}
-                            <header class="flex flex-col ">
+                            <header class="flex flex-col">
                                 <div class="flex items-center justify-between">
-                                    <h5 class="text-lg font-bold   text-decoration-none text-black">{{ $office->name }}</h5>
-                                    {{-- <p class="text-lg   text-decoration-none text-black">{{ $office->services->count() }}
-                                        Services
-                                    </p> --}}
+                                    <h5 class="text-lg font-bold text-black">{{ $office->name }}</h5>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-2   text-decoration-none text-black">
+                                <p class="text-sm text-gray-500 mt-2 text-black">
                                     {{ $office->description }}
                                 </p>
                             </header>
                             {{-- Footer --}}
                             <footer class="flex items-center justify-between pt-10">
-                                <span
-                                    class="text-blue-50 hover:text-blue-700  text-decoration-none flux-btn flux-btn-primary">View
-                                    Office</span>
+                                <span class="text-blue-50 hover:text-blue-700 flux-btn flux-btn-primary">View Office</span>
                             </footer>
                         </a>
                     @empty
-                        <div class="flux-card p-4 bg-red-50 border-red-200 shadow-lg rounded-lg">
+                        <div class="flux-card p-4 bg-red-50 border-red-200 shadow-lg rounded-lg col-span-full">
                             <p class="text-gray-500">No offices found</p>
-                            <p class="text-sm text-gray-500">You don't have any offices yet. Please create one to get
-                                started.</p>
+                            <p class="text-sm text-gray-500">You don't have any offices yet. Please create one to get started.
+                            </p>
                         </div>
                     @endforelse
                 </div>
 
                 {{-- Appointments Calendar --}}
+                <div class="w-full">
+                    <h4 class="text-2xl font-bold text-gray-900">Appointments Calendar</h4>
+                </div>
                 <div class=" w-full">
                     <livewire:components.full-calendar />
                 </div>

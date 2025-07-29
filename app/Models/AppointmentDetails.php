@@ -9,64 +9,66 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class AppointmentDetails extends Model
 {
-  protected $fillable = [
-    // Personal information
-    'first_name',
-    'middle_name',
-    'last_name',
-    'suffix',
-    'sex',
-    'government_id_type',
-    'government_id_image_path',
+    protected $fillable = [
+        'appointment_id',
+        'request_for',
+        'first_name',
+        'middle_name',
+        'last_name',
+        'email',
+        'phone',
+        'metadata', // JSON field for certificates metadata
+        'purpose',
+        'notes',
 
-    // Address information
-    'email',
-    'phone',
-    'address',
-    'region',
-    'province',
-    'city',
-    'barangay',
-    'street',
-    'zip_code',
+    ];
 
-    // Additional fields
-    'request_for',
-    'appointment_id',
-    'purpose',
-    'notes',
-  ];
+    protected $casts = [
+        'metadata' => 'array', // Cast metadata to array for easier access
+    ];
 
-  public function appointment(): BelongsTo
-  {
-    return $this->belongsTo(Appointments::class, 'appointment_id');
-  }
+    public function appointment(): BelongsTo
+    {
+        return $this->belongsTo(Appointments::class, 'appointment_id');
+    }
 
-  /**
-   * Get the full name of the person for this appointment
-   */
-  public function getFullNameAttribute(): string
-  {
-    $parts = array_filter([
-      $this->first_name,
-      $this->middle_name,
-      $this->last_name,
-      $this->suffix,
-    ]);
-    return implode(' ', $parts);
-  }
+    // Helper method to get certificate requests
+    public function getCertificateRequests(): array
+    {
+        return $this->metadata['certificate_requests'] ?? [];
+    }
 
-  /**
-   * Get the complete address for this appointment
-   */
-  public function getCompleteAddressAttribute(): string
-  {
-    $addressParts = array_filter([
-      $this->address,
-      $this->city,
-      $this->state,
-      $this->zip_code,
-    ]);
-    return implode(', ', $addressParts);
-  }
+    // Helper method to get document reference numbers
+    public function getDocumentReferenceNumbers(): array
+    {
+        return $this->metadata['reference_numbers'] ?? [];
+    }
+
+    /**
+     * Get the full name of the person for this appointment
+     */
+    public function getFullNameAttribute(): string
+    {
+        $parts = array_filter([
+            $this->first_name,
+            $this->middle_name,
+            $this->last_name,
+            $this->suffix,
+        ]);
+        return implode(' ', $parts);
+    }
+
+    /**
+     * Get the complete address for this appointment
+     */
+    public function getCompleteAddressAttribute(): string
+    {
+        $addressParts = array_filter([
+            $this->address,
+            $this->city,
+            $this->state,
+            $this->zip_code,
+        ]);
+        return implode(', ', $addressParts);
+    }
 }
