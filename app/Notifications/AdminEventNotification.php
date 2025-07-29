@@ -107,10 +107,10 @@ class AdminEventNotification extends Notification
             AdminNotificationEvent::UserSubmittedDocumentRequest => 'A user has submitted a document request. Reference #: ' . $this->data['reference_no'] . ' Summary: ' . $this->data['summary'],
             AdminNotificationEvent::UserPaymentProofUploaded => 'A user has uploaded a payment proof.',
             AdminNotificationEvent::UserPayedDocumentRequest => 'A user has paid for a document request. Reference #: ' . $this->data['reference_no'] . ' Summary: ' . $this->data['summary'] . ' Payment Method: ' . $this->data['payment_method'],
-            AdminNotificationEvent::UserAppointmentScheduled => 'A user has scheduled an appointment. Reference #: ' . $this->data['reference_no'] . ' Service: ' . $this->data['service'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
-            AdminNotificationEvent::UserAppointmentCancelled => 'A user has cancelled an appointment. Reference #: ' . $this->data['reference_no'] . ' Service: ' . $this->data['service'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
-            AdminNotificationEvent::UserAppointmentRescheduled => 'A user has rescheduled an appointment. Reference #: ' . $this->data['reference_no'] . ' Service: ' . $this->data['service'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
-            AdminNotificationEvent::UserAppointmentCompleted => 'A user has completed an appointment. Reference #: ' . $this->data['reference_no'] . ' Service: ' . $this->data['service'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
+            AdminNotificationEvent::UserAppointmentScheduled => 'A user has scheduled an appointment. Reference #: ' . $this->data['reference_no'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
+            AdminNotificationEvent::UserAppointmentCancelled => 'A user has cancelled an appointment. Reference #: ' . $this->data['reference_no'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
+            AdminNotificationEvent::UserAppointmentRescheduled => 'A user has rescheduled an appointment. Reference #: ' . $this->data['reference_no'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
+            AdminNotificationEvent::UserAppointmentCompleted => 'A user has completed an appointment. Reference #: ' . $this->data['reference_no'] . ' Date: ' . $this->data['date'] . ' Time: ' . $this->data['time'],
         };
     }
 }

@@ -31,168 +31,134 @@
 
     <div class="space-y-6" wire:loading.remove>
         <!-- Appointment Summary -->
-        <div class="flux-card p-6">
-            <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Appointment Summary</h3>
-            <div class="grid md:grid-cols-2 gap-6">
+        <div class="flex flex-row gap-4 w-full">
+            
+            <div class="flux-card p-6 w-1/2">
                 <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Office</label>
-                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $office->name }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Service</label>
-                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $service->title }}
-                    </p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
-                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $purpose }}</p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
-                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                        {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}
-                    </p>
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-600 mb-1">Time</label>
-                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                        {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}
-                    </p>
-                </div>
-            </div>
-        </div>
-
-        @if ($includeCertificates && count($certificates) > 0)
-            <!-- Certificate Requests -->
-            <div class="flux-card p-6">
-                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Certificate Requests
-                </h3>
-
-                @foreach ($certificates as $index => $certificate)
-                    <div class="mb-4 p-3 border border-gray-200 rounded-lg">
-                        <h4 class="font-medium text-gray-700 mb-2">Certificate #{{ $index + 1 }}</h4>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Certificate Type</label>
-                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    @switch($certificate['certificate_type'])
-                                        @case('birth_certificate')
-                                            Birth Certificate
-                                        @break
-
-                                        @case('death_certificate')
-                                            Death Certificate
-                                        @break
-
-                                        @case('marriage_certificate')
-                                            Marriage Certificate
-                                        @break
-
-                                        @case('cenomar')
-                                            CENOMAR
-                                        @break
-
-                                        @default
-                                            {{ $certificate['certificate_type'] }}
-                                    @endswitch
-                                </p>
-                            </div>
-                            <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Relationship</label>
-                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ ucfirst($certificate['relationship']) }}
-                                </p>
-                            </div>
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Appointment Summary</h3>
+                    <div class="grid grid-cols-1 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Office</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $office->name }}</p>
+                        </div> 
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $purpose }}</p>
                         </div>
-                        <div class="grid md:grid-cols-3 gap-4 mt-2">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Time</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Information</h3>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 gap-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $certificate['first_name'] }}
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $first_name }}
                                 </p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $certificate['middle_name'] ?? 'N/A' }}
-                                </p>
+                                    {{ $middle_name ?? 'N/A' }}</p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                    {{ $certificate['last_name'] }}
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $last_name }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-1 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $email }}
+                                </p>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $phone }}
                                 </p>
                             </div>
                         </div>
                     </div>
-                @endforeach
-            </div>
-        @endif
-
-        <!-- Personal Information -->
-        <div class="flux-card p-6">
-            <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Information</h3>
-            <div class="space-y-4">
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $first_name }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $middle_name ?? 'N/A' }}</p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $last_name }}
-                        </p>
-                    </div>
                 </div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $email }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Phone</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $phone }}
-                        </p>
-                    </div>
+                <div>
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Request Details</h3>
+                            <div class="space-y-4">
+                                <div class="grid grid-cols-1 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
+                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $purpose }}
+                                        </p>
+                                    </div>
+                                </div>
+                                @if ($message)
+                                    <div class="grid grid-cols-1 gap-6">
+                                        <div>
+                                            <label class="block text-sm font-medium text-gray-600 mb-1">Additional Notes</label>
+                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                {{ $message }}</p>
+                                        </div>
+                                    </div>
+                                @endif
+                            </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Request Details -->
-        <div class="flux-card p-6">
-            <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Request Details</h3>
-            <div class="space-y-4">
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Request For</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $to_whom === 'myself' ? 'Myself' : 'Someone Else' }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $purpose }}
-                        </p>
-                    </div>
-                </div>
-                @if ($message)
-                    <div class="grid md:grid-cols-1 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Additional Notes</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $message }}</p>
+            @if ($includeCertificates && count($certificates) > 0)
+                <!-- Certificate Requests -->
+                 <div class="flux-card p-6 w-1/2">
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Certificate Requests
+                    </h3>
+
+                    @foreach ($certificates as $index => $certificate)
+                        @php
+                            $toWhom = [
+                                'myself' => 'SF',
+                                'spouse' => 'SP',
+                                'child' => 'CH',
+                                'parent' => 'PA',
+                                'sibling' => 'SI',
+                                'other' => 'OT',
+                            ];
+
+                            $certificateTypeCodes = [
+                                'birth_certificate' => 'BC',
+                                'marriage_certificate' => 'MC',
+                                'death_certificate' => 'DC',
+                            ];
+
+                            $certificateCode = $certificateTypeCodes[$certificate['certificate_type']] . ':' . $toWhom[$certificate['relationship']] . ' - ' . $first_name . ' ' . $last_name;
+                        @endphp
+                        <div class="flex flex-row mb-4 p-3 border border-gray-200 rounded-lg">
+                            <h5 class="font-medium text-gray-700 mb-2" style="margin-right: 12px;"> #{{ $index + 1 }}</h5>
+                            <h5 class="font-bold text-gray-400 mb-2">
+                                {{ $certificateCode }}
+                            </h5>
+                              
                         </div>
-                    </div>
-                @endif
-            </div>
+                    @endforeach
+                </div>
+            @else
+                <div class="flux-card p-6 w-1/2">
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">No Certificate Requests</h3>
+                </div>
+            @endif
+
         </div>
+        
+ 
     </div>
 
     <footer class="my-6 flex justify-between" wire:loading.remove>

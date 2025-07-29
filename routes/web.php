@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\EmailsController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -65,7 +66,7 @@ Route::middleware(['auth'])->group(function () {
         // Volt::route('admin/offices/{office:slug}/services/{service:slug}', 'offices.request')->name('offices.service.request');
         Volt::route('admin/offices/{office:slug}/services/request', 'offices.request')->name('offices.service.request');
         // Volt::route('offices/{office:slug}/services/{service:slug}', 'offices.appointmentbooking')->name('offices.service.appointment');
-        Volt::route('offices/{office:slug}/services/appointment', 'offices.appointmentbooking')->name('offices.service.appointment');
+        Volt::route('offices/{office:slug}/appointment', 'offices.appointment')->name('offices.appointment');
     });
 
     // Testing route (remove in production)
@@ -75,5 +76,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('appointment-slip/{reference_number}/download', [App\Http\Controllers\AppointmentSlipController::class, 'downloadPdf'])
         ->name('appointment-slip.download');
 });
+
+Route::get('test-mail', [EmailsController::class, 'sendWelcomeMail'])->name('test.mail');
 
 require __DIR__ . '/auth.php';

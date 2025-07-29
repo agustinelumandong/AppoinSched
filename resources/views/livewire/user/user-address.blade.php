@@ -68,18 +68,17 @@
             </div>
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code"
-                    placeholder="Zip Code">
+                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
     </div>
 
-    <!-- Temporary Address Information -->
+    <!-- Present Address Information -->
     <div class="flux-card p-6">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <h2 class="text-xl font-bold">Temporary Address</h2>
+                <h2 class="text-xl font-bold">Present Address</h2>
             </div>
             <div>
                 <label class="label cursor-pointer">
@@ -98,23 +97,20 @@
         </div>
         <div class="flex flex-col mb-4">
             <label for="temp_address_line_1" class="text-xs font-medium mb-1">Address Line 1</label>
-            <input id="temp_address_line_1" class="flux-form-control" type="text"
-                wire:model="temporary_address_line_1" placeholder="Address Line 1"
-                {{ $same_as_permanent ? 'disabled' : '' }}>
+            <input id="temp_address_line_1" class="flux-form-control" type="text" wire:model="temporary_address_line_1"
+                placeholder="Address Line 1" {{ $same_as_permanent ? 'disabled' : '' }}>
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col mb-4">
             <label for="temp_address_line_2" class="text-xs font-medium mb-1">Address Line 2</label>
-            <input id="temp_address_line_2" class="flux-form-control" type="text"
-                wire:model="temporary_address_line_2" placeholder="Address Line 2"
-                {{ $same_as_permanent ? 'disabled' : '' }}>
+            <input id="temp_address_line_2" class="flux-form-control" type="text" wire:model="temporary_address_line_2"
+                placeholder="Address Line 2" {{ $same_as_permanent ? 'disabled' : '' }}>
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex flex-col">
                 <label for="temp_region" class="text-xs font-medium mb-1">Region</label>
-                <select id="temp_region" class="flux-form-control" wire:model.live="temporary_region"
-                    {{ $same_as_permanent ? 'disabled' : '' }}>
+                <select id="temp_region" class="flux-form-control" wire:model.live="temporary_region" {{ $same_as_permanent ? 'disabled' : '' }}>
                     <option value="">Select Region</option>
                     @foreach ($regions as $region)
                         <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
@@ -124,8 +120,7 @@
             </div>
             <div class="flex flex-col">
                 <label for="temp_province" class="text-xs font-medium mb-1">Province</label>
-                <select id="temp_province" class="flux-form-control" wire:model.live="temporary_province"
-                    {{ $same_as_permanent ? 'disabled' : '' }}>
+                <select id="temp_province" class="flux-form-control" wire:model.live="temporary_province" {{ $same_as_permanent ? 'disabled' : '' }}>
                     <option value="">Select Province</option>
                     @foreach ($provinces as $provinceKey => $provinceName)
                         <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
@@ -135,8 +130,7 @@
             </div>
             <div class="flex flex-col">
                 <label for="temp_city" class="text-xs font-medium mb-1">City</label>
-                <select id="temp_city" class="flux-form-control" wire:model.live="temporary_city"
-                    {{ $same_as_permanent ? 'disabled' : '' }}>
+                <select id="temp_city" class="flux-form-control" wire:model.live="temporary_city" {{ $same_as_permanent ? 'disabled' : '' }}>
                     <option value="">Select City</option>
                     @foreach ($cities as $cityKey => $cityName)
                         <option value="{{ $cityKey }}">{{ $cityName }}</option>
@@ -146,8 +140,7 @@
             </div>
             <div class="flex flex-col">
                 <label for="temp_barangay" class="text-xs font-medium mb-1">Barangay</label>
-                <select id="temp_barangay" class="flux-form-control" wire:model.live="temporary_barangay"
-                    {{ $same_as_permanent ? 'disabled' : '' }}>
+                <select id="temp_barangay" class="flux-form-control" wire:model.live="temporary_barangay" {{ $same_as_permanent ? 'disabled' : '' }}>
                     <option value="">Select Barangay</option>
                     @foreach ($barangays as $barangay)
                         <option value="{{ $barangay }}">{{ $barangay }}</option>

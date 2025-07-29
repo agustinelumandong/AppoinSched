@@ -175,7 +175,7 @@ new class extends Component {
 
   private function getAppointmentsForDate(Carbon $date): Collection
   {
-    $query = Appointments::with(['user', 'office', 'service', 'appointmentDetails'])
+    $query = Appointments::with(['user', 'office', 'appointmentDetails'])
       ->whereDate('booking_date', $date->format('Y-m-d'));
 
     // Map office slugs to their corresponding staff roles
@@ -298,12 +298,12 @@ new class extends Component {
         <div class="inline-flex rounded-lg border border-gray-200 p-1">
           <button wire:click="setView('month')"
             class="px-4 py-2 text-sm font-medium rounded-md transition-colors {{ $view === 'month' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Month</button>
-            @hasrole('admin|super-admin|MCR-staff|MTO-staff|BPLS-staff')
+          @hasrole('admin|super-admin|MCR-staff|MTO-staff|BPLS-staff')
           <button wire:click="setView('week')"
             class="px-4 py-2 text-sm font-medium rounded-md transition-colors {{ $view === 'week' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Week</button>
           <button wire:click="setView('day')"
             class="px-4 py-2 text-sm font-medium rounded-md transition-colors {{ $view === 'day' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Day</button>
-            @endhasrole
+          @endhasrole
         </div>
         <button wire:click="refreshCalendar"
           class="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">

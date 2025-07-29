@@ -18,16 +18,15 @@
             <div class="mb-4" wire:key="slot-picker-wrapper">
                 <label class="form-label fw-semibold">Select Date and Time</label>
                 <div id="slot-picker-container-stepper" wire:ignore>
-                    <livewire:slot-picker :office-id="$office->id" :service-id="$service->id" :pre-selected-date="$selectedDate" :pre-selected-time="$selectedTime"
-                        wire:key="stepper-slot-picker-{{ $office->id }}-{{ $service->id }}" />
+                    <livewire:slot-picker :office-id="$office->id" :pre-selected-date="$selectedDate"
+                        :pre-selected-time="$selectedTime" wire:key="stepper-slot-picker-{{ $office->id }}" />
                 </div>
             </div>
 
             {{-- Footer --}}
             <footer class="my-6 flex justify-between" wire:loading.remove>
                 <button class="flux-btn flux-btn-secondary" wire:click="previousStep">Previous</button>
-                <button class="flux-btn flux-btn-primary" wire:click="nextStep"
-                    {{ !$selectedDate || !$selectedTime ? 'disabled' : '' }}>
+                <button class="flux-btn flux-btn-primary" wire:click="nextStep" {{ !$selectedDate || !$selectedTime ? 'disabled' : '' }}>
                     Next
                 </button>
             </footer>

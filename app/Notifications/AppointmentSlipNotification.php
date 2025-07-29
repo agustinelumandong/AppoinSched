@@ -52,7 +52,6 @@ class AppointmentSlipNotification extends Notification implements ShouldQueue
     $data = [
       'reference_number' => $appointment->reference_number,
       'office' => $appointment->office,
-      'service' => $appointment->service,
       'purpose' => $appointment->purpose,
       'selectedDate' => $appointment->booking_date,
       'selectedTime' => $appointment->booking_time,
@@ -61,13 +60,7 @@ class AppointmentSlipNotification extends Notification implements ShouldQueue
       'last_name' => $details->last_name,
       'email' => $details->email,
       'phone' => $details->phone,
-      'address' => $details->address,
-      'region' => $details->region,
-      'province' => $details->province,
-      'city' => $details->city,
-      'barangay' => $details->barangay,
-      'street' => $details->street,
-      'zip_code' => $details->zip_code,
+      'metadata' => $details->metadata ?? null,
     ];
 
     $pdf = Pdf::loadView('emails.appointment-slip-pdf', $data);

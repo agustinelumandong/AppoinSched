@@ -41,7 +41,7 @@ class DocumentRequestDetails extends Model
         'street',
         'zip_code',
 
-        // Temporary Address
+        // Present Address
         'temporary_address_line_1',
         'temporary_address_line_2',
         'temporary_region',

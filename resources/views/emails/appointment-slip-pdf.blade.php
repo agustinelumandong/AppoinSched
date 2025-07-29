@@ -120,7 +120,7 @@
 <body>
     <div class="header">
         <div class="title">Appointment Confirmation</div>
-        <div class="reference">Reference: {{ $reference_number }}</div>
+        {{-- <div class="reference">Reference: {{ $reference_number }}</div> --}}
     </div>
 
     <div class="section">
@@ -129,10 +129,6 @@
             <div class="row">
                 <div class="col label">Office:</div>
                 <div class="col value">{{ $office->name }}</div>
-            </div>
-            <div class="row">
-                <div class="col label">Service:</div>
-                <div class="col value">{{ $service->title }}</div>
             </div>
             <div class="row">
                 <div class="col label">Purpose:</div>
@@ -147,10 +143,7 @@
                 <div class="col value">{{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}</div>
             </div>
         </div>
-    </div>
 
-    <div class="section">
-        <div class="section-title">Client Information</div>
         <div class="grid">
             <div class="row">
                 <div class="col label">Name:</div>
@@ -167,6 +160,26 @@
             </div>
         </div>
     </div>
+
+
+    @if (isset($metadata) && is_array($metadata) && count($metadata) > 0)
+        <div class="section">
+            <div class="section-title">Certificate Requests</div>
+            <div class="grid">
+                @foreach ($metadata as $index => $certificateData)
+                    @if (isset($certificateData['certificate_code']))
+                        <div class="row">
+                            <div class="col label">Certificate #{{ $certificateData['number'] }}:</div>
+                            <div class="col value" style="font-family: monospace; font-weight: bold;">
+                                {{ $certificateData['certificate_code'] }}
+                            </div>
+                        </div>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    @endif
+
 
     <div class="qr-section">
         <div style="text-align: center; margin-bottom: 10px;">

@@ -20,27 +20,43 @@
             </div>
 
             <div class="flex flex-col gap-2 w-full" wire:loading.remove>
-                <input type="radio" id="consultation" name="purpose" value="consultation" wire:model.live="purpose"
-                    hidden />
-                <label for="consultation"
-                    class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'consultation' ? 'flux-btn-active-primary' : '' }} p-2">Consultation
-                </label>
-                <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose"
-                    hidden />
-                <label for="follow_up"
-                    class="flux-input-primary  flux-btn cursor-pointer {{ $purpose === 'follow_up' ? 'flux-btn-active-primary' : '' }} p-2">Follow
-                    Up
-                </label>
+                @if($office->slug === 'business-permits-and-licensing-section')
+                    <input type="radio" id="special-permit" name="purpose" value="special-permit" wire:model.live="purpose"
+                        hidden />
+                    <label for="special-permit"
+                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'special-permit' ? 'flux-btn-active-primary' : '' }} p-2">Special
+                        Permit
+                    </label>
+                @elseif($office->slug === 'municipal-treasurers-office')
+                    <input type="radio" id="appointment-mto" name="purpose" value="appointment-mto"
+                        wire:model.live="purpose" hidden />
+                    <label for="appointment-mto"
+                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'appointment-mto' ? 'flux-btn-active-primary' : '' }} p-2">Payment
+                    </label>
+                @else
+                    <input type="radio" id="consultation" name="purpose" value="consultation" wire:model.live="purpose"
+                        hidden />
+                    <label for="consultation"
+                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'consultation' ? 'flux-btn-active-primary' : '' }} p-2">Consultation
+                    </label>
+                @endif
+
+                @if($office->slug === 'municipal-treasurers-office')
+                    <input type="radio" id="purpose" name="purpose" value="purpose" wire:model.live="purpose" hidden />
+                    <label for="purpose"
+                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'purpose' ? 'flux-btn-active-primary' : '' }} p-2">Purpose
+                    </label>
+                @else
+
+                    <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose" hidden />
+                    <label for="follow_up"
+                        class="flux-input-primary  flux-btn cursor-pointer {{ $purpose === 'follow_up' ? 'flux-btn-active-primary' : '' }} p-2">Follow
+                        Up
+                    </label>
+                @endif
             </div>
 
-            <div class="form-control mt-6" wire:loading.remove>
-                <label class="cursor-pointer label justify-start gap-4">
-                    <input type="checkbox" wire:model.live="includeCertificates" class="checkbox checkbox-primary" />
-                    <span class="label-text">I need to request certificates with this appointment</span>
-                </label>
-                <p class="text-sm text-gray-500 mt-1 ml-9">Check this if you need Birth, Death, Marriage certificates,
-                    or CENOMAR</p>
-            </div>
+
 
             <footer class="my-6 flex justify-between" wire:loading.remove>
                 <button class="flux-btn flux-btn-secondary" wire:click="previousStep">Previous</button>

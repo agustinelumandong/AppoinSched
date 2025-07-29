@@ -65,7 +65,7 @@ new #[Title('Document Request')] class extends Component {
     public string $address_type = 'Permanent';
     public string $address_line_1 = '';
     public string $address_line_2 = '';
-   
+
     public string $government_id_type = '';
     public mixed $government_id_image_path = null;
     public mixed $government_id_image_file = null;
@@ -134,7 +134,7 @@ new #[Title('Document Request')] class extends Component {
     public string $groom_middle_name = '';
     public string $groom_last_name = '';
     public string $groom_suffix = '';
-    public ?int $groom_age ;
+    public ?int $groom_age;
     public string $groom_date_of_birth = '';
     public string $groom_place_of_birth = '';
     public string $groom_sex = '';
@@ -161,7 +161,7 @@ new #[Title('Document Request')] class extends Component {
     public string $bride_middle_name = '';
     public string $bride_last_name = '';
     public string $bride_suffix = '';
-    public ?int $bride_age ;
+    public ?int $bride_age;
     public string $bride_date_of_birth = '';
     public string $bride_place_of_birth = '';
     public string $bride_sex = '';
@@ -201,7 +201,7 @@ new #[Title('Document Request')] class extends Component {
     public string $zip_code = '';
     public string $country = '';
 
-    // Temporary address properties
+    // Present Address properties
     // public string $temporary_address_type = '';
     // public string $temporary_address_line_1 = '';
     // public string $temporary_address_line_2 = '';
@@ -231,8 +231,8 @@ new #[Title('Document Request')] class extends Component {
         $this->editPersonDetails = false;
         // Pre-populate dependent dropdowns if values exist
 
- // Initialize user and userAddresses like userinfo.blade.php
-    $this->user = auth()->user();
+        // Initialize user and userAddresses like userinfo.blade.php
+        $this->user = auth()->user();
         $this->userAddresses = $this->user->userAddresses->first();
 
         $this->address = $this->userAddresses->address_line_1 ?? '';
@@ -348,7 +348,7 @@ new #[Title('Document Request')] class extends Component {
     {
         $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
         $this->barangay = '';
-    }   
+    }
     public function populateUserData(): void
     {
         $userData = auth()->user()->getDocumentRequestFormData();
@@ -601,15 +601,18 @@ new #[Title('Document Request')] class extends Component {
                         'informant_address' => 'required|string|max:255',
                         'informant_relationship' => 'required|string|max:100',
                         'informant_contact_no' => 'required|string|max:50',
-                    
+
                     ];
                 } elseif ($this->service->slug === 'marriage-certificate') {
                     $rules = $this->marriageLicenseRules();
                 } else {
                     $rules = [
                         'first_name' => 'required|string|max:255',
+                        'middle_name' => 'nullable|string|max:255',
                         'last_name' => 'required|string|max:255',
+                        'suffix' => 'nullable|string|max:10',
                         'email' => 'required|email|max:255',
+                        'phone' => 'required|numeric|digits_between:7,25',
                         'sex_at_birth' => 'required|in:Male,Female',
                         'date_of_birth' => 'required|date|before:today',
                         'place_of_birth' => 'required|string|max:255',
@@ -648,7 +651,7 @@ new #[Title('Document Request')] class extends Component {
                                 'father_religion' => 'required|string|max:255',
                                 'father_contact_no' => 'required|string|max:20',
                             ]);
-                        
+
 
                             $rules = array_merge($rules, [
                                 'mother_last_name' => 'required|string|max:255',
@@ -675,7 +678,7 @@ new #[Title('Document Request')] class extends Component {
                     'contact_first_name' => 'required|string|max:255',
                     'contact_last_name' => 'required|string|max:255',
                     'contact_email' => 'required|email|max:255',
-                    'contact_phone' => 'required|string|max:20',
+                    'contact_phone' => 'required|numeric|digits_between:7,25',
                 ]);
                 break;
             case 7:
@@ -687,7 +690,7 @@ new #[Title('Document Request')] class extends Component {
                         'middle_name' => 'nullable|string|max:255',
                         'suffix' => 'nullable|string|max:10',
                         'email' => 'required|email|max:255',
-                        'phone' => 'required|string|max:20',
+                        'phone' => 'required|numeric|digits_between:7,25',
                     ]);
                 } else {
                     // For other document types, validate contact information
@@ -695,7 +698,7 @@ new #[Title('Document Request')] class extends Component {
                         'contact_first_name' => 'required|string|max:255',
                         'contact_last_name' => 'required|string|max:255',
                         'contact_email' => 'required|email|max:255',
-                        'contact_phone' => 'required|string|max:20',
+                        'contact_phone' => 'required|numeric|digits_between:7,25',
                     ]);
                 }
                 break;
@@ -963,155 +966,155 @@ new #[Title('Document Request')] class extends Component {
             ];
 
             // If Marriage License, use modular fields
-            
-                $detailsData = array_merge($detailsData, [
-                    // Groom
-                    'groom_first_name' => $this->groom_first_name,
-                    'groom_middle_name' => $this->groom_middle_name,
-                    'groom_last_name' => $this->groom_last_name,
-                    'groom_suffix' => $this->groom_suffix,
-                     'groom_age' => $this->groom_age ?? null,
-                    'groom_date_of_birth' => $this->groom_date_of_birth,
-                    'groom_place_of_birth' => $this->groom_place_of_birth,
-                    'groom_sex' => $this->groom_sex,
-                    'groom_citizenship' => $this->groom_citizenship,
-                    'groom_residence' => $this->groom_residence,
-                    'groom_religion' => $this->groom_religion,
-                    'groom_civil_status' => $this->groom_civil_status,
-                    // Groom Father
-                    'groom_father_first_name' => $this->groom_father_first_name,
-                    'groom_father_middle_name' => $this->groom_father_middle_name,
-                    'groom_father_last_name' => $this->groom_father_last_name,
-                    'groom_father_suffix' => $this->groom_father_suffix,
-                    'groom_father_citizenship' => $this->groom_father_citizenship,
-                    'groom_father_residence' => $this->groom_father_residence,
-                    // Groom Mother
-                    'groom_mother_first_name' => $this->groom_mother_first_name,
-                    'groom_mother_middle_name' => $this->groom_mother_middle_name,
-                    'groom_mother_last_name' => $this->groom_mother_last_name,
-                    'groom_mother_suffix' => $this->groom_mother_suffix,
-                    'groom_mother_citizenship' => $this->groom_mother_citizenship,
-                    'groom_mother_residence' => $this->groom_mother_residence,
-                    // Bride
-                    'bride_first_name' => $this->bride_first_name,
-                    'bride_middle_name' => $this->bride_middle_name,
-                    'bride_last_name' => $this->bride_last_name,
-                    'bride_suffix' => $this->bride_suffix,
-                    'bride_age' => $this->bride_age ?? null,
-                    'bride_date_of_birth' => $this->bride_date_of_birth,
-                    'bride_place_of_birth' => $this->bride_place_of_birth,
-                    'bride_sex' => $this->bride_sex,
-                    'bride_citizenship' => $this->bride_citizenship,
-                    'bride_residence' => $this->bride_residence,
-                    'bride_religion' => $this->bride_religion,
-                    'bride_civil_status' => $this->bride_civil_status,
-                    // Bride Father
-                    'bride_father_first_name' => $this->bride_father_first_name,
-                    'bride_father_middle_name' => $this->bride_father_middle_name,
-                    'bride_father_last_name' => $this->bride_father_last_name,
-                    'bride_father_suffix' => $this->bride_father_suffix,
-                    'bride_father_citizenship' => $this->bride_father_citizenship,
-                    'bride_father_residence' => $this->bride_father_residence,
-                    // Bride Mother
-                    'bride_mother_first_name' => $this->bride_mother_first_name,
-                    'bride_mother_middle_name' => $this->bride_mother_middle_name,
-                    'bride_mother_last_name' => $this->bride_mother_last_name,
-                    'bride_mother_suffix' => $this->bride_mother_suffix,
-                    'bride_mother_citizenship' => $this->bride_mother_citizenship,
-                    'bride_mother_residence' => $this->bride_mother_residence,
-                    // Consent Section
-                    'consent_person' => $this->consent_person,
-                    'consent_relationship' => $this->consent_relationship,
-                    'consent_citizenship' => $this->consent_citizenship,
-                    'consent_residence' => $this->consent_residence,
-                ]);
-           
-                // Existing logic for other document types
-                $detailsData = array_merge($detailsData, [
-                    // Personal Information
-                    'last_name' => $this->last_name,
-                    'first_name' => $this->first_name,
-                    'middle_name' => $this->middle_name,
-                    'suffix' => $this->suffix,
-                    'email' => $this->email,
-                    'contact_no' => $this->phone,
-                    'sex_at_birth' => $this->sex_at_birth,
-                    'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
-                    'place_of_birth' => $this->place_of_birth,
-                    'civil_status' => $this->civil_status,
-                    'religion' => $this->religion,
-                    'nationality' => $this->nationality,
-                    'government_id_type' => $this->government_id_type,
-                    'government_id_image_path' => $governmentIdImagePath,
-                    'address_type' => $this->address_type,
-                    'address_line_1' => $this->address_line_1,
-                    'address_line_2' => $this->address_line_2,
-                    'region' => $this->region,
-                    'province' => $this->province,
-                    'city' => $this->city,
-                    'barangay' => $this->barangay,
-                    'street' => $this->street,
-                    'zip_code' => $this->zip_code,
 
-                    // 
-                    // 'temporary_address_type' => $this->temporary_address_type,
-                    // 'temporary_address_line_1' => $this->temporary_address_line_1,
-                    // 'temporary_address_line_2' => $this->temporary_address_line_2,
-                    // 'temporary_region' => $this->temporary_region,
-                    // 'temporary_province' => $this->temporary_province,
-                    // 'temporary_city' => $this->temporary_city,
-                    // 'temporary_barangay' => $this->temporary_barangay,
-                    // 'temporary_street' => $this->temporary_street,
-                    // 'temporary_zip_code' => $this->temporary_zip_code,
+            $detailsData = array_merge($detailsData, [
+                // Groom
+                'groom_first_name' => $this->groom_first_name,
+                'groom_middle_name' => $this->groom_middle_name,
+                'groom_last_name' => $this->groom_last_name,
+                'groom_suffix' => $this->groom_suffix,
+                'groom_age' => $this->groom_age ?? null,
+                'groom_date_of_birth' => $this->groom_date_of_birth,
+                'groom_place_of_birth' => $this->groom_place_of_birth,
+                'groom_sex' => $this->groom_sex,
+                'groom_citizenship' => $this->groom_citizenship,
+                'groom_residence' => $this->groom_residence,
+                'groom_religion' => $this->groom_religion,
+                'groom_civil_status' => $this->groom_civil_status,
+                // Groom Father
+                'groom_father_first_name' => $this->groom_father_first_name,
+                'groom_father_middle_name' => $this->groom_father_middle_name,
+                'groom_father_last_name' => $this->groom_father_last_name,
+                'groom_father_suffix' => $this->groom_father_suffix,
+                'groom_father_citizenship' => $this->groom_father_citizenship,
+                'groom_father_residence' => $this->groom_father_residence,
+                // Groom Mother
+                'groom_mother_first_name' => $this->groom_mother_first_name,
+                'groom_mother_middle_name' => $this->groom_mother_middle_name,
+                'groom_mother_last_name' => $this->groom_mother_last_name,
+                'groom_mother_suffix' => $this->groom_mother_suffix,
+                'groom_mother_citizenship' => $this->groom_mother_citizenship,
+                'groom_mother_residence' => $this->groom_mother_residence,
+                // Bride
+                'bride_first_name' => $this->bride_first_name,
+                'bride_middle_name' => $this->bride_middle_name,
+                'bride_last_name' => $this->bride_last_name,
+                'bride_suffix' => $this->bride_suffix,
+                'bride_age' => $this->bride_age ?? null,
+                'bride_date_of_birth' => $this->bride_date_of_birth,
+                'bride_place_of_birth' => $this->bride_place_of_birth,
+                'bride_sex' => $this->bride_sex,
+                'bride_citizenship' => $this->bride_citizenship,
+                'bride_residence' => $this->bride_residence,
+                'bride_religion' => $this->bride_religion,
+                'bride_civil_status' => $this->bride_civil_status,
+                // Bride Father
+                'bride_father_first_name' => $this->bride_father_first_name,
+                'bride_father_middle_name' => $this->bride_father_middle_name,
+                'bride_father_last_name' => $this->bride_father_last_name,
+                'bride_father_suffix' => $this->bride_father_suffix,
+                'bride_father_citizenship' => $this->bride_father_citizenship,
+                'bride_father_residence' => $this->bride_father_residence,
+                // Bride Mother
+                'bride_mother_first_name' => $this->bride_mother_first_name,
+                'bride_mother_middle_name' => $this->bride_mother_middle_name,
+                'bride_mother_last_name' => $this->bride_mother_last_name,
+                'bride_mother_suffix' => $this->bride_mother_suffix,
+                'bride_mother_citizenship' => $this->bride_mother_citizenship,
+                'bride_mother_residence' => $this->bride_mother_residence,
+                // Consent Section
+                'consent_person' => $this->consent_person,
+                'consent_relationship' => $this->consent_relationship,
+                'consent_citizenship' => $this->consent_citizenship,
+                'consent_residence' => $this->consent_residence,
+            ]);
 
-                    'father_last_name' => $this->father_last_name,
-                    'father_first_name' => $this->father_first_name,
-                    'father_middle_name' => $this->father_middle_name,
-                    'father_suffix' => $this->father_suffix,
-                    'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
-                    'father_nationality' => $this->father_nationality,
-                    'father_religion' => $this->father_religion,
-                    'father_contact_no' => $this->father_contact_no,
-                    'mother_last_name' => $this->mother_last_name,
-                    'mother_first_name' => $this->mother_first_name,
-                    'mother_middle_name' => $this->mother_middle_name,
-                    'mother_suffix' => $this->mother_suffix,
-                    'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
-                    'mother_nationality' => $this->mother_nationality,
-                    'mother_religion' => $this->mother_religion,
-                    'mother_contact_no' => $this->mother_contact_no,
+            // Existing logic for other document types
+            $detailsData = array_merge($detailsData, [
+                // Personal Information
+                'last_name' => $this->last_name,
+                'first_name' => $this->first_name,
+                'middle_name' => $this->middle_name,
+                'suffix' => $this->suffix,
+                'email' => $this->email,
+                'contact_no' => $this->phone,
+                'sex_at_birth' => $this->sex_at_birth,
+                'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
+                'place_of_birth' => $this->place_of_birth,
+                'civil_status' => $this->civil_status,
+                'religion' => $this->religion,
+                'nationality' => $this->nationality,
+                'government_id_type' => $this->government_id_type,
+                'government_id_image_path' => $governmentIdImagePath,
+                'address_type' => $this->address_type,
+                'address_line_1' => $this->address_line_1,
+                'address_line_2' => $this->address_line_2,
+                'region' => $this->region,
+                'province' => $this->province,
+                'city' => $this->city,
+                'barangay' => $this->barangay,
+                'street' => $this->street,
+                'zip_code' => $this->zip_code,
 
-                    // Death Certificate specific fields
+                // 
+                // 'temporary_address_type' => $this->temporary_address_type,
+                // 'temporary_address_line_1' => $this->temporary_address_line_1,
+                // 'temporary_address_line_2' => $this->temporary_address_line_2,
+                // 'temporary_region' => $this->temporary_region,
+                // 'temporary_province' => $this->temporary_province,
+                // 'temporary_city' => $this->temporary_city,
+                // 'temporary_barangay' => $this->temporary_barangay,
+                // 'temporary_street' => $this->temporary_street,
+                // 'temporary_zip_code' => $this->temporary_zip_code,
 
-                    'deceased_last_name' => $this->deceased_last_name,
-                    'deceased_first_name' => $this->deceased_first_name,
-                    'deceased_middle_name' => $this->deceased_middle_name,
-                    'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
-                    'death_time' => $this->death_time,
-                    'death_place' => $this->death_place,
-                    'relationship_to_deceased' => $this->relationship_to_deceased,
-                    'deceased_sex' => $this->deceased_sex,
-                    'deceased_religion' => $this->deceased_religion,
-                    'deceased_age' => $this->deceased_age,
-                    'deceased_place_of_birth' => $this->deceased_place_of_birth,
-                    'deceased_date_of_birth' => $this->deceased_date_of_birth,
-                    'deceased_civil_status' => $this->deceased_civil_status,
-                    'deceased_residence' => $this->deceased_residence,
-                    'deceased_occupation' => $this->deceased_occupation,
-                    'deceased_father_last_name' => $this->deceased_father_last_name,
-                    'deceased_father_first_name' => $this->deceased_father_first_name,
-                    'deceased_father_middle_name' => $this->deceased_father_middle_name,
-                    'deceased_mother_last_name' => $this->deceased_mother_last_name,
-                    'deceased_mother_first_name' => $this->deceased_mother_first_name,
-                    'deceased_mother_middle_name' => $this->deceased_mother_middle_name,
-                    'burial_cemetery_name' => $this->burial_cemetery_name,
-                    'burial_cemetery_address' => $this->burial_cemetery_address,
-                    'informant_name' => $this->informant_name,
-                    'informant_address' => $this->informant_address,
-                    'informant_relationship' => $this->informant_relationship,
-                    'informant_contact_no' => $this->informant_contact_no,
-                ]);
-            
+                'father_last_name' => $this->father_last_name,
+                'father_first_name' => $this->father_first_name,
+                'father_middle_name' => $this->father_middle_name,
+                'father_suffix' => $this->father_suffix,
+                'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
+                'father_nationality' => $this->father_nationality,
+                'father_religion' => $this->father_religion,
+                'father_contact_no' => $this->father_contact_no,
+                'mother_last_name' => $this->mother_last_name,
+                'mother_first_name' => $this->mother_first_name,
+                'mother_middle_name' => $this->mother_middle_name,
+                'mother_suffix' => $this->mother_suffix,
+                'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
+                'mother_nationality' => $this->mother_nationality,
+                'mother_religion' => $this->mother_religion,
+                'mother_contact_no' => $this->mother_contact_no,
+
+                // Death Certificate specific fields
+
+                'deceased_last_name' => $this->deceased_last_name,
+                'deceased_first_name' => $this->deceased_first_name,
+                'deceased_middle_name' => $this->deceased_middle_name,
+                'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
+                'death_time' => $this->death_time,
+                'death_place' => $this->death_place,
+                'relationship_to_deceased' => $this->relationship_to_deceased,
+                'deceased_sex' => $this->deceased_sex,
+                'deceased_religion' => $this->deceased_religion,
+                'deceased_age' => $this->deceased_age,
+                'deceased_place_of_birth' => $this->deceased_place_of_birth,
+                'deceased_date_of_birth' => $this->deceased_date_of_birth,
+                'deceased_civil_status' => $this->deceased_civil_status,
+                'deceased_residence' => $this->deceased_residence,
+                'deceased_occupation' => $this->deceased_occupation,
+                'deceased_father_last_name' => $this->deceased_father_last_name,
+                'deceased_father_first_name' => $this->deceased_father_first_name,
+                'deceased_father_middle_name' => $this->deceased_father_middle_name,
+                'deceased_mother_last_name' => $this->deceased_mother_last_name,
+                'deceased_mother_first_name' => $this->deceased_mother_first_name,
+                'deceased_mother_middle_name' => $this->deceased_mother_middle_name,
+                'burial_cemetery_name' => $this->burial_cemetery_name,
+                'burial_cemetery_address' => $this->burial_cemetery_address,
+                'informant_name' => $this->informant_name,
+                'informant_address' => $this->informant_address,
+                'informant_relationship' => $this->informant_relationship,
+                'informant_contact_no' => $this->informant_contact_no,
+            ]);
+
 
             // Contact Information (for third-party requests)
 
@@ -1170,7 +1173,7 @@ new #[Title('Document Request')] class extends Component {
     {
         $this->editPersonDetails = true;
     }
-    
+
     public function lockPersonDetailsBtn()
     {
         $this->editPersonDetails = false;
@@ -1364,8 +1367,8 @@ new #[Title('Document Request')] class extends Component {
             </li>
             <li class="step {{ $step >= 2 ? 'step-info' : '' }}">
                 <div class="step-content">
-                    <div class="step-title">Service</div>
-                    <div class="step-description text-sm text-gray-500">Select a service</div>
+                    <div class="step-title">Certificate</div>
+                    <div class="step-description text-sm text-gray-500">Select a Certificate Type</div>
                 </div>
                 
             </li>
@@ -1386,12 +1389,14 @@ new #[Title('Document Request')] class extends Component {
             <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     @php 
-                        if ($this->service->slug === 'marriage-certificate') {
+                                                if ($this->service->slug === 'marriage-certificate') {
                             $stepTitle = 'Marriage License';
                             $stepDescription = 'Marriage License Information';
                         } elseif ($this->service->slug === 'death-certificate') {
                             $stepTitle = 'Death Certificate';
                             $stepDescription = 'Death Certificate Information';
+                        } elseif ($this->service->slug === 'special-permit') {
+                            $stepTitle = 'Permit Request';
                         } else {
                             $stepTitle = 'Personal Information';
                             $stepDescription = 'Your/Someone details';
@@ -1431,100 +1436,100 @@ new #[Title('Document Request')] class extends Component {
 </div>
     {{-- Stepper Content --}}
    @if ($step == 1)
-        <div class="px-5 py-2 mt-5">
-            <div class="flex flex-col gap-4">
-                <div>
-                    <div class="header mb-4">
-                        <h3 class="text-xl font-semibold text-base-content">Terms and Conditions</h3>
-                        <div class="flex items-center gap-2 text-sm text-base-content/70">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Please read and accept the terms and conditions.</span>
-                        </div>
-                    </div>
-
-                    <div class="terms-conditions-content mb-6">
-                        <p class="mb-4">By submitting this document request, you agree to the following terms and
-                            conditions:</p>
-                        <ul class="list-disc list-inside space-y-2 text-sm text-base-content/80">
-                            <li>You are requesting a document for yourself or someone else.</li>
-                            <li>You understand that the document request is subject to verification and approval.</li>
-                            <li>You agree to provide accurate and truthful information.</li>
-                            <li>You acknowledge that the document request details will be sent to the relevant staff.</li>
-                            <li>You agree to the terms of service and privacy policy of this platform.</li>
-                            <li>You understand that document processing times may vary based on complexity.</li>
-                            <li>You agree to provide all required supporting documents.</li>
-                            <li>You acknowledge that incomplete information may delay processing.</li>
-                        </ul>
-                    </div>
-
-                    <div class="flex justify-center mb-6">
-                        <label for="termsAccepted" class="flex items-center cursor-pointer">
-                            <input type="checkbox" wire:model.live="termsAccepted" class="checkbox checkbox-sm">
-                            I accept the <a href="TERMS" class="text-blue-500">Terms and Conditions</a>
-                        </label>
-                    </div>
-
-                    <footer class="my-6 flex justify-end gap-2">
-                        <button class="btn btn-primary" wire:click="nextStep" @if(!$termsAccepted) disabled
-                        @endif>Next</button>
-                    </footer>
-                </div>
-            </div>
-        </div>
-    @elseif($step == 2)
     <div class="px-5 py-2 mt-5">
         <div class="flex flex-col gap-4">
             <div>
                 <div class="header mb-4">
-                    <h3 class="text-xl font-semibold text-base-content">Select a Service</h3>
+                    <h3 class="text-xl font-semibold text-base-content">Terms and Conditions</h3>
                     <div class="flex items-center gap-2 text-sm text-base-content/70">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
-                        <span>Please select a service</span>
+                        <span>Please read and accept the terms and conditions.</span>
                     </div>
                 </div>
 
-                <!-- Loading State -->
-                <div wire:loading.delay class="text-center ">
-                    <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
-                    <p class="text-gray-600">Loading...</p>
+                <div class="terms-conditions-content mb-6">
+                    <p class="mb-4">By submitting this document request, you agree to the following terms and
+                        conditions:</p>
+                    <ul class="list-disc list-inside space-y-2 text-sm text-base-content/80">
+                        <li>You are requesting a document for yourself or someone else.</li>
+                        <li>You understand that the document request is subject to verification and approval.</li>
+                        <li>You agree to provide accurate and truthful information.</li>
+                        <li>You acknowledge that the document request details will be sent to the relevant staff.</li>
+                        <li>You agree to the terms of service and privacy policy of this platform.</li>
+                        <li>You understand that document processing times may vary based on complexity.</li>
+                        <li>You agree to provide all required supporting documents.</li>
+                        <li>You acknowledge that incomplete information may delay processing.</li>
+                    </ul>
                 </div>
 
-                <div class="flex flex-col gap-2 w-full" wire:loading.remove>
-                    @foreach ($services as $service)
-                        <input
-                            type="radio"
-                            id="{{ $service->slug }}"
-                            name="service"
-                            value="{{ $service->slug }}"
-                            wire:model.live="serviceSelected"
-                            hidden
-                        />
-                        <label
-                            for="{{ $service->slug }}"
-                            class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2"
-                        >
-                            {{ $service->title }}
-                        </label>
-                    @endforeach
+                <div class="flex justify-center mb-6">
+                    <label for="termsAccepted" class="flex items-center cursor-pointer">
+                        <input type="checkbox" wire:model.live="termsAccepted" class="checkbox checkbox-sm">
+                        I accept the <a href="TERMS" class="text-blue-500">Terms and Conditions</a>
+                    </label>
                 </div>
-
-                
 
                 <footer class="my-6 flex justify-end gap-2">
-                    <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                    <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                    <button class="btn btn-primary" wire:click="nextStep" @if(!$termsAccepted) disabled
+                    @endif>Next</button>
                 </footer>
             </div>
         </div>
     </div>
+@elseif($step == 2)
+        <div class="px-5 py-2 mt-5">
+            <div class="flex flex-col gap-4">
+                <div>
+                    <div class="header mb-4">
+                        <h3 class="text-xl font-semibold text-base-content">Select a Service</h3>
+                        <div class="flex items-center gap-2 text-sm text-base-content/70">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Please select a service</span>
+                        </div>
+                    </div>
+
+                    <!-- Loading State -->
+                    <div wire:loading.delay class="text-center ">
+                        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+                        <p class="text-gray-600">Loading...</p>
+                    </div>
+
+                    <div class="flex flex-col gap-2 w-full" wire:loading.remove>
+                        @foreach ($services as $service)
+                            <input
+                                type="radio"
+                                id="{{ $service->slug }}"
+                                name="service"
+                                value="{{ $service->slug }}"
+                                wire:model.live="serviceSelected"
+                                hidden
+                            />
+                            <label
+                                for="{{ $service->slug }}"
+                                class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2"
+                            >
+                                {{ $service->title }}
+                            </label>
+                        @endforeach
+                    </div>
+
+
+
+                    <footer class="my-6 flex justify-end gap-2">
+                        <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
+                        <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                    </footer>
+                </div>
+            </div>
+        </div>
     @elseif($step == 3)
         @include('livewire.documentrequest.components.document-request-steps.step1')
     @elseif($step == 4)

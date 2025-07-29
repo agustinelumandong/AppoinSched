@@ -19,7 +19,7 @@ new class extends Component {
         $user = auth()->user();
         return [
             'myAppointments' => Appointments::where('user_id', $user->id)
-                ->with(['office', 'service'])
+                ->with(['office'])
                 ->latest()
                 ->take(5)
                 ->get(),

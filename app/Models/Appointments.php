@@ -15,11 +15,9 @@ class Appointments extends Model
     protected $fillable = [
         'user_id',
         'office_id',
-        'service_id',
         'booking_date',
         'booking_time',
         'notes',
-        'to_whom',
         'purpose',
         'reference_number',
         'status',
@@ -39,11 +37,6 @@ class Appointments extends Model
     public function office()
     {
         return $this->belongsTo(Offices::class, 'office_id');
-    }
-
-    public function service()
-    {
-        return $this->belongsTo(Services::class, 'service_id');
     }
 
     public function appointmentDetails()

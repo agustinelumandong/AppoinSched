@@ -76,31 +76,32 @@ new #[Title('Office Details')] class extends Component {
                             $logo = asset('images/BPLS_logo.jpg');
                         }
                     @endphp
-
-                    <a href="{{ route('offices.service.request', ['office' => $office->slug]) }}"
-                        class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
-                        id="office-{{ $office->id }}">
-                        <div class="absolute" style="top: -50px; right: -80px;">
-                            <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
-                                style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
-                        </div>
-                        {{-- Header --}}
-                        <header class="flex flex-col ">
-                            <h3 class="text-lg font-bold  text-decoration-none text-black ">
-                                Document Request
-                            </h3>
-                            <p class="text-sm text-gray-500  text-decoration-none text-black ">
-                                Request a document from this office
-                            </p>
-                        </header>
-                        {{-- Footer --}}
-                        <footer class="flex items-center justify-between pt-10">
-                            <span
-                                class="text-blue-50 hover:text-blue-700  text-decoration-none  flux-btn flux-btn-primary">Request
-                                Document</span>
-                        </footer>
-                    </a>
-                    <a href="{{ route('offices.service.appointment', ['office' => $office->slug]) }}"
+                    @if($office->slug !== 'municipal-treasurers-office')
+                        <a href="{{ route('offices.service.request', ['office' => $office->slug]) }}"
+                            class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
+                            id="office-{{ $office->id }}">
+                            <div class="absolute" style="top: -50px; right: -80px;">
+                                <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
+                                    style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
+                            </div>
+                            {{-- Header --}}
+                            <header class="flex flex-col ">
+                                <h3 class="text-lg font-bold  text-decoration-none text-black ">
+                                    Document Request
+                                </h3>
+                                <p class="text-sm text-gray-500  text-decoration-none text-black ">
+                                    Request a document from this office
+                                </p>
+                            </header>
+                            {{-- Footer --}}
+                            <footer class="flex items-center justify-between pt-10">
+                                <span
+                                    class="text-blue-50 hover:text-blue-700  text-decoration-none  flux-btn flux-btn-primary">Request
+                                    Document</span>
+                            </footer>
+                        </a>
+                    @endif
+                    <a href="{{ route('offices.appointment', ['office' => $office->slug]) }}"
                         class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
                         id="office-{{ $office->id }}">
                         <div class="absolute" style="top: -50px; right: -80px;">

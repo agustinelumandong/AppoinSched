@@ -15,7 +15,6 @@
                     <tr>
                         <th>Client</th>
                         <th>Office</th>
-                        <th>Service</th>
                         <th>Notes</th>
                         <th>Date&Time</th>
                         <th>Actions</th>
@@ -31,9 +30,6 @@
 
                             <td>
                                 <p class="fw-semibold ">{{ $appointment->office?->name ?? 'N/A' }}</p>
-                            </td>
-                            <td>
-                                <p class="fw-semibold">{{ $appointment->service?->title ?? 'N/A' }}</p>
                             </td>
                             <td>
                                 <p class="fw-semibold">{{ $appointment->notes ?? 'N/A' }}</p>
@@ -61,7 +57,7 @@
                         </tr>
                     @empty
                         <tr>
-                            <td colspan="9" class="text-center py-5">
+                            <td colspan="8" class="text-center py-5">
                                 <div class="text-muted">
                                     <i class="bi bi-person-badge display-4 mb-3"></i>
                                     <div>No appointments found. Create your first appointment to get started.</div>

@@ -24,7 +24,7 @@ return new class extends Migration {
             $table->string('street')->nullable();
             $table->string('zip_code')->nullable();
 
-            // Temporary Address
+            // Present Address
             $table->enum('temporary_address_type', ['Permanent', 'Temporary'])->default('Temporary')->nullable();
             $table->string('temporary_address_line_1')->nullable();
             $table->string('temporary_address_line_2')->nullable();

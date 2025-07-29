@@ -22,7 +22,6 @@ new class extends Component {
     public ?Appointments $appointment = null;
     public $user = null;
     public $office = null;
-    public $service = null;
     public bool $showAppointmentModal = false;
 
     public function mount(): void
@@ -81,94 +80,88 @@ new class extends Component {
 
             $this->dispatch('open-modal-edit-appointment');
         } catch (\Exception $e) {
-            Log::error('Error opening edit modal: ' . $e->getMessage());
-            session()->flash('error', 'Failed to open edit modal');
+            Log::error('Error opening edit appointment modal: ' . $e->getMessage());
+            session()->flash('error', 'Failed to open appointment for editing');
         }
     }
 
     public function updateAppointment(): void
     {
-        if (!$this->appointment) {
-            session()->flash('error', 'Appointment not found');
-            return;
-        }
-
-        // Check if staff is assigned to this appointment's office
-        if (!auth()->user()->isAssignedToOffice($this->appointment->office_id)) {
-            session()->flash('error', 'You are not authorized to update this appointment');
-            return;
-        }
-
         try {
-            $validated = $this->validate([
-                'selectedDate' => 'required|date|after_or_equal:today',
-                'selectedTime' => 'required|string',
-                'notes' => 'nullable|string|max:1000',
-            ]);
-
-            // Check for scheduling conflicts
-            $conflict = $this->checkForConflicts();
-            if ($conflict) {
-                session()->flash('error', 'This time slot is already booked');
+            if (!$this->appointment) {
+                session()->flash('error', 'Appointment not found');
                 return;
             }
 
-            $updateData = [
+            // Check for scheduling conflicts
+            if ($this->checkForConflicts()) {
+                Log::info('Conflict found, appointment not updated');
+                session()->flash('error', 'This hour has reached the maximum of 5 appointments. Please select a different time.');
+                return;
+            }
+
+            // Validate the data
+            $this->validate([
+                'selectedDate' => 'required|date|after_or_equal:today',
+                'selectedTime' => 'required|string',
+                'notes' => 'nullable|string|max:500',
+            ]);
+
+            $this->appointment->update([
                 'booking_date' => $this->selectedDate,
                 'booking_time' => $this->selectedTime,
                 'notes' => $this->notes,
-            ];
+            ]);
 
-            $updated = $this->appointment->update($updateData);
+            session()->flash('success', 'Appointment updated successfully');
+            $this->dispatch('appointmentUpdated');
+            $this->dispatch('close-modal-edit-appointment');
+            $this->resetAppointmentData();
 
-            if ($updated) {
-                $this->resetAppointmentData();
-                $this->dispatch('appointmentUpdated');
-                $this->dispatch('close-modal-edit-appointment');
-                session()->flash('success', 'Appointment updated successfully');
-            } else {
-                session()->flash('error', 'Failed to update appointment');
-            }
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $errors = collect($e->errors())->flatten();
-            session()->flash('error', 'Validation failed: ' . $errors->first());
+            // Clear cache for the updated date
+            $cacheKey = "time_slots_{$this->appointment->office_id}_{$this->selectedDate}";
+            Cache::forget($cacheKey);
+
         } catch (\Exception $e) {
-            Log::error('Appointment update failed: ' . $e->getMessage());
-            session()->flash('error', 'An error occurred while updating the appointment');
+            Log::error('Failed to update appointment: ' . $e->getMessage());
+            session()->flash('error', 'Failed to update appointment.');
         }
     }
 
     private function checkForConflicts(): bool
     {
         try {
-            // Convert the selected time to 24-hour format for comparison
-            $timeToCheck = Carbon::parse($this->selectedTime)->format('H:i');
+            // Get hour from selected time for hourly limit check
+            $selectedTime = $this->selectedTime;
+            $hour = Carbon::parse($selectedTime)->format('H');
 
-            $conflict = Appointments::where('booking_date', $this->selectedDate)
-                ->where(function ($query) use ($timeToCheck) {
-                    $query->whereRaw("TIME_FORMAT(booking_time, '%H:%i') = ?", [$timeToCheck]);
-                })
+            // Maximum appointments allowed per hour
+            $hourlyLimit = 5;
+
+            // Count appointments in the same hour
+            $hourlyCount = Appointments::where('booking_date', $this->selectedDate)
                 ->where('office_id', $this->appointment->office_id)
                 ->where('id', '!=', $this->appointment->id)
-                ->exists();
+                ->whereRaw('HOUR(booking_time) = ?', [$hour])
+                ->whereIn('status', ['on-going', 'completed'])
+                ->count();
 
-            Log::info('Checking for conflicts:', [
+            $conflict = $hourlyCount >= $hourlyLimit;
+
+            Log::info('Checking for hourly conflicts in appointment update:', [
                 'date' => $this->selectedDate,
-                'time' => $this->selectedTime,
-                'time_to_check' => $timeToCheck,
+                'time' => $selectedTime,
+                'hour' => $hour,
                 'office_id' => $this->appointment->office_id,
-                'appointment_id' => $this->appointment->id,
+                'hourly_count' => $hourlyCount,
+                'hourly_limit' => $hourlyLimit,
                 'has_conflict' => $conflict,
             ]);
 
             return $conflict;
         } catch (\Exception $e) {
-            Log::error('Error checking for conflicts: ' . $e->getMessage(), [
-                'date' => $this->selectedDate,
-                'time' => $this->selectedTime,
-                'appointment_id' => $this->appointment->id,
-            ]);
-            return true; // Return true to prevent booking in case of error
+            Log::error('Error checking for conflicts: ' . $e->getMessage());
+            return true;
         }
     }
 
@@ -179,7 +172,7 @@ new class extends Component {
 
     public function openShowAppointmentModal(int $id): void
     {
-        $appointment = Appointments::with(['user', 'office', 'service'])->findOrFail($id);
+        $appointment = Appointments::with(['user', 'office'])->findOrFail($id);
 
         // Check if staff is assigned to this appointment's office
         if (!auth()->user()->isAssignedToOffice($appointment->office_id)) {
@@ -190,7 +183,6 @@ new class extends Component {
         $this->appointment = $appointment;
         $this->user = $appointment->user;
         $this->office = $appointment->office;
-        $this->service = $appointment->service;
         $this->showAppointmentModal = true;
         $this->dispatch('open-modal-show-appointment');
     }
@@ -235,7 +227,7 @@ new class extends Component {
 
     public function with(): array
     {
-        $query = Appointments::with(['user', 'office', 'service'])
+        $query = Appointments::with(['user', 'office'])
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->whereHas('user', function ($userQuery) {

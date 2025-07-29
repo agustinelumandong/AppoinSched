@@ -104,9 +104,9 @@
       </div>
     </div>
   </div>
-  {{-- Temporary Address --}}
+  {{-- Present Address --}}
   <div>
-    <h4 class="text-lg font-bold mb-4">Temporary Address</h4>
+    <h4 class="text-lg font-bold mb-4">Present Address</h4>
     <div class="flex items-center mb-4">
       <input type="checkbox" id="same_as_personal_address" wire:model="same_as_personal_address"
         class="checkbox checkbox-primary mr-2" />

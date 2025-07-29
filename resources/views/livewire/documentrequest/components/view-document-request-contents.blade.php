@@ -35,176 +35,83 @@
                 'documentRequest' => $documentRequest
             ])
         @elseif ($documentRequest->service->title !== 'Death Certificate')
-                                <!-- Personal Identity Section -->
-                                <div class="mb-8">
-                                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Identity</h3>
-                                    <div class="space-y-4">
-                                        <div class="grid md:grid-cols-4 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->last_name ?? $documentRequest->user->last_name }}
-                                                </p>
+                                    <!-- Personal Identity Section -->
+                                    <div class="mb-8">
+                                        <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Identity</h3>
+                                        <div class="space-y-4">
+                                            <div class="grid md:grid-cols-4 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->last_name ?? $documentRequest->user->last_name }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->first_name ?? $documentRequest->user->first_name }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->middle_name ?? ($documentRequest->user->middle_name ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->suffix ?? ($documentRequest->user->suffix ?? 'N/A') }}
+                                                    </p>
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->first_name ?? $documentRequest->user->first_name }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->middle_name ?? ($documentRequest->user->middle_name ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->suffix ?? ($documentRequest->user->suffix ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
 
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Date of Birth</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ optional($documentRequest->details)->date_of_birth
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Date of Birth</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ optional($documentRequest->details)->date_of_birth
             ? \Carbon\Carbon::parse($documentRequest->details->date_of_birth)->format('M d, Y')
             : (optional($documentRequest->user)->date_of_birth
                 ? \Carbon\Carbon::parse($documentRequest->user->date_of_birth)->format('M d, Y')
                 : 'N/A') }}
 
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Place of Birth</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->place_of_birth ?? ($documentRequest->user->place_of_birth ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-3 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Sex at Birth</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->sex_at_birth ?? ($documentRequest->user->sex_at_birth ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Civil Status</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->civil_status ?? ($documentRequest->user->civil_status ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->nationality ?? ($documentRequest->user->nationality ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->religion ?? ($documentRequest->user->religion ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->contact_no ?? ($documentRequest->user->contact_no ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Government ID Type</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->government_id_type ?? ($documentRequest->user->government_id_type ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Government ID PDF</label>
-                                                @if($documentRequest->details && $documentRequest->details->government_id_image_path)
-                                                    <div class="mt-2">
-                                                        <a href="{{ asset('storage/' . $documentRequest->details->government_id_image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
-                                                            View PDF Document
-                                                        </a>
-                                                    </div>
-                                                @elseif($documentRequest->user->personalInformation && $documentRequest->user->personalInformation->government_id_image_path)
-                                                    <div class="mt-2">
-                                                        <a href="{{ asset('storage/' . $documentRequest->user->personalInformation->government_id_image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
-                                                            View PDF Document
-                                                        </a>
-                                                    </div>
-                                                @else
-                                                    <p class="text-gray-500 text-sm">No government ID PDF uploaded</p>
-                                                @endif
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <!-- Contact Information Section -->
-                                <div class="mb-8">
-                                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Contact Information
-                                    </h3>
-                                    <div class="space-y-4">
-                                        <!-- Contact Person Information -->
-                                        @if ($documentRequest->details && ($documentRequest->details->contact_first_name || $documentRequest->details->contact_last_name))
-                                            <div class="bg-blue-50 p-4 rounded-lg mb-4">
-                                                <h4 class="text-sm font-medium text-blue-800 mb-3">Contact Person (for this request)</h4>
-                                                <div class="grid md:grid-cols-3 gap-6 mb-4">
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                            {{ $documentRequest->details->contact_last_name ?? 'N/A' }}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                            {{ $documentRequest->details->contact_first_name ?? 'N/A' }}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                            {{ $documentRequest->details->contact_middle_name ?? 'N/A' }}
-                                                        </p>
-                                                    </div>
+                                                    </p>
                                                 </div>
-                                                <div class="grid md:grid-cols-2 gap-6">
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Contact Email</label>
-                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                            {{ $documentRequest->details->contact_email ?? 'N/A' }}
-                                                        </p>
-                                                    </div>
-                                                    <div>
-                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Contact Phone</label>
-                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                            {{ $documentRequest->details->contact_phone ?? 'N/A' }}
-                                                        </p>
-                                                    </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Place of Birth</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->place_of_birth ?? ($documentRequest->user->place_of_birth ?? 'N/A') }}
+                                                    </p>
                                                 </div>
                                             </div>
-                                        @endif
 
-                                        <!-- Beneficiary Contact Information -->
-                                        <div class="bg-gray-50 p-4 rounded-lg">
-                                            <h4 class="text-sm font-medium text-gray-800 mb-3">Beneficiary Contact Information</h4>
+                                            <div class="grid md:grid-cols-3 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Sex at Birth</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->sex_at_birth ?? ($documentRequest->user->sex_at_birth ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Civil Status</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->civil_status ?? ($documentRequest->user->civil_status ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->nationality ?? ($documentRequest->user->nationality ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
                                             <div class="grid md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Email Address</label>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
                                                     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->email ?? $documentRequest->user->email }}
+                                                        {{ $documentRequest->details->religion ?? ($documentRequest->user->religion ?? 'N/A') }}
                                                     </p>
                                                 </div>
                                                 <div>
@@ -214,271 +121,364 @@
                                                     </p>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                                <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Permanent Address</h4>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->address_type ?? ($documentRequest->user->address_type ?? 'N/A') }}
-                                                </p>
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Government ID Type</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->government_id_type ?? ($documentRequest->user->government_id_type ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Government ID PDF</label>
+                                                    @if($documentRequest->details && $documentRequest->details->government_id_image_path)
+                                                        <div class="mt-2">
+                                                            <a href="{{ asset('storage/' . $documentRequest->details->government_id_image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                                                View PDF Document
+                                                            </a>
+                                                        </div>
+                                                    @elseif($documentRequest->user->personalInformation && $documentRequest->user->personalInformation->government_id_image_path)
+                                                        <div class="mt-2">
+                                                            <a href="{{ asset('storage/' . $documentRequest->user->personalInformation->government_id_image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                                                View PDF Document
+                                                            </a>
+                                                        </div>
+                                                    @else
+                                                        <p class="text-gray-500 text-sm">No government ID PDF uploaded</p>
+                                                    @endif
+                                                </div>
                                             </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Zip Code</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->zip_code ?? ($documentRequest->user->zip_code ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 1</label>
-                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                {{ $documentRequest->details->address_line_1 ?? ($documentRequest->user->address_line_1 ?? 'N/A') }}
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 2</label>
-                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                {{ $documentRequest->details->address_line_2 ?? ($documentRequest->user->address_line_2 ?? 'N/A') }}
-                                            </p>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Region</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->region ?? ($documentRequest->user->region ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->province ?? ($documentRequest->user->province ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">City</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->city ?? ($documentRequest->user->city ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Barangay</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->barangay ?? ($documentRequest->user->barangay ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Street</label>
-                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                {{ $documentRequest->details->street ?? ($documentRequest->user->street ?? 'N/A') }}
-                                            </p>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Temporary Address</h4>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->address_type ?? ($documentRequest->user->address_type ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Zip Code</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->zip_code ?? ($documentRequest->user->zip_code ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 1</label>
-                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                {{ $documentRequest->details->address_line_1 ?? ($documentRequest->user->address_line_1 ?? 'N/A') }}
-                                            </p>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 2</label>
-                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                {{ $documentRequest->details->address_line_2 ?? ($documentRequest->user->address_line_2 ?? 'N/A') }}
-                                            </p>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Region</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->region ?? ($documentRequest->user->region ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->province ?? ($documentRequest->user->province ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div class="grid md:grid-cols-2 gap-6">
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">City</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->city ?? ($documentRequest->user->city ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                            <div>
-                                                <label class="block text-sm font-medium text-gray-600 mb-1">Barangay</label>
-                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                    {{ $documentRequest->details->barangay ?? ($documentRequest->user->barangay ?? 'N/A') }}
-                                                </p>
-                                            </div>
-                                        </div>
-
-                                        <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Street</label>
-                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                {{ $documentRequest->details->street ?? ($documentRequest->user->street ?? 'N/A') }}
-                                            </p>
                                         </div>
                                     </div>
-                                </div>
 
-                                <!-- Family Information Section -->
-                                <div class="mb-8">
-                                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Family Information</h3>
-                                    <div class="space-y-6">
-                                        <!-- Father Information -->
-                                        <div>
-                                            <h4 class="text-sm font-medium text-gray-700 mb-3">Father's Information</h4>
-                                            <div class="grid md:grid-cols-4 gap-6 mb-4">
+                                    <!-- Contact Information Section -->
+                                    <div class="mb-8">
+                                        <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Contact Information
+                                        </h3>
+                                        <div class="space-y-4">
+                                            <!-- Contact Person Information -->
+                                            @if ($documentRequest->details && ($documentRequest->details->contact_first_name || $documentRequest->details->contact_last_name))
+                                                <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                                                    <h4 class="text-sm font-medium text-blue-800 mb-3">Contact Person (for this request)</h4>
+                                                    <div class="grid md:grid-cols-3 gap-6 mb-4">
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                                {{ $documentRequest->details->contact_last_name ?? 'N/A' }}
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                                {{ $documentRequest->details->contact_first_name ?? 'N/A' }}
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                                {{ $documentRequest->details->contact_middle_name ?? 'N/A' }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                    <div class="grid md:grid-cols-2 gap-6">
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-600 mb-1">Contact Email</label>
+                                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                                {{ $documentRequest->details->contact_email ?? 'N/A' }}
+                                                            </p>
+                                                        </div>
+                                                        <div>
+                                                            <label class="block text-sm font-medium text-gray-600 mb-1">Contact Phone</label>
+                                                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                                {{ $documentRequest->details->contact_phone ?? 'N/A' }}
+                                                            </p>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            @endif
+
+                                            <!-- Beneficiary Contact Information -->
+                                            <div class="bg-gray-50 p-4 rounded-lg">
+                                                <h4 class="text-sm font-medium text-gray-800 mb-3">Beneficiary Contact Information</h4>
+                                                <div class="grid md:grid-cols-2 gap-6">
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Email Address</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->email ?? $documentRequest->user->email }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->contact_no ?? ($documentRequest->user->contact_no ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                    <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Permanent Address</h4>
                                                 <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
                                                     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_last_name ?? ($documentRequest->user->father_last_name ?? 'N/A') }}
+                                                        {{ $documentRequest->details->address_type ?? ($documentRequest->user->address_type ?? 'N/A') }}
                                                     </p>
                                                 </div>
                                                 <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Zip Code</label>
                                                     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_first_name ?? ($documentRequest->user->father_first_name ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_middle_name ?? ($documentRequest->user->father_middle_name ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_suffix ?? ($documentRequest->user->father_suffix ?? 'N/A') }}
+                                                        {{ $documentRequest->details->zip_code ?? ($documentRequest->user->zip_code ?? 'N/A') }}
                                                     </p>
                                                 </div>
                                             </div>
-                                            <div class="grid md:grid-cols-4 gap-6">
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 1</label>
+                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                    {{ $documentRequest->details->address_line_1 ?? ($documentRequest->user->address_line_1 ?? 'N/A') }}
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 2</label>
+                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                    {{ $documentRequest->details->address_line_2 ?? ($documentRequest->user->address_line_2 ?? 'N/A') }}
+                                                </p>
+                                            </div>
+
+                                            <div class="grid md:grid-cols-2 gap-6">
                                                 <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Region</label>
                                                     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ optional($documentRequest->details)->father_birthdate
+                                                        {{ $documentRequest->details->region ?? ($documentRequest->user->region ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->province ?? ($documentRequest->user->province ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">City</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->city ?? ($documentRequest->user->city ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Barangay</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->barangay ?? ($documentRequest->user->barangay ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-600 mb-1">Street</label>
+                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                    {{ $documentRequest->details->street ?? ($documentRequest->user->street ?? 'N/A') }}
+                                                </p>
+                                            </div>
+
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Present Address</h4>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->address_type ?? ($documentRequest->user->address_type ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Zip Code</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->zip_code ?? ($documentRequest->user->zip_code ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 1</label>
+                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                    {{ $documentRequest->details->address_line_1 ?? ($documentRequest->user->address_line_1 ?? 'N/A') }}
+                                                </p>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-600 mb-1">Address Line 2</label>
+                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                    {{ $documentRequest->details->address_line_2 ?? ($documentRequest->user->address_line_2 ?? 'N/A') }}
+                                                </p>
+                                            </div>
+
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Region</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->region ?? ($documentRequest->user->region ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Province</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->province ?? ($documentRequest->user->province ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div class="grid md:grid-cols-2 gap-6">
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">City</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->city ?? ($documentRequest->user->city ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                                <div>
+                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Barangay</label>
+                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                        {{ $documentRequest->details->barangay ?? ($documentRequest->user->barangay ?? 'N/A') }}
+                                                    </p>
+                                                </div>
+                                            </div>
+
+                                            <div>
+                                                <label class="block text-sm font-medium text-gray-600 mb-1">Street</label>
+                                                <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                    {{ $documentRequest->details->street ?? ($documentRequest->user->street ?? 'N/A') }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Family Information Section -->
+                                    <div class="mb-8">
+                                        <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Family Information</h3>
+                                        <div class="space-y-6">
+                                            <!-- Father Information -->
+                                            <div>
+                                                <h4 class="text-sm font-medium text-gray-700 mb-3">Father's Information</h4>
+                                                <div class="grid md:grid-cols-4 gap-6 mb-4">
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_last_name ?? ($documentRequest->user->father_last_name ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_first_name ?? ($documentRequest->user->father_first_name ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_middle_name ?? ($documentRequest->user->father_middle_name ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_suffix ?? ($documentRequest->user->father_suffix ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                                <div class="grid md:grid-cols-4 gap-6">
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ optional($documentRequest->details)->father_birthdate
             ? \Carbon\Carbon::parse($documentRequest->details->father_birthdate)->format('M d, Y')
             : (optional($documentRequest->user)->father_birthdate
                 ? \Carbon\Carbon::parse($documentRequest->user->father_birthdate)->format('M d, Y')
                 : 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_nationality ?? ($documentRequest->user->father_nationality ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_religion ?? ($documentRequest->user->father_religion ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->father_contact_no ?? ($documentRequest->user->father_contact_no ?? 'N/A') }}
-                                                    </p>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_nationality ?? ($documentRequest->user->father_nationality ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_religion ?? ($documentRequest->user->father_religion ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->father_contact_no ?? ($documentRequest->user->father_contact_no ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
-                                        </div>
 
-                                        <!-- Mother Information -->
-                                        <div>
-                                            <h4 class="text-sm font-medium text-gray-700 mb-3">Mother's Information</h4>
-                                            <div class="grid md:grid-cols-4 gap-6 mb-4">
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_last_name ?? ($documentRequest->user->mother_last_name ?? 'N/A') }}
-                                                    </p>
+                                            <!-- Mother Information -->
+                                            <div>
+                                                <h4 class="text-sm font-medium text-gray-700 mb-3">Mother's Information</h4>
+                                                <div class="grid md:grid-cols-4 gap-6 mb-4">
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_last_name ?? ($documentRequest->user->mother_last_name ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_first_name ?? ($documentRequest->user->mother_first_name ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_middle_name ?? ($documentRequest->user->mother_middle_name ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_suffix ?? ($documentRequest->user->mother_suffix ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
                                                 </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_first_name ?? ($documentRequest->user->mother_first_name ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_middle_name ?? ($documentRequest->user->mother_middle_name ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Suffix</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_suffix ?? ($documentRequest->user->mother_suffix ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                            </div>
-                                            <div class="grid md:grid-cols-4 gap-6">
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ optional($documentRequest->details)->mother_birthdate
+                                                <div class="grid md:grid-cols-4 gap-6">
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ optional($documentRequest->details)->mother_birthdate
             ? \Carbon\Carbon::parse($documentRequest->details->mother_birthdate)->format('M d, Y')
             : (optional($documentRequest->user)->mother_birthdate
                 ? \Carbon\Carbon::parse($documentRequest->user->mother_birthdate)->format('M d, Y')
                 : 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_nationality ?? ($documentRequest->user->mother_nationality ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_religion ?? ($documentRequest->user->mother_religion ?? 'N/A') }}
-                                                    </p>
-                                                </div>
-                                                <div>
-                                                    <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
-                                                    <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                                        {{ $documentRequest->details->mother_contact_no ?? ($documentRequest->user->mother_contact_no ?? 'N/A') }}
-                                                    </p>
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Nationality</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_nationality ?? ($documentRequest->user->mother_nationality ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_religion ?? ($documentRequest->user->mother_religion ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
+                                                    <div>
+                                                        <label class="block text-sm font-medium text-gray-600 mb-1">Contact Number</label>
+                                                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                                            {{ $documentRequest->details->mother_contact_no ?? ($documentRequest->user->mother_contact_no ?? 'N/A') }}
+                                                        </p>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
         @else
             <!-- Deceased Person Information -->
             <div class="mb-8">

@@ -12,15 +12,7 @@
                     </div>
                 </div>
 
-                <!-- Service Information -->
-                <div class="col-md-6">
-                    <div class="info-group">
-                        <h6 class="text-muted mb-2">Service</h6>
-                        <div class="p-3 flux-card">
-                            <p class="mb-0 text-dark">{{ $appointment->service?->title ?? 'N/A' }}</p>
-                        </div>
-                    </div>
-                </div>
+
 
                 <!-- Date and Time -->
                 <div class="col-md-6">
@@ -77,8 +69,6 @@
                                         </p>
                                     </div>
                                     <div class="col-md-6">
-                                        <p class="mb-1"><strong>Address:</strong>
-                                            {{ $appointment->appointmentDetails->complete_address ?? 'N/A' }}</p>
                                         @if ($appointment->appointmentDetails->purpose)
                                             <p class="mb-1"><strong>Purpose:</strong>
                                                 {{ $appointment->appointmentDetails->purpose }}</p>
@@ -110,6 +100,38 @@
                         </p>
                     </div>
                 </div>
+
+
+
+                <!-- Metadata/Certificate Requests -->
+
+                @if ($appointment->appointmentDetails && $appointment->appointmentDetails->metadata && is_array($appointment->appointmentDetails->metadata) && count($appointment->appointmentDetails->metadata) > 0)
+                    <div class="col-12">
+                        <div class="info-group">
+                            <h6 class="text-muted mb-2">Certificate Requests</h6>
+                            <div class="p-3 flux-card">
+                                <div class="row">
+                                    @foreach ($appointment->appointmentDetails->metadata as $index => $certificateData)
+                                        @if (isset($certificateData['certificate_code']))
+                                            <div class="col-md-6 mb-2">
+                                                <div class="d-flex justify-content-between align-items-center">
+                                                    <span class="text-muted">Certificate
+                                                        #{{ $certificateData['number'] ?? ($index + 1) }}:</span>
+                                                    <span class="badge bg-primary font-monospace fw-bold">
+                                                        {{ $certificateData['certificate_code'] }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+
+
             </div>
         @else
             <div class="text-center py-4">

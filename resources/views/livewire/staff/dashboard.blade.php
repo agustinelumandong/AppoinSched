@@ -22,15 +22,15 @@ new class extends Component {
     public function with(): array
     {
         return [
-            'recentAppointments' => Appointments::with(['user', 'office', 'service'])
+            'recentAppointments' => Appointments::with(['user', 'office'])
                 ->where('office_id', $this->getOfficeIdForStaff())
                 ->latest()
                 ->get(),
-            'approvedAppointments' => Appointments::with(['user', 'office', 'service'])
+            'approvedAppointments' => Appointments::with(['user', 'office'])
                 ->where('office_id', $this->getOfficeIdForStaff())
                 ->latest()
                 ->get(),
-            'pendingAppointments' => Appointments::with(['user', 'office', 'service'])
+            'pendingAppointments' => Appointments::with(['user', 'office'])
                 ->where('office_id', $this->getOfficeIdForStaff())
                 ->where('status', 'pending')
                 ->get(),
