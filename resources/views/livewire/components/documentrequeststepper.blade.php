@@ -1530,22 +1530,31 @@ new #[Title('Document Request')] class extends Component {
                     </div>
 
                     <div class="flex flex-col gap-2 w-full" wire:loading.remove>
-                        @foreach ($services as $service)
-                            <input
-                                type="radio"
-                                id="{{ $service->slug }}"
-                                name="service"
-                                value="{{ $service->slug }}"
-                                wire:model.live="serviceSelected"
-                                hidden
-                            />
-                            <label
-                                for="{{ $service->slug }}"
-                                class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2"
-                            >
-                                {{ $service->title }}
+                        @if($office->slug === 'business-permits-and-licensing-section')
+                            <input type="radio" id="special-permit" name="service" value="special-permit" wire:model.live="serviceSelected"
+                                hidden />
+                            <label for="special-permit"
+                                class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2">Special
+                                Permit
                             </label>
-                        @endforeach
+                        @else
+                            @foreach ($services as $service)
+                                <input
+                                    type="radio"
+                                    id="{{ $service->slug }}"
+                                    name="service"
+                                    value="{{ $service->slug }}"
+                                    wire:model.live="serviceSelected"
+                                    hidden
+                                />
+                                <label
+                                    for="{{ $service->slug }}"
+                                    class="flux-input-primary flux-btn cursor-pointer {{ $service->slug === $serviceSelected ? 'flux-btn-active-primary' : '' }} p-2"
+                                >
+                                    {{ $service->title }}
+                                </label>
+                            @endforeach
+                        @endif
                     </div>
 
 

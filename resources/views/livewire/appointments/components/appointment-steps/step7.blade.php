@@ -77,7 +77,7 @@
                 </div>
             </div>
 
-            @if ($includeCertificates && count($certificates) > 0)
+            @if ($this->includeCertificates && count($certificates) > 0)
                 <!-- Certificate Requests -->
                 <div class="border-t pt-4">
                     <h3 class="text-md font-semibold text-gray-700 mb-3">Certificate Requests</h3>
