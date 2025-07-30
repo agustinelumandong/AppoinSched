@@ -116,7 +116,7 @@
                 </div>
             </div>
 
-            @if ($includeCertificates && count($certificates) > 0)
+            @if ($this->includeCertificates && count($certificates) > 0)
                 <!-- Certificate Requests -->
                  <div class="flux-card p-6 w-1/2">
                     <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Certificate Requests

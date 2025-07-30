@@ -80,6 +80,11 @@ new #[Title('Appointment')] class extends Component {
             ],
         ];
 
+        // Skip certificates step for MTO office
+        if ($this->office->name === 'Municipal Treasurer\'s Office') {
+            $this->includeCertificates = false;
+        }
+
         // Check if user has complete profile
         if (!auth()->user()->hasCompleteProfile()) {
             session()->flash('warning', 'Please complete your profile information before making an appointment.');
@@ -216,6 +221,12 @@ new #[Title('Appointment')] class extends Component {
             } elseif ($this->step == 4 && !$this->includeCertificates) {
                 // If we are on the personal details step without certificates, go back to step 2
                 $this->step = 2;
+            } elseif ($this->step == ($this->includeCertificates ? 5 : 4) && !$this->includeCertificates) {
+                // If we are on the date/time step without certificates, go back to step 3
+                $this->step = 3;
+            } elseif ($this->step == ($this->includeCertificates ? 6 : 5) && !$this->includeCertificates) {
+                // If we are on the confirmation step without certificates, go back to step 4
+                $this->step = 4;
             } else {
                 // Otherwise, just go back one step
                 $this->step--;
@@ -559,31 +570,33 @@ new #[Title('Appointment')] class extends Component {
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
-                <div class="step-content">
-                    <div class="step-title">Certificate Requests</div>
-                    <div class="step-description text-sm text-gray-500">Required documents</div>
-                </div>
-            </li>
-            <li class="step {{ $step >= 4 ? 'step-info' : '' }}">
+            @if($this->includeCertificates)
+                <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
+                    <div class="step-content">
+                        <div class="step-title">Certificate Requests</div>
+                        <div class="step-description text-sm text-gray-500">Required documents</div>
+                    </div>
+                </li>
+            @endif
+            <li class="step {{ $step >= ($this->includeCertificates ? 4 : 3) ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Personal Information</div>
                     <div class="step-description text-sm text-gray-500">Your details</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= ($this->includeCertificates ? 5 : 4) ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Date & Time</div>
                     <div class="step-description text-sm text-gray-500">Schedule</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= ($this->includeCertificates ? 6 : 5) ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Confirmation</div>
                     <div class="step-description text-sm text-gray-500">Review & Submit</div>
                 </div>
             </li>
-            <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
+            <li class="step {{ $step >= ($this->includeCertificates ? 7 : 6) ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Appointment Slip</div>
                     <div class="step-description text-sm text-gray-500">Save Your Details</div>
@@ -643,15 +656,15 @@ new #[Title('Appointment')] class extends Component {
         </div>
     @elseif($step == 2)
         @include('livewire.appointments.components.appointment-steps.step2')
-    @elseif($step == 3 && $includeCertificates)
+    @elseif($step == 3 && $this->includeCertificates)
         @include('livewire.appointments.components.appointment-steps.certificates-step')
-    @elseif(($step == 3 && !$includeCertificates) || $step == 4)
+    @elseif(($step == 3 && !$this->includeCertificates) || $step == 4)
         @include('livewire.appointments.components.appointment-steps.step3')
-    @elseif($step == 5)
+    @elseif($step == ($this->includeCertificates ? 5 : 4))
         @include('livewire.appointments.components.appointment-steps.step4')
-    @elseif($step == 6)
+    @elseif($step == ($this->includeCertificates ? 6 : 5))
         @include('livewire.appointments.components.appointment-steps.step6')
-    @elseif($step == 7)
+    @elseif($step == ($this->includeCertificates ? 7 : 6))
         @include('livewire.appointments.components.appointment-steps.step7')
     @endif
 </div>
