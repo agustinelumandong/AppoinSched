@@ -1415,7 +1415,7 @@ new #[Title('Document Request')] class extends Component {
             <li class="step {{ $step >= 5 ? 'step-info' : '' }}">
                 <div class="step-content">
                     @php 
-                                                if ($this->service->slug === 'marriage-certificate') {
+                        if ($this->service->slug === 'marriage-certificate') {
                             $stepTitle = 'Marriage License';
                             $stepDescription = 'Marriage License Information';
                         } elseif ($this->service->slug === 'death-certificate') {
@@ -1423,6 +1423,7 @@ new #[Title('Document Request')] class extends Component {
                             $stepDescription = 'Death Certificate Information';
                         } elseif ($this->service->slug === 'special-permit') {
                             $stepTitle = 'Permit Request';
+                            $stepDescription = 'Permit Request Information';
                         } else {
                             $stepTitle = 'Personal Information';
                             $stepDescription = 'Your/Someone details';
