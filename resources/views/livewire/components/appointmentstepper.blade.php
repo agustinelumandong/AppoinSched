@@ -81,7 +81,7 @@ new #[Title('Appointment')] class extends Component {
         ];
 
         // Skip certificates step for MTO office
-        if ($this->office->name === 'Municipal Treasurer\'s Office') {
+        if ($this->office->slug === 'municipal-treasurers-office') {
             $this->includeCertificates = false;
         }
 
@@ -139,8 +139,10 @@ new #[Title('Appointment')] class extends Component {
                     'purpose' => 'required',
                 ]);
                 // Skip the certificates step if includeCertificates is false
-                if (!$this->includeCertificates) {
-                    $this->step++; // Skip to next step
+                if (!$this->office->slug === 'municipal-treasurers-office') {
+                    if (!$this->includeCertificates) {
+                        $this->step++; // Skip to next step
+                    }
                 }
                 break;
             case 3:
@@ -160,53 +162,78 @@ new #[Title('Appointment')] class extends Component {
                 break;
             case 4:
                 $this->isLoading = true;
-                $this->validate([
-                    'first_name' => 'string|required',
-                    'last_name' => 'string|required',
-                    'middle_name' => 'string|nullable',
-                    'email' => 'string|required|email',
-                    'phone' => 'required|numeric|digits_between:7,25',
-                ]);
+                if ($this->includeCertificates) {
+                    // This is the personal information step when certificates are included
+                    $this->validate([
+                        'first_name' => 'string|required',
+                        'last_name' => 'string|required',
+                        'middle_name' => 'string|nullable',
+                        'email' => 'string|required|email',
+                        'phone' => 'required|numeric|digits_between:7,25',
+                    ]);
 
-                // Add info redundancy validation directly here
-                if ($this->includeCertificates && !empty($this->certificates)) {
-                    $currentUser = auth()->user();
-                    $userData = $currentUser->getAppointmentFormData();
+                    // Add info redundancy validation directly here
+                    if (!empty($this->certificates)) {
+                        $currentUser = auth()->user();
+                        $userData = $currentUser->getAppointmentFormData();
 
-                    foreach ($this->certificates as $index => $certificate) {
-                        if ($certificate['relationship'] === 'myself') {
-                            continue;
-                        }
+                        foreach ($this->certificates as $index => $certificate) {
+                            if ($certificate['relationship'] === 'myself') {
+                                continue;
+                            }
 
-                        $isRedundant = true;
+                            $isRedundant = true;
 
-                        if (strtolower(trim($certificate['first_name'])) !== strtolower(trim($userData['first_name'] ?? ''))) {
-                            $isRedundant = false;
-                        }
-                        if (strtolower(trim($certificate['last_name'])) !== strtolower(trim($userData['last_name'] ?? ''))) {
-                            $isRedundant = false;
-                        }
-                        if (!empty($certificate['middle_name']) && strtolower(trim($certificate['middle_name'])) !== strtolower(trim($userData['middle_name'] ?? ''))) {
-                            $isRedundant = false;
-                        }
+                            if (strtolower(trim($certificate['first_name'])) !== strtolower(trim($userData['first_name'] ?? ''))) {
+                                $isRedundant = false;
+                            }
+                            if (strtolower(trim($certificate['last_name'])) !== strtolower(trim($userData['last_name'] ?? ''))) {
+                                $isRedundant = false;
+                            }
+                            if (!empty($certificate['middle_name']) && strtolower(trim($certificate['middle_name'])) !== strtolower(trim($userData['middle_name'] ?? ''))) {
+                                $isRedundant = false;
+                            }
 
-                        if ($isRedundant) {
-                            $relationshipName = ucfirst($certificate['relationship']);
-                            $this->addError('info_redundancy', "INFO REDUNDANCY: You are entering your own information for a certificate that is for your {$relationshipName}. Please enter the correct information for your {$relationshipName} instead of your own details.");
-                            return;
+                            if ($isRedundant) {
+                                $relationshipName = ucfirst($certificate['relationship']);
+                                $this->addError('info_redundancy', "INFO REDUNDANCY: You are entering your own information for a certificate that is for your {$relationshipName}. Please enter the correct information for your {$relationshipName} instead of your own details.");
+                                return;
+                            }
                         }
                     }
+                } else {
+                    // This is the date/time step when certificates are skipped
+                    $this->validate([
+                        'selectedTime' => 'required|string',
+                    ]);
                 }
                 break;
             case 5:
                 $this->isLoading = true;
-                $this->validate([
-                    'selectedTime' => 'required|string',
-                ]);
+                if ($this->includeCertificates) {
+                    // This is the date/time step when certificates are included
+                    $this->validate([
+                        'selectedTime' => 'required|string',
+                    ]);
+                } else {
+                    // This is the confirmation step when certificates are skipped
+                    // No additional validation needed - just confirmation step
+                }
                 break;
             case 6:
                 $this->isLoading = true;
-                // No additional validation needed - just confirmation step
+                if ($this->includeCertificates) {
+                    // This is the confirmation step when certificates are included
+                    // No additional validation needed - just confirmation step
+                } else {
+                    // This is the appointment slip step when certificates are skipped
+                    // No additional validation needed
+                }
+                break;
+            case 7:
+                $this->isLoading = true;
+                // This is the appointment slip step when certificates are included
+                // No additional validation needed
                 break;
         }
         $this->step++;
@@ -218,15 +245,30 @@ new #[Title('Appointment')] class extends Component {
             if ($this->step == 3 && $this->includeCertificates) {
                 // If we are on the certificates step, go back to step 2
                 $this->step = 2;
-            } elseif ($this->step == 4 && !$this->includeCertificates) {
+            } elseif ($this->step == 3 && !$this->includeCertificates) {
                 // If we are on the personal details step without certificates, go back to step 2
                 $this->step = 2;
-            } elseif ($this->step == ($this->includeCertificates ? 5 : 4) && !$this->includeCertificates) {
+            } elseif ($this->step == 4 && $this->includeCertificates) {
+                // If we are on the personal details step with certificates, go back to step 3
+                $this->step = 3;
+            } elseif ($this->step == 4 && !$this->includeCertificates) {
                 // If we are on the date/time step without certificates, go back to step 3
                 $this->step = 3;
-            } elseif ($this->step == ($this->includeCertificates ? 6 : 5) && !$this->includeCertificates) {
+            } elseif ($this->step == 5 && $this->includeCertificates) {
+                // If we are on the date/time step with certificates, go back to step 4
+                $this->step = 4;
+            } elseif ($this->step == 5 && !$this->includeCertificates) {
                 // If we are on the confirmation step without certificates, go back to step 4
                 $this->step = 4;
+            } elseif ($this->step == 6 && $this->includeCertificates) {
+                // If we are on the confirmation step with certificates, go back to step 5
+                $this->step = 5;
+            } elseif ($this->step == 6 && !$this->includeCertificates) {
+                // If we are on the appointment slip step without certificates, go back to step 5
+                $this->step = 5;
+            } elseif ($this->step == 7 && $this->includeCertificates) {
+                // If we are on the appointment slip step with certificates, go back to step 6
+                $this->step = 6;
             } else {
                 // Otherwise, just go back one step
                 $this->step--;
@@ -402,8 +444,11 @@ new #[Title('Appointment')] class extends Component {
                 Log::info('Appointment created successfully', ['appointment_id' => $appointment->id]);
 
                 $this->reference_number = $reference_number;
-
-                $this->step = 7;
+                if (!$this->office->slug === 'municipal-treasurers-office') {
+                    $this->step = 7;
+                } else {
+                    $this->step = 6;
+                }
 
                 $cacheKey = "time_slots_{$this->office->id}_{$this->selectedDate}";
                 Cache::forget($cacheKey);
@@ -658,13 +703,21 @@ new #[Title('Appointment')] class extends Component {
         @include('livewire.appointments.components.appointment-steps.step2')
     @elseif($step == 3 && $this->includeCertificates)
         @include('livewire.appointments.components.appointment-steps.certificates-step')
-    @elseif(($step == 3 && !$this->includeCertificates) || $step == 4)
+    @elseif($step == 3 && !$this->includeCertificates)
         @include('livewire.appointments.components.appointment-steps.step3')
-    @elseif($step == ($this->includeCertificates ? 5 : 4))
+    @elseif($step == 4 && $this->includeCertificates)
+        @include('livewire.appointments.components.appointment-steps.step3')
+    @elseif($step == 4 && !$this->includeCertificates)
         @include('livewire.appointments.components.appointment-steps.step4')
-    @elseif($step == ($this->includeCertificates ? 6 : 5))
+    @elseif($step == 5 && $this->includeCertificates)
+        @include('livewire.appointments.components.appointment-steps.step4')
+    @elseif($step == 5 && !$this->includeCertificates)
         @include('livewire.appointments.components.appointment-steps.step6')
-    @elseif($step == ($this->includeCertificates ? 7 : 6))
+    @elseif($step == 6 && $this->includeCertificates)
+        @include('livewire.appointments.components.appointment-steps.step6')
+    @elseif($step == 6 && !$this->includeCertificates)
+        @include('livewire.appointments.components.appointment-steps.step7')
+    @elseif($step == 7 && $this->includeCertificates)
         @include('livewire.appointments.components.appointment-steps.step7')
     @endif
 </div>
