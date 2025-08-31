@@ -191,6 +191,11 @@ new #[Title('Document Request')] class extends Component {
 
     public bool $editPersonDetails = false;
 
+    // Special Permit Fields
+    public string $establishment_name = '';
+    public string $establishment_address = '';
+    public string $establishment_purpose = '';
+
     // Address Information
     public string $address = '';
     public string $region = '';
@@ -284,11 +289,42 @@ new #[Title('Document Request')] class extends Component {
                     $this->step = 1; // fallback
                 }
                 // Populate ALL fields from details if available
-                if ($existingRequest->details) {
+                if ($existingRequest->details && !$this->service->slug === 'special-permit') {
                     foreach ($existingRequest->details->toArray() as $field => $value) {
                         if (property_exists($this, $field)) {
                             $this->{$field} = $value;
                         }
+                    }
+                }else{
+                    $this->details = $existingRequest->details;
+
+                    // Map details fields to component properties if they exist
+                    if ($this->details) {
+                        $fields = [
+                            'request_for' => 'to_whom',
+                            'purpose' => 'purpose',
+                            'establishment_name' => 'establishment_name',
+                            'establishment_address' => 'establishment_address',
+                            'establishment_purpose' => 'establishment_purpose',
+                            'payment_reference' => 'payment_reference',
+                            'status' => 'status',
+                            'payment_status' => 'payment_status',
+                        ];
+
+                        foreach ($fields as $detailField => $property) {
+                            if (property_exists($this, $property) && isset($this->details->{$detailField})) {
+                                $this->{$property} = $this->details->{$detailField};
+                            }
+                        }
+                    }
+
+                    // Set step based on payment status
+                    if ($this->payment_status === 'unpaid') {
+                        $this->step = 8;
+                    } elseif (in_array($this->payment_status, ['processing', 'paid', 'completed'], true)) {
+                        $this->step = 9;
+                    } else {
+                        $this->step = 1;
                     }
                 }
                 return;
@@ -551,21 +587,30 @@ new #[Title('Document Request')] class extends Component {
                 break;
             case 3:
                 $this->isLoading = true;
-                $this->validate([
-                    'to_whom' => 'required',
-                    'relationship' => $this->to_whom === 'someone_else'
-                        ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
-                        : 'nullable|in:my_father,my_mother,my_son,my_daughter,others',
-                ]);
+                if ($this->service->slug === 'special-permit') {
+                    // For special permit, skip to_whom validation as it's not needed
+                    // The special permit form is self-contained
+                } else {
+                    $this->validate([
+                        'to_whom' => 'required',
+                        'relationship' => $this->to_whom === 'someone_else'
+                            ? 'required|in:my_father,my_mother,my_son,my_daughter,others'
+                            : 'nullable|in:my_father,my_mother,my_son,my_daughter,others',
+                    ]);
+                }
                 do {
                     $this->reference_number = 'DOC-' . strtoupper(Str::random(10));
                 } while (DocumentRequest::where('reference_number', $this->reference_number)->exists());
                 break;
             case 4:
                 $this->isLoading = true;
-                $this->validate([
-                    'purpose' => 'required',
-                ]);
+                if ($this->service->slug === 'special-permit') {
+                    // For special permit, skip purpose validation as it's handled in the special permit form
+                } else {
+                    $this->validate([
+                        'purpose' => 'required',
+                    ]);
+                }
                 break;
             case 5:
                 $this->isLoading = true;
@@ -605,6 +650,12 @@ new #[Title('Document Request')] class extends Component {
                     ];
                 } elseif ($this->service->slug === 'marriage-certificate') {
                     $rules = $this->marriageLicenseRules();
+                } elseif ($this->service->slug === 'special-permit') {
+                    $rules = [
+                        'establishment_name' => 'required|string|max:255',
+                        'establishment_address' => 'required|string|max:500',
+                        'establishment_purpose' => 'required|string|max:500',
+                    ];
                 } else {
                     $rules = [
                         'first_name' => 'required|string|max:255',
@@ -669,8 +720,8 @@ new #[Title('Document Request')] class extends Component {
 
                 $this->validate($rules);
                 
-                // Add info redundancy validation for someone else
-                if ($this->to_whom === 'someone_else') {
+                // Add info redundancy validation for someone else (skip for special permit)
+                if ($this->to_whom === 'someone_else' && $this->service->slug !== 'special-permit') {
                     $currentUser = auth()->user();
                     $userData = $currentUser->getAppointmentFormData();
                     
@@ -694,18 +745,32 @@ new #[Title('Document Request')] class extends Component {
                     }
                 }
                 
-                $this->fillMarriageCertificateData();
-                $this->fillFamilyDefaults();
-                $this->initializeContactInfo();
+                if ($this->service->slug === 'special-permit') {
+                    // For special permit, skip family defaults and contact info initialization
+                    // as the special permit form is self-contained
+                    // Go to step 7 (confirmation) for special permit
+                    $this->step = 7;
+                    $this->isLoading = false;
+                    return;
+                } else {
+                    $this->fillMarriageCertificateData();
+                    $this->fillFamilyDefaults();
+                    $this->initializeContactInfo();
+                }
                 break;
             case 6:
                 $this->isLoading = true;
-                $this->validate([
-                    'contact_first_name' => 'required|string|max:255',
-                    'contact_last_name' => 'required|string|max:255',
-                    'contact_email' => 'required|email|max:255',
-                    'contact_phone' => 'required|numeric|digits_between:7,25',
-                ]);
+                if ($this->service->slug === 'special-permit') {
+                    // For special permit, skip contact validation as it's not needed
+                    // The special permit form is self-contained
+                } else {
+                    $this->validate([
+                        'contact_first_name' => 'required|string|max:255',
+                        'contact_last_name' => 'required|string|max:255',
+                        'contact_email' => 'required|email|max:255',
+                        'contact_phone' => 'required|numeric|digits_between:7,25',
+                    ]);
+                }
                 break;
             case 7:
                 $this->isLoading = true;
@@ -718,6 +783,9 @@ new #[Title('Document Request')] class extends Component {
                         'email' => 'required|email|max:255',
                         'phone' => 'required|numeric|digits_between:7,25',
                     ]);
+                } elseif ($this->service->slug === 'special-permit') {
+                    // For special permit, skip contact validation as it's not needed
+                    // The special permit form is self-contained
                 } else {
                     // For other document types, validate contact information
                     $this->validate([
@@ -730,6 +798,7 @@ new #[Title('Document Request')] class extends Component {
                 break;
         }
         $this->step++;
+        $this->isLoading = false;
     }
 
     private function fillFamilyDefaults(): void
@@ -951,7 +1020,14 @@ new #[Title('Document Request')] class extends Component {
     public function previousStep(): void
     {
         if ($this->step > 1) {
-            $this->step--;
+            // For special permit, handle step progression differently
+            if ($this->service->slug === 'special-permit' && $this->step === 8) {
+                $this->step = 7; // Go back to confirmation
+            } elseif ($this->service->slug === 'special-permit' && $this->step === 7) {
+                $this->step = 5; // Go back to special permit form
+            } else {
+                $this->step--;
+            }
         } else {
             $this->step = 1;
         }
@@ -992,166 +1068,180 @@ new #[Title('Document Request')] class extends Component {
             ];
 
             // If Marriage License, use modular fields
+            if ($this->service->slug === 'marriage-certificate') {
+                $detailsData = array_merge($detailsData, [
+                    // Groom
+                    'groom_first_name' => $this->groom_first_name,
+                    'groom_middle_name' => $this->groom_middle_name,
+                    'groom_last_name' => $this->groom_last_name,
+                    'groom_suffix' => $this->groom_suffix,
+                    'groom_age' => $this->groom_age ?? null,
+                    'groom_date_of_birth' => $this->groom_date_of_birth,
+                    'groom_place_of_birth' => $this->groom_place_of_birth,
+                    'groom_sex' => $this->groom_sex,
+                    'groom_citizenship' => $this->groom_citizenship,
+                    'groom_residence' => $this->groom_residence,
+                    'groom_religion' => $this->groom_religion,
+                    'groom_civil_status' => $this->groom_civil_status,
+                    // Groom Father
+                    'groom_father_first_name' => $this->groom_father_first_name,
+                    'groom_father_middle_name' => $this->groom_father_middle_name,
+                    'groom_father_last_name' => $this->groom_father_last_name,
+                    'groom_father_suffix' => $this->groom_father_suffix,
+                    'groom_father_citizenship' => $this->groom_father_citizenship,
+                    'groom_father_residence' => $this->groom_father_residence,
+                    // Groom Mother
+                    'groom_mother_first_name' => $this->groom_mother_first_name,
+                    'groom_mother_middle_name' => $this->groom_mother_middle_name,
+                    'groom_mother_last_name' => $this->groom_mother_last_name,
+                    'groom_mother_suffix' => $this->groom_mother_suffix,
+                    'groom_mother_citizenship' => $this->groom_mother_citizenship,
+                    'groom_mother_residence' => $this->groom_mother_residence,
+                    // Bride
+                    'bride_first_name' => $this->bride_first_name,
+                    'bride_middle_name' => $this->bride_middle_name,
+                    'bride_last_name' => $this->bride_last_name,
+                    'bride_suffix' => $this->bride_suffix,
+                    'bride_age' => $this->bride_age ?? null,
+                    'bride_date_of_birth' => $this->bride_date_of_birth,
+                    'bride_place_of_birth' => $this->bride_place_of_birth,
+                    'bride_sex' => $this->bride_sex,
+                    'bride_citizenship' => $this->bride_citizenship,
+                    'bride_residence' => $this->bride_residence,
+                    'bride_religion' => $this->bride_religion,
+                    'bride_civil_status' => $this->bride_civil_status,
+                    // Bride Father
+                    'bride_father_first_name' => $this->bride_father_first_name,
+                    'bride_father_middle_name' => $this->bride_father_middle_name,
+                    'bride_father_last_name' => $this->bride_father_last_name,
+                    'bride_father_suffix' => $this->bride_father_suffix,
+                    'bride_father_citizenship' => $this->bride_father_citizenship,
+                    'bride_father_residence' => $this->bride_father_residence,
+                    // Bride Mother
+                    'bride_mother_first_name' => $this->bride_mother_first_name,
+                    'bride_mother_middle_name' => $this->bride_mother_middle_name,
+                    'bride_mother_last_name' => $this->bride_mother_last_name,
+                    'bride_mother_suffix' => $this->bride_mother_suffix,
+                    'bride_mother_citizenship' => $this->bride_mother_citizenship,
+                    'bride_mother_residence' => $this->bride_mother_residence,
+                    // Consent Section
+                    'consent_person' => $this->consent_person,
+                    'consent_relationship' => $this->consent_relationship,
+                    'consent_citizenship' => $this->consent_citizenship,
+                    'consent_residence' => $this->consent_residence,
+                ]);
+            }
 
-            $detailsData = array_merge($detailsData, [
-                // Groom
-                'groom_first_name' => $this->groom_first_name,
-                'groom_middle_name' => $this->groom_middle_name,
-                'groom_last_name' => $this->groom_last_name,
-                'groom_suffix' => $this->groom_suffix,
-                'groom_age' => $this->groom_age ?? null,
-                'groom_date_of_birth' => $this->groom_date_of_birth,
-                'groom_place_of_birth' => $this->groom_place_of_birth,
-                'groom_sex' => $this->groom_sex,
-                'groom_citizenship' => $this->groom_citizenship,
-                'groom_residence' => $this->groom_residence,
-                'groom_religion' => $this->groom_religion,
-                'groom_civil_status' => $this->groom_civil_status,
-                // Groom Father
-                'groom_father_first_name' => $this->groom_father_first_name,
-                'groom_father_middle_name' => $this->groom_father_middle_name,
-                'groom_father_last_name' => $this->groom_father_last_name,
-                'groom_father_suffix' => $this->groom_father_suffix,
-                'groom_father_citizenship' => $this->groom_father_citizenship,
-                'groom_father_residence' => $this->groom_father_residence,
-                // Groom Mother
-                'groom_mother_first_name' => $this->groom_mother_first_name,
-                'groom_mother_middle_name' => $this->groom_mother_middle_name,
-                'groom_mother_last_name' => $this->groom_mother_last_name,
-                'groom_mother_suffix' => $this->groom_mother_suffix,
-                'groom_mother_citizenship' => $this->groom_mother_citizenship,
-                'groom_mother_residence' => $this->groom_mother_residence,
-                // Bride
-                'bride_first_name' => $this->bride_first_name,
-                'bride_middle_name' => $this->bride_middle_name,
-                'bride_last_name' => $this->bride_last_name,
-                'bride_suffix' => $this->bride_suffix,
-                'bride_age' => $this->bride_age ?? null,
-                'bride_date_of_birth' => $this->bride_date_of_birth,
-                'bride_place_of_birth' => $this->bride_place_of_birth,
-                'bride_sex' => $this->bride_sex,
-                'bride_citizenship' => $this->bride_citizenship,
-                'bride_residence' => $this->bride_residence,
-                'bride_religion' => $this->bride_religion,
-                'bride_civil_status' => $this->bride_civil_status,
-                // Bride Father
-                'bride_father_first_name' => $this->bride_father_first_name,
-                'bride_father_middle_name' => $this->bride_father_middle_name,
-                'bride_father_last_name' => $this->bride_father_last_name,
-                'bride_father_suffix' => $this->bride_father_suffix,
-                'bride_father_citizenship' => $this->bride_father_citizenship,
-                'bride_father_residence' => $this->bride_father_residence,
-                // Bride Mother
-                'bride_mother_first_name' => $this->bride_mother_first_name,
-                'bride_mother_middle_name' => $this->bride_mother_middle_name,
-                'bride_mother_last_name' => $this->bride_mother_last_name,
-                'bride_mother_suffix' => $this->bride_mother_suffix,
-                'bride_mother_citizenship' => $this->bride_mother_citizenship,
-                'bride_mother_residence' => $this->bride_mother_residence,
-                // Consent Section
-                'consent_person' => $this->consent_person,
-                'consent_relationship' => $this->consent_relationship,
-                'consent_citizenship' => $this->consent_citizenship,
-                'consent_residence' => $this->consent_residence,
-            ]);
+            // If Special Permit, use special permit fields
+            if ($this->service->slug === 'special-permit') {
+                $detailsData = array_merge($detailsData, [
+                    'establishment_name' => $this->establishment_name,
+                    'establishment_address' => $this->establishment_address,
+                    'establishment_purpose' => $this->establishment_purpose,
+                ]);
+            }
 
-            // Existing logic for other document types
-            $detailsData = array_merge($detailsData, [
-                // Personal Information
-                'last_name' => $this->last_name,
-                'first_name' => $this->first_name,
-                'middle_name' => $this->middle_name,
-                'suffix' => $this->suffix,
-                'email' => $this->email,
-                'contact_no' => $this->phone,
-                'sex_at_birth' => $this->sex_at_birth,
-                'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
-                'place_of_birth' => $this->place_of_birth,
-                'civil_status' => $this->civil_status,
-                'religion' => $this->religion,
-                'nationality' => $this->nationality,
-                'government_id_type' => $this->government_id_type,
-                'government_id_image_path' => $governmentIdImagePath,
-                'address_type' => $this->address_type,
-                'address_line_1' => $this->address_line_1,
-                'address_line_2' => $this->address_line_2,
-                'region' => $this->region,
-                'province' => $this->province,
-                'city' => $this->city,
-                'barangay' => $this->barangay,
-                'street' => $this->street,
-                'zip_code' => $this->zip_code,
+            // Existing logic for other document types (excluding special permit)
+            if ($this->service->slug !== 'special-permit') {
+                $detailsData = array_merge($detailsData, [
+                    // Personal Information
+                    'last_name' => $this->last_name,
+                    'first_name' => $this->first_name,
+                    'middle_name' => $this->middle_name,
+                    'suffix' => $this->suffix,
+                    'email' => $this->email,
+                    'contact_no' => $this->phone,
+                    'sex_at_birth' => $this->sex_at_birth,
+                    'date_of_birth' => $this->date_of_birth ? Carbon::parse($this->date_of_birth) : null,
+                    'place_of_birth' => $this->place_of_birth,
+                    'civil_status' => $this->civil_status,
+                    'religion' => $this->religion,
+                    'nationality' => $this->nationality,
+                    'government_id_type' => $this->government_id_type,
+                    'government_id_image_path' => $governmentIdImagePath,
+                    'address_type' => $this->address_type,
+                    'address_line_1' => $this->address_line_1,
+                    'address_line_2' => $this->address_line_2,
+                    'region' => $this->region,
+                    'province' => $this->province,
+                    'city' => $this->city,
+                    'barangay' => $this->barangay,
+                    'street' => $this->street,
+                    'zip_code' => $this->zip_code,
 
-                // 
-                // 'temporary_address_type' => $this->temporary_address_type,
-                // 'temporary_address_line_1' => $this->temporary_address_line_1,
-                // 'temporary_address_line_2' => $this->temporary_address_line_2,
-                // 'temporary_region' => $this->temporary_region,
-                // 'temporary_province' => $this->temporary_province,
-                // 'temporary_city' => $this->temporary_city,
-                // 'temporary_barangay' => $this->temporary_barangay,
-                // 'temporary_street' => $this->temporary_street,
-                // 'temporary_zip_code' => $this->temporary_zip_code,
+                    // 
+                    // 'temporary_address_type' => $this->temporary_address_type,
+                    // 'temporary_address_line_1' => $this->temporary_address_line_1,
+                    // 'temporary_address_line_2' => $this->temporary_address_line_2,
+                    // 'temporary_region' => $this->temporary_region,
+                    // 'temporary_province' => $this->temporary_province,
+                    // 'temporary_city' => $this->temporary_city,
+                    // 'temporary_barangay' => $this->temporary_barangay,
+                    // 'temporary_street' => $this->temporary_street,
+                    // 'temporary_zip_code' => $this->temporary_zip_code,
 
-                'father_last_name' => $this->father_last_name,
-                'father_first_name' => $this->father_first_name,
-                'father_middle_name' => $this->father_middle_name,
-                'father_suffix' => $this->father_suffix,
-                'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
-                'father_nationality' => $this->father_nationality,
-                'father_religion' => $this->father_religion,
-                'father_contact_no' => $this->father_contact_no,
-                'mother_last_name' => $this->mother_last_name,
-                'mother_first_name' => $this->mother_first_name,
-                'mother_middle_name' => $this->mother_middle_name,
-                'mother_suffix' => $this->mother_suffix,
-                'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
-                'mother_nationality' => $this->mother_nationality,
-                'mother_religion' => $this->mother_religion,
-                'mother_contact_no' => $this->mother_contact_no,
+                    'father_last_name' => $this->father_last_name,
+                    'father_first_name' => $this->father_first_name,
+                    'father_middle_name' => $this->father_middle_name,
+                    'father_suffix' => $this->father_suffix,
+                    'father_birthdate' => $this->father_birthdate ? Carbon::parse($this->father_birthdate) : null,
+                    'father_nationality' => $this->father_nationality,
+                    'father_religion' => $this->father_religion,
+                    'father_contact_no' => $this->father_contact_no,
+                    'mother_last_name' => $this->mother_last_name,
+                    'mother_first_name' => $this->mother_first_name,
+                    'mother_middle_name' => $this->mother_middle_name,
+                    'mother_suffix' => $this->mother_suffix,
+                    'mother_birthdate' => $this->mother_birthdate ? Carbon::parse($this->mother_birthdate) : null,
+                    'mother_nationality' => $this->mother_nationality,
+                    'mother_religion' => $this->mother_religion,
+                    'mother_contact_no' => $this->mother_contact_no,
 
-                // Death Certificate specific fields
+                    // Death Certificate specific fields
 
-                'deceased_last_name' => $this->deceased_last_name,
-                'deceased_first_name' => $this->deceased_first_name,
-                'deceased_middle_name' => $this->deceased_middle_name,
-                'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
-                'death_time' => $this->death_time,
-                'death_place' => $this->death_place,
-                'relationship_to_deceased' => $this->relationship_to_deceased,
-                'deceased_sex' => $this->deceased_sex,
-                'deceased_religion' => $this->deceased_religion,
-                'deceased_age' => $this->deceased_age,
-                'deceased_place_of_birth' => $this->deceased_place_of_birth,
-                'deceased_date_of_birth' => $this->deceased_date_of_birth,
-                'deceased_civil_status' => $this->deceased_civil_status,
-                'deceased_residence' => $this->deceased_residence,
-                'deceased_occupation' => $this->deceased_occupation,
-                'deceased_father_last_name' => $this->deceased_father_last_name,
-                'deceased_father_first_name' => $this->deceased_father_first_name,
-                'deceased_father_middle_name' => $this->deceased_father_middle_name,
-                'deceased_mother_last_name' => $this->deceased_mother_last_name,
-                'deceased_mother_first_name' => $this->deceased_mother_first_name,
-                'deceased_mother_middle_name' => $this->deceased_mother_middle_name,
-                'burial_cemetery_name' => $this->burial_cemetery_name,
-                'burial_cemetery_address' => $this->burial_cemetery_address,
-                'informant_name' => $this->informant_name,
-                'informant_address' => $this->informant_address,
-                'informant_relationship' => $this->informant_relationship,
-                'informant_contact_no' => $this->informant_contact_no,
-            ]);
+                    'deceased_last_name' => $this->deceased_last_name,
+                    'deceased_first_name' => $this->deceased_first_name,
+                    'deceased_middle_name' => $this->deceased_middle_name,
+                    'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
+                    'death_time' => $this->death_time,
+                    'death_place' => $this->death_place,
+                    'relationship_to_deceased' => $this->relationship_to_deceased,
+                    'deceased_sex' => $this->deceased_sex,
+                    'deceased_religion' => $this->deceased_religion,
+                    'deceased_age' => $this->deceased_age,
+                    'deceased_place_of_birth' => $this->deceased_place_of_birth,
+                    'deceased_date_of_birth' => $this->deceased_date_of_birth,
+                    'deceased_civil_status' => $this->deceased_civil_status,
+                    'deceased_residence' => $this->deceased_residence,
+                    'deceased_occupation' => $this->deceased_occupation,
+                    'deceased_father_last_name' => $this->deceased_father_last_name,
+                    'deceased_father_first_name' => $this->deceased_father_first_name,
+                    'deceased_father_middle_name' => $this->deceased_father_middle_name,
+                    'deceased_mother_last_name' => $this->deceased_mother_last_name,
+                    'deceased_mother_first_name' => $this->deceased_mother_first_name,
+                    'deceased_mother_middle_name' => $this->deceased_mother_middle_name,
+                    'burial_cemetery_name' => $this->burial_cemetery_name,
+                    'burial_cemetery_address' => $this->burial_cemetery_address,
+                    'informant_name' => $this->informant_name,
+                    'informant_address' => $this->informant_address,
+                    'informant_relationship' => $this->informant_relationship,
+                    'informant_contact_no' => $this->informant_contact_no,
+                ]);
+            }
 
 
-            // Contact Information (for third-party requests)
-
-            $detailsData = array_merge($detailsData, [
-                'contact_first_name' => $this->contact_first_name,
-                'contact_last_name' => $this->contact_last_name,
-                'contact_middle_name' => $this->contact_middle_name,
-                'contact_email' => $this->contact_email,
-                'contact_phone' => $this->contact_phone,
-            ]);
+            // Contact Information (for third-party requests, excluding special permit)
+            if ($this->service->slug !== 'special-permit') {
+                $detailsData = array_merge($detailsData, [
+                    'contact_first_name' => $this->contact_first_name,
+                    'contact_last_name' => $this->contact_last_name,
+                    'contact_middle_name' => $this->contact_middle_name,
+                    'contact_email' => $this->contact_email,
+                    'contact_phone' => $this->contact_phone,
+                ]);
+            }
             // Create the document request details
+            // dd($detailsData);
             DocumentRequestDetails::create($detailsData);
 
             // Store the document ID for the payment step
@@ -1159,12 +1249,19 @@ new #[Title('Document Request')] class extends Component {
 
             DB::commit();
 
+            // Prepare notification summary based on service type
+            if ($this->service->slug === 'special-permit') {
+                $summary = $this->service->title . ' for ' . $this->establishment_name;
+            } else {
+                $summary = $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name;
+            }
+
             // Send notification to user
             auth()->user()->notify(new RequestEventNotification(
                 RequestNotificationEvent::Submitted,
                 [
                     'reference_no' => $this->reference_number,
-                    'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name
+                    'summary' => $summary
                 ]
             ));
 
@@ -1176,7 +1273,7 @@ new #[Title('Document Request')] class extends Component {
                         AdminNotificationEvent::UserSubmittedDocumentRequest,
                         [
                             'reference_no' => $this->reference_number,
-                            'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name
+                            'summary' => $summary
                         ]
                     ));
                 }
@@ -1262,6 +1359,13 @@ new #[Title('Document Request')] class extends Component {
             $documentRequest->payment_date = now();
             $documentRequest->save();
 
+            // Prepare notification summary based on service type
+            if ($this->service->slug === 'special-permit') {
+                $summary = $this->service->title . ' for ' . $this->establishment_name;
+            } else {
+                $summary = $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name;
+            }
+
             // Send notification to staff
             $staffs = User::getStaffsByOfficeId($this->office->id);
             if ($staffs->count() > 0) {
@@ -1270,7 +1374,7 @@ new #[Title('Document Request')] class extends Component {
                         AdminNotificationEvent::UserPayedDocumentRequest,
                         [
                             'reference_no' => $this->reference_number,
-                            'summary' => $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name,
+                            'summary' => $summary,
                             'payment_method' => $this->selectedPaymentMethod
                         ]
                     ));
@@ -1422,8 +1526,8 @@ new #[Title('Document Request')] class extends Component {
                             $stepTitle = 'Death Certificate';
                             $stepDescription = 'Death Certificate Information';
                         } elseif ($this->service->slug === 'special-permit') {
-                            $stepTitle = 'Permit Request';
-                            $stepDescription = 'Permit Request Information';
+                            $stepTitle = 'Special Permit';
+                            $stepDescription = 'Special Permit Information';
                         } else {
                             $stepTitle = 'Personal Information';
                             $stepDescription = 'Your/Someone details';
@@ -1434,12 +1538,14 @@ new #[Title('Document Request')] class extends Component {
                 </div>
                 
             </li>
+            @if($this->service->slug !== 'special-permit')
             <li class="step {{ $step >= 6 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Contact Information</div>
                     <div class="step-description text-sm text-gray-500">How to reach you</div>
                 </div>    
              </li>
+            @endif
             <li class="step {{ $step >= 7 ? 'step-info' : '' }}">
                 <div class="step-content">
                     <div class="step-title">Confirmation</div>
@@ -1572,7 +1678,7 @@ new #[Title('Document Request')] class extends Component {
         @include('livewire.documentrequest.components.document-request-steps.step2')
     @elseif($step == 5)
         @include('livewire.documentrequest.components.document-request-steps.step3')
-    @elseif($step == 6)
+    @elseif($step == 6 && $this->service->slug !== 'special-permit')
         @include('livewire.documentrequest.components.document-request-steps.step4')
     @elseif($step == 7)
         @include('livewire.documentrequest.components.document-request-steps.step5')

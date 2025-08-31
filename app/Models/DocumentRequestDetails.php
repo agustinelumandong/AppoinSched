@@ -164,6 +164,9 @@ class DocumentRequestDetails extends Model
         'bride_mother_last_name',
         'bride_mother_citizenship',
         'bride_mother_residence',
+        // Special Permit
+        'establishment_name',
+        'establishment_address',
         // Consent Section
         'consent_person',
         'consent_relationship',
