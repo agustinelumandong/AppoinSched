@@ -3,7 +3,7 @@
 
 
         {{-- Personal Information Section --}}
-        @if($this->service->slug !== 'marriage-certificate' && $this->service->slug !== 'death-certificate')
+        @if($this->service->slug !== 'marriage-certificate' && $this->service->slug !== 'death-certificate' && $this->service->slug !== 'special-permit')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.personal-information')
 
             {{-- Address Information Section --}}
@@ -23,6 +23,12 @@
         @if ($this->service->slug === 'marriage-certificate')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form')
         @endif
+
+        {{-- Special Permit Section (only if Special Permit) --}}
+        @if ($this->service->slug === 'special-permit')
+            @include('livewire.documentrequest.components.document-request-steps.document-request-forms.special-permit')
+        @endif
+
 
         <footer class="my-6 flex justify-end gap-2">
             <button class="btn btn-ghost" wire:click="previousStep">Previous</button>

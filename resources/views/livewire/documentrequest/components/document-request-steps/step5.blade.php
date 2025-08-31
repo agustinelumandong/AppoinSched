@@ -101,6 +101,30 @@
                 </div>
 
             </div>
+        @elseif ($service->slug === 'special-permit')
+            <div class="flux-card p-6">
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Special Permit Details</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Establishment Name</label>
+                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                            {{ $establishment_name }}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Establishment Address</label>
+                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                            {{ $establishment_address }}
+                        </p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
+                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                            {{ $establishment_purpose }}
+                        </p>
+                    </div>
+                </div>
+            </div>
         @else
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.personal-information')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.address-information')
@@ -109,47 +133,49 @@
             @endif
         @endif
 
-        <!-- Contact Person Information -->
-        <div class="flux-card p-6">
-            <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Contact Person Information
-            </h3>
-            <div class="space-y-4">
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $contact_last_name }}
-                        </p>
+        @if($service->slug !== 'special-permit')
+            <!-- Contact Person Information -->
+            <div class="flux-card p-6">
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Contact Person Information
+                </h3>
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-3 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $contact_last_name }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $contact_first_name }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $contact_middle_name ?? 'N/A' }}
+                            </p>
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $contact_first_name }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $contact_middle_name ?? 'N/A' }}
-                        </p>
-                    </div>
-                </div>
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $contact_email }}
-                        </p>
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-600 mb-1">Phone</label>
-                        <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                            {{ $contact_phone ?? 'N/A' }}
-                        </p>
+                    <div class="grid md:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $contact_email }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $contact_phone ?? 'N/A' }}
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
+        @endif
     </div>
 
     <footer class="my-6 flex justify-end gap-2">
