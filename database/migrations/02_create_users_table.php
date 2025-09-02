@@ -28,10 +28,10 @@ return new class extends Migration {
             $table->softDeletes();
 
 
-            $table->index('username', 'is_active');
-            $table->index('is_active', 'email');
+            $table->index(['username', 'is_active']);
+            $table->index(['is_active', 'email']);
             $table->index('phone');
-            $table->index('is_active', 'created_at');
+            $table->index(['is_active', 'created_at']);
             $table->index('last_login_at');
 
         });
