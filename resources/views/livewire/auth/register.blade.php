@@ -4,44 +4,91 @@ use App\Models\User;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use function Livewire\Volt\{rules};
+
+rules([
+    'username' => 'required|string|min:3|unique:' . User::class,
+    'phone' => 'required|regex:/^(\+63|0)[\d]{10}$/',
+    'email' => 'required|email|lowercase|string|unique:' . User::class,
+    'password' => 'required|string|confirmed|min:8|regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/',
+])
+    ->messages([
+        'email.required' => 'The :attribute may not be empty.',
+        'email.email' => 'The :attribute format is invalid.',
+    ])
+    ->attributes([
+        'email' => 'email address',
+    ]);
 
 new #[Layout('components.layouts.auth')] class extends Component {
-    public string $first_name = '';
-    public string $middle_name = '';
-    public string $last_name = '';
+    public User $users;
+    public string $username = '';
+    public string $phone = '';
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
 
+    public function mount(User $users)
+    {
+        $this->users = $users;
+    }
+
+    protected function rules()
+    {
+        return [
+            'username' => ['required', 'string', 'max:255', 'unique:' . User::class],
+            'phone' => ['required', 'regex:/^(\+63|0)[\d]{10}$/', 'max:255'],
+            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+            'password' => ['required', 'string', 'confirmed', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'],
+        ];
+    }
+
+    protected function messages()
+    {
+        return [
+            'email.required' => 'buang butangii ang input!!!.',
+            'email.email' => 'The Email Address format is not valid.',
+        ];
+    }
+
+    protected function validationAttributes()
+    {
+        return [
+            'email' => 'email address',
+        ];
+    }
+
+    public function updated($prop)
+    {
+        $this->validateOnly($prop, $this->rules);
+    }
+
+    // public function rules(): array
+    // {
+    //     return [
+    //         'username' => ['required', 'string', 'max:255', 'unique:' . User::class],
+    //         'phone' => ['required', 'regex:/^(\+63|0)[\d]{10}$/', 'max:255'],
+    //         'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+    //         'password' => ['required', 'string', 'confirmed', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'],
+    //     ];
+    // }
+    // +63912345678
+    // 09123456789
     /**
      * Handle an incoming registration request.
      */
     public function register(): void
     {
-        $validated = $this->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => [
-                'required',
-                'string',
-                'confirmed',
-                'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/',
-            ],
-        ], [
-            'password.regex' => 'Password must be at least 8 characters long and include both lowercase and uppercase letters, a number, and a special character.',
-        ]);
-
-        $validated['password'] = Hash::make($validated['password']);
+        $validated = $this->validate();
+        dd($validated);
+        $this->password = Hash::make($this->password);
 
         event(new Registered(($user = User::create($validated))));
-        // Assign default client role to new users
+
         $user->assignRole('client');
+
         Auth::login($user);
 
         $this->redirectIntended(route('verification.notice', absolute: false));
@@ -55,27 +102,25 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <form wire:submit="register" class="flex flex-col gap-6">
-        <!-- Name -->
-        <flux:input wire:model="first_name" :label="__('First name')" type="text" required autocomplete="name"
-            :placeholder="__('First name')" />
+    <form wire:submit.prevent="register" class="flex flex-col gap-1">
+        <!-- Username -->
+        <flux:input wire:model="username" :label="__('Username')" type="text" autocomplete="username"
+            :placeholder="__('Username')" />
 
-        <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" autocomplete="name"
-            :placeholder="__('Middle name')" />
 
-        <flux:input wire:model="last_name" :label="__('Last name')" type="text" required autocomplete="name"
-            :placeholder="__('Last name')" />
+        <flux:input wire:model="phone" :label="__('Phone')" type="text" autocomplete="phone"
+            :placeholder="__('+63 921 231 1234')" />
 
         <!-- Email Address -->
-        <flux:input wire:model="email" :label="__('Email address')" type="email" required autocomplete="email"
+        <flux:input wire:model="email" :label="__('Email address')" type="email" autocomplete="email"
             placeholder="email@example.com" />
 
         <!-- Password -->
-        <flux:input wire:model="password" :label="__('Password')" type="password" required autocomplete="new-password"
+        <flux:input wire:model="password" :label="__('Password')" type="password" autocomplete="new-password"
             :placeholder="__('Password')" viewable />
 
         <!-- Confirm Password -->
-        <flux:input wire:model="password_confirmation" :label="__('Confirm password')" type="password" required
+        <flux:input wire:model="password_confirmation" :label="__('Confirm password')" type="password"
             autocomplete="new-password" :placeholder="__('Confirm password')" viewable />
 
         <div class="flex items-center justify-end">

@@ -9,13 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Str;
+use Laravel\Sanctum\HasApiTokens;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Database\Eloquent\Collection;
 
 class User extends Authenticatable
 {
     /** @use HasFactory<\Database\Factories\UserFactory> */
-    use HasFactory, Notifiable, HasRoles;
+    use HasApiTokens, HasFactory, Notifiable, HasRoles;
 
     /**
      * The attributes that are mass assignable.
@@ -23,11 +24,12 @@ class User extends Authenticatable
      * @var list<string>
      */
     protected $fillable = [
-        'first_name',
-        'middle_name',
-        'last_name',
+        'username',
+        'phone',
         'email',
         'password',
+        'is_validated',
+        'preferences',
         'notification_settings',
     ];
 
@@ -51,6 +53,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'is_verified' => 'boolean',
             'notification_settings' => 'array',
         ];
     }
@@ -273,7 +276,7 @@ class User extends Authenticatable
             'email' => $this->email ?? '',
             'phone' => $personalInfo?->contact_no ?? '',
 
-            // Address Information (basic) 
+            // Address Information (basic)
             'address' => $userAddress?->address_line_1 ?? '',
             'region' => $userAddress?->region ?? '',
             'province' => $userAddress?->province ?? '',

@@ -57,7 +57,7 @@ composer dev   # Runs server, queue listener, and Vite in concurrent mode
 - Use lifecycle hooks and public properties for state management
 - Form validation through Livewire's validation system
 - Modal dialogs for CRUD operations
-- Evezent handling with Livewire's emit/listen pattern and Volt's attribute syntax
+- Event handling with Livewire's emit/listen pattern and Volt's attribute syntax
 - Component state is managed through public properties with PHP 8.2+ type declarations
 - Component methods follow naming conventions like `save()`, `delete()`, `resetData()`
 
