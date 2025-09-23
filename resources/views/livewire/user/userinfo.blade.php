@@ -767,7 +767,7 @@ new class extends Component {
     </div>
 
 
-    @include('livewire.user.user-information')
+    @include('livewire.user.user-Information')
 
     @include('livewire.user.user-address')
 
