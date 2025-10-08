@@ -37,6 +37,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
             ]);
         }
 
+        $user = Auth::user();
+        if ($user && !$user->hasVerifiedEmail()) {
+            $this->redirectIntended(route('verification.notice', absolute: false));
+        }
+
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
 
