@@ -190,21 +190,21 @@
     <h5 class="text-md font-semibold mb-3">Mother's Information</h5>
     <div class="flex flex-row md:flex-col gap-4 mb-4">
       <div class="w-full md:w-1/3">
-        <label for="deceased_mother_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+        <label for="deceased_mother_last_name" class="block text-xs font-medium mb-1">Last Maiden Name</label>
         <input class="flux-form-control" type="text" wire:model="deceased_mother_last_name"
           id="deceased_mother_last_name" name="deceased_mother_last_name" placeholder="Last Name">
         @error('deceased_mother_last_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
-        <label for="deceased_mother_first_name" class="block text-xs font-medium mb-1">First Name</label>
+        <label for="deceased_mother_first_name" class="block text-xs font-medium mb-1">First Maiden Name</label>
         <input class="flux-form-control" type="text" wire:model="deceased_mother_first_name"
           id="deceased_mother_first_name" name="deceased_mother_first_name" placeholder="First Name">
         @error('deceased_mother_first_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror
         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
-        <label for="deceased_mother_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+        <label for="deceased_mother_middle_name" class="block text-xs font-medium mb-1">Middle Maiden Name</label>
         <input class="flux-form-control" type="text" wire:model="deceased_mother_middle_name"
           id="deceased_mother_middle_name" name="deceased_mother_middle_name" placeholder="Middle Name">
         @error('deceased_mother_middle_name')<span class="text-red-500 text-sm">{{ $message }}</span>@enderror

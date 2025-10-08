@@ -79,7 +79,7 @@
                     <div>{{ $deceased_father_first_name }}</div>
                     <div>{{ $deceased_father_middle_name }}</div>
                 </div>
-                <h4 class="font-semibold mt-4 mb-2">Mother's Name</h4>
+                <h4 class="font-semibold mt-4 mb-2">Mother's Maiden Name</h4>
                 <div class="grid md:grid-cols-3 gap-4 mb-4">
                     <div>{{ $deceased_mother_last_name }}</div>
                     <div>{{ $deceased_mother_first_name }}</div>
