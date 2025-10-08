@@ -598,7 +598,7 @@ new #[Title('Appointment')] class extends Component {
 
     @include('components.alert')
 
-    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request an Appointment</h1>
+    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request an Appointment on <span class="font-bold">{{ $this->office->name }}</span> Office</h1>
 
     {{-- Stepper Header --}}
     <div class="px-5 py-2 mt-5">

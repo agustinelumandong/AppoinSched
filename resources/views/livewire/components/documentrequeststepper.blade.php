@@ -1483,7 +1483,7 @@ new #[Title('Document Request')] class extends Component {
 
 
 
-    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request a Document
+    <h1 class="text-2xl text-base-content mt-3 py-2 text-center">Request a Document on <span class="font-bold">{{ $this->office->name }}</span> Office
     </h1>
 
     {{-- Stepper Header --}}
