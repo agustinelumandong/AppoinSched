@@ -393,6 +393,8 @@
     @livewireScripts
     @fluxScripts
     @stack('scripts')
+    <script src="{{ asset('js/qrcode.min.js') }}"></script>
+
 
     <!-- Logout Confirmation Modal -->
     <x-modal id="logout-confirmation" title="Confirm Logout" size="max-w-md">

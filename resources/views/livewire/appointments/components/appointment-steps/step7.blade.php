@@ -41,7 +41,7 @@
         <div class="flex justify-between items-center border-b pb-4 mb-4">
             <div>
                 <h2 class="text-xl font-bold text-primary">Appointment Confirmation</h2>
-                <p class="text-sm text-gray-600">Reference: {{ $reference_number }}</p>
+                <p class="text-sm text-gray-600">Transaction ID: {{ $reference_number }}</p>
             </div>
             <div>
                 <img src="{{ asset('images/LGU_logo.png') }}" alt="Logo" class="h-16 w-auto">
@@ -110,13 +110,24 @@
                 </div>
             @endif
 
-            <!-- QR Code for verification -->
-            <div class="flex justify-center my-4">
-                <div class="text-center">
-                    <div id="qrcode" class="mx-auto"></div>
+            {{-- <div class="flex justify-center my-4">
+                <div class="text-center" x-data x-init="
+                    const qrValue = '{{ $reference_number ?? 'appointment-request' }}';
+                    const qr = qrcode(0, 'H');
+                    qr.addData(qrValue);
+                    qr.make();
+                    $refs.qr.innerHTML = qr.createImgTag(4, 8);
+                ">
+                    <div x-ref="qr" class="mx-auto" wire:ignore></div>
                     <p class="text-xs text-gray-500 mt-2">Scan this QR code at the office</p>
                 </div>
             </div>
+
+            @push('scripts')
+            <script src="{{ asset('js/qrcode.min.js') }}"></script>
+            @endpush --}}
+
+            
 
             <!-- Important Notes -->
             <div class="bg-gray-50 p-4 rounded-lg text-sm">
@@ -163,22 +174,6 @@
         </a>
     </div>
 
-    @push('scripts')
-        <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function () {
-                // Generate QR code with the appointment reference
-                new QRCode(document.getElementById("qrcode"), {
-                    text: "{{ $reference_number }}",
-                    width: 128,
-                    height: 128
-                });
 
-                // Print functionality - simple approach
-                document.getElementById('print-slip').addEventListener('click', function () {
-                    window.print();
-                });
-            });
-        </script>
-    @endpush
 </div>
+
