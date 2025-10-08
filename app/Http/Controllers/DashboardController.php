@@ -13,6 +13,11 @@ class DashboardController extends Controller
   {
     $user = $request->user();
 
+    // Check if user is verified
+    if (!$user->hasVerifiedEmail()) {
+      return redirect()->route('verification.notice');
+    }
+
     if ($user->hasRole('super-admin')) {
       return redirect()->route('admin.dashboard');
     }
