@@ -28,7 +28,11 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'email_otp',
+        'email_otp_expires_at',
         'notification_settings',
+        'email_verified_at',
+        'remember_token',
     ];
 
     /**
@@ -49,6 +53,7 @@ class User extends Authenticatable
     protected function casts(): array
     {
         return [
+            'email_otp_expires_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'notification_settings' => 'array',

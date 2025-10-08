@@ -16,7 +16,10 @@ return new class extends Migration {
             $table->string('middle_name')->nullable();
             $table->string('last_name');
             $table->string('email')->unique();
+            $table->string('email_otp')->nullable();
+            $table->timestamp('email_otp_expires_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
+            $table->json('notification_settings')->nullable()->after('remember_token');
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
