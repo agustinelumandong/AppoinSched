@@ -183,10 +183,11 @@
 
     <div class="qr-section">
         <div style="text-align: center; margin-bottom: 10px;">
-            <strong>Reference Code: {{ $reference_number }}</strong>
+            <strong>Transaction ID: {{ $reference_number }}</strong>
         </div>
+        <div id="qrcode" class="mx-auto"></div>
         <div style="text-align: center; font-size: 12px; color: #666;">
-            Present this reference code at the office for verification
+            Present this transaction ID at the office for verification
         </div>
     </div>
 
@@ -198,6 +199,20 @@
             <li>For cancellations, please contact us at least 24 hours in advance.</li>
         </ul>
     </div>
+
+    
+    {{-- <script src="{{ asset('js/qrcode.min.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const qrElement = document.getElementById('qrcode');
+            const qrValue = "{{ $reference_number ?? 'appointment-request' }}";
+
+            const qr = qrcode(0, 'H');
+            qr.addData(qrValue);
+            qr.make();
+            qrElement.innerHTML = qr.createImgTag(4, 8);
+        });
+    </script> --}}
 </body>
 
 </html>

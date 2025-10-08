@@ -445,9 +445,9 @@ new #[Title('Appointment')] class extends Component {
 
                 $this->reference_number = $reference_number;
                 if (!$this->office->slug === 'municipal-treasurers-office') {
-                    $this->step = 7;
-                } else {
                     $this->step = 6;
+                } else {
+                    $this->step = 7;
                 }
 
                 $cacheKey = "time_slots_{$this->office->id}_{$this->selectedDate}";
