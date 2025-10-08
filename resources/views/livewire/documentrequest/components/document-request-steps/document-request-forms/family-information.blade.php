@@ -113,7 +113,7 @@
     </div>
     <div class="flex flex-row md:flex-col gap-4 mb-4">
       <div class="w-full md:w-1/3">
-        <label for="mother_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+        <label for="mother_last_name" class="block text-xs font-medium mb-1">Last Maiden Name</label>
         <input class="flux-form-control md:col-span-3 w-full @if($editPersonDetails === false) bg-gray-100 @endif"
           type="text" wire:model="mother_last_name" placeholder="Last Name" name="mother_last_name"
           id="mother_last_name" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -121,7 +121,7 @@
         <span class="text-xs text-gray-500 mt-1">Required</span>
       </div>
       <div class="w-full md:w-1/3">
-        <label for="mother_first_name" class="block text-xs font-medium mb-1">First Name</label>
+        <label for="mother_first_name" class="block text-xs font-medium mb-1">First Maiden Name</label>
         <input class="flux-form-control md:col-span-3 w-full @if($editPersonDetails === false) bg-gray-100 @endif"
           type="text" wire:model="mother_first_name" placeholder="First Name" name="mother_first_name"
           id="mother_first_name" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -129,7 +129,7 @@
         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
       </div>
       <div class="w-full md:w-1/3">
-        <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+        <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Maiden Name</label>
         <input class="flux-form-control md:col-span-3 w-full @if($editPersonDetails === false) bg-gray-100 @endif"
           type="text" wire:model="mother_middle_name" placeholder="Middle Name" name="mother_middle_name"
           id="mother_middle_name" @if($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>

@@ -1,18 +1,18 @@
 <div class="space-y-4">
   <div>
-    <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">Last Maiden Name</label>
     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
       {{ $details[$prefix . '_last_name'] ?? 'N/A' }}
     </p>
   </div>
   <div>
-    <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">First Maiden Name</label>
     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
       {{ $details[$prefix . '_first_name'] ?? 'N/A' }}
     </p>
   </div>
   <div>
-    <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+    <label class="block text-sm font-medium text-gray-600 mb-1">Middle Maiden Name</label>
     <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
       {{ $details[$prefix . '_middle_name'] ?? 'N/A' }}
     </p>
