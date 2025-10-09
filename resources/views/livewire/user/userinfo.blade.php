@@ -184,29 +184,9 @@ new class extends Component {
         $this->mother_contact_no = $this->userFamily->mother_contact_no ?? '';
 
         // Set father_is_unknown if all father fields are N/A
-        $this->father_is_unknown = $this->father_last_name === 'N/A'
-            && $this->father_first_name === 'N/A'
-            && $this->father_middle_name === 'N/A'
-            && $this->father_suffix === 'N/A'
-            && $this->father_nationality === 'N/A'
-            && $this->father_religion === 'N/A'
-            && $this->father_contact_no === 'N/A';
-        $this->mother_is_unknown = $this->mother_last_name === 'N/A'
-            && $this->mother_first_name === 'N/A'
-            && $this->mother_middle_name === 'N/A'
-            && $this->mother_suffix === 'N/A'
-            && $this->mother_nationality === 'N/A'
-            && $this->mother_religion === 'N/A'
-            && $this->mother_contact_no === 'N/A';
-        $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1
-            && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2
-            && $this->userAddresses->temporary_region === $this->userAddresses->region
-            && $this->userAddresses->temporary_province === $this->userAddresses->province
-            && $this->userAddresses->temporary_city === $this->userAddresses->city
-            && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay
-            && $this->userAddresses->temporary_street === $this->userAddresses->street
-            && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
-
+        $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
+        $this->mother_is_unknown = $this->mother_last_name === 'N/A' && $this->mother_first_name === 'N/A' && $this->mother_middle_name === 'N/A' && $this->mother_suffix === 'N/A' && $this->mother_nationality === 'N/A' && $this->mother_religion === 'N/A' && $this->mother_contact_no === 'N/A';
+        $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1 && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2 && $this->userAddresses->temporary_region === $this->userAddresses->region && $this->userAddresses->temporary_province === $this->userAddresses->province && $this->userAddresses->temporary_city === $this->userAddresses->city && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay && $this->userAddresses->temporary_street === $this->userAddresses->street && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
 
         // Pre-populate dependent dropdowns if values exist
         if ($this->region) {
@@ -277,29 +257,9 @@ new class extends Component {
         $this->mother_contact_no = $this->userFamily->mother_contact_no ?? '';
 
         // Set father_is_unknown if all father fields are N/A
-        $this->father_is_unknown = $this->father_last_name === 'N/A'
-            && $this->father_first_name === 'N/A'
-            && $this->father_middle_name === 'N/A'
-            && $this->father_suffix === 'N/A'
-            && $this->father_nationality === 'N/A'
-            && $this->father_religion === 'N/A'
-            && $this->father_contact_no === 'N/A';
-        $this->mother_is_unknown = $this->mother_last_name === 'N/A'
-            && $this->mother_first_name === 'N/A'
-            && $this->mother_middle_name === 'N/A'
-            && $this->mother_suffix === 'N/A'
-            && $this->mother_nationality === 'N/A'
-            && $this->mother_religion === 'N/A'
-            && $this->mother_contact_no === 'N/A';
-        $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1
-            && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2
-            && $this->userAddresses->temporary_region === $this->userAddresses->region
-            && $this->userAddresses->temporary_province === $this->userAddresses->province
-            && $this->userAddresses->temporary_city === $this->userAddresses->city
-            && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay
-            && $this->userAddresses->temporary_street === $this->userAddresses->street
-            && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
-
+        $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
+        $this->mother_is_unknown = $this->mother_last_name === 'N/A' && $this->mother_first_name === 'N/A' && $this->mother_middle_name === 'N/A' && $this->mother_suffix === 'N/A' && $this->mother_nationality === 'N/A' && $this->mother_religion === 'N/A' && $this->mother_contact_no === 'N/A';
+        $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1 && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2 && $this->userAddresses->temporary_region === $this->userAddresses->region && $this->userAddresses->temporary_province === $this->userAddresses->province && $this->userAddresses->temporary_city === $this->userAddresses->city && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay && $this->userAddresses->temporary_street === $this->userAddresses->street && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
 
         // Pre-populate dependent dropdowns if values exist
         if ($this->region) {
