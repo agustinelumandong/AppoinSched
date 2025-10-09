@@ -106,9 +106,81 @@
 
                 <footer class="my-6 flex justify-between" wire:loading.remove>
                     <button class="flux-btn flux-btn-secondary" wire:click="previousStep">Previous</button>
-                    <button class="flux-btn flux-btn-primary" wire:click="nextStep">Next</button>
+                    {{-- <button class="flux-btn flux-btn-primary" x-data x-on:click="$dispatch('open-modal-appoint-info-confirmation')" title="Appointment Confirmation">
+                        Next
+                    </button> --}}
+
+                    <button class="flux-btn btn-sm flux-btn-primary" type="button" x-data="{}"
+                        x-on:click="$dispatch('open-modal-consent-confirmation')" title="Confirmation">
+                        <i class="bi bi-check"></i>Next
+                    </button>
                 </footer>
             </div>
         </div>
     </div>
+    <x-modal id="consent-confirmation" title="Confirmation" size="max-w-2xl">
+        <div class="modal-body">
+            <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
+                <h3 class="font-bold text-lg mb-2">Consent and Affirmation</h3>
+
+                <div class="bg-base-200 p-3 rounded-lg">
+                    <p>I affirm that I am the document owner or the duly authorized representative of the owner of the
+                        requested PSA certificate. I attest that all information provided above is true and accurate to
+                        the best of my knowledge.</p>
+                    <p class="mt-2">I understand that as the authorized requester, I am required to personally appear
+                        at the designated office to claim the requested document. I will present valid identification to
+                        verify my identity during collection.</p>
+                    <p class="mt-2">I acknowledge that my personal information will be processed in accordance with
+                        the Data Privacy Act of 2012 (Republic Act No. 10173). I understand that the information
+                        provided will be used solely for the purpose of processing my document request.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-base mt-4 mb-2">Disclaimer</h4>
+                    <p>This online system serves only as a platform to facilitate document requests and appointment
+                        scheduling. It does not provide courier, mailing, or delivery services of any kind.</p>
+                    <p class="mt-2">All requested documents must be personally claimed by the requester or their
+                        authorized representative at the designated Municipal Office. Failure to appear or present valid
+                        identification may result in delays or denial of release.</p>
+                    <p class="mt-2">The processing, printing, and release of documents are conducted exclusively by
+                        the authorized Municipal Offices. Our system has no involvement in or responsibility for the
+                        physical handling, storage, or issuance of the requested documents.</p>
+                    <p class="mt-2">For any concerns regarding the status or release of your document, please contact
+                        or visit your respective Municipal Office directly.</p>
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="font-semibold text-base mb-2">Acceptance</h4>
+                    <p>As a Requisition and Appointment System customer, I fully understand and accept the terms stated
+                        above, including all requirements, processes, and applicable laws governing this application.
+                    </p>
+                </div>
+
+            </div>
+        </div>
+
+
+        <x-slot name="footer">
+            <div class="flex gap-2">
+                <button type="button" class="flux-btn flux-btn-outline" x-data
+                    x-on:click="$dispatch('close-modal-appoint-info-confirmation')">
+                    <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+                <button type="button" class="flux-btn btn-sm flux-btn-success" x-data="{}"
+                    x-on:click="
+                        $dispatch('close-modal-consent-confirmation');
+                        $wire.nextStep();
+                    ">
+                    <span wire:loading.remove>
+                        <i class="bi bi-check-circle me-1"></i>
+                        Confirm
+                    </span>
+                    <span wire:loading>
+                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Loading...
+                    </span>
+                </button>
+            </div>
+        </x-slot>
+    </x-modal>
 </div>
