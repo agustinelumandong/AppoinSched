@@ -21,6 +21,9 @@
     x-transition:leave="ease-in duration-100"
     x-transition:leave-start="opacity-100"
     x-transition:leave-end="opacity-0"
+    role="dialog"
+    aria-modal="true"
+    aria-label="{{ $title }}"
 >
     @if ($backdrop)
         <div class="fixed inset-0 bg-black bg-opacity-50 transition-opacity" x-on:click="open = false"></div>
@@ -47,9 +50,11 @@
                             type="button"
                             class="text-gray-400 hover:text-gray-600 focus:outline-none"
                             x-on:click="open = false"
+                            aria-label="Close modal"
+                            title="Close modal"
                         >
                             <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
-                                viewBox="0 0 24 24">
+                                viewBox="0 0 24 24" aria-hidden="true">
                                 <path stroke-linecap="round" stroke-linejoin="round"
                                     d="M6 18L18 6M6 6l12 12" />
                             </svg>
