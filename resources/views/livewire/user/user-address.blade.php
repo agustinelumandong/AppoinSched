@@ -68,7 +68,10 @@
             </div>
             <div class="flex flex-col">
                 <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="zip_code" class="flux-form-control" type="text" wire:model="zip_code" placeholder="Zip Code">
+                <input id="zip_code" class="flux-form-control" type="tel" 
+                        inputmode="numeric" 
+                        pattern="[0-9]*"
+                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="zip_code" placeholder="Zip Code">
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
         </div>
@@ -156,7 +159,10 @@
             </div>
             <div class="flex flex-col">
                 <label for="temp_zip_code" class="text-xs font-medium mb-1">Zip Code</label>
-                <input id="temp_zip_code" class="flux-form-control" type="text" wire:model="temporary_zip_code"
+                <input id="temp_zip_code" class="flux-form-control" type="tel" 
+                        inputmode="numeric" 
+                        pattern="[0-9]*"
+                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="temporary_zip_code"
                     placeholder="Zip Code" {{ $same_as_permanent ? 'disabled' : '' }}>
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
