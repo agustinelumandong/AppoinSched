@@ -29,7 +29,8 @@
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="father_last_name" placeholder="Last Name" name="father_last_name"
                     id="father_last_name" required {{ $father_is_unknown ? 'disabled' : '' }}
-                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('father_last_name')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -41,7 +42,8 @@
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="father_first_name" placeholder="First Name" name="father_first_name"
                     id="father_first_name" required {{ $father_is_unknown ? 'disabled' : '' }}
-                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('father_first_name')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -53,7 +55,8 @@
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="father_middle_name" placeholder="Middle Name" name="father_middle_name"
                     id="father_middle_name" required {{ $father_is_unknown ? 'disabled' : '' }}
-                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('father_middle_name')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -95,7 +98,8 @@
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="father_nationality" placeholder="Nationality" name="father_nationality"
                     id="father_nationality" required {{ $father_is_unknown ? 'disabled' : '' }}
-                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('father_nationality')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -106,7 +110,8 @@
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="father_religion" placeholder="Religion" name="father_religion" id="father_religion"
                     required {{ $father_is_unknown ? 'disabled' : '' }}
-                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('father_religion')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -145,7 +150,8 @@
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="mother_last_name" placeholder="Last Name" name="mother_last_name"
-                    id="mother_last_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    id="mother_last_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('mother_last_name')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -156,7 +162,8 @@
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="mother_first_name" placeholder="First Name" name="mother_first_name"
-                    id="mother_first_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    id="mother_first_name" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('mother_first_name')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -168,7 +175,8 @@
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="mother_middle_name" placeholder="Middle Name"
                     name="mother_middle_name" id="mother_middle_name"
-                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('mother_middle_name')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -190,7 +198,8 @@
                 <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's Nationality</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="mother_nationality" placeholder="Mother's Nationality" name="mother_nationality"
-                    id="mother_nationality" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    id="mother_nationality" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('mother_nationality')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror
@@ -200,7 +209,8 @@
                 <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's Religion</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="mother_religion" placeholder="Mother's Religion" name="mother_religion"
-                    id="mother_religion" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
+                    id="mother_religion" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
+                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 @error('mother_religion')
                     <span class="text-red-500 text-sm">{{ $message }}</span>
                 @enderror

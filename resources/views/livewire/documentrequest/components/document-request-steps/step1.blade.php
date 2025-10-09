@@ -34,25 +34,26 @@
 
             <div class="flex flex-col gap-2 w-full" wire:loading.remove>
                 @if ($this->service->title === 'Death Certificate')
-                                <?php
+                    <?php
                     $to_whom = 'someone_else';
-                                                                                                                                                                                    ?>
-                                <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom" hidden
-                                    disabled />
-                                <label for="myself"
-                                    class="flux-input-primary flux-btn cursor-pointer opacity-50 cursor-not-allowed p-2">Myself
-                                    (Not available for Death Certificate)</label>
-                                <input type="radio" id="someone_else" name="to_whom" value="someone_else" wire:model.live="to_whom"
-                                    hidden />
-                                <label for="someone_else"
-                                    class="flux-input-primary flux-btn cursor-pointer {{ $to_whom === 'someone_else' ? 'flux-btn-active-primary' : '' }} p-2">Someone
-                                    Else</label>
+                    ?>
+                    <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom" hidden
+                        disabled />
+                    <label for="myself"
+                        class="flux-input-primary flux-btn cursor-pointer opacity-50 cursor-not-allowed p-2">Myself
+                        (Not available for Death Certificate)</label>
+                    <input type="radio" id="someone_else" name="to_whom" value="someone_else"
+                        wire:model.live="to_whom" hidden />
+                    <label for="someone_else"
+                        class="flux-input-primary flux-btn cursor-pointer {{ $to_whom === 'someone_else' ? 'flux-btn-active-primary' : '' }} p-2">Someone
+                        Else</label>
                 @else
-                    <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom" hidden />
+                    <input type="radio" id="myself" name="to_whom" value="myself" wire:model.live="to_whom"
+                        hidden />
                     <label for="myself"
                         class="flux-input-primary flux-btn cursor-pointer {{ $to_whom === 'myself' ? 'flux-btn-active-primary' : '' }} p-2">Myself</label>
-                    <input type="radio" id="someone_else" name="to_whom" value="someone_else" wire:model.live="to_whom"
-                        hidden />
+                    <input type="radio" id="someone_else" name="to_whom" value="someone_else"
+                        wire:model.live="to_whom" hidden />
                     <label for="someone_else"
                         class="flux-input-primary flux-btn cursor-pointer {{ $to_whom === 'someone_else' ? 'flux-btn-active-primary' : '' }} p-2">Someone
                         Else</label>
@@ -73,7 +74,7 @@
                         </div>
                     </div>
 
-                    <?php    $relationship = $relationship ?? ''; ?>
+                    <?php $relationship = $relationship ?? ''; ?>
                     <div class="flex flex-col gap-2 w-full">
                         <input type="radio" id="my_father" name="relationship" value="my_father"
                             wire:model.live="relationship" hidden />
@@ -87,8 +88,8 @@
                             class="flux-input-primary flux-btn cursor-pointer {{ $relationship === 'my_mother' ? 'flux-btn-active-primary' : '' }} p-2">My
                             Mother</label>
 
-                        <input type="radio" id="my_son" name="relationship" value="my_son" wire:model.live="relationship"
-                            hidden />
+                        <input type="radio" id="my_son" name="relationship" value="my_son"
+                            wire:model.live="relationship" hidden />
                         <label for="my_son"
                             class="flux-input-primary flux-btn cursor-pointer {{ $relationship === 'my_son' ? 'flux-btn-active-primary' : '' }} p-2">My
                             Son</label>

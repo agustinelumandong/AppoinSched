@@ -21,21 +21,18 @@ new #[Layout('components.layouts.auth')] class extends Component {
      */
     public function register(): void
     {
-        $validated = $this->validate([
-            'first_name' => ['required', 'string', 'max:255'],
-            'middle_name' => ['nullable', 'string', 'max:255'],
-            'last_name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
-            'password' => [
-                'required',
-                'string',
-                'confirmed',
-                'min:8',
-                'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/',
+        $validated = $this->validate(
+            [
+                'first_name' => ['required', 'string', 'max:255'],
+                'middle_name' => ['nullable', 'string', 'max:255'],
+                'last_name' => ['required', 'string', 'max:255'],
+                'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
+                'password' => ['required', 'string', 'confirmed', 'min:8', 'regex:/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/'],
             ],
-        ], [
-            'password.regex' => 'Password must be at least 8 characters long and include both lowercase and uppercase letters, a number, and a special character.',
-        ]);
+            [
+                'password.regex' => 'Password must be at least 8 characters long and include both lowercase and uppercase letters, a number, and a special character.',
+            ],
+        );
 
         $validated['password'] = Hash::make($validated['password']);
 
@@ -58,13 +55,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <form wire:submit="register" class="flex flex-col gap-6">
         <!-- Name -->
         <flux:input wire:model="first_name" :label="__('First name')" type="text" required autocomplete="name"
-            :placeholder="__('First name')" />
+            :placeholder="__('First name')"
+            x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
 
         <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" autocomplete="name"
-            :placeholder="__('Middle name')" />
+            :placeholder="__('Middle name')"
+            x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
 
         <flux:input wire:model="last_name" :label="__('Last name')" type="text" required autocomplete="name"
-            :placeholder="__('Last name')" />
+            :placeholder="__('Last name')"
+            x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
 
         <!-- Email Address -->
         <flux:input wire:model="email" :label="__('Email address')" type="email" required autocomplete="email"

@@ -30,7 +30,8 @@
             <label for="address_line_1" class="block text-xs font-medium mb-1">Address Line 1</label>
             <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                 wire:model="address_line_1" name="address_line_1" placeholder="Address Line 1" id="address_line_1"
-                @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled @endif>
+                @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled @endif
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             @error('address_line_1')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
@@ -40,7 +41,8 @@
             <label for="address_line_2" class="block text-xs font-medium mb-1">Address Line 2</label>
             <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                 wire:model="address_line_2" name="address_line_2" placeholder="Address Line 2" id="address_line_2"
-                @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled @endif>
+                @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled @endif
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             @error('address_line_2')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
@@ -101,7 +103,8 @@
                     <input id="street"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                         wire:model="street" placeholder="Street" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif>
+                        @if ($same_as_personal_address) disabled @endif
+                        x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>
@@ -146,7 +149,8 @@
             <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                 type="text" wire:model="address_line_1" name="address_line_1" placeholder="Address Line 1"
                 id="address_line_1" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                @if ($same_as_personal_address) disabled @endif>
+                @if ($same_as_personal_address) disabled @endif
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             @error('address_line_1')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
@@ -157,7 +161,8 @@
             <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                 type="text" wire:model="address_line_2" name="address_line_2" placeholder="Address Line 2"
                 id="address_line_2" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                @if ($same_as_personal_address) disabled @endif>
+                @if ($same_as_personal_address) disabled @endif
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             @error('address_line_2')
                 <span class="text-red-500 text-sm">{{ $message }}</span>
             @enderror
@@ -219,7 +224,8 @@
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         type="text" wire:model="street" placeholder="Street"
                         @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif>
+                        @if ($same_as_personal_address) disabled @endif
+                        x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>

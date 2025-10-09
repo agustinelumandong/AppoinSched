@@ -44,7 +44,8 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_last_name" placeholder="Requester's Last Name"
-                                    name="contact_last_name" id="contact_last_name">
+                                    name="contact_last_name" id="contact_last_name"
+                                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -54,7 +55,8 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_first_name" placeholder="Requester's First Name"
-                                    name="contact_first_name" id="contact_first_name">
+                                    name="contact_first_name" id="contact_first_name"
+                                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -65,7 +67,8 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_middle_name" placeholder="Requester's Middle Name"
-                                    name="contact_middle_name" id="contact_middle_name">
+                                    name="contact_middle_name" id="contact_middle_name"
+                                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_middle_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -100,7 +103,8 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_last_name" placeholder="Requester's Last Name"
-                                    name="contact_last_name" id="contact_last_name">
+                                    name="contact_last_name" id="contact_last_name"
+                                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -110,7 +114,8 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_first_name" placeholder="Requester's First Name"
-                                    name="contact_first_name" id="contact_first_name">
+                                    name="contact_first_name" id="contact_first_name"
+                                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -121,7 +126,8 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_middle_name" placeholder="Requester's Middle Name"
-                                    name="contact_middle_name" id="contact_middle_name">
+                                    name="contact_middle_name" id="contact_middle_name"
+                                    x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_middle_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
