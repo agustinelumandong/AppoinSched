@@ -169,6 +169,15 @@
         </div>
       </div>
     </div>
+
+    <!-- Payment Disclaimer -->
+    <div class="mt-8 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+      <p class="text-sm text-gray-700">
+        <strong>Disclaimer:</strong> Please ensure that all payments are made accurately to the official account details provided by our system. Clients must upload a clear and valid screenshot of their GCash payment receipt as proof of transaction. Refunds will not be issued for payments that are incorrect, incomplete, or sent to the wrong account. The client assumes full responsibility for any errors in the payment amount or account details used during the transaction.
+      </p>
+    </div>
+
+
     <footer class="my-6 flex justify-end gap-2">
       <button class="btn btn-ghost" wire:click="previousStep" wire:loading.attr="disabled">Previous</button>
       <button class="btn btn-primary" wire:click="completePayment" wire:loading.attr="disabled"
