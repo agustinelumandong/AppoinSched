@@ -40,10 +40,11 @@
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="flex flex-row md:flex-col gap-4 mb-4">
                             <div class="w-full md:w-1/3">
-                                <label for="contact_last_name" class="block text-xs font-medium mb-1">Requester's Last Name</label>
+                                <label for="contact_last_name" class="block text-xs font-medium mb-1">Requester's Last
+                                    Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_last_name" placeholder="Requester's Last Name" name="contact_last_name"
-                                    id="contact_last_name">
+                                    wire:model="contact_last_name" placeholder="Requester's Last Name"
+                                    name="contact_last_name" id="contact_last_name">
                                 @error('contact_last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -52,18 +53,19 @@
                                 <label for="contact_first_name" class="block text-xs font-medium mb-1">Requester's First
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_first_name" placeholder="Requester's First Name" name="contact_first_name"
-                                    id="contact_first_name">
+                                    wire:model="contact_first_name" placeholder="Requester's First Name"
+                                    name="contact_first_name" id="contact_first_name">
                                 @error('contact_first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="w-full md:w-1/3">
-                                <label for="contact_middle_name" class="block text-xs font-medium mb-1">Requester's Middle
+                                <label for="contact_middle_name" class="block text-xs font-medium mb-1">Requester's
+                                    Middle
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_middle_name" placeholder="Requester's Middle Name" name="contact_middle_name"
-                                    id="contact_middle_name">
+                                    wire:model="contact_middle_name" placeholder="Requester's Middle Name"
+                                    name="contact_middle_name" id="contact_middle_name">
                                 @error('contact_middle_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -92,10 +94,11 @@
                     <div class="bg-base-200 p-4 rounded-lg">
                         <div class="flex flex-row md:flex-col gap-4 mb-4">
                             <div class="w-full md:w-1/3">
-                                <label for="contact_last_name" class="block text-xs font-medium mb-1">Requester's Last Name</label>
+                                <label for="contact_last_name" class="block text-xs font-medium mb-1">Requester's Last
+                                    Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_last_name" placeholder="Requester's Last Name" name="contact_last_name"
-                                    id="contact_last_name">
+                                    wire:model="contact_last_name" placeholder="Requester's Last Name"
+                                    name="contact_last_name" id="contact_last_name">
                                 @error('contact_last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -104,18 +107,19 @@
                                 <label for="contact_first_name" class="block text-xs font-medium mb-1">Requester's First
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_first_name" placeholder="Requester's First Name" name="contact_first_name"
-                                    id="contact_first_name">
+                                    wire:model="contact_first_name" placeholder="Requester's First Name"
+                                    name="contact_first_name" id="contact_first_name">
                                 @error('contact_first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div class="w-full md:w-1/3">
-                                <label for="contact_middle_name" class="block text-xs font-medium mb-1">Requester's Middle
+                                <label for="contact_middle_name" class="block text-xs font-medium mb-1">Requester's
+                                    Middle
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_middle_name" placeholder="Requester's Middle Name" name="contact_middle_name"
-                                    id="contact_middle_name">
+                                    wire:model="contact_middle_name" placeholder="Requester's Middle Name"
+                                    name="contact_middle_name" id="contact_middle_name">
                                 @error('contact_middle_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -124,16 +128,16 @@
                         <div class=" grid grid-cols-1 gap-2">
                             <div>
                                 <label class="font-medium text-sm">Email Address:</label>
-                                <input class="flux-form-control " wire:model="contact_email" placeholder="Email Address"
-                                    name="contact_email" id="contact_email">
+                                <input class="flux-form-control " wire:model="contact_email"
+                                    placeholder="Email Address" name="contact_email" id="contact_email">
                                 @error('contact_email')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div>
                                 <label class="font-medium text-sm">Phone Number:</label>
-                                <input class="flux-form-control" wire:model="contact_phone" placeholder="Phone Number"
-                                    name="contact_phone" id="contact_phone">
+                                <input class="flux-form-control" wire:model="contact_phone"
+                                    placeholder="Phone Number" name="contact_phone" id="contact_phone">
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -142,8 +146,8 @@
                     </div>
                 @endif
                 <p class="text-sm text-base-content/70 mt-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 inline mr-1" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
@@ -153,9 +157,8 @@
 
             <footer class="my-6 flex justify-end gap-2">
                 <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                <button class="flux-btn btn-sm flux-btn-primary" type="button" 
-                    x-data x-on:click="$dispatch('open-modal-consent-confirmation-modal')" 
-                    title="Confirmation">
+                <button class="flux-btn btn-sm flux-btn-primary" type="button" x-data="{}"
+                    x-on:click="$dispatch('open-modal-consent-confirmation')" title="Confirmation">
                     <i class="bi bi-check"></i>Next
                 </button>
                 {{-- <button class="btn btn-primary" wire:click="nextStep">Next</button> --}}
@@ -163,53 +166,69 @@
         </div>
     </div>
 
-    <x-modal id="consent-confirmation-modal" title="Confirmation" size="max-w-2xl">
-    <div class="modal-body">
-        <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
-            <h3 class="font-bold text-lg mb-2">Consent and Affirmation</h3>
-            
-            <div class="bg-base-200 p-3 rounded-lg">
-                <p>I affirm that I am the document owner or the duly authorized representative of the owner of the requested PSA certificate. I attest that all information provided above is true and accurate to the best of my knowledge.</p>
-                <p class="mt-2">I understand that as the authorized requester, I am required to personally appear at the designated office to claim the requested document. I will present valid identification to verify my identity during collection.</p>
-                <p class="mt-2">I acknowledge that my personal information will be processed in accordance with the Data Privacy Act of 2012 (Republic Act No. 10173). I understand that the information provided will be used solely for the purpose of processing my document request.</p>
+    <x-modal id="consent-confirmation" title="Confirmation" size="max-w-2xl">
+        <div class="modal-body">
+            <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
+                <h3 class="font-bold text-lg mb-2">Consent and Affirmation</h3>
+
+                <div class="bg-base-200 p-3 rounded-lg">
+                    <p>I affirm that I am the document owner or the duly authorized representative of the owner of the
+                        requested PSA certificate. I attest that all information provided above is true and accurate to
+                        the best of my knowledge.</p>
+                    <p class="mt-2">I understand that as the authorized requester, I am required to personally appear
+                        at the designated office to claim the requested document. I will present valid identification to
+                        verify my identity during collection.</p>
+                    <p class="mt-2">I acknowledge that my personal information will be processed in accordance with
+                        the Data Privacy Act of 2012 (Republic Act No. 10173). I understand that the information
+                        provided will be used solely for the purpose of processing my document request.</p>
+                </div>
+
+                <div>
+                    <h4 class="font-semibold text-base mt-4 mb-2">Disclaimer</h4>
+                    <p>This online system serves only as a platform to facilitate document requests and appointment
+                        scheduling. It does not provide courier, mailing, or delivery services of any kind.</p>
+                    <p class="mt-2">All requested documents must be personally claimed by the requester or their
+                        authorized representative at the designated Municipal Office. Failure to appear or present valid
+                        identification may result in delays or denial of release.</p>
+                    <p class="mt-2">The processing, printing, and release of documents are conducted exclusively by
+                        the authorized Municipal Offices. Our system has no involvement in or responsibility for the
+                        physical handling, storage, or issuance of the requested documents.</p>
+                    <p class="mt-2">For any concerns regarding the status or release of your document, please contact
+                        or visit your respective Municipal Office directly.</p>
+                </div>
+
+                <div class="mt-4">
+                    <h4 class="font-semibold text-base mb-2">Acceptance</h4>
+                    <p>As a Requisition and Appointment System customer, I fully understand and accept the terms stated
+                        above, including all requirements, processes, and applicable laws governing this application.
+                    </p>
+                </div>
+
             </div>
-            
-            <div>
-                <h4 class="font-semibold text-base mt-4 mb-2">Disclaimer</h4>
-                <p>This online system serves only as a platform to facilitate document requests and appointment scheduling. It does not provide courier, mailing, or delivery services of any kind.</p>
-                <p class="mt-2">All requested documents must be personally claimed by the requester or their authorized representative at the designated Municipal Office. Failure to appear or present valid identification may result in delays or denial of release.</p>
-                <p class="mt-2">The processing, printing, and release of documents are conducted exclusively by the authorized Municipal Offices. Our system has no involvement in or responsibility for the physical handling, storage, or issuance of the requested documents.</p>
-                <p class="mt-2">For any concerns regarding the status or release of your document, please contact or visit your respective Municipal Office directly.</p>
-            </div>
-            
-            <div class="mt-4">
-                <h4 class="font-semibold text-base mb-2">Acceptance</h4>
-                <p>As a Requisition and Appointment System customer, I fully understand and accept the terms stated above, including all requirements, processes, and applicable laws governing this application.</p>
-            </div>
-            
         </div>
-    </div>
 
 
-    <x-slot name="footer">
-        <div class="gap-2">
-            <button type="button" class="flux-btn flux-btn-outline" x-data
-                x-on:click="$dispatch('close-modal-consent-confirmation-modal')">
-                <i class="bi bi-x-lg me-1"></i>Cancel
-            </button>
-            <button type="button" class="flux-btn btn-sm flux-btn-success"
-                wire:click="nextStep" wire:loading.attr="disabled"
-                x-on:click="$dispatch('close-modal-consent-confirmation-modal')">
-                <span wire:loading.remove>
-                    <i class="bi bi-check-circle me-1"></i>
-                    Confirm
-                </span>
-                <span wire:loading>
-                    <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                    Loading...
-                </span>
-            </button>
-        </div>
-    </x-slot>
-</x-modal>
+        <x-slot name="footer">
+            <div class="gap-2">
+                <button type="button" class="flux-btn flux-btn-outline" x-data
+                    x-on:click="$dispatch('close-modal-consent-confirmation')">
+                    <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+                <button type="button" class="flux-btn btn-sm flux-btn-success" x-data="{}"
+                    x-on:click="
+        $dispatch('close-modal-consent-confirmation');
+        $wire.nextStep();
+    ">
+                    <span wire:loading.remove>
+                        <i class="bi bi-check-circle me-1"></i>
+                        Confirm
+                    </span>
+                    <span wire:loading>
+                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
+                        Loading...
+                    </span>
+                </button>
+            </div>
+        </x-slot>
+    </x-modal>
 </div>
