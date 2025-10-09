@@ -1602,7 +1602,8 @@ new #[Title('Document Request')] class extends Component {
                                             identification</strong> for verification upon claiming your document.</li>
                                     <li>If you are an authorized representative, you must present an
                                         <strong>authorization letter</strong> and valid IDs of both the requester and
-                                        the owner of the document.</li>
+                                        the owner of the document.
+                                    </li>
                                 </ul>
                             </div>
 

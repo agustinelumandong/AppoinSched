@@ -57,7 +57,7 @@
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form')
         @elseif ($service->slug === 'death-certificate')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.death-information')
-            <div class="flux-card p-6 mt-4">
+            {{-- <div class="flux-card p-6 mt-4">
                 <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Deceased Details</h3>
                 <div class="grid md:grid-cols-3 gap-4 mb-4">
                     <div><span class="font-semibold">Sex:</span> {{ $deceased_sex }}</div>
@@ -100,7 +100,7 @@
                     <div><span class="font-semibold">Contact No:</span> {{ $informant_contact_no }}</div>
                 </div>
 
-            </div>
+            </div> --}}
         @elseif ($service->slug === 'special-permit')
             <div class="flux-card p-6">
                 <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Special Permit Details</h3>

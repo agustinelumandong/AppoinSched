@@ -3,7 +3,10 @@
 
 
         {{-- Personal Information Section --}}
-        @if($this->service->slug !== 'marriage-certificate' && $this->service->slug !== 'death-certificate' && $this->service->slug !== 'special-permit')
+        @if (
+            $this->service->slug !== 'marriage-certificate' &&
+                $this->service->slug !== 'death-certificate' &&
+                $this->service->slug !== 'special-permit')
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.personal-information')
 
             {{-- Address Information Section --}}
@@ -32,17 +35,20 @@
 
         <footer class="my-6 flex justify-end gap-2">
             <button class="flux-btn btn-ghost" wire:click="previousStep">Previous</button>
-            <button class="flux-btn flux-btn-primary" x-data x-on:click="$dispatch('open-modal-info-confirmation-modal')" title="Information Confirmation" wire:loading.disabled>
+            <button class="flux-btn flux-btn-primary" x-data x-on:click="$dispatch('open-modal-info-confirmation-modal')"
+                title="Information Confirmation" wire:loading.disabled>
                 Next
             </button>
         </footer>
     </div>
 
-     <x-modal id="info-confirmation-modal" title="Information Confirmation" size="max-w-2xl">
+    <x-modal id="info-confirmation-modal" title="Information Confirmation" size="max-w-2xl">
         <div class="modal-body">
             <div class="text-sm space-y-4 p-2">
                 <h3>Have you double-checked all your information to ensure it's accurate?</h3>
-                <p>Please review all the details you have provided in the previous steps. If everything is correct, click "Confirm" to proceed with your document request. If you need to make any changes, click "Cancel" to return to the form.</p>
+                <p>Please review all the details you have provided in the previous steps. If everything is correct,
+                    click "Confirm" to proceed with your document request. If you need to make any changes, click
+                    "Cancel" to return to the form.</p>
                 <p class="font-bold">Note: Once you confirm, you will not be able to edit your information.</p>
             </div>
         </div>
@@ -54,8 +60,7 @@
                     x-on:click="$dispatch('close-modal-info-confirmation-modal')">
                     <i class="bi bi-x-lg me-1"></i>Cancel
                 </button>
-                <button type="button" class="flux-btn flux-btn-success"
-                    wire:click="nextStep" x-data
+                <button type="button" class="flux-btn flux-btn-success" wire:click="nextStep" x-data
                     x-on:click="$dispatch('close-modal-info-confirmation-modal')">
                     <span wire:loading.remove>
                         <i class="bi bi-check-circle me-1"></i>
