@@ -5,10 +5,10 @@
     @include('partials.head')
 </head>
 
-<body class="min-h-screen bg-white dark:bg-zinc-800">
+<body class="min-h-screen bg-zinc-50">
 
     <!-- Mobile Header -->
-    <flux:header class="lg:hidden border-b border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+    <flux:header class="lg:hidden border-b border-zinc-200 bg-white">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-3" inset="left" />
 
         <flux:spacer />
@@ -22,7 +22,7 @@
                         <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                             <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                 <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black ">
                                     {{ auth()->user()->initials() }}
                                 </span>
                             </span>
@@ -58,7 +58,7 @@
     </flux:header>
 
     <!-- Desktop Header -->
-    <flux:header sticky class="border-b border-zinc-200 bg-zinc-50 p-3 dark:border-zinc-700 dark:bg-zinc-900">
+    <flux:header sticky class="border-b border-zinc-200 bg-white p-3">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
         <a href="{{ route('dashboard') }}"
@@ -88,7 +88,7 @@
                         <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                             <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                 <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black ">
                                     {{ auth()->user()->initials() }}
                                 </span>
                             </span>
@@ -125,30 +125,37 @@
 
     <!-- Desktop Sidebar -->
     <flux:sidebar sticky
-        class="max-lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        class="max-lg:hidden border-e border-zinc-200 bg-white ">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
 
 
         <flux:navlist variant="outline">
             <flux:navlist.group :heading="__('Platform')" class="grid">
-                <flux:navlist.item icon="home" :href="route('dashboard')"
-                    class="text-decoration-none text-black truncate" :current="request()->routeIs('dashboard')"
-                    wire:navigate>{{ Str::limit(__('Dashboard'), 14) }}
+                <flux:navlist.item
+                    icon="home"
+                    :href="route(auth()->user()->hasRole('super-admin|admin') ? 'admin.dashboard' : (auth()->user()->hasAnyRole('MCR-staff|MTO-staff|BPLS-staff') ? 'staff.dashboard' : 'client.dashboard'))"
+                    :current="request()->routeIs('*.dashboard')"
+                    wire:navigate
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!"
+                >
+                    {{ Str::limit(__('Dashboard'), 14) }}
                 </flux:navlist.item>
-            </flux:navlist.group>
 
+            </flux:navlist.group>
+             
             {{-- Client Navigation --}}
             @hasrole('client')
-            <flux:navlist.group expandable :expanded="request()->routeIs('client.*')" heading="My Services">
+            {{-- request()->routeIs('client.*'); --}}
+            <flux:navlist.group expandable heading="My Services">
                 <flux:navlist.item icon="calendar" :href="route('client.appointments')"
                     :current="request()->routeIs('client.appointments')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('My Appointments'), 14) }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('client.documents')"
                     :current="request()->routeIs('client.documents')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full!">
                     {{ Str::limit(__('My Documents'), 14) }}
                 </flux:navlist.item>
             </flux:navlist.group>
@@ -156,7 +163,7 @@
 
             {{-- Staff Navigation --}}
             @hasrole('MCR-staff|MTO-staff|BPLS-staff')
-            <flux:navlist.group expandable :expanded="request()->routeIs('staff.*')" heading="Staff Management">
+            <flux:navlist.group expandable heading="Staff Management">
                 <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
                     :current="request()->routeIs('staff.appointments')" wire:navigate
                     class="text-decoration-none text-black truncate">
@@ -183,30 +190,30 @@
 
             {{-- Admin Navigation --}}
             @hasrole('admin|super-admin')
-            <flux:navlist.group expandable :expanded="request()->routeIs('admin.*')" heading="Administration">
+            <flux:navlist.group expandable heading="Administration">
                 <flux:navlist.item icon="building-office-2" :href="route('admin.offices')"
                     :current="request()->routeIs('admin.offices')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Offices Management'), 14) }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="cog-6-tooth" :href="route('admin.services')"
                     :current="request()->routeIs('admin.services')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Services Management'), 14) }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="calendar" :href="route('admin.appointments-management')"
                     :current="request()->routeIs('admin.appointments-management')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Appointments Management'), 14) }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="document-text" :href="route('admin.document-request')"
                     :current="request()->routeIs('admin.document-request')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Document Request Management'), 14) }}
                 </flux:navlist.item>
                 <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
                     :current="request()->routeIs('admin.users.users-management')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Users Management'), 14) }}
                 </flux:navlist.item>
             </flux:navlist.group>
@@ -214,10 +221,10 @@
 
             {{-- Super Admin Navigation --}}
             @hasrole('super-admin')
-            <flux:navlist.group expandable :expanded="request()->routeIs('admin.roles-permissions')" heading="System">
+            <flux:navlist.group expandable heading="System">
                 <flux:navlist.item icon="shield-check" :href="route('admin.roles-permissions')"
                     :current="request()->routeIs('admin.roles-permissions')" wire:navigate
-                    class="text-decoration-none text-black truncate">
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Roles & Permissions'), 14) }}
                 </flux:navlist.item>
             </flux:navlist.group>
@@ -228,10 +235,15 @@
 
         @hasrole('client')
         <flux:navlist variant="outline">
-            <flux:navlist.item icon="user" :href="route('userinfo')" wire:navigate
-                class="text-decoration-none text-black truncate">
+            <flux:navlist.item 
+                icon="user" 
+                :href="route('userinfo')"
+                :current="request()->routeIs('userinfo')"
+                wire:navigate
+                class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                 {{ Str::limit(__('User Information'), 14) }}
             </flux:navlist.item>
+
         </flux:navlist>
         @endhasrole
         <!-- Desktop User Menu -->
@@ -245,7 +257,7 @@
                         <div class="flex items-center gap-2 px-1 py-1.5 text-start text-sm">
                             <span class="relative flex h-8 w-8 shrink-0 overflow-hidden rounded-lg">
                                 <span
-                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black dark:bg-neutral-700 dark:text-white">
+                                    class="flex h-full w-full items-center justify-center rounded-lg bg-neutral-200 text-black">
                                     {{ auth()->user()->initials() }}
                                 </span>
                             </span>
@@ -280,7 +292,7 @@
 
     <!-- Mobile Sidebar -->
     <flux:sidebar sticky stashable z-index-mobile="50"
-        class="lg:hidden border-e border-zinc-200 bg-zinc-50 dark:border-zinc-700 dark:bg-zinc-900">
+        class="lg:hidden border-e border-zinc-200 bg-white">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
         <a href="{{ route('dashboard') }}"
@@ -314,7 +326,7 @@
 
             {{-- Staff Navigation --}}
             @hasrole('MCR-staff|MTO-staff|BPLS-staff')
-            <flux:navlist.group expandable :expanded="request()->routeIs('staff.*')" heading="Staff Management">
+            <flux:navlist.group expandable heading="Staff Management">
                 <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
                     :current="request()->routeIs('staff.appointments')" wire:navigate
                     class="text-decoration-none text-black truncate">
@@ -390,10 +402,10 @@
 
 
     {{ $slot }}
+
     @livewireScripts
     @fluxScripts
     @stack('scripts')
-    <script src="{{ asset('js/qrcode.min.js') }}"></script>
 
 
     <!-- Logout Confirmation Modal -->
