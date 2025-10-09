@@ -6,19 +6,22 @@
         <div class="flex flex-col md:col-span-3">
             <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
             <input id="last_name" class="flux-form-control w-full" type="text" wire:model="last_name"
-                placeholder="Last Name">
+                placeholder="Last Name"
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col md:col-span-3">
             <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
             <input id="first_name" class="flux-form-control w-full" type="text" wire:model="first_name"
-                placeholder="First Name">
+                placeholder="First Name"
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col md:col-span-3">
             <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
             <input id="middle_name" class="flux-form-control w-full" type="text" wire:model="middle_name"
-                placeholder="Middle Name">
+                placeholder="Middle Name"
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
         <div class="flex flex-col md:col-span-1">
@@ -43,10 +46,8 @@
         </div>
         <div class="flex flex-col">
             <label for="contact_no" class="text-xs font-medium mb-1">Contact No</label>
-            <input id="contact_no" class="flux-form-control" type="tel" 
-                        inputmode="numeric" 
-                        pattern="[0-9]*"
-                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="contact_no"
+            <input id="contact_no" class="flux-form-control" type="tel" inputmode="numeric" pattern="[0-9]*"
+                x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="contact_no"
                 placeholder="Contact No">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
@@ -68,7 +69,8 @@
         <div class="flex flex-col">
             <label for="place_of_birth" class="text-xs font-medium mb-1">Place of Birth</label>
             <input id="place_of_birth" class="flux-form-control" type="text" wire:model="place_of_birth"
-                placeholder="Place of Birth">
+                placeholder="Place of Birth"
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
@@ -87,14 +89,17 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="flex flex-col">
             <label for="religion" class="text-xs font-medium mb-1">Religion</label>
-            <input id="religion" class="flux-form-control" type="text" wire:model="religion" placeholder="Religion">
+            <input id="religion" class="flux-form-control" type="text" wire:model="religion"
+                placeholder="Religion"
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
             <label for="nationality" class="text-xs font-medium mb-1">Nationality</label>
             <input id="nationality" class="flux-form-control" type="text" wire:model="nationality"
-                placeholder="Nationality">
+                placeholder="Nationality"
+                x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
@@ -127,7 +132,8 @@
             <label for="government_id_image_path" class="text-xs font-medium mb-1">Government ID PDF</label>
             <input id="government_id_image_path" class="flux-form-control" type="file"
                 wire:model="government_id_image_path" accept=".pdf" required>
-            <span class="text-xs text-gray-500 mt-1">Please upload a PDF file showing both the front and back of your government-issued ID (maximum size: 5MB).</span>
+            <span class="text-xs text-gray-500 mt-1">Please upload a PDF file showing both the front and back of your
+                government-issued ID (maximum size: 5MB).</span>
             @error('government_id_image_path')
                 <span class="text-xs text-red-500 mt-1">{{ $message }}</span>
             @enderror
