@@ -94,7 +94,9 @@
 
                     <div class="w-full">
                         <label for="phone" class="text-xs font-medium mb-1">Phone</label>
-                        <input type="tel" placeholder="Phone"
+                        <input type="tel" inputmode="numeric" pattern="[0-9]*"
+                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                            placeholder="Phone"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                             wire:model="phone" @if ($editPersonDetails === false) disabled @endif />
                         @error('phone')

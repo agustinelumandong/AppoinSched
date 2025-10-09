@@ -43,7 +43,10 @@
         </div>
         <div class="flex flex-col">
             <label for="contact_no" class="text-xs font-medium mb-1">Contact No</label>
-            <input id="contact_no" class="flux-form-control" type="text" wire:model="contact_no"
+            <input id="contact_no" class="flux-form-control" type="tel" 
+                        inputmode="numeric" 
+                        pattern="[0-9]*"
+                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="contact_no"
                 placeholder="Contact No">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>

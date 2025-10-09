@@ -82,8 +82,10 @@
                             </div>
                             <div>
                                 <label class="font-medium text-sm">Phone Number:</label>
-                                <input class="flux-form-control" wire:model="contact_phone" placeholder="Phone Number"
-                                    name="contact_phone" id="contact_phone">
+                                <input class="flux-form-control" wire:model="contact_phone" type="tel"
+                                    inputmode="numeric" pattern="[0-9]*"
+                                    x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                    placeholder="Phone Number" name="contact_phone" id="contact_phone">
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -136,7 +138,9 @@
                             </div>
                             <div>
                                 <label class="font-medium text-sm">Phone Number:</label>
-                                <input class="flux-form-control" wire:model="contact_phone"
+                                <input class="flux-form-control" wire:model="contact_phone" type="tel"
+                                    inputmode="numeric" pattern="[0-9]*"
+                                    x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
                                     placeholder="Phone Number" name="contact_phone" id="contact_phone">
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>

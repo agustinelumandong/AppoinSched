@@ -92,7 +92,10 @@
                 </div>
                 <div class="w-full md:w-1/3">
                     <label for="father_contact_no" class="block text-xs font-medium mb-1">Contact No.</label>
-                    <input class="flux-form-control" type="text" wire:model="father_contact_no"
+                    <input class="flux-form-control" type="tel" 
+                        inputmode="numeric" 
+                        pattern="[0-9]*"
+                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="father_contact_no"
                         placeholder="Contact Number" name="father_contact_no" id="father_contact_no" required
                         {{ $father_is_unknown ? 'disabled' : '' }}>
                     @error('father_contact_no')
@@ -178,7 +181,10 @@
             </div>
             <div class="w-full md:w-1/3">
                 <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's Contact No</label>
-                <input class="flux-form-control     " type="text" wire:model="mother_contact_no"
+                <input class="flux-form-control" type="tel" 
+                        inputmode="numeric" 
+                        pattern="[0-9]*"
+                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="mother_contact_no"
                     placeholder="Mother's Contact No" name="mother_contact_no" id="mother_contact_no"
                     {{ $mother_is_unknown ? 'disabled' : '' }}>
                 @error('mother_contact_no')
