@@ -359,3 +359,44 @@
     padding: 0.25rem 0.75rem;
     font-size: 0.75rem;
 }
+
+.flux-checkbox {
+    width: 1rem;
+    height: 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    background: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.flux-checkbox input {
+    display: none;
+}
+
+.flux-checkbox.checked {
+    background: #3b82f6;
+    border-color: #3b82f6;
+}
+
+.flux-checkbox.checked::before {
+    content: '';
+    width: 0.5rem;
+    height: 0.5rem;
+    background: white;
+    border-radius: 0.125rem;
+}
+
+.flux-checkbox:hover {
+    border-color: #9ca3af;
+    cursor: pointer;
+}
+
+.flux-checkbox:focus-within {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+/* Radio Button Styles */
