@@ -166,12 +166,12 @@
             wire:loading.attr="disabled">Previous</button>
         <button class="flux-btn btn-sm flux-btn-primary" type="button" x-data="{}"
             x-on:click="$dispatch('open-modal-submit-confirmation')" title="Submission Confirmation">
-            <i class="bi bi-check"></i>Submit-modal
+            <i class="bi bi-check"></i>Submit
         </button>
-        <button class="flux-btn flux-btn-primary" wire:click="submitAppointment" wire:loading.attr="disabled">
+        {{-- <button class="flux-btn flux-btn-primary" wire:click="submitAppointment" wire:loading.attr="disabled">
             <span wire:loading wire:target="submitAppointment" class="loading loading-spinner"></span>
             Submit
-        </button>
+        </button> --}}
     </footer>
 <x-modal id="submit-confirmation" title="Submission Confirmation" size="max-w-2xl">
     <div class="modal-body">
