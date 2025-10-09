@@ -180,7 +180,7 @@
 
     <footer class="my-6 flex justify-end gap-2">
         <button class="flux-btn btn-ghost" wire:click="previousStep" wire:loading.attr="disabled">Previous</button>
-        <button class="flux-btn flux-btn-primary" x-data x-on:click="$dispatch('open-modal-confirm-modal')" wire:loading.attr="disabled">
+        <button class="flux-btn flux-btn-primary" x-data x-on:click="$dispatch('open-modal-confirm-modal')" wire:loading.attr="disabled" title="Confirm Submission">
             <span wire:loading class="loading loading-spinner"></span>
             Submit
         </button>
@@ -211,7 +211,7 @@
                 <i class="bi bi-x-lg me-1"></i>Cancel
             </button>
             <button type="button" class="flux-btn flux-btn-success"
-                wire:click="submitDocumentRequest" wire:loading.attr="disabled"
+                wire:click="submitDocumentRequest" wire:loading.attr="disabled" x-data
                 x-on:click="$dispatch('close-modal-confirm-modal')">
                 <span wire:loading.remove>
                     <i class="bi bi-check-circle me-1"></i>
