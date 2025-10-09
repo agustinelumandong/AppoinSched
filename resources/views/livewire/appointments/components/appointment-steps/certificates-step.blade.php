@@ -52,13 +52,13 @@
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                                    <div class="form-control">
+                                    <div>
                                         <label class="label">
                                             <span class="label-text">Certificate Type <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <select wire:model="certificates.{{ $index }}.certificate_type"
-                                            class="select select-bordered" required>
+                                            class="flux-form-control" required>
                                             <option value="">-- Select Certificate Type --</option>
                                             @foreach ($certificateTypes as $value => $label)
                                                 <option value="{{ $value }}">{{ $label }}</option>
@@ -69,13 +69,13 @@
                                         @enderror
                                     </div>
 
-                                    <div class="form-control">
+                                    <div>
                                         <label class="label">
                                             <span class="label-text">Relationship <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <select wire:model="certificates.{{ $index }}.relationship"
-                                            class="select select-bordered" required>
+                                            class="flux-form-control" required>
                                             <option value="">-- Select Relationship --</option>
                                             @foreach ($relationshipTypes as $value => $label)
                                                 <option value="{{ $value }}">{{ $label }}</option>
@@ -88,36 +88,36 @@
                                 </div>
 
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                                    <div class="form-control">
+                                    <div>
                                         <label class="label">
                                             <span class="label-text">First Name <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <input type="text" wire:model="certificates.{{ $index }}.first_name"
-                                            class="input input-bordered" required>
+                                            class="flux-form-control" required x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" >
                                         @error("certificates.{$index}.first_name")
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
 
-                                    <div class="form-control">
+                                    <div>
                                         <label class="label">
                                             <span class="label-text">Last Name <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <input type="text" wire:model="certificates.{{ $index }}.last_name"
-                                            class="input input-bordered" required>
+                                            class="flux-form-control" required x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" >
                                         @error("certificates.{$index}.last_name")
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
                                         @enderror
                                     </div>
 
-                                    <div class="form-control">
+                                    <div>
                                         <label class="label">
                                             <span class="label-text">Middle Name</span>
                                         </label>
                                         <input type="text" wire:model="certificates.{{ $index }}.middle_name"
-                                            class="input input-bordered">
+                                            class="flux-form-control" x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" >
                                     </div>
                                 </div>
                             </div>

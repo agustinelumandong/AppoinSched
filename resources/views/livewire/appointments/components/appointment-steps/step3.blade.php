@@ -50,7 +50,7 @@
                         <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
                         <input type="text" placeholder="Last Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="last_name" @if ($editPersonDetails === false) disabled @endif />
+                            wire:model="last_name" @if ($editPersonDetails === false) disabled @endif x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
                         @error('last_name')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
@@ -61,7 +61,7 @@
                         <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
                         <input type="text" placeholder="First Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="first_name" @if ($editPersonDetails === false) disabled @endif />
+                            wire:model="first_name" @if ($editPersonDetails === false) disabled @endif x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
                         @error('first_name')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
@@ -72,7 +72,7 @@
                         <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
                         <input type="text" placeholder="Middle Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
-                            wire:model="middle_name" @if ($editPersonDetails === false) disabled @endif />
+                            wire:model="middle_name" @if ($editPersonDetails === false) disabled @endif x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
                         @error('middle_name')
                             <span class="text-red-500">{{ $message }}</span>
                         @enderror
