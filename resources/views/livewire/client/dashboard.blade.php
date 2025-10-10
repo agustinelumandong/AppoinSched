@@ -42,11 +42,11 @@ new class extends Component {
     @include('components.alert')
 
     <div class="space-y-6">
-        <div class="mb-1 flex flex-row gap-4">
+        {{-- <div class="mb-1 flex flex-row gap-4">
             <div class="w-full">
-                <h4 class="text-2xl font-bold text-gray-900">Available Offices</h4>
+                <h4 class="text-lg font-bold text-gray-900">Available Offices</h4>
             </div>
-        </div>
+        </div> --}}
 
         @if (!$hasCompleteProfile)
             <div id="alert" class="opacity-100 transition-all" x-data="{ show: true }" x-show="show">
@@ -83,8 +83,8 @@ new class extends Component {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     @forelse ($offices as $office)
                         <a href="{{ route('offices.show', $office->slug) }}"
-                            class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:-translate-y-2 transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-black"
-                            id="office-{{ $office->id }}" style="height: 230px;">
+                            class="flux-office-card relative p-4 border-blue-200 hover:bg-blue-50 hover:-translate-y-2 transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-black no-underline"
+                            id="office-{{ $office->id }}">
                             <div class="absolute" style="top: -50px; right: -80px;">
                                 @php
                                     $logo = $office->logo;
@@ -112,7 +112,7 @@ new class extends Component {
                                 </p>
                             </header>
                             {{-- Footer --}}
-                            <footer class="flex items-center justify-between pt-10">
+                            <footer class="flex items-center justify-between pt-2">
                                 <span class="text-blue-50 hover:text-blue-700 flux-btn flux-btn-primary">View Office</span>
                             </footer>
                         </a>
@@ -126,11 +126,11 @@ new class extends Component {
                 </div>
 
                 {{-- Appointments Calendar --}}
+                {{-- <div class="w-full">
+                    <h4 class="text-lg font-bold text-gray-900">Appointments Calendar</h4>
+                </div> --}}
                 <div class="w-full">
-                    <h4 class="text-2xl font-bold text-gray-900">Appointments Calendar</h4>
-                </div>
-                <div class=" w-full">
-                    <livewire:components.full-calendar />
+                    <livewire:components.full-calendar :calendartitle="'Appointments Calendar'" />
                 </div>
             </div>
 
@@ -167,4 +167,13 @@ new class extends Component {
             </div>
         </div> --}}
     </div>
+    
+<style>
+    .flux-office-card {
+        background: linear-gradient(90deg, #C4D5FF 4%, #fff 100%);
+        /* height: 230px; */
+        height: fit-content;
+        text-decoration: none;
+    }
+</style>
 </div>
