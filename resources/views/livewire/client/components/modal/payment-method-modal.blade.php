@@ -3,7 +3,7 @@
         {{-- Debug --}}
         {{-- {{ $selectedDocumentRequest->id ?? 'null' }} --}}
         <div class="row" x-data="{ selectedPaymentMethod: null }">
-            <div class="col-md-6">
+            <div class="col-md-12">
                 <div class="flux-card payment-option-card p-5"
                     x-on:click="selectedPaymentMethod = 'online'; $wire.selectPaymentMethod('online')"
                     :class="{ 'border-primary bg-primary-subtle': selectedPaymentMethod === 'online' }"

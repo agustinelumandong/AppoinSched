@@ -307,14 +307,13 @@ new class extends Component {
     </div>
 
     <!-- Appointments Table -->
-    <div class="flux-card ">
+    <div class="flux-card " style="padding: 12px;">
         <div class="overflow-x-auto">
             <table class="table flux-table w-full">
                 <thead>
                     <tr>
                         <th>Reference Number</th>
                         <th>Client</th>
-                        <th>Service</th>
                         <th>Status</th>
                         <th>Date & Time</th>
                         <th>Actions</th>
@@ -343,9 +342,7 @@ new class extends Component {
                                     </div>
                                 </div>
                             </td>
-                            <td>
-                                <div class="text-sm text-gray-900">{{ $appointment->service->title ?? '' }}</div>
-                            </td>
+                            
                             <td>
                                 <span
                                     class="flux-badge flux-badge-{{ $appointment->status == 'completed' ? 'success' : ($appointment->status == 'cancelled' ? 'danger' : 'warning') }}">

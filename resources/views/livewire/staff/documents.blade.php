@@ -250,7 +250,7 @@ new class extends Component {
     </div>
 
     <!-- Document Requests Table -->
-    <div class="flux-card">
+    <div class="flux-card" style="padding: 12px;">
         <div class="overflow-x-auto">
             <table class="table flux-table w-full">
                 <thead>
@@ -278,8 +278,15 @@ new class extends Component {
                                             </td>
                                             <td>
                                                 @if ($documentRequest->details)
-                                                    {{ $documentRequest->details->first_name }}
-                                                    {{ $documentRequest->details->last_name }}
+                                                    @if (
+                                                        ($documentRequest->details->first_name === 'N/A' && $documentRequest->details->last_name === 'N/A') ||
+                                                        (empty($documentRequest->details->first_name) && empty($documentRequest->details->last_name))
+                                                    )
+                                                        {{-- Empty string if both are N/A or empty --}}
+                                                    @else
+                                                        {{ $documentRequest->details->first_name }}
+                                                        {{ $documentRequest->details->last_name }}
+                                                    @endif
                                                     <span
                                                         class="inline-flex px-2 py-1 text-xs font-semibold rounded-full {{ $documentRequest->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800' }}">
                                                         {{ ucfirst(str_replace('_', ' ', $documentRequest->details->request_for)) }}

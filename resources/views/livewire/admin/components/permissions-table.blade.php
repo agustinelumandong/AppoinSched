@@ -1,5 +1,5 @@
 <div>
-    <div class="flux-card">
+    <div class="flux-card" style="padding: 12px;">
         <div class="p-4 border-bottom">
             <h5 class="mb-0 fw-semibold">Permissions Management</h5>
         </div>

@@ -25,6 +25,7 @@ new class extends Component {
             'recentAppointments' => Appointments::with(['user', 'office'])
                 ->where('office_id', $this->getOfficeIdForStaff())
                 ->latest()
+                ->take(5)
                 ->get(),
             'approvedAppointments' => Appointments::with(['user', 'office'])
                 ->where('office_id', $this->getOfficeIdForStaff())
@@ -72,11 +73,11 @@ new class extends Component {
     <div class="space-y-6">
         <div class="flex justify-between items-center">
             <div>
-                <h1 class="text-3xl font-bold text-gray-900">Staff Dashboard</h1>
+                <h4 class="text-3xl font-bold text-gray-900">Staff Dashboard</h4>
                 <p class="text-gray-600">Welcome back, {{ auth()->user()->first_name }}!</p>
             </div>
             <div class="flex items-center space-x-2">
-                <span class="badge badge-secondary">{{ auth()->user()->roles->first()->name ?? 'No Role' }}</span>
+                <span class="flux-badge flux-badge-primary">{{ auth()->user()->roles->first()->name ?? 'No Role' }}</span>
             </div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -171,10 +172,10 @@ new class extends Component {
         </div>
 
         <div class="  py-8">
-            <div class="mb-6">
+            {{-- <div class="mb-6">
                 <h1 class="text-3xl font-bold text-gray-900">Appointments Calendar</h1>
                 <p class="text-gray-600 mt-2">View and filter appointments across different offices and staff</p>
-            </div>
+            </div> --}}
             <livewire:components.full-calendar />
         </div>
 
