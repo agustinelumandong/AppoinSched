@@ -6,6 +6,7 @@ use Livewire\Volt\Volt;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\EmailsController;
+use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -54,6 +55,10 @@ Route::middleware(['auth'])->group(function () {
         Volt::route('staff/services', 'staff.services')->name('staff.services');
         Volt::route('staff/reports', 'staff.reports')->name('staff.reports');
         Volt::route('admin/view/document-request/{id}', 'documentrequest.view-document-request')->name('admin.view-document-request');
+
+        // Report export routes
+        Route::get('reports/export/pdf', [ReportController::class, 'generatePdf'])->name('reports.export.pdf');
+        Route::get('reports/export/csv', [ReportController::class, 'generateCsv'])->name('reports.export.csv');
     });
 
     // Client routes (all authenticated users with complete profile)
