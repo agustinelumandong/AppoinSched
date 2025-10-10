@@ -25,15 +25,17 @@ new #[Title('Office Details')] class extends Component {
 
     <!-- Header Section -->
     <div class="d-flex justify-content-between align-items-center mb-4">
+        
         <div>
-            <h1 class="h3 mb-1 fw-bold text-dark">{{ $office->name }}</h1>
-            <p class="mb-0 text-muted text-sm">{{ $office->description ?? 'No description available' }}</p>
+            <h4 class="mb-3">Services Offered</h4>
+            {{-- <h1 class="h3 mb-1 fw-bold text-dark">{{ $office->name }}</h1>
+            <p class="mb-0 text-muted text-sm">{{ $office->description ?? 'No description available' }}</p> --}}
         </div>
-        <div class=" ml-3">
-            <a href="{{ route('dashboard') }}" class="flux-btn flux-btn-outline text-decoration-none text-black">
-                <i class="bi bi-arrow-left me-1"></i>
+        {{-- <div class=" ml-3">
+            <a href="{{ route('dashboard') }}" class="text-decoration-none text-black">
+                <i class="bi bi-arrow-left me-36 font-bold text-2xl"></i>
             </a>
-        </div>
+        </div> --}}
     </div>
 
     <!-- Office Details Card -->
@@ -42,7 +44,7 @@ new #[Title('Office Details')] class extends Component {
     <div class="row mt-4">
         <!-- Office Information -->
         <div class="col-md-12">
-            <h4 class="mb-3">Services Offered</h4>
+            
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
 
                 @php
@@ -78,7 +80,7 @@ new #[Title('Office Details')] class extends Component {
                     @endphp
                     @if($office->slug !== 'municipal-treasurers-office')
                         <a href="{{ route('offices.service.request', ['office' => $office->slug]) }}"
-                            class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
+                            class="flux-office-card relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
                             id="office-{{ $office->id }}">
                             <div class="absolute" style="top: -50px; right: -80px;">
                                 <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
@@ -102,7 +104,7 @@ new #[Title('Office Details')] class extends Component {
                         </a>
                     @endif
                     <a href="{{ route('offices.appointment', ['office' => $office->slug]) }}"
-                        class="relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
+                        class="flux-office-card relative flux-card p-4 border-blue-200 hover:bg-blue-50 hover:translate-y-[-10px] transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-decoration-none text-black"
                         id="office-{{ $office->id }}">
                         <div class="absolute" style="top: -50px; right: -80px;">
                             <img src="{{ $logo }}" alt="{{ $office->name }} Logo" class="rounded-full"
