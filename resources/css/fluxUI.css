@@ -399,4 +399,192 @@
     outline: none;
 }
 
-/* Radio Button Styles */
+/* ----------------------------------
+   🔷 Primary (Blue) Theme
+---------------------------------- */
+
+.flux-bg-blue-50 {
+    background-color: #eff6ff;
+}
+
+.flux-bg-blue-100 {
+    background-color: #dbeafe;
+}
+
+.flux-bg-blue-200 {
+    background-color: #bfdbfe;
+}
+
+.flux-bg-blue-300 {
+    background-color: #93c5fd;
+}
+
+.flux-bg-blue-400 {
+    background-color: #60a5fa;
+}
+
+.flux-bg-blue-500 {
+    background-color: #3b82f6;
+}
+
+.flux-bg-blue-600 {
+    background-color: #2563eb;
+}
+
+.flux-bg-blue-700 {
+    background-color: #1d4ed8;
+}
+
+.flux-bg-blue-800 {
+    background-color: #1e40af;
+}
+
+.flux-bg-blue-900 {
+    background-color: #1e3a8a;
+}
+
+.flux-text-blue-50 {
+    color: #eff6ff;
+}
+
+.flux-text-blue-100 {
+    color: #dbeafe;
+}
+
+.flux-text-blue-200 {
+    color: #bfdbfe;
+}
+
+.flux-text-blue-300 {
+    color: #93c5fd;
+}
+
+.flux-text-blue-400 {
+    color: #60a5fa;
+}
+
+.flux-text-blue-500 {
+    color: #3b82f6;
+}
+
+.flux-text-blue-600 {
+    color: #2563eb;
+}
+
+.flux-text-blue-700 {
+    color: #1d4ed8;
+}
+
+.flux-text-blue-800 {
+    color: #1e40af;
+}
+
+.flux-text-blue-900 {
+    color: #1e3a8a;
+}
+
+/* Button Variants */
+.flux-btn {
+    @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium transition-all duration-150 ease-in-out;
+}
+
+.flux-btn-primary {
+    background-color: #3b82f6;
+    color: white;
+}
+
+.flux-btn-primary:hover {
+    background-color: #2563eb;
+}
+
+.flux-btn-primary:active,
+.flux-btn-active-primary {
+    background-color: #1d4ed8;
+    color: white;
+}
+
+.flux-btn-outline-primary {
+    border: 1px solid #3b82f6;
+    color: #3b82f6;
+    background-color: transparent;
+}
+
+.flux-btn-outline-primary:hover {
+    background-color: #eff6ff;
+}
+
+/* Focus and Ring States */
+.flux-focus-ring-blue {
+    box-shadow: 0 0 0 3px rgba(147, 197, 253, 0.6);
+}
+
+/* Accent Utility */
+.flux-accent {
+    transition: all 0.15s ease-in-out;
+}
+
+.flux-accent:hover {
+    filter: brightness(1.05);
+}
+
+/* ----------------------------------
+   ⚫ Neutral / Zinc Variants
+---------------------------------- */
+
+.flux-text-zinc-500 {
+    color: #71717a;
+}
+
+.flux-text-zinc-600 {
+    color: #52525b;
+}
+
+.flux-text-zinc-700 {
+    color: #3f3f46;
+}
+
+.flux-bg-zinc-100 {
+    background-color: #f4f4f5;
+}
+
+.flux-bg-zinc-200 {
+    background-color: #e4e4e7;
+}
+
+/* ----------------------------------
+   🟢 Success / 🟠 Warning / 🔴 Danger
+---------------------------------- */
+
+.flux-bg-green-500 {
+    background-color: #22c55e;
+    color: white;
+}
+
+.flux-bg-green-600:hover {
+    background-color: #16a34a;
+}
+
+.flux-bg-yellow-500 {
+    background-color: #eab308;
+    color: white;
+}
+
+.flux-bg-yellow-600:hover {
+    background-color: #ca8a04;
+}
+
+.flux-bg-red-500 {
+    background-color: #ef4444;
+    color: white;
+}
+
+.flux-bg-red-600:hover {
+    background-color: #dc2626;
+}
+
+.flux-office-card {
+    background: linear-gradient(90deg, #C4D5FF 4%, #fff 100%);
+    /* height: 230px; */
+    /* height: fit-content; */
+    /* text-decoration: none; */
+}
