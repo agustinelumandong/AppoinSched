@@ -170,7 +170,7 @@ new class extends Component {
     
 <style>
     .flux-office-card {
-        background: linear-gradient(90deg, #C4D5FF 4%, #fff 100%);
+        /* background: linear-gradient(90deg, #C4D5FF 4%, #fff 100%); */
         /* height: 230px; */
         height: fit-content;
         text-decoration: none;

@@ -204,7 +204,7 @@ new class extends Component {
     </div>
   </div>
 
-  <div class="flux-card">
+  <div class="flux-card" style="padding: 12px;">
     <div class="overflow-x-auto">
       <table class="table flux-table w-full">
         <thead>

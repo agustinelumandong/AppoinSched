@@ -34,7 +34,7 @@ new class extends Component {
             'appointments' => Appointments::where('user_id', auth()->user()->id)
                 ->with(['office', 'appointmentDetails'])
                 ->latest()
-                ->paginate(10),
+                ->paginate(5),
         ];
     }
 
@@ -180,13 +180,14 @@ new class extends Component {
 
     @include('components.alert')
 
-    <div class="flux-card mb-4">
-        <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
+<div class="flux-card mb-4" >
+        <div style="padding: 12px;" >
+        <div class=" flex justify-content-between align-items-center p-4 border-b rounded-t-lg bg-base-100">
             <h5 class="mb-0 fw-semibold">My Appointments</h5>
             <div class="d-flex align-items-center gap-2">
                 <div class="d-flex align-items-center gap-2">
                     <input type="text" class="flux-form-control search" placeholder="Search appointments"
-                        wire:model.live="search" wire:keyup="searchs" wire:debounce.300ms>
+                    wire:model.live="search" wire:keyup="searchs" wire:debounce.300ms>
                 </div>
             </div>
         </div>
@@ -292,6 +293,7 @@ new class extends Component {
         <!-- Pagination links -->
         <div class="mt-3">
             {{ $appointments->links(data: ['scrollTo' => false]) }}
+        </div>
         </div>
     </div>
 

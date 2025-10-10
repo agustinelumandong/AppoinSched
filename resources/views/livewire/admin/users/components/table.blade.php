@@ -1,5 +1,5 @@
 <div>
-  <div class="flux-card mb-4">
+  <div class="flux-card mb-4" style="padding: 12px;">
     <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
         <h5 class="mb-0 fw-semibold">Users</h5>
         <input type="text" class="flux-form-control search" placeholder="Search users" wire:model.live="search">

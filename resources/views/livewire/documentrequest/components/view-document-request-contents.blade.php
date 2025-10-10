@@ -34,7 +34,35 @@
             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form', [
                 'documentRequest' => $documentRequest
             ])
-        @elseif ($documentRequest->service->title !== 'Death Certificate')
+        @elseif ($documentRequest->service->title === 'Special Permit')
+            
+            <div class="mb-8">
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Establishment Information</h3>
+                <div class="space-y-4">
+                    <div class="grid md:grid-cols-1 gap-6">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Establishment Name</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->establishment_name ?? 'N/A' }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Establishment Address</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->establishment_address ?? 'N/A' }}
+                            </p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
+                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->establishment_purpose ?? 'N/A' }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        @elseif ($documentRequest->service->title === 'Birth Certificate')
             <!-- Personal Identity Section -->
             <div class="mb-8">
                 <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Identity</h3>
