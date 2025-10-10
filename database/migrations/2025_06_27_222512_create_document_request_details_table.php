@@ -179,6 +179,7 @@ return new class extends Migration {
             // Special Permit
             $table->string('establishment_name', 100)->nullable()->default('N/A');
             $table->string('establishment_address', 150)->nullable()->default('N/A');
+            $table->string('establishment_purpose', 150)->nullable()->default('N/A');
             // Consent Section
             $table->string('consent_person', 100)->nullable()->default('N/A');
             $table->string('consent_relationship', 50)->nullable()->default('N/A');

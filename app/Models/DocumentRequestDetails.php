@@ -167,6 +167,7 @@ class DocumentRequestDetails extends Model
         // Special Permit
         'establishment_name',
         'establishment_address',
+        'establishment_purpose',
         // Consent Section
         'consent_person',
         'consent_relationship',
