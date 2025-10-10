@@ -3,6 +3,14 @@
 
 <head>
     @include('partials.head')
+    <style>
+        .d-header{
+            background: linear-gradient(269deg, rgba(196, 213, 255, 0.5) 0%, #fff 100%); 
+        }
+        .d-sidebar{
+            background: linear-gradient(0deg, rgba(196, 213, 255, 0.5) 0%, #fff 5%); 
+        }
+    </style>
 </head>
 
 <body class="min-h-screen bg-zinc-50">
@@ -58,7 +66,7 @@
     </flux:header>
 
     <!-- Desktop Header -->
-    <flux:header sticky class="border-b border-zinc-200 bg-white p-3">
+    <flux:header sticky class="d-header border-b border-zinc-200 bg-white p-3">
         <flux:sidebar.toggle class="lg:hidden" icon="bars-2" inset="left" />
 
         <a href="{{ route('dashboard') }}"
@@ -124,8 +132,7 @@
     </flux:header>
 
     <!-- Desktop Sidebar -->
-    <flux:sidebar sticky
-        class="max-lg:hidden border-e border-zinc-200 bg-white ">
+    <flux:sidebar sticky class="d-sidebar max-lg:hidden border-e border-zinc-200 bg-white ">
         <flux:sidebar.toggle class="lg:hidden" icon="x-mark" />
 
 
@@ -137,7 +144,7 @@
                     :href="route(auth()->user()->hasRole('super-admin|admin') ? 'admin.dashboard' : (auth()->user()->hasAnyRole('MCR-staff|MTO-staff|BPLS-staff') ? 'staff.dashboard' : 'client.dashboard'))"
                     :current="request()->routeIs('*.dashboard')"
                     wire:navigate
-                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!"
+                    class="text-decoration-none text-black truncate h-12! w-full! mb-2!"
                 >
                     {{ Str::limit(__('Dashboard'), 14) }}
                 </flux:navlist.item>
