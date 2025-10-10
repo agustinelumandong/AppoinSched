@@ -268,11 +268,18 @@ new class extends Component {
   }
 }; ?>
 
+@props([
+    'calendartitle' => 'Appointment Calendar',
+])
+
 <div class="full-calendar-container bg-white rounded-lg shadow"
   x-data="{ isLoading: @entangle('isLoading'), view: @entangle('view') }">
   <!-- Calendar Header -->
-  <div class="border-b border-gray-200 p-4">
+  <div class="border-b border-gray-200 p-3">
     <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div>
+        <h4 class="text-lg font-bold text-gray-900">{{ $calendartitle }}</h4>
+      </div>
       <!-- Navigation and Title -->
       <div class="flex items-center gap-4">
         <div class="flex items-center gap-2">
@@ -281,28 +288,30 @@ new class extends Component {
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
             </svg>
           </button>
-          <h2 class="text-xl font-semibold text-gray-900 min-w-0">
+          <h5 class="text-md font-semibold text-gray-900 min-w-0">
             {{ $calendarData['title'] ?? '' }}
-          </h2>
+          </h5>
           <button wire:click="nextPeriod" class="p-2 hover:bg-gray-100 rounded-lg transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
             </svg>
           </button>
         </div>
-        <button wire:click="goToToday"
-          class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">Today</button>
       </div>
       <!-- View Switcher -->
       <div class="flex items-center gap-2">
         <div class="inline-flex rounded-lg border border-gray-200 p-1">
+          <button wire:click="goToToday"
+            class="px-4 py-1 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50">
+            Today
+          </button>
           <button wire:click="setView('month')"
-            class="px-4 py-2 text-sm font-medium rounded-md transition-colors {{ $view === 'month' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Month</button>
+            class="px-4 py-1 text-sm font-medium rounded-md transition-colors {{ $view === 'month' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Month</button>
           @hasrole('admin|super-admin|MCR-staff|MTO-staff|BPLS-staff')
           <button wire:click="setView('week')"
-            class="px-4 py-2 text-sm font-medium rounded-md transition-colors {{ $view === 'week' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Week</button>
+            class="px-4 py-1 text-sm font-medium rounded-md transition-colors {{ $view === 'week' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Week</button>
           <button wire:click="setView('day')"
-            class="px-4 py-2 text-sm font-medium rounded-md transition-colors {{ $view === 'day' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Day</button>
+            class="px-4 py-1 text-sm font-medium rounded-md transition-colors {{ $view === 'day' ? 'bg-blue-100 text-blue-700' : 'text-gray-500 hover:text-gray-700' }}">Day</button>
           @endhasrole
         </div>
         <button wire:click="refreshCalendar"
