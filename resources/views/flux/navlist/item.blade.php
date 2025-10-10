@@ -28,34 +28,40 @@
 
     // Base classes with hover, focus, and active logic
     $classes = Flux::classes()
-        ->add('h-10 lg:h-8 relative flex items-center gap-3 rounded-lg truncate w-full! mb-2! text-start px-3 my-px')
-        ->add($square ? 'px-2.5!' : '')
-        ->add('text-zinc-500 dark:text-white/80 transition-all duration-150 ease-in-out')
-        ->add(match ($variant) {
-            'outline' => match ($accent) {
-                true => [
-                    'hover:bg-' . $activeColor . '-50 hover:text-' . $activeColor . '-700',
-                    'border border-transparent',
-                ],
-                false => [
-                    'hover:text-zinc-800 dark:hover:text-white',
-                ],
-            },
-            default => match ($accent) {
-                true => [
-                    'hover:bg-' . $activeColor . '-50 hover:text-' . $activeColor . '-700',
-                ],
-                false => [
-                    'hover:text-zinc-800 dark:hover:text-white',
-                ],
-            },
-        })
-        // Focus state
-        ->add('focus:outline-none focus:ring-2 focus:ring-' . $activeColor . '-400 focus:bg-' . $activeColor . '-100 dark:focus:ring-' . $activeColor . '-500')
-        // Active pressed state
-        ->add('active:bg-' . $activeColor . '-200 active:text-' . $activeColor . '-800')
-        // Highlight when current or active
-        ->add($isActive ? 'bg-' . $activeColor . '-100 text-' . $activeColor . '-700 ring-2 ring-' . $activeColor . '-300 dark:bg-' . $activeColor . '-900/40' : '');
+    ->add('h-10 lg:h-12 mb-1 relative flex items-center gap-3 rounded-lg truncate w-full! mb-2! text-start px-3 my-px')
+    ->add($square ? 'px-2.5!' : '')
+    ->add('text-zinc-500 transition-all duration-150 ease-in-out')
+
+    // Base hover (different for active vs non-active)
+    ->add(match (true) {
+        $isActive => 'hover:bg-' . $activeColor . '-600 hover:text-white', // darker hover for active
+        default => 'hover:bg-' . $activeColor . '-100 hover:text-' . $activeColor . '-700', // soft hover for inactive
+    })
+
+    // Variant and accent logic (kept for consistency)
+    ->add(match ($variant) {
+        'outline' => match ($accent) {
+            true => [
+                'border border-transparent',
+            ],
+            false => [],
+        },
+        default => match ($accent) {
+            true => [],
+            false => [],
+        },
+    })
+
+    // Focus state (solid blue background + white text)
+    ->add('focus:outline-none focus:ring-2 focus:ring-' . $activeColor . '-400 focus:bg-' . $activeColor . '-500 focus:text-white')
+
+    // Active pressed state (solid main color)
+    ->add('active:bg-' . $activeColor . '-500 active:text-white')
+
+    // Highlight when current or active route
+    ->add($isActive ? 'bg-' . $activeColor . '-500 text-white ring-2 ring-' . $activeColor . '-400' : '');
+
+
 @endphp
 
 <flux:button-or-link :attributes="$attributes->class($classes)" data-flux-navlist-item>
