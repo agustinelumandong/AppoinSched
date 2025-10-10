@@ -1,4 +1,10 @@
-<div>
+<!-- Loading State -->
+<div wire:loading.delay.class="flex" wire:loading.remove.class="hidden"
+    class="hidden justify-center items-center w-full h-64">
+    <div class="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-500"></div>
+</div>
+
+<div wire:loading.remove>
     <!-- Client Info -->
     <div class="flux-card p-6 mb-6">
         {{-- Header --}}
@@ -31,13 +37,16 @@
             @endif
         </div>
         @if ($documentRequest->service->title === 'Marriage Certificate')
-            @include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form', [
-                'documentRequest' => $documentRequest
-            ])
+            @include(
+                'livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form',
+                [
+                    'documentRequest' => $documentRequest,
+                ]
+            )
         @elseif ($documentRequest->service->title === 'Special Permit')
-            
             <div class="mb-8">
-                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Establishment Information</h3>
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Establishment
+                    Information</h3>
                 <div class="space-y-4">
                     <div class="grid md:grid-cols-1 gap-6">
                         <div>
@@ -61,7 +70,6 @@
                     </div>
                 </div>
             </div>
-            
         @elseif ($documentRequest->service->title === 'Birth Certificate')
             <!-- Personal Identity Section -->
             <div class="mb-8">
@@ -99,10 +107,10 @@
                             <label class="block text-sm font-medium text-gray-600 mb-1">Date of Birth</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                 {{ optional($documentRequest->details)->date_of_birth
-                                ? \Carbon\Carbon::parse($documentRequest->details->date_of_birth)->format('M d, Y')
-                                : (optional($documentRequest->user)->date_of_birth
-                                    ? \Carbon\Carbon::parse($documentRequest->user->date_of_birth)->format('M d, Y')
-                                    : 'N/A') }}
+                                    ? \Carbon\Carbon::parse($documentRequest->details->date_of_birth)->format('M d, Y')
+                                    : (optional($documentRequest->user)->date_of_birth
+                                        ? \Carbon\Carbon::parse($documentRequest->user->date_of_birth)->format('M d, Y')
+                                        : 'N/A') }}
 
                             </p>
                         </div>
@@ -159,15 +167,19 @@
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Government ID PDF</label>
-                            @if($documentRequest->details && $documentRequest->details->government_id_image_path)
+                            @if ($documentRequest->details && $documentRequest->details->government_id_image_path)
                                 <div class="mt-2">
-                                    <a href="{{ asset('storage/' . $documentRequest->details->government_id_image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                    <a href="{{ asset('storage/' . $documentRequest->details->government_id_image_path) }}"
+                                        target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
                                         View PDF Document
                                     </a>
                                 </div>
-                            @elseif($documentRequest->user->personalInformation && $documentRequest->user->personalInformation->government_id_image_path)
+                            @elseif(
+                                $documentRequest->user->personalInformation &&
+                                    $documentRequest->user->personalInformation->government_id_image_path)
                                 <div class="mt-2">
-                                    <a href="{{ asset('storage/' . $documentRequest->user->personalInformation->government_id_image_path) }}" target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
+                                    <a href="{{ asset('storage/' . $documentRequest->user->personalInformation->government_id_image_path) }}"
+                                        target="_blank" class="text-blue-600 hover:text-blue-800 text-sm">
                                         View PDF Document
                                     </a>
                                 </div>
@@ -185,7 +197,9 @@
                 </h3>
                 <div class="space-y-4">
                     <!-- Contact Person Information -->
-                    @if ($documentRequest->details && ($documentRequest->details->contact_first_name || $documentRequest->details->contact_last_name))
+                    @if (
+                        $documentRequest->details &&
+                            ($documentRequest->details->contact_first_name || $documentRequest->details->contact_last_name))
                         <div class="bg-blue-50 p-4 rounded-lg mb-4">
                             <h4 class="text-sm font-medium text-blue-800 mb-3">Contact Person (for this request)</h4>
                             <div class="grid md:grid-cols-3 gap-6 mb-4">
@@ -245,7 +259,8 @@
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
-                            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Permanent Address</h4>
+                        <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Permanent
+                            Address</h4>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
@@ -312,7 +327,8 @@
                     </div>
 
                     <div class="grid md:grid-cols-2 gap-6">
-                        <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Present Address</h4>
+                        <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Present
+                            Address</h4>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Address Type</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
@@ -382,7 +398,8 @@
 
             <!-- Family Information Section -->
             <div class="mb-8">
-                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Family Information</h3>
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Family Information
+                </h3>
                 <div class="space-y-6">
                     <!-- Father Information -->
                     <div>
@@ -418,10 +435,10 @@
                                 <label class="block text-sm font-medium text-gray-600 mb-1">Birth Date</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                     {{ optional($documentRequest->details)->father_birthdate
-                                    ? \Carbon\Carbon::parse($documentRequest->details->father_birthdate)->format('M d, Y')
-                                    : (optional($documentRequest->user)->father_birthdate
-                                        ? \Carbon\Carbon::parse($documentRequest->user->father_birthdate)->format('M d, Y')
-                                        : 'N/A') }}
+                                        ? \Carbon\Carbon::parse($documentRequest->details->father_birthdate)->format('M d, Y')
+                                        : (optional($documentRequest->user)->father_birthdate
+                                            ? \Carbon\Carbon::parse($documentRequest->user->father_birthdate)->format('M d, Y')
+                                            : 'N/A') }}
                                 </p>
                             </div>
                             <div>
@@ -510,7 +527,8 @@
         @else
             <!-- Deceased Person Information -->
             <div class="mb-8">
-                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Deceased Person Information</h3>
+                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Deceased Person
+                    Information</h3>
                 <div class="space-y-4">
                     <div class="grid md:grid-cols-4 gap-6">
                         <div>
@@ -605,20 +623,26 @@
                     <div class="mb-4">
                         <h4 class="text-sm font-medium text-gray-700 mb-2">Burial Details</h4>
                         <div class="grid md:grid-cols-2 gap-4">
-                            <div><span class="font-semibold">Cemetery Name:</span> {{ $documentRequest->details->burial_cemetery_name ?? 'N/A' }}</div>
-                            <div><span class="font-semibold">Cemetery Address:</span> {{ $documentRequest->details->burial_cemetery_address ?? 'N/A' }}</div>
+                            <div><span class="font-semibold">Cemetery Name:</span>
+                                {{ $documentRequest->details->burial_cemetery_name ?? 'N/A' }}</div>
+                            <div><span class="font-semibold">Cemetery Address:</span>
+                                {{ $documentRequest->details->burial_cemetery_address ?? 'N/A' }}</div>
                         </div>
                     </div>
                     <!-- Informant's Declaration -->
                     <div class="mb-4">
                         <h4 class="text-sm font-medium text-gray-700 mb-2">Informant's Declaration</h4>
                         <div class="grid md:grid-cols-2 gap-4 mb-2">
-                            <div><span class="font-semibold">Name:</span> {{ $documentRequest->details->informant_name ?? 'N/A' }}</div>
-                            <div><span class="font-semibold">Address:</span> {{ $documentRequest->details->informant_address ?? 'N/A' }}</div>
+                            <div><span class="font-semibold">Name:</span>
+                                {{ $documentRequest->details->informant_name ?? 'N/A' }}</div>
+                            <div><span class="font-semibold">Address:</span>
+                                {{ $documentRequest->details->informant_address ?? 'N/A' }}</div>
                         </div>
                         <div class="grid md:grid-cols-2 gap-4 mb-2">
-                            <div><span class="font-semibold">Relationship:</span> {{ $documentRequest->details->informant_relationship ?? 'N/A' }}</div>
-                            <div><span class="font-semibold">Contact No:</span> {{ $documentRequest->details->informant_contact_no ?? 'N/A' }}</div>
+                            <div><span class="font-semibold">Relationship:</span>
+                                {{ $documentRequest->details->informant_relationship ?? 'N/A' }}</div>
+                            <div><span class="font-semibold">Contact No:</span>
+                                {{ $documentRequest->details->informant_contact_no ?? 'N/A' }}</div>
                         </div>
 
                     </div>
@@ -679,7 +703,9 @@
                     </div>
 
                     <!-- Contact Person Information (if different from requester) -->
-                    @if ($documentRequest->details && ($documentRequest->details->contact_first_name || $documentRequest->details->contact_last_name))
+                    @if (
+                        $documentRequest->details &&
+                            ($documentRequest->details->contact_first_name || $documentRequest->details->contact_last_name))
                         <div class="bg-blue-50 p-4 rounded-lg">
                             <h4 class="text-sm font-medium text-blue-800 mb-3">Contact Person (for this request)</h4>
                             <div class="grid md:grid-cols-3 gap-6 mb-4">
@@ -795,7 +821,8 @@
             </div>
         @else
             <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center">
-                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none"
+                    viewBox="0 0 48 48">
                     <path
                         d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02"
                         stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
@@ -830,10 +857,11 @@
                         </p>
                     @endif
                 </div>
-                <span class="flux-badge
+                <span
+                    class="flux-badge
                     @if ($documentRequest->payment_status === 'paid') flux-badge-success
                     @elseif ($documentRequest->payment_status === 'processing') flux-badge-warning
-                    @elseif ($documentRequest->payment_status === 'failed') flux-badge-danger 
+                    @elseif ($documentRequest->payment_status === 'failed') flux-badge-danger
                     @else flux-badge-secondary @endif">
                     {{ ucfirst($documentRequest->payment_status ?? 'Unpaid') }}
                 </span>
@@ -844,8 +872,8 @@
         <div class="space-y-3">
             <h5 class="text-sm font-medium text-gray-700 mb-3">Update Payment Status:</h5>
             <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
-                <button wire:click="updatePaymentStatus('unpaid')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->payment_status === 'unpaid') flux-btn-primary @else flux-btn-outline @endif">
+                <button wire:click="setPaymentStatusToUpdate('unpaid')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->payment_status === 'unpaid') flux-btn-primary @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1">
@@ -854,8 +882,8 @@
                     <span class="text-xs">Unpaid</span>
                 </button>
 
-                <button wire:click="updatePaymentStatus('processing')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->payment_status === 'processing') flux-btn-warning @else flux-btn-outline @endif">
+                <button wire:click="setPaymentStatusToUpdate('processing')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->payment_status === 'processing') flux-btn-warning @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -863,34 +891,37 @@
                     <span class="text-xs">Processing</span>
                 </button>
 
-                <button wire:click="updatePaymentStatus('paid')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->payment_status === 'paid') flux-btn-success @else flux-btn-outline @endif">
+                <button wire:click="setPaymentStatusToUpdate('paid')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->payment_status === 'paid') flux-btn-success @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                        </path>
                     </svg>
                     <span class="text-xs">Paid</span>
                 </button>
 
-                <button wire:click="updatePaymentStatus('failed')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->payment_status === 'failed') flux-btn-danger @else flux-btn-outline @endif">
+                <button wire:click="setPaymentStatusToUpdate('failed')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->payment_status === 'failed') flux-btn-danger @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12">
                         </path>
                     </svg>
                     <span class="text-xs">Failed</span>
                 </button>
- 
+
             </div>
         </div>
     </div>
 
     <!-- Remarks Input -->
-    
+
 
     <!-- Document Request Status -->
     <div class="flux-card p-6 mb-6">
         <div class="flex items-center space-x-2 mb-4">
-            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Document Request Status</h4>
+            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Document Request Status
+            </h4>
         </div>
 
         <!-- Current Status Display -->
@@ -909,14 +940,15 @@
                         </p>
                     @endif
                 </div>
-                <span class="flux-badge
+                <span
+                    class="flux-badge
                     @if ($documentRequest->status === 'approved') flux-badge-success
                     @elseif ($documentRequest->status === 'pending') flux-badge-warning
                     @elseif ($documentRequest->status === 'rejected') flux-badge-danger
                     @elseif ($documentRequest->status === 'completed') flux-badge-success
                     @elseif ($documentRequest->status === 'cancelled') flux-badge-danger
                     @elseif ($documentRequest->status === 'in-progress') flux-badge-info
-                    @elseif ($documentRequest->status === 'ready-for-pickup') flux-badge-primary 
+                    @elseif ($documentRequest->status === 'ready-for-pickup') flux-badge-primary
                     @else flux-badge-secondary @endif">
                     {{ ucfirst($documentRequest->status ?? 'Pending') }}
                 </span>
@@ -927,67 +959,74 @@
         <div class="space-y-3">
             <h5 class="text-sm font-medium text-gray-700 mb-3">Update Document Request Status:</h5>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
-                <button wire:click="updateDocumentStatusModal('pending')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'pending') flux-btn-warning @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('pending')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'pending') flux-btn-warning @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span class="text-xs">Pending</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('approved')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'approved') flux-btn-success @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('approved')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'approved') flux-btn-success @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
+                        </path>
                     </svg>
                     <span class="text-xs">Approved</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('rejected')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'rejected') flux-btn-danger @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('rejected')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'rejected') flux-btn-danger @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                     <span class="text-xs">Rejected</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('completed')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'completed') flux-btn-success @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('completed')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'completed') flux-btn-success @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span class="text-xs">Completed</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('cancelled')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'cancelled') flux-btn-danger @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('cancelled')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'cancelled') flux-btn-danger @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
                     <span class="text-xs">Cancelled</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('in-progress')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'in-progress') flux-btn-info @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('in-progress')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'in-progress') flux-btn-info @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                     <span class="text-xs">In Progress</span>
                 </button>
 
-                <button wire:click="updateDocumentStatusModal('ready-for-pickup')"
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if($documentRequest->status === 'ready-for-pickup') flux-btn-primary @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('ready-for-pickup')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'ready-for-pickup') flux-btn-primary @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
                     </svg>
                     <span class="text-xs">Ready for Pickup</span>
                 </button>
 
-                 
+
             </div>
         </div>
 
-        
+
     </div>
 
     <div class="flux-card p-6 mb-6">
@@ -1012,6 +1051,50 @@
                 </svg>
                 <span>Back to List</span>
             </a>
+
+            {{-- <button onclick="printDocument()" class="flux-btn flux-btn-primary flex items-center">
+                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
+                    </path>
+                </svg>
+                <span>Print Document</span>
+            </button> --}}
         </div>
     </div>
+
+    <script>
+        function printDocument() {
+            // Add print-specific styles
+            const style = document.createElement('style');
+            style.innerHTML = `
+                @media print {
+                    body * {
+                        visibility: hidden;
+                    }
+                    .flux-card, .flux-card * {
+                        visibility: visible;
+                    }
+                    .flux-card {
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        width: 100%;
+                    }
+                    button, .flux-btn, .navigation-section, .modal {
+                        display: none !important;
+                    }
+                }
+            `;
+            document.head.appendChild(style);
+
+            // Trigger browser print dialog
+            window.print();
+
+            // Remove the style after printing
+            setTimeout(() => {
+                document.head.removeChild(style);
+            }, 1000);
+        }
+    </script>
 </div>
