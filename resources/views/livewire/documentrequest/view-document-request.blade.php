@@ -17,6 +17,8 @@ new class extends Component {
     public $confirmApproved = false;
     public $confirmRejected = false;
     public $confirmPending = false;
+    public $confirmPaymentStatus = false;
+    public $paymentStatusToUpdate = '';
     public $personalInformation;
     public $userFamily;
     public $userAddresses;
@@ -72,31 +74,27 @@ new class extends Component {
 
     public function confirmDocumentRequest()
     {
-        // dd($this->confirmApproved, $this->confirmRejected, $this->confirmPending);
         try {
+            // Handle document status confirmations
             if ($this->confirmApproved == true) {
-                $this->documentRequest->update([
-                    'status' => 'approved',
-                    'remarks' => $this->remarks,
-                ]);
+                $this->updateDocumentStatusModal('approved');
                 session()->flash('success', 'Document request approved successfully.');
             } elseif ($this->confirmRejected == true) {
-                $this->documentRequest->update([
-                    'status' => 'rejected',
-                    'remarks' => $this->remarks,
-                ]);
+                $this->updateDocumentStatusModal('rejected');
                 session()->flash('error', 'Document request rejected successfully.');
             } elseif ($this->confirmPending == true) {
-                $this->documentRequest->update([
-                    'status' => 'pending',
-                    'remarks' => $this->remarks,
-                ]);
+                $this->updateDocumentStatusModal('pending');
                 session()->flash('error', 'Document request set to pending successfully.');
+            }
+            // Handle payment status confirmations
+            elseif ($this->confirmPaymentStatus == true && !empty($this->paymentStatusToUpdate)) {
+                $this->updatePaymentStatus($this->paymentStatusToUpdate);
+                session()->flash('success', 'Payment status updated to ' . ucfirst($this->paymentStatusToUpdate) . ' successfully.');
             }
 
             $this->resetConfirmationStates();
         } catch (\Exception $e) {
-            session()->flash('error', 'An error occurred while updating the document request.');
+            session()->flash('error', 'An error occurred while updating the request: ' . $e->getMessage());
         }
     }
 
@@ -105,6 +103,15 @@ new class extends Component {
         $this->confirmApproved = false;
         $this->confirmRejected = false;
         $this->confirmPending = false;
+        $this->confirmPaymentStatus = false;
+        $this->paymentStatusToUpdate = '';
+    }
+
+    public function setPaymentStatusToUpdate(string $status): void
+    {
+        $this->confirmPaymentStatus = true;
+        $this->paymentStatusToUpdate = $status;
+        $this->dispatch('open-modal-confirm-document-request');
     }
 
     public function updatePaymentStatus(string $status): void
@@ -114,28 +121,40 @@ new class extends Component {
                 'payment_status' => $status,
             ]);
 
-            if ($status === 'paid') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::PaymentVerified,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'processing') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::PaymentProcessing,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'failed') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::PaymentFailed,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+            // Send appropriate notification based on payment status
+            switch ($status) {
+                case 'paid':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::PaymentVerified, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'processing':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::PaymentProcessing, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'failed':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'unpaid':
+                    // No specific notification for unpaid status
+                    break;
             }
+
+            // Apply automatic transitions for all payment status changes
+            $this->handleStatusTransitions('payment_status', $status);
+
             session()->flash('success', 'Payment status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update payment status.');
@@ -163,53 +182,301 @@ new class extends Component {
             $this->documentRequest->update($updateData);
 
             if ($status === 'approved') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentApproved,
-                    [
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentApproved, [
                         'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+                    ]),
+                );
             } elseif ($status === 'rejected') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentRejected,
-                    [
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentRejected, [
                         'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+                    ]),
+                );
             } elseif ($status === 'cancelled') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentCancelled,
-                    [
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentCancelled, [
                         'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+                    ]),
+                );
             } elseif ($status === 'completed') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentCompleted,
-                    [
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentCompleted, [
                         'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+                    ]),
+                );
             } elseif ($status === 'in-progress') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentInProgress,
-                    [
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
                         'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+                    ]),
+                );
             } elseif ($status === 'ready-for-pickup') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentReadyForPickup,
-                    [
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
                         'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+                    ]),
+                );
             }
-
 
             session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
             session()->flash('error', 'Failed to update document request status.');
+        }
+    }
+
+    public function setDocumentStatusToUpdate(string $status): void
+    {
+        if ($status === 'approved') {
+            $this->confirmApproved = true;
+        } elseif ($status === 'rejected') {
+            $this->confirmRejected = true;
+        } elseif ($status === 'pending') {
+            $this->confirmPending = true;
+        } else {
+            // For other statuses, we'll use a generic confirmation
+            $this->confirmApproved = false;
+            $this->confirmRejected = false;
+            $this->confirmPending = false;
+        }
+
+        $this->paymentStatusToUpdate = '';
+        $this->confirmPaymentStatus = false;
+        $this->dispatch('open-modal-confirm-document-request');
+    }
+
+    public function handleStatusTransitions(string $triggerType, string $newStatus): void
+    {
+        try {
+            // Refresh the document request to get the latest data
+            $this->documentRequest = DocumentRequest::with(['user', 'staff', 'office', 'service', 'details'])->findOrFail($this->documentRequest->id);
+
+            // Handle payment status transitions
+            if ($triggerType === 'payment_status') {
+                if ($newStatus === 'paid') {
+                    // When payment is marked as paid, update document status to in-progress
+                    if ($this->documentRequest->status !== 'in-progress' && $this->documentRequest->status !== 'completed' && $this->documentRequest->status !== 'ready-for-pickup') {
+                        $this->documentRequest->update([
+                            'status' => 'in-progress',
+                            'remarks' => $this->remarks ? $this->remarks : 'Automatically set to in-progress after payment verification',
+                            'staff_id' => auth()->id(),
+                        ]);
+
+                        // Send notification for automatic status change
+                        $this->documentRequest->user->notify(
+                            new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
+                                'reference_no' => $this->documentRequest->reference_number,
+                            ]),
+                        );
+
+                        session()->flash('success', 'Payment verified. Document request status automatically updated to In Progress.');
+                    }
+                } elseif ($newStatus === 'failed') {
+                    // When payment is marked as failed, update document status to pending
+                    if ($this->documentRequest->status !== 'pending') {
+                        $this->documentRequest->update([
+                            'status' => 'pending',
+                            'remarks' => $this->remarks ? $this->remarks : 'Set to pending due to payment failure',
+                        ]);
+
+                        session()->flash('info', 'Payment failed. Document request status set to Pending.');
+                    }
+                } elseif ($newStatus === 'unpaid') {
+                    // When payment is marked as unpaid, ensure document status reflects this
+                    if ($this->documentRequest->status !== 'pending') {
+                        $this->documentRequest->update([
+                            'status' => 'pending',
+                            'remarks' => $this->remarks ? $this->remarks : 'Set to pending due to unpaid status',
+                        ]);
+
+                        session()->flash('info', 'Payment marked as unpaid. Document request status set to Pending.');
+                    }
+                } elseif ($newStatus === 'processing') {
+                    // When payment is marked as processing, update remarks if needed
+                    if (!$this->remarks) {
+                        $this->documentRequest->update([
+                            'remarks' => 'Payment is being processed',
+                        ]);
+                    }
+
+                    // Set document status to pending if it's not in a more advanced state
+                    if (!in_array($this->documentRequest->status, ['in-progress', 'ready-for-pickup', 'completed'])) {
+                        $this->documentRequest->update([
+                            'status' => 'pending',
+                        ]);
+                    }
+                }
+            }
+            // Handle document status transitions
+            elseif ($triggerType === 'document_status') {
+                switch ($newStatus) {
+                    case 'ready-for-pickup':
+                        // Set pickup_ready_date if not already set
+                        if (!$this->documentRequest->pickup_ready_date) {
+                            $this->documentRequest->update([
+                                'pickup_ready_date' => now(),
+                            ]);
+                        }
+
+                        // Update payment status if not already paid
+                        if ($this->documentRequest->payment_status !== 'paid') {
+                            $this->documentRequest->update([
+                                'payment_status' => 'paid',
+                            ]);
+
+                            // Send payment notification
+                            $this->documentRequest->user->notify(
+                                new RequestEventNotification(RequestNotificationEvent::PaymentVerified, [
+                                    'reference_no' => $this->documentRequest->reference_number,
+                                ]),
+                            );
+
+                            session()->flash('info', 'Payment status automatically updated to Paid.');
+                        }
+                        break;
+
+                    case 'completed':
+                        // Set completed_date if not already set
+                        if (!$this->documentRequest->completed_date) {
+                            $this->documentRequest->update([
+                                'completed_date' => now(),
+                            ]);
+                        }
+
+                        // Ensure payment is marked as paid
+                        if ($this->documentRequest->payment_status !== 'paid') {
+                            $this->documentRequest->update([
+                                'payment_status' => 'paid',
+                            ]);
+
+                            // Send payment notification
+                            $this->documentRequest->user->notify(
+                                new RequestEventNotification(RequestNotificationEvent::PaymentVerified, [
+                                    'reference_no' => $this->documentRequest->reference_number,
+                                ]),
+                            );
+
+                            session()->flash('info', 'Payment status automatically updated to Paid.');
+                        }
+                        break;
+
+                    case 'approved':
+                        // If approved, ensure staff_id is set
+                        if (!$this->documentRequest->staff_id) {
+                            $this->documentRequest->update([
+                                'staff_id' => auth()->id(),
+                            ]);
+                        }
+
+                        // If payment is already verified, move to in-progress
+                        if ($this->documentRequest->payment_status === 'paid') {
+                            $this->documentRequest->update([
+                                'status' => 'in-progress',
+                                'remarks' => $this->remarks ? $this->remarks : 'Automatically set to in-progress after approval',
+                            ]);
+
+                            // Send notification for automatic status change
+                            $this->documentRequest->user->notify(
+                                new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
+                                    'reference_no' => $this->documentRequest->reference_number,
+                                ]),
+                            );
+
+                            session()->flash('info', 'Document request automatically moved to In Progress.');
+                        }
+                        break;
+
+                    case 'in-progress':
+                        // If moving to in-progress, ensure staff_id is set
+                        if (!$this->documentRequest->staff_id) {
+                            $this->documentRequest->update([
+                                'staff_id' => auth()->id(),
+                            ]);
+                        }
+
+                        // If not already paid or processing, set payment to processing
+                        if (!in_array($this->documentRequest->payment_status, ['paid', 'processing'])) {
+                            $this->documentRequest->update([
+                                'payment_status' => 'processing',
+                            ]);
+
+                            // Send payment notification
+                            $this->documentRequest->user->notify(
+                                new RequestEventNotification(RequestNotificationEvent::PaymentProcessing, [
+                                    'reference_no' => $this->documentRequest->reference_number,
+                                ]),
+                            );
+
+                            session()->flash('info', 'Payment status automatically updated to Processing.');
+                        }
+                        break;
+
+                    case 'rejected':
+                        // If rejected, ensure staff_id is set
+                        if (!$this->documentRequest->staff_id) {
+                            $this->documentRequest->update([
+                                'staff_id' => auth()->id(),
+                            ]);
+                        }
+
+                        // If payment is not failed, set it to failed
+                        if ($this->documentRequest->payment_status !== 'failed' && $this->documentRequest->payment_status !== 'unpaid') {
+                            $this->documentRequest->update([
+                                'payment_status' => 'failed',
+                            ]);
+
+                            // Send payment notification
+                            $this->documentRequest->user->notify(
+                                new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
+                                    'reference_no' => $this->documentRequest->reference_number,
+                                ]),
+                            );
+
+                            session()->flash('info', 'Payment status automatically updated to Failed.');
+                        }
+                        break;
+
+                    case 'cancelled':
+                        // If cancelled, ensure staff_id is set
+                        if (!$this->documentRequest->staff_id) {
+                            $this->documentRequest->update([
+                                'staff_id' => auth()->id(),
+                            ]);
+                        }
+
+                        // If payment is not unpaid, set it to unpaid
+                        if ($this->documentRequest->payment_status !== 'unpaid') {
+                            $this->documentRequest->update([
+                                'payment_status' => 'unpaid',
+                            ]);
+
+                            session()->flash('info', 'Payment status automatically updated to Unpaid.');
+                        }
+                        break;
+
+                    case 'pending':
+                        // Reset certain fields when moving back to pending
+                        $this->documentRequest->update([
+                            'pickup_ready_date' => null,
+                        ]);
+
+                        // Set payment to unpaid if it's not already processing or paid
+                        if (!in_array($this->documentRequest->payment_status, ['processing', 'paid'])) {
+                            $this->documentRequest->update([
+                                'payment_status' => 'unpaid',
+                            ]);
+
+                            session()->flash('info', 'Payment status automatically updated to Unpaid.');
+                        }
+                        break;
+                }
+            }
+
+            // Refresh the document request after all changes
+            $this->documentRequest = DocumentRequest::with(['user', 'staff', 'office', 'service', 'details'])->findOrFail($this->documentRequest->id);
+        } catch (\Exception $e) {
+            // Log error but don't show to user as this is an automatic process
+            \Illuminate\Support\Facades\Log::error('Error in automatic status transition: ' . $e->getMessage());
         }
     }
 
@@ -231,51 +498,70 @@ new class extends Component {
                 $updateData['completed_date'] = now();
             }
 
+            // Set pickup_ready_date if status is ready-for-pickup
+            if ($status === 'ready-for-pickup') {
+                $updateData['pickup_ready_date'] = now();
+            }
+
             $this->documentRequest->update($updateData);
 
-            if ($status === 'approved') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentApproved,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'rejected') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentRejected,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'cancelled') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentCancelled,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'completed') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentCompleted,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'in-progress') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentInProgress,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
-            } elseif ($status === 'ready-for-pickup') {
-                $this->documentRequest->user->notify(new RequestEventNotification(
-                    RequestNotificationEvent::DocumentReadyForPickup,
-                    [
-                        'reference_no' => $this->documentRequest->reference_number,
-                    ]
-                ));
+            // Send appropriate notification based on status
+            switch ($status) {
+                case 'approved':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentApproved, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'rejected':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentRejected, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'cancelled':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCancelled, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'completed':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCompleted, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'in-progress':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'ready-for-pickup':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'pending':
+                    // No specific notification for pending status
+                    break;
             }
+
+            // Handle automatic transitions for all document status changes
+            $this->handleStatusTransitions('document_status', $status);
 
             session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
