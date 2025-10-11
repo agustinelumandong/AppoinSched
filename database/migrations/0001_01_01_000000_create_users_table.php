@@ -19,7 +19,8 @@ return new class extends Migration {
             $table->string('email_otp')->nullable();
             $table->timestamp('email_otp_expires_at')->nullable();
             $table->timestamp('email_verified_at')->nullable();
-            $table->json('notification_settings')->nullable()->after('remember_token');
+            // $table->json('notification_settings')->nullable()->after('remember_token');
+            $table->json('notification_settings')->nullable();
             $table->string('password');
             $table->rememberToken();
             $table->timestamps();
