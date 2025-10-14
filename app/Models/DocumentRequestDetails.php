@@ -190,6 +190,43 @@ class DocumentRequestDetails extends Model
     }
 
     /**
+     * Get the certificate-specific details based on certificate type
+     */
+    public function certificateDetails()
+    {
+        return match ($this->certificate_type) {
+            'birth' => $this->hasOne(BirthCertificateDetails::class, 'document_request_detail_id'),
+            'death' => $this->hasOne(DeathCertificateDetails::class, 'document_request_detail_id'),
+            'marriage' => $this->hasOne(MarriageLicenseDetails::class, 'document_request_detail_id'),
+            default => null,
+        };
+    }
+
+    /**
+     * Get birth certificate details
+     */
+    public function birthCertificateDetails()
+    {
+        return $this->hasOne(BirthCertificateDetails::class, 'document_request_detail_id');
+    }
+
+    /**
+     * Get death certificate details
+     */
+    public function deathCertificateDetails()
+    {
+        return $this->hasOne(DeathCertificateDetails::class, 'document_request_detail_id');
+    }
+
+    /**
+     * Get marriage license details
+     */
+    public function marriageLicenseDetails()
+    {
+        return $this->hasOne(MarriageLicenseDetails::class, 'document_request_detail_id');
+    }
+
+    /**
      * Get the full name of the person for this document request
      */
     public function getFullNameAttribute(): string
