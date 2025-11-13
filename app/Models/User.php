@@ -76,7 +76,15 @@ class User extends Authenticatable
      */
     public function getNameAttribute(): string
     {
-        return trim($this->first_name . ' ' . $this->middle_name . ' ' . $this->last_name);
+        $parts = array_filter([
+            $this->first_name,
+            strtolower($this->middle_name ?? '') !== 'n/a' ? $this->middle_name : null,
+            $this->last_name,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 
     public function personalInformation()
@@ -278,7 +286,7 @@ class User extends Authenticatable
             'email' => $this->email ?? '',
             'phone' => $personalInfo?->contact_no ?? '',
 
-            // Address Information (basic) 
+            // Address Information (basic)
             'address' => $userAddress?->address_line_1 ?? '',
             'region' => $userAddress?->region ?? '',
             'province' => $userAddress?->province ?? '',

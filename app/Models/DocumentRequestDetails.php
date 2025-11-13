@@ -196,11 +196,13 @@ class DocumentRequestDetails extends Model
     {
         $parts = array_filter([
             $this->first_name,
-            $this->middle_name,
+            strtolower($this->middle_name ?? '') !== 'n/a' ? $this->middle_name : null,
             $this->last_name,
-        ]);
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
 
-        return implode(' ', $parts);
+        return trim(implode(' ', $parts));
     }
 
     /**
@@ -227,7 +229,15 @@ class DocumentRequestDetails extends Model
      */
     public function getFatherFullNameAttribute(): string
     {
-        return trim("{$this->father_first_name} {$this->father_middle_name} {$this->father_last_name}");
+        $parts = array_filter([
+            $this->father_first_name,
+            strtolower($this->father_middle_name ?? '') !== 'n/a' ? $this->father_middle_name : null,
+            $this->father_last_name,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 
     /**
@@ -235,7 +245,15 @@ class DocumentRequestDetails extends Model
      */
     public function getMotherFullNameAttribute(): string
     {
-        return trim("{$this->mother_first_name} {$this->mother_middle_name} {$this->mother_last_name}");
+        $parts = array_filter([
+            $this->mother_first_name,
+            strtolower($this->mother_middle_name ?? '') !== 'n/a' ? $this->mother_middle_name : null,
+            $this->mother_last_name,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 
 
@@ -244,7 +262,15 @@ class DocumentRequestDetails extends Model
      */
     public function getDeceasedFullNameAttribute(): string
     {
-        return trim("{$this->deceased_first_name} {$this->deceased_middle_name} {$this->deceased_last_name}");
+        $parts = array_filter([
+            $this->deceased_first_name,
+            strtolower($this->deceased_middle_name ?? '') !== 'n/a' ? $this->deceased_middle_name : null,
+            $this->deceased_last_name,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 
     /**
@@ -252,8 +278,16 @@ class DocumentRequestDetails extends Model
      */
     public function getContactInfo(): array
     {
+        $nameParts = array_filter([
+            $this->contact_first_name,
+            strtolower($this->contact_middle_name ?? '') !== 'n/a' ? $this->contact_middle_name : null,
+            $this->contact_last_name,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
         return [
-            'name' => trim("{$this->contact_first_name} {$this->contact_middle_name} {$this->contact_last_name}"),
+            'name' => trim(implode(' ', $nameParts)),
             'email' => $this->contact_email,
             'phone' => $this->contact_phone,
             'is_third_party' => $this->request_for === 'someone_else',
@@ -274,6 +308,14 @@ class DocumentRequestDetails extends Model
      */
     public function getContactFullNameAttribute(): string
     {
-        return trim("{$this->contact_first_name} {$this->contact_middle_name} {$this->contact_last_name}");
+        $parts = array_filter([
+            $this->contact_first_name,
+            strtolower($this->contact_middle_name ?? '') !== 'n/a' ? $this->contact_middle_name : null,
+            $this->contact_last_name,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 }

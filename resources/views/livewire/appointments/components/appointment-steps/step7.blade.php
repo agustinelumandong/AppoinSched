@@ -68,8 +68,15 @@
                 <div>
                     <h3 class="text-md font-semibold text-gray-700">Client Information</h3>
                     <div class="mt-2 space-y-1">
-                        <p><span class="font-medium">Name:</span> {{ $last_name }}, {{ $first_name }}
-                            {{ $middle_name ? $middle_name : '' }}
+                        <p><span class="font-medium">Name:</span>
+                            @php
+                                $middleName = strtolower($middle_name ?? '') !== 'n/a' && !empty(trim($middle_name ?? '')) ? $middle_name : null;
+                                $nameParts = array_filter([$first_name, $middleName], function ($part) {
+                                    return !empty($part) && strtolower(trim($part)) !== 'n/a';
+                                });
+                                $name = $last_name . ', ' . implode(' ', $nameParts);
+                            @endphp
+                            {{ $name }}
                         </p>
                         <p><span class="font-medium">Email:</span> {{ $email }}</p>
                         <p><span class="font-medium">Phone:</span> {{ $phone }}</p>
@@ -127,7 +134,7 @@
             <script src="{{ asset('js/qrcode.min.js') }}"></script>
             @endpush --}}
 
-            
+
 
             <!-- Important Notes -->
             <div class="bg-gray-50 p-4 rounded-lg text-sm">

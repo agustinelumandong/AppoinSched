@@ -146,25 +146,29 @@ new #[Layout('components.layouts.auth')] class extends Component {
         {{ $otpActive ? 'You have an active OTP code.' : 'No active OTP code.' }}
     </p>
 
-    {{-- @p hp
-        $userData = $user ? [
-            'id' => $user->id,
-            'name' => $user->name,
-            'email' => $user->email,
-            'email_verified' => (bool) $user->email_verified_at,
-            'email_otp' => $user->email_otp,
-            'otp_active' => $otpActive,
-            'email_otp_expires_at' => $user->email_otp_expires_at ? $user->email_otp_expires_at->toDateTimeString() : null,
-            'created_at' => $user->created_at->toDateTimeString(),
-            'updated_at' => $user->updated_at->toDateTimeString(),
-        ] : null;
+    @php
+        $userData = $user
+            ? [
+                'id' => $user->id,
+                'name' => $user->name,
+                'email' => $user->email,
+                'email_verified' => (bool) $user->email_verified_at,
+                'email_otp' => $user->email_otp,
+                'otp_active' => $otpActive,
+                'email_otp_expires_at' => $user->email_otp_expires_at
+                    ? $user->email_otp_expires_at->toDateTimeString()
+                    : null,
+                'created_at' => $user->created_at->toDateTimeString(),
+                'updated_at' => $user->updated_at->toDateTimeString(),
+            ]
+            : null;
         $userJson = json_encode($userData, JSON_PRETTY_PRINT);
-    @e ndphp
+    @endphp
 
     <div class="bg-gray-100 p-4 rounded-lg mb-6">
         <h3 class="text-sm font-semibold mb-2">User Data (JSON):</h3>
         <pre class="text-xs overflow-auto max-h-48 bg-gray-50 p-2 rounded border border-gray-200">{{ $userJson }}</pre>
-    </div> --}}
+    </div>
 
     @if (session('status') == 'otp-sent')
         <p class="text-green-600 text-sm mb-3">OTP has been sent to your email.</p>

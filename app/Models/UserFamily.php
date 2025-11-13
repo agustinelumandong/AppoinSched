@@ -36,12 +36,30 @@ class UserFamily extends Model
 
     public function getFatherNameAttribute()
     {
-        return $this->father_last_name . ' ' . $this->father_first_name . ' ' . $this->father_middle_name . ' ' . $this->father_suffix;
+        $parts = array_filter([
+            $this->father_last_name,
+            $this->father_first_name,
+            strtolower($this->father_middle_name ?? '') !== 'n/a' ? $this->father_middle_name : null,
+            strtolower($this->father_suffix ?? '') !== 'n/a' ? $this->father_suffix : null,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 
     public function getMotherNameAttribute()
     {
-        return $this->mother_last_name . ' ' . $this->mother_first_name . ' ' . $this->mother_middle_name . ' ' . $this->mother_suffix;
+        $parts = array_filter([
+            $this->mother_last_name,
+            $this->mother_first_name,
+            strtolower($this->mother_middle_name ?? '') !== 'n/a' ? $this->mother_middle_name : null,
+            strtolower($this->mother_suffix ?? '') !== 'n/a' ? $this->mother_suffix : null,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+
+        return trim(implode(' ', $parts));
     }
 
 

@@ -147,7 +147,15 @@
         <div class="grid">
             <div class="row">
                 <div class="col label">Name:</div>
-                <div class="col value">{{ $last_name }}, {{ $first_name }} {{ $middle_name ? $middle_name : '' }}
+                <div class="col value">
+                    @php
+                        $middleName = strtolower($middle_name ?? '') !== 'n/a' && !empty(trim($middle_name ?? '')) ? $middle_name : null;
+                        $nameParts = array_filter([$first_name, $middleName], function ($part) {
+                            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+                        });
+                        $name = $last_name . ', ' . implode(' ', $nameParts);
+                    @endphp
+                    {{ $name }}
                 </div>
             </div>
             <div class="row">
@@ -200,7 +208,7 @@
         </ul>
     </div>
 
-    
+
     {{-- <script src="{{ asset('js/qrcode.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {

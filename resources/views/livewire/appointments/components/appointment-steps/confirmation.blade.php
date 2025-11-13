@@ -77,7 +77,16 @@
       <div>
         <p class="font-medium">{{ ucfirst($certificate['certificate_type']) }}</p>
         <p class="text-sm text-gray-600">
-        {{ $certificate['first_name'] }} {{ $certificate['middle_name'] }} {{ $certificate['last_name'] }}
+            @php
+                $nameParts = array_filter([
+                    $certificate['first_name'] ?? '',
+                    strtolower($certificate['middle_name'] ?? '') !== 'n/a' ? ($certificate['middle_name'] ?? null) : null,
+                    $certificate['last_name'] ?? '',
+                ], function ($part) {
+                    return !empty($part) && strtolower(trim($part)) !== 'n/a';
+                });
+                echo implode(' ', $nameParts);
+            @endphp
         </p>
         <p class="text-xs text-gray-500">Relationship: {{ ucfirst($certificate['relationship']) }}</p>
       </div>

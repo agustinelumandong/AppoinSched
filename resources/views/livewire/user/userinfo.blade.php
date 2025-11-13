@@ -406,7 +406,7 @@ new class extends Component {
                 'city' => ['required', 'string', 'max:100'],
                 'barangay' => ['required', 'string', 'max:100'],
                 'street' => ['nullable', 'string', 'max:255'],
-                'zip_code' => ['nullable', 'string', 'max:20'],
+                'zip_code' => ['required', 'string', 'max:20'],
 
                 'temporary_address_type' => ['nullable', 'string', 'max:50'],
                 'temporary_address_line_1' => ['nullable', 'string', 'max:255'],
@@ -460,7 +460,7 @@ new class extends Component {
                 ->fill([
                     'last_name' => $this->last_name,
                     'first_name' => $this->first_name,
-                    'middle_name' => $this->middle_name ?? 'N/A',
+                    'middle_name' => !empty(trim($this->middle_name)) ? $this->middle_name : 'N/A',
                     'email' => $this->email,
                 ])
                 ->save();
@@ -481,15 +481,15 @@ new class extends Component {
             $this->personalInformation
                 ->fill([
                     'user_id' => $this->user->getKey(),
-                    'suffix' => $this->suffix ?? 'N/A',
-                    'contact_no' => $this->contact_no ?: null,
+                    'suffix' => !empty(trim($this->suffix)) ? $this->suffix : 'N/A',
+                    'contact_no' => !empty(trim($this->contact_no)) ? $this->contact_no : null,
                     'sex_at_birth' => $this->sex_at_birth ?: null,
                     'date_of_birth' => $this->date_of_birth ?: null,
                     'place_of_birth' => $this->place_of_birth ?: null,
                     'civil_status' => $this->civil_status ?? 'Single',
-                    'religion' => $this->religion ?: null,
+                    'religion' => !empty(trim($this->religion)) ? $this->religion : 'N/A',
                     'nationality' => $this->nationality ?? 'Filipino',
-                    'government_id_type' => $this->government_id_type ?: null,
+                    'government_id_type' => !empty(trim($this->government_id_type)) ? $this->government_id_type : 'N/A',
                     'government_id_image_path' => $governmentIdImagePath,
                 ])
                 ->save();
@@ -500,12 +500,12 @@ new class extends Component {
                     'personal_information_id' => $this->personalInformation->getKey(),
                     'address_type' => 'Permanent',
                     'address_line_1' => $this->address_line_1 ?: null,
-                    'address_line_2' => $this->address_line_2 ?: null,
+                    'address_line_2' => !empty(trim($this->address_line_2)) ? $this->address_line_2 : 'N/A',
                     'region' => $this->region ?: null,
                     'province' => $this->province ?: null,
                     'city' => $this->city ?: null,
                     'barangay' => $this->barangay ?: null,
-                    'street' => $this->street ?: null,
+                    'street' => !empty(trim($this->street)) ? $this->street : 'N/A',
                     'zip_code' => $this->zip_code ?: null,
 
                     // Present Address
@@ -542,26 +542,28 @@ new class extends Component {
             }
 
             // Update User Family
+            // For required fields (when not unknown), validation ensures they have values
+            // For nullable fields, save as 'N/A' if empty
             $this->userFamily
                 ->fill([
                     'user_id' => $this->user->getKey(),
                     'personal_information_id' => $this->personalInformation->getKey(),
-                    'father_last_name' => $this->father_last_name ?: null,
-                    'father_first_name' => $this->father_first_name ?: null,
-                    'father_middle_name' => $this->father_middle_name ?: null,
-                    'father_suffix' => $this->father_suffix ?? 'N/A',
+                    'father_last_name' => $this->father_is_unknown ? 'N/A' : ($this->father_last_name ?: 'N/A'),
+                    'father_first_name' => $this->father_is_unknown ? 'N/A' : ($this->father_first_name ?: 'N/A'),
+                    'father_middle_name' => !empty(trim($this->father_middle_name)) ? $this->father_middle_name : 'N/A',
+                    'father_suffix' => !empty(trim($this->father_suffix)) ? $this->father_suffix : 'N/A',
                     'father_birthdate' => $this->father_birthdate ?: null,
-                    'father_nationality' => $this->father_nationality ?: null,
-                    'father_religion' => $this->father_religion ?: null,
-                    'father_contact_no' => $this->father_contact_no ?: null,
-                    'mother_last_name' => $this->mother_last_name ?: null,
-                    'mother_first_name' => $this->mother_first_name ?: null,
-                    'mother_middle_name' => $this->mother_middle_name ?: null,
-                    'mother_suffix' => $this->mother_suffix ?? 'N/A',
+                    'father_nationality' => $this->father_is_unknown ? 'N/A' : ($this->father_nationality ?: 'N/A'),
+                    'father_religion' => $this->father_is_unknown ? 'N/A' : ($this->father_religion ?: 'N/A'),
+                    'father_contact_no' => $this->father_is_unknown ? 'N/A' : ($this->father_contact_no ?: 'N/A'),
+                    'mother_last_name' => $this->mother_is_unknown ? 'N/A' : ($this->mother_last_name ?: 'N/A'),
+                    'mother_first_name' => $this->mother_is_unknown ? 'N/A' : ($this->mother_first_name ?: 'N/A'),
+                    'mother_middle_name' => !empty(trim($this->mother_middle_name)) ? $this->mother_middle_name : 'N/A',
+                    'mother_suffix' => !empty(trim($this->mother_suffix)) ? $this->mother_suffix : 'N/A',
                     'mother_birthdate' => $this->mother_birthdate ?: null,
-                    'mother_nationality' => $this->mother_nationality ?: null,
-                    'mother_religion' => $this->mother_religion ?: null,
-                    'mother_contact_no' => $this->mother_contact_no ?: null,
+                    'mother_nationality' => $this->mother_is_unknown ? 'N/A' : ($this->mother_nationality ?: 'N/A'),
+                    'mother_religion' => $this->mother_is_unknown ? 'N/A' : ($this->mother_religion ?: 'N/A'),
+                    'mother_contact_no' => $this->mother_is_unknown ? 'N/A' : ($this->mother_contact_no ?: 'N/A'),
                 ])
                 ->save();
 

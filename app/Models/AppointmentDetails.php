@@ -51,11 +51,13 @@ class AppointmentDetails extends Model
     {
         $parts = array_filter([
             $this->first_name,
-            $this->middle_name,
+            strtolower($this->middle_name ?? '') !== 'n/a' ? $this->middle_name : null,
             $this->last_name,
-            $this->suffix,
-        ]);
-        return implode(' ', $parts);
+            strtolower($this->suffix ?? '') !== 'n/a' ? $this->suffix : null,
+        ], function ($part) {
+            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+        });
+        return trim(implode(' ', $parts));
     }
 
     /**
