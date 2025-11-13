@@ -9,6 +9,7 @@ class UserFamily extends Model
     protected $table = 'user_families';
 
     protected $fillable = [
+        'user_id',
         'personal_information_id',
         'father_last_name',
         'father_first_name',

@@ -116,6 +116,7 @@ new class extends Component {
         // Create UserFamily if it doesn't exist yet
         if (!$this->user->userFamilies || $this->user->userFamilies->isEmpty()) {
             $userFamily = new UserFamily();
+            $userFamily->user_id = $this->user->getKey();
             $userFamily->personal_information_id = $this->personalInformation->getKey();
             $userFamily->save();
             $this->user->refresh();
@@ -543,6 +544,7 @@ new class extends Component {
             // Update User Family
             $this->userFamily
                 ->fill([
+                    'user_id' => $this->user->getKey(),
                     'personal_information_id' => $this->personalInformation->getKey(),
                     'father_last_name' => $this->father_last_name ?: null,
                     'father_first_name' => $this->father_first_name ?: null,
