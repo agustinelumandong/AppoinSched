@@ -9,12 +9,11 @@ use Livewire\Volt\Component;
 use Illuminate\Support\Facades\Log;
 
 new #[Layout('components.layouts.auth')] class extends Component {
-
     public $otpDigits = ['', '', '', '', '', ''];
     public $otpSent = false;
     public $timer = 300;
     public $canResend = false;
-    
+
     public function mount()
     {
         $user = Auth::user();
@@ -74,7 +73,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 Log::error("Failed to update OTP for user {$user->id}");
             }
         }
-        
+
         Mail::raw("Your verification code is: {$otp}", function ($message) use ($user) {
             $message->to($user->email)->subject('Your Email Verification Code');
         });
@@ -139,14 +138,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     @php
         $user = Auth::user();
-        $otpActive = $user && $user->email_otp && $user->email_otp_expires_at && now()->lessThan($user->email_otp_expires_at);
+        $otpActive =
+            $user && $user->email_otp && $user->email_otp_expires_at && now()->lessThan($user->email_otp_expires_at);
     @endphp
 
     <p class="{{ $otpActive ? 'text-green-500' : 'text-gray-500' }}">
         {{ $otpActive ? 'You have an active OTP code.' : 'No active OTP code.' }}
     </p>
 
-    @php
+    {{-- @p hp
         $userData = $user ? [
             'id' => $user->id,
             'name' => $user->name,
@@ -159,12 +159,12 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'updated_at' => $user->updated_at->toDateTimeString(),
         ] : null;
         $userJson = json_encode($userData, JSON_PRETTY_PRINT);
-    @endphp
+    @e ndphp
 
     <div class="bg-gray-100 p-4 rounded-lg mb-6">
         <h3 class="text-sm font-semibold mb-2">User Data (JSON):</h3>
         <pre class="text-xs overflow-auto max-h-48 bg-gray-50 p-2 rounded border border-gray-200">{{ $userJson }}</pre>
-    </div>
+    </div> --}}
 
     @if (session('status') == 'otp-sent')
         <p class="text-green-600 text-sm mb-3">OTP has been sent to your email.</p>
@@ -175,59 +175,50 @@ new #[Layout('components.layouts.auth')] class extends Component {
     @endif
 
     <div class="flex justify-center gap-2 mb-6">
-        @foreach(range(0, 5) as $i)
-            <input type="text" maxlength="1"
-                wire:model="otpDigits.{{ $i }}"
+        @foreach (range(0, 5) as $i)
+            <input type="text" maxlength="1" wire:model="otpDigits.{{ $i }}"
                 class="w-10 h-12 text-center text-lg border border-gray-300 rounded-md focus:border-green-500 focus:ring-1 focus:ring-green-500"
                 oninput="this.value = this.value.toUpperCase(); if(this.value.length===1 && this.nextElementSibling){this.nextElementSibling.focus()}"
-                onkeydown="if(event.key==='Backspace' && !this.value && this.previousElementSibling){this.previousElementSibling.focus()}"
-            />
+                onkeydown="if(event.key==='Backspace' && !this.value && this.previousElementSibling){this.previousElementSibling.focus()}" />
         @endforeach
     </div>
 
-    <button wire:click="verifyOtp"
-        class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition">
+    <button wire:click="verifyOtp" class="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-lg transition">
         Submit
     </button>
 
     <!-- ✅ Fixed AlpineJS Timer + Resend Logic -->
-    <div
-        x-data="{
-            expiry: new Date('{{ $user && $user->email_otp_expires_at ? $user->email_otp_expires_at->toIso8601String() : now()->addSeconds($timer)->toIso8601String() }}').getTime(),
-            remaining: 0,
-            canResend: false,
-            interval: null,
-            init() {
-                this.updateRemaining();
-                this.interval = setInterval(() => this.updateRemaining(), 1000);
-            },
-            updateRemaining() {
-                const diff = Math.max(0, this.expiry - Date.now());
-                this.remaining = Math.floor(diff / 1000);
-                if (this.remaining <= 0) {
-                    clearInterval(this.interval);
-                    this.canResend = true;
-                    $wire.enableResend();
-                }
-            },
-            formattedTime() {
-                const m = String(Math.floor(this.remaining / 60)).padStart(2, '0');
-                const s = String(this.remaining % 60).padStart(2, '0');
-                return `${m}:${s}`;
+    <div x-data="{
+        expiry: new Date('{{ $user && $user->email_otp_expires_at ? $user->email_otp_expires_at->toIso8601String() : now()->addSeconds($timer)->toIso8601String() }}').getTime(),
+        remaining: 0,
+        canResend: false,
+        interval: null,
+        init() {
+            this.updateRemaining();
+            this.interval = setInterval(() => this.updateRemaining(), 1000);
+        },
+        updateRemaining() {
+            const diff = Math.max(0, this.expiry - Date.now());
+            this.remaining = Math.floor(diff / 1000);
+            if (this.remaining <= 0) {
+                clearInterval(this.interval);
+                this.canResend = true;
+                $wire.enableResend();
             }
-        }"
-        x-init="init()"
-        class="mt-6 text-sm text-gray-500 text-center"
-    >
+        },
+        formattedTime() {
+            const m = String(Math.floor(this.remaining / 60)).padStart(2, '0');
+            const s = String(this.remaining % 60).padStart(2, '0');
+            return `${m}:${s}`;
+        }
+    }" x-init="init()" class="mt-6 text-sm text-gray-500 text-center">
         <template x-if="!canResend">
             <p>Resend available in <span x-text="formattedTime()"></span></p>
         </template>
 
-        <button
-            x-show="canResend"
+        <button x-show="canResend"
             @click="$wire.sendVerification(); canResend = false; expiry = Date.now() + 60000; updateRemaining();"
-            class="mt-2 px-4 py-2 rounded-lg border border-green-500 text-green-500 hover:bg-green-50"
-        >
+            class="mt-2 px-4 py-2 rounded-lg border border-green-500 text-green-500 hover:bg-green-50">
             Resend OTP
         </button>
 
@@ -237,7 +228,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
     </div>
 </div>
 
- 
+
 <script>
     function otpTimer(seconds, onExpire) {
         return {
