@@ -9,7 +9,6 @@ class UserFamily extends Model
     protected $table = 'user_families';
 
     protected $fillable = [
-        'user_id',
         'personal_information_id',
         'father_last_name',
         'father_first_name',
@@ -26,13 +25,8 @@ class UserFamily extends Model
         'mother_birthdate',
         'mother_nationality',
         'mother_religion',
-        'mother_contact_no', 
+        'mother_contact_no',
     ];
-
-    public function user()
-    {
-        return $this->belongsTo(User::class, 'user_id');
-    }
 
     public function personalInformation()
     {
@@ -49,5 +43,5 @@ class UserFamily extends Model
         return $this->mother_last_name . ' ' . $this->mother_first_name . ' ' . $this->mother_middle_name . ' ' . $this->mother_suffix;
     }
 
- 
+
 }
