@@ -28,10 +28,10 @@
                         Permit
                     </label>
                 @elseif($office->slug === 'municipal-treasurers-office')
-                    <input type="radio" id="appointment-mto" name="purpose" value="appointment-mto"
+                    <input type="radio" id="payment" name="purpose" value="payment"
                         wire:model.live="purpose" hidden />
-                    <label for="appointment-mto"
-                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'appointment-mto' ? 'flux-btn-active-primary' : '' }} p-2">Payment
+                    <label for="payment"
+                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'payment' ? 'flux-btn-active-primary' : '' }} p-2">Payment
                     </label>
                 @else
                     <input type="radio" id="consultation" name="purpose" value="consultation" wire:model.live="purpose"
@@ -41,13 +41,7 @@
                     </label>
                 @endif
 
-                @if($office->slug === 'municipal-treasurers-office')
-                    <input type="radio" id="purpose" name="purpose" value="purpose" wire:model.live="purpose" hidden />
-                    <label for="purpose"
-                        class="flux-input-primary flux-btn cursor-pointer {{ $purpose === 'purpose' ? 'flux-btn-active-primary' : '' }} p-2">Purpose
-                    </label>
-                @else
-
+                @if(!$office->slug === 'municipal-treasurers-office')
                     <input type="radio" id="follow_up" name="purpose" value="follow_up" wire:model.live="purpose" hidden />
                     <label for="follow_up"
                         class="flux-input-primary  flux-btn cursor-pointer {{ $purpose === 'follow_up' ? 'flux-btn-active-primary' : '' }} p-2">Follow

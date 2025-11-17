@@ -135,12 +135,10 @@ new #[Title('Appointment')] class extends Component {
                     'purpose' => 'required',
                 ]);
                 // Skip the certificates step if includeCertificates is false
-                if (!$this->office->slug === 'municipal-treasurers-office') {
-                    if (!$this->includeCertificates) {
-                        $this->step++; // Skip to next step
-                        // Enable editing when reaching personal information step
-                        $this->editPersonDetails = true;
-                    }
+                if (!$this->includeCertificates) {
+                    $this->step++; // Skip to next step
+                    // Enable editing when reaching personal information step
+                    $this->editPersonDetails = true;
                 }
                 break;
             case 3:
@@ -452,10 +450,10 @@ new #[Title('Appointment')] class extends Component {
                 Log::info('Appointment created successfully', ['appointment_id' => $appointment->id]);
 
                 $this->reference_number = $reference_number;
-                if (!$this->office->slug === 'municipal-treasurers-office') {
-                    $this->step = 6;
+                if (!$this->includeCertificates) {
+                    $this->step = 6;  // MTO office - no certificates, appointment slip at step 6
                 } else {
-                    $this->step = 7;
+                    $this->step = 7;  // Other offices - with certificates, appointment slip at step 7
                 }
 
                 $cacheKey = "time_slots_{$this->office->id}_{$this->selectedDate}";
