@@ -9,6 +9,8 @@ use App\Models\PersonalInformation;
 use App\Models\UserAddresses;
 use App\Models\UserFamily;
 use App\Services\PhilippineLocationsService;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 
 new class extends Component {
     use WithFileUploads;
@@ -109,15 +111,19 @@ new class extends Component {
 
         $this->personalInformation = $this->user->personalInformation;
 
-        // Create UserAddresses if it doesn't exist yet
-        if (!$this->user->userAddresses || $this->user->userAddresses->isEmpty()) {
-            $userAddress = new UserAddresses();
-            $userAddress->personal_information_id = $this->personalInformation->getKey();
-            $userAddress->save();
+        // Create or get Permanent UserAddresses
+        $permanentAddress = $this->user->userAddresses->where('address_type', 'Permanent')->first();
+        if (!$permanentAddress) {
+            $permanentAddress = new UserAddresses();
+            $permanentAddress->personal_information_id = $this->personalInformation->getKey();
+            $permanentAddress->address_type = 'Permanent';
+            $permanentAddress->save();
             $this->user->refresh();
         }
+        $this->userAddresses = $permanentAddress;
 
-        $this->userAddresses = $this->user->userAddresses->first();
+        // Get Temporary Address (if exists)
+        $temporaryAddress = $this->user->userAddresses->where('address_type', 'Temporary')->first();
 
         // Create UserFamily if it doesn't exist yet
         if (!$this->user->userFamilies || $this->user->userFamilies->isEmpty()) {
@@ -159,16 +165,16 @@ new class extends Component {
         $this->street = $this->userAddresses->street ?? '';
         $this->zip_code = $this->userAddresses->zip_code ?? '';
 
-        // Present Address - initialize with empty values
-        $this->temporary_address_type = $this->userAddresses->temporary_address_type ?? 'Temporary';
-        $this->temporary_address_line_1 = $this->userAddresses->temporary_address_line_1 ?? '';
-        $this->temporary_address_line_2 = $this->userAddresses->temporary_address_line_2 ?? '';
-        $this->temporary_region = $this->userAddresses->temporary_region ?? '';
-        $this->temporary_province = $this->userAddresses->temporary_province ?? '';
-        $this->temporary_city = $this->userAddresses->temporary_city ?? '';
-        $this->temporary_barangay = $this->userAddresses->temporary_barangay ?? '';
-        $this->temporary_street = $this->userAddresses->temporary_street ?? '';
-        $this->temporary_zip_code = $this->userAddresses->temporary_zip_code ?? '';
+        // Present Address - load from temporary address record
+        $this->temporary_address_type = $temporaryAddress->address_type ?? 'Temporary';
+        $this->temporary_address_line_1 = $temporaryAddress->address_line_1 ?? '';
+        $this->temporary_address_line_2 = $temporaryAddress->address_line_2 ?? '';
+        $this->temporary_region = $temporaryAddress->region ?? '';
+        $this->temporary_province = $temporaryAddress->province ?? '';
+        $this->temporary_city = $temporaryAddress->city ?? '';
+        $this->temporary_barangay = $temporaryAddress->barangay ?? '';
+        $this->temporary_street = $temporaryAddress->street ?? '';
+        $this->temporary_zip_code = $temporaryAddress->zip_code ?? '';
 
         // Family - Father
         $this->father_last_name = $this->userFamily->father_last_name ?? '';
@@ -192,7 +198,17 @@ new class extends Component {
         // Set father_is_unknown if all father fields are N/A
         $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
         $this->mother_is_unknown = $this->mother_last_name === 'N/A' && $this->mother_first_name === 'N/A' && $this->mother_middle_name === 'N/A' && $this->mother_suffix === 'N/A' && $this->mother_nationality === 'N/A' && $this->mother_religion === 'N/A' && $this->mother_contact_no === 'N/A';
-        $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1 && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2 && $this->userAddresses->temporary_region === $this->userAddresses->region && $this->userAddresses->temporary_province === $this->userAddresses->province && $this->userAddresses->temporary_city === $this->userAddresses->city && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay && $this->userAddresses->temporary_street === $this->userAddresses->street && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
+
+        // Check if temporary address is same as permanent
+        $this->same_as_permanent = $temporaryAddress &&
+            $temporaryAddress->address_line_1 === $this->userAddresses->address_line_1 &&
+            $temporaryAddress->address_line_2 === $this->userAddresses->address_line_2 &&
+            $temporaryAddress->region === $this->userAddresses->region &&
+            $temporaryAddress->province === $this->userAddresses->province &&
+            $temporaryAddress->city === $this->userAddresses->city &&
+            $temporaryAddress->barangay === $this->userAddresses->barangay &&
+            $temporaryAddress->street === $this->userAddresses->street &&
+            $temporaryAddress->zip_code === $this->userAddresses->zip_code;
 
         // Pre-populate dependent dropdowns if values exist
         if ($this->region) {
@@ -205,78 +221,17 @@ new class extends Component {
             $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
         }
 
-        $this->regions = $locations->getRegions();
-
-        // User
-        $this->last_name = $this->user->last_name ?? '';
-        $this->first_name = $this->user->first_name ?? '';
-        $this->middle_name = $this->user->middle_name ?? '';
-        $this->email = $this->user->email ?? '';
-        $this->contact_no = $this->personalInformation->contact_no ?? '';
-        // Personal Information
-        $this->suffix = $this->personalInformation->suffix ?? 'N/A';
-        $this->sex_at_birth = $this->personalInformation->sex_at_birth ?? '';
-        $this->date_of_birth = $this->personalInformation->date_of_birth ?? '';
-        $this->place_of_birth = $this->personalInformation->place_of_birth ?? '';
-        $this->civil_status = $this->personalInformation->civil_status ?? 'Single';
-        $this->religion = $this->personalInformation->religion ?? '';
-        $this->nationality = $this->personalInformation->nationality ?? 'Filipino';
-        $this->government_id_type = $this->personalInformation->government_id_type ?? '';
-        // Note: government_id_image_path is handled as a PDF file upload, not a string
-        // Address
-        $this->address_type = $this->userAddresses->address_type ?? 'Permanent';
-        $this->address_line_1 = $this->userAddresses->address_line_1 ?? '';
-        $this->address_line_2 = $this->userAddresses->address_line_2 ?? '';
-        $this->region = $this->userAddresses->region ?? '';
-        $this->province = $this->userAddresses->province ?? '';
-        $this->city = $this->userAddresses->city ?? '';
-        $this->barangay = $this->userAddresses->barangay ?? '';
-        $this->street = $this->userAddresses->street ?? '';
-        $this->zip_code = $this->userAddresses->zip_code ?? '';
-        // Present Address
-        $this->temporary_address_type = $this->userAddresses->temporary_address_type ?? 'Temporary';
-        $this->temporary_address_line_1 = $this->userAddresses->temporary_address_line_1 ?? '';
-        $this->temporary_address_line_2 = $this->userAddresses->temporary_address_line_2 ?? '';
-        $this->temporary_region = $this->userAddresses->temporary_region ?? '';
-        $this->temporary_province = $this->userAddresses->temporary_province ?? '';
-        $this->temporary_city = $this->userAddresses->temporary_city ?? '';
-        $this->temporary_barangay = $this->userAddresses->temporary_barangay ?? '';
-        $this->temporary_street = $this->userAddresses->temporary_street ?? '';
-        $this->temporary_zip_code = $this->userAddresses->temporary_zip_code ?? '';
-        // Family - Father
-        $this->father_last_name = $this->userFamily->father_last_name ?? '';
-        $this->father_first_name = $this->userFamily->father_first_name ?? '';
-        $this->father_middle_name = $this->userFamily->father_middle_name ?? '';
-        $this->father_suffix = $this->userFamily->father_suffix ?? 'N/A';
-        $this->father_birthdate = $this->userFamily->father_birthdate ?? '';
-        $this->father_nationality = $this->userFamily->father_nationality ?? '';
-        $this->father_religion = $this->userFamily->father_religion ?? '';
-        $this->father_contact_no = $this->userFamily->father_contact_no ?? '';
-        // Family - Mother
-        $this->mother_last_name = $this->userFamily->mother_last_name ?? '';
-        $this->mother_first_name = $this->userFamily->mother_first_name ?? '';
-        $this->mother_middle_name = $this->userFamily->mother_middle_name ?? '';
-        $this->mother_suffix = $this->userFamily->mother_suffix ?? 'N/A';
-        $this->mother_birthdate = $this->userFamily->mother_birthdate ?? '';
-        $this->mother_nationality = $this->userFamily->mother_nationality ?? '';
-        $this->mother_religion = $this->userFamily->mother_religion ?? '';
-        $this->mother_contact_no = $this->userFamily->mother_contact_no ?? '';
-
-        // Set father_is_unknown if all father fields are N/A
-        $this->father_is_unknown = $this->father_last_name === 'N/A' && $this->father_first_name === 'N/A' && $this->father_middle_name === 'N/A' && $this->father_suffix === 'N/A' && $this->father_nationality === 'N/A' && $this->father_religion === 'N/A' && $this->father_contact_no === 'N/A';
-        $this->mother_is_unknown = $this->mother_last_name === 'N/A' && $this->mother_first_name === 'N/A' && $this->mother_middle_name === 'N/A' && $this->mother_suffix === 'N/A' && $this->mother_nationality === 'N/A' && $this->mother_religion === 'N/A' && $this->mother_contact_no === 'N/A';
-        $this->same_as_permanent = $this->userAddresses->temporary_address_line_1 === $this->userAddresses->address_line_1 && $this->userAddresses->temporary_address_line_2 === $this->userAddresses->address_line_2 && $this->userAddresses->temporary_region === $this->userAddresses->region && $this->userAddresses->temporary_province === $this->userAddresses->province && $this->userAddresses->temporary_city === $this->userAddresses->city && $this->userAddresses->temporary_barangay === $this->userAddresses->barangay && $this->userAddresses->temporary_street === $this->userAddresses->street && $this->userAddresses->temporary_zip_code === $this->userAddresses->zip_code;
-
-        // Pre-populate dependent dropdowns if values exist
-        if ($this->region) {
-            $this->provinces = $locations->getProvinces($this->region);
+        // Pre-populate temporary address dropdowns if values exist
+        if ($this->temporary_region) {
+            $this->temporary_provinces = $locations->getProvinces($this->temporary_region);
         }
-        if ($this->region && $this->province) {
-            $this->cities = $locations->getMunicipalities($this->region, $this->province);
+        if ($this->temporary_region && $this->temporary_province) {
+            $this->temporary_cities = $locations->getMunicipalities($this->temporary_region, $this->temporary_province);
         }
-        if ($this->region && $this->province && $this->city) {
-            $this->barangays = $locations->getBarangays($this->region, $this->province, $this->city);
+        if ($this->temporary_region && $this->temporary_province && $this->temporary_city) {
+            $this->temporary_barangays = $locations->getBarangays($this->temporary_region, $this->temporary_province, $this->temporary_city);
         }
+
     }
 
     public function updatedRegion(PhilippineLocationsService $locations)
@@ -386,8 +341,14 @@ new class extends Component {
 
     public function updateAll(): void
     {
+        Log::info('=== UserInfo UpdateAll Started ===', [
+            'user_id' => $this->user->getKey(),
+            'permanent_address_id' => $this->userAddresses->id ?? null,
+        ]);
+
         try {
             // Validate input using Laravel's validator
+            Log::debug('Starting validation...');
             $validated = $this->validate([
                 'last_name' => ['required', 'string', 'max:255'],
                 'first_name' => ['required', 'string', 'max:255'],
@@ -442,6 +403,8 @@ new class extends Component {
                 'mother_contact_no' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
             ]);
 
+            Log::debug('Validation passed', ['validated_fields_count' => count($validated)]);
+
             // Check if required personal info fields are filled
             $missingFields = [];
             $requiredPersonalFields = ['sex_at_birth', 'date_of_birth', 'place_of_birth', 'civil_status', 'religion', 'nationality', 'government_id_type', 'government_id_image_path'];
@@ -457,11 +420,25 @@ new class extends Component {
             }
 
             if (count($missingFields) > 0) {
+                Log::warning('Missing required fields', ['missing_fields' => $missingFields]);
                 session()->flash('error', 'Please fill up the following personal information fields: ' . implode(', ', $missingFields));
                 return;
             }
 
+            // Start database transaction for data integrity
+            DB::beginTransaction();
+            Log::info('Database transaction started');
+
             // Update User
+            Log::debug('Updating User', [
+                'user_id' => $this->user->getKey(),
+                'data' => [
+                    'last_name' => $this->last_name,
+                    'first_name' => $this->first_name,
+                    'middle_name' => $this->middle_name,
+                    'email' => $this->email,
+                ],
+            ]);
             $this->user
                 ->fill([
                     'last_name' => $this->last_name,
@@ -470,8 +447,13 @@ new class extends Component {
                     'email' => $this->email,
                 ])
                 ->save();
+            Log::info('User updated successfully');
 
             // Handle government ID PDF upload
+            Log::debug('Processing government ID upload', [
+                'has_current_image' => !empty($this->personalInformation->getAttribute('government_id_image_path')),
+                'has_new_upload' => is_object($this->government_id_image_path),
+            ]);
             $governmentIdImagePath = null;
             $currentImagePath = $this->personalInformation->getAttribute('government_id_image_path') ?? null;
 
@@ -499,8 +481,24 @@ new class extends Component {
                     'government_id_image_path' => $governmentIdImagePath,
                 ])
                 ->save();
+            Log::info('Personal Information updated successfully');
 
-            // Update User Addresses
+            // Update User Addresses (Permanent Address)
+            Log::debug('Updating Permanent Address', [
+                'address_id' => $this->userAddresses->id ?? null,
+                'data' => [
+                    'personal_information_id' => $this->personalInformation->getKey(),
+                    'address_type' => 'Permanent',
+                    'address_line_1' => $this->address_line_1,
+                    'address_line_2' => $this->address_line_2,
+                    'region' => $this->region,
+                    'province' => $this->province,
+                    'city' => $this->city,
+                    'barangay' => $this->barangay,
+                    'street' => $this->street,
+                    'zip_code' => $this->zip_code,
+                ],
+            ]);
             $this->userAddresses
                 ->fill([
                     'personal_information_id' => $this->personalInformation->getKey(),
@@ -513,23 +511,33 @@ new class extends Component {
                     'barangay' => $this->barangay ?: null,
                     'street' => !empty(trim($this->street)) ? $this->street : 'N/A',
                     'zip_code' => $this->zip_code ?: null,
-
-                    // Present Address
-                    'temporary_address_type' => 'Temporary',
-                    'temporary_address_line_1' => $this->temporary_address_line_1 ?: 'null',
-                    'temporary_address_line_2' => $this->temporary_address_line_2 ?: 'null',
-                    'temporary_region' => $this->temporary_region ?: 'null',
-                    'temporary_city' => $this->temporary_city ?: 'null',
-                    'temporary_province' => $this->temporary_province ?: 'null',
-                    'temporary_barangay' => $this->temporary_barangay ?: 'null',
-                    'temporary_street' => $this->temporary_street ?: 'null',
-                    'temporary_zip_code' => $this->temporary_zip_code ?: 'null',
                 ])
                 ->save();
+            Log::info('Permanent Address updated successfully');
 
             // Save Present Address as a separate record
-            if ($this->temporary_address_line_1 || $this->temporary_address_line_2 || $this->temporary_region || $this->temporary_province || $this->temporary_city || $this->temporary_barangay || $this->temporary_street || $this->temporary_zip_code) {
-                UserAddresses::updateOrCreate(
+            $hasTemporaryAddress = $this->temporary_address_line_1 || $this->temporary_address_line_2 || $this->temporary_region || $this->temporary_province || $this->temporary_city || $this->temporary_barangay || $this->temporary_street || $this->temporary_zip_code;
+
+            Log::debug('Checking Temporary Address', [
+                'has_temporary_address' => $hasTemporaryAddress,
+                'temporary_data' => [
+                    'address_line_1' => $this->temporary_address_line_1,
+                    'address_line_2' => $this->temporary_address_line_2,
+                    'region' => $this->temporary_region,
+                    'province' => $this->temporary_province,
+                    'city' => $this->temporary_city,
+                    'barangay' => $this->temporary_barangay,
+                    'street' => $this->temporary_street,
+                    'zip_code' => $this->temporary_zip_code,
+                ],
+            ]);
+
+            if ($hasTemporaryAddress) {
+                Log::debug('Creating/Updating Temporary Address', [
+                    'personal_information_id' => $this->personalInformation->getKey(),
+                ]);
+
+                $temporaryAddress = UserAddresses::updateOrCreate(
                     [
                         'personal_information_id' => $this->personalInformation->getKey(),
                         'address_type' => 'Temporary',
@@ -545,11 +553,24 @@ new class extends Component {
                         'zip_code' => $this->temporary_zip_code ?: null,
                     ],
                 );
+
+                Log::info('Temporary Address saved', [
+                    'address_id' => $temporaryAddress->id,
+                    'was_recently_created' => $temporaryAddress->wasRecentlyCreated,
+                ]);
+            } else {
+                Log::debug('No temporary address data provided, skipping...');
             }
 
             // Update User Family
             // For required fields (when not unknown), validation ensures they have values
             // For nullable fields, save as 'N/A' if empty
+            Log::debug('Updating User Family', [
+                'family_id' => $this->userFamily->id ?? null,
+                'father_is_unknown' => $this->father_is_unknown,
+                'mother_is_unknown' => $this->mother_is_unknown,
+            ]);
+
             $this->userFamily
                 ->fill([
                     // 'user_id' => $this->user->getKey(),
@@ -572,18 +593,56 @@ new class extends Component {
                     'mother_contact_no' => $this->mother_is_unknown ? 'N/A' : ($this->mother_contact_no ?: 'N/A'),
                 ])
                 ->save();
+            Log::info('User Family updated successfully');
+
+            // Commit transaction
+            DB::commit();
+            Log::info('Database transaction committed successfully');
 
             if ($this->user->hasCompleteProfile()) {
+                Log::info('Profile is complete, redirecting to dashboard');
                 session()->flash('success', 'All information updated!');
                 redirect()->route('client.dashboard');
+            } else {
+                Log::info('Profile update completed but profile is not yet complete');
+                session()->flash('success', 'Information updated successfully!');
             }
         } catch (\Illuminate\Validation\ValidationException $e) {
+            DB::rollBack();
             $messages = $e->validator->errors()->all();
+            $errorDetails = [
+                'validation_errors' => $e->validator->errors()->toArray(),
+                'user_id' => $this->user->getKey(),
+            ];
+            Log::error('Validation failed in updateAll', $errorDetails);
             session()->flash('error', 'Validation failed: ' . implode(' ', $messages));
             return;
+        } catch (\Illuminate\Database\QueryException $e) {
+            DB::rollBack();
+            $errorDetails = [
+                'error_code' => $e->getCode(),
+                'error_message' => $e->getMessage(),
+                'sql' => $e->getSql(),
+                'bindings' => $e->getBindings(),
+                'user_id' => $this->user->getKey(),
+            ];
+            Log::error('Database query error in updateAll', $errorDetails);
+            session()->flash('error', 'Database error occurred. Please check the logs for details. Error: ' . $e->getMessage());
+            return;
         } catch (\Exception $e) {
+            DB::rollBack();
+            $errorDetails = [
+                'error_message' => $e->getMessage(),
+                'error_file' => $e->getFile(),
+                'error_line' => $e->getLine(),
+                'error_trace' => $e->getTraceAsString(),
+                'user_id' => $this->user->getKey(),
+            ];
+            Log::error('Unexpected error in updateAll', $errorDetails);
             session()->flash('error', 'An unexpected error occurred: ' . $e->getMessage());
             return;
+        } finally {
+            Log::info('=== UserInfo UpdateAll Completed ===');
         }
     }
 

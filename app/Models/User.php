@@ -147,25 +147,26 @@ class User extends Authenticatable
 
     /**
      * Check if user has completed their address information
+     * Only checks permanent address as it's required
      */
     public function hasCompleteAddress(): bool
     {
-        $address = $this->userAddresses->first();
-        if (!$address) {
+        $permanentAddress = $this->userAddresses->where('address_type', 'Permanent')->first();
+        if (!$permanentAddress) {
             return false;
         }
 
-        return !empty($address->address_line_1) &&
-            !empty($address->region) &&
-            !empty($address->province) &&
-            !empty($address->city) &&
-            !empty($address->barangay) &&
-            // !empty($address->street) &&
-            !empty($address->zip_code);
+        return !empty($permanentAddress->address_line_1) &&
+            !empty($permanentAddress->region) &&
+            !empty($permanentAddress->province) &&
+            !empty($permanentAddress->city) &&
+            !empty($permanentAddress->barangay) &&
+            !empty($permanentAddress->zip_code);
     }
 
     /**
      * Check if user has completed their family information
+     * At minimum, requires father's or mother's first and last name (not "N/A")
      */
     public function hasCompleteFamilyInfo(): bool
     {
@@ -174,10 +175,19 @@ class User extends Authenticatable
             return false;
         }
 
-        // At minimum, require father's or mother's information
-        $hasFatherInfo = !empty($family->father_first_name) && !empty($family->father_last_name);
-        $hasMotherInfo = !empty($family->mother_first_name) && !empty($family->mother_last_name);
+        // Check if father info is provided (first and last name exist and are not "N/A")
+        $hasFatherInfo = !empty($family->father_first_name) &&
+                        !empty($family->father_last_name) &&
+                        strtoupper(trim($family->father_first_name)) !== 'N/A' &&
+                        strtoupper(trim($family->father_last_name)) !== 'N/A';
 
+        // Check if mother info is provided (first and last name exist and are not "N/A")
+        $hasMotherInfo = !empty($family->mother_first_name) &&
+                        !empty($family->mother_last_name) &&
+                        strtoupper(trim($family->mother_first_name)) !== 'N/A' &&
+                        strtoupper(trim($family->mother_last_name)) !== 'N/A';
+
+        // At minimum, require father's or mother's information (with valid names, not just "N/A")
         return $hasFatherInfo || $hasMotherInfo;
     }
 
@@ -216,7 +226,8 @@ class User extends Authenticatable
     public function getDocumentRequestFormData(): array
     {
         $personalInfo = $this->personalInformation;
-        $userAddress = $this->userAddresses->first();
+        $permanentAddress = $this->userAddresses->where('address_type', 'Permanent')->first();
+        $temporaryAddress = $this->userAddresses->where('address_type', 'Temporary')->first();
         $userFamily = $this->userFamilies->first();
 
         return [
@@ -238,16 +249,27 @@ class User extends Authenticatable
             'government_id_type' => $personalInfo?->government_id_type ?? '',
             'government_id_image_path' => $personalInfo?->government_id_image_path ?? '',
 
-            // Address Information
-            'address_type' => $userAddress?->address_type ?? 'Permanent',
-            'address_line_1' => $userAddress?->address_line_1 ?? '',
-            'address_line_2' => $userAddress?->address_line_2 ?? '',
-            'region' => $userAddress?->region ?? '',
-            'province' => $userAddress?->province ?? '',
-            'city' => $userAddress?->city ?? '',
-            'barangay' => $userAddress?->barangay ?? '',
-            'street' => $userAddress?->street ?? '',
-            'zip_code' => $userAddress?->zip_code ?? '',
+            // Permanent Address Information
+            'address_type' => $permanentAddress?->address_type ?? 'Permanent',
+            'address_line_1' => $permanentAddress?->address_line_1 ?? '',
+            'address_line_2' => $permanentAddress?->address_line_2 ?? '',
+            'region' => $permanentAddress?->region ?? '',
+            'province' => $permanentAddress?->province ?? '',
+            'city' => $permanentAddress?->city ?? '',
+            'barangay' => $permanentAddress?->barangay ?? '',
+            'street' => $permanentAddress?->street ?? '',
+            'zip_code' => $permanentAddress?->zip_code ?? '',
+
+            // Temporary Address Information (if exists)
+            'temporary_address_type' => $temporaryAddress?->address_type ?? 'Temporary',
+            'temporary_address_line_1' => $temporaryAddress?->address_line_1 ?? '',
+            'temporary_address_line_2' => $temporaryAddress?->address_line_2 ?? '',
+            'temporary_region' => $temporaryAddress?->region ?? '',
+            'temporary_province' => $temporaryAddress?->province ?? '',
+            'temporary_city' => $temporaryAddress?->city ?? '',
+            'temporary_barangay' => $temporaryAddress?->barangay ?? '',
+            'temporary_street' => $temporaryAddress?->street ?? '',
+            'temporary_zip_code' => $temporaryAddress?->zip_code ?? '',
 
             // Family Information
             'father_last_name' => $userFamily?->father_last_name ?? '',
@@ -446,27 +468,43 @@ class User extends Authenticatable
     }
 
     /**
-     * Get user's complete address as a formatted string
+     * Get user's permanent address as a formatted string
      */
     public function getFormattedAddress(): string
     {
-        $address = $this->userAddresses->first();
-        if (!$address) {
+        $permanentAddress = $this->userAddresses->where('address_type', 'Permanent')->first();
+        if (!$permanentAddress) {
             return 'No address on file';
         }
 
         $addressParts = array_filter([
-            $address->address_line_1,
-            $address->address_line_2,
-            $address->street,
-            $address->barangay,
-            $address->city,
-            $address->province,
-            $address->region,
-            $address->zip_code,
+            $permanentAddress->address_line_1,
+            $permanentAddress->address_line_2,
+            $permanentAddress->street,
+            $permanentAddress->barangay,
+            $permanentAddress->city,
+            $permanentAddress->province,
+            $permanentAddress->region,
+            $permanentAddress->zip_code,
         ]);
 
         return implode(', ', $addressParts);
+    }
+
+    /**
+     * Get user's permanent address record
+     */
+    public function getPermanentAddress(): ?UserAddresses
+    {
+        return $this->userAddresses->where('address_type', 'Permanent')->first();
+    }
+
+    /**
+     * Get user's temporary address record
+     */
+    public function getTemporaryAddress(): ?UserAddresses
+    {
+        return $this->userAddresses->where('address_type', 'Temporary')->first();
     }
 
     /**

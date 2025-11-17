@@ -19,17 +19,6 @@ class UserAddresses extends Model
         'barangay',
         'street',
         'zip_code',
-
-        // Present Address
-        'temporary_address_type',
-        'temporary_address_line_1',
-        'temporary_address_line_2',
-        'temporary_region',
-        'temporary_province',
-        'temporary_city',
-        'temporary_barangay',
-        'temporary_street',
-        'temporary_zip_code',
     ];
 
     public function user()
@@ -45,5 +34,34 @@ class UserAddresses extends Model
     public function getCompleteAddressAttribute()
     {
         return $this->address_line_1 . ' ' . $this->address_line_2 . ' ' . $this->region . ' ' . $this->province . ' ' . $this->city . ' ' . $this->barangay . ' ' . $this->zip_code;
+    }
+
+    /**
+     * Check if this address is complete (has all required fields)
+     */
+    public function isComplete(): bool
+    {
+        return !empty($this->address_line_1) &&
+            !empty($this->region) &&
+            !empty($this->province) &&
+            !empty($this->city) &&
+            !empty($this->barangay) &&
+            !empty($this->zip_code);
+    }
+
+    /**
+     * Scope to get permanent addresses
+     */
+    public function scopePermanent($query)
+    {
+        return $query->where('address_type', 'Permanent');
+    }
+
+    /**
+     * Scope to get temporary addresses
+     */
+    public function scopeTemporary($query)
+    {
+        return $query->where('address_type', 'Temporary');
     }
 }
