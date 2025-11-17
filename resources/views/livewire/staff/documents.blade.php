@@ -251,6 +251,9 @@ new class extends Component {
 
     <!-- Document Requests Table -->
     <div class="flux-card" style="padding: 12px;">
+        <h1>
+            {{  $documentRequests->count() }}
+        </h1>
         <div class="overflow-x-auto">
             <table class="table flux-table w-full">
                 <thead>

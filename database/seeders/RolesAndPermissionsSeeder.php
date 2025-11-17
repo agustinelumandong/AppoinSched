@@ -96,6 +96,22 @@ class RolesAndPermissionsSeeder extends Seeder
             'guard_name' => 'web'
         ]);
 
+        // Create office-specific admin roles
+        $mcrAdminRole = Role::firstOrCreate([
+            'name' => 'MCR-admin',
+            'guard_name' => 'web'
+        ]);
+
+        $mtoAdminRole = Role::firstOrCreate([
+            'name' => 'MTO-admin',
+            'guard_name' => 'web'
+        ]);
+
+        $bplsAdminRole = Role::firstOrCreate([
+            'name' => 'BPLS-admin',
+            'guard_name' => 'web'
+        ]);
+
         // Assign permissions to roles
 
         // SuperAdmin - Full system access for maintenance and upgrades
@@ -167,6 +183,68 @@ class RolesAndPermissionsSeeder extends Seeder
             'approve-documents',
             'reject-documents',
         ]);
+
+        // Office-specific Admin roles - Same permissions as general admin but office-scoped
+        $mcrAdminRole->givePermissionTo([
+            'create-documents',
+            'edit-documents',
+            'delete-documents',
+            'view-documents',
+            'request-documents',
+            'approve-documents',
+            'reject-documents',
+            'create-users',
+            'edit-users',
+            'view-users',
+            'create-appointments',
+            'edit-appointments',
+            'delete-appointments',
+            'view-appointments',
+            'approve-appointments',
+            'manage-settings',
+            'view-reports',
+        ]);
+
+        $mtoAdminRole->givePermissionTo([
+            'create-documents',
+            'edit-documents',
+            'delete-documents',
+            'view-documents',
+            'request-documents',
+            'approve-documents',
+            'reject-documents',
+            'create-users',
+            'edit-users',
+            'view-users',
+            'create-appointments',
+            'edit-appointments',
+            'delete-appointments',
+            'view-appointments',
+            'approve-appointments',
+            'manage-settings',
+            'view-reports',
+        ]);
+
+        $bplsAdminRole->givePermissionTo([
+            'create-documents',
+            'edit-documents',
+            'delete-documents',
+            'view-documents',
+            'request-documents',
+            'approve-documents',
+            'reject-documents',
+            'create-users',
+            'edit-users',
+            'view-users',
+            'create-appointments',
+            'edit-appointments',
+            'delete-appointments',
+            'view-appointments',
+            'approve-appointments',
+            'manage-settings',
+            'view-reports',
+        ]);
+
         // Client - Citizens requesting documents or permits
         $clientRole->givePermissionTo([
             'view-documents',
@@ -179,12 +257,12 @@ class RolesAndPermissionsSeeder extends Seeder
         $this->command->info('Roles and permissions seeded successfully!');
 
         // Create example users and assign roles
-        $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole, $mcrStaffRole, $mtoStaffRole, $bplsStaffRole);
+        $this->createExampleUsers($superAdminRole, $adminRole, $staffRole, $clientRole, $mcrStaffRole, $mtoStaffRole, $bplsStaffRole, $mcrAdminRole, $mtoAdminRole, $bplsAdminRole);
 
 
     }
 
-    private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole, Role $mcrStaffRole, Role $mtoStaffRole, Role $bplsStaffRole): void
+    private function createExampleUsers(Role $superAdminRole, Role $adminRole, Role $staffRole, Role $clientRole, Role $mcrStaffRole, Role $mtoStaffRole, Role $bplsStaffRole, Role $mcrAdminRole, Role $mtoAdminRole, Role $bplsAdminRole): void
     {
         // Create SuperAdmin user
         $superAdmin = User::firstOrCreate(
@@ -268,6 +346,39 @@ class RolesAndPermissionsSeeder extends Seeder
         );
         $staff4->assignRole($bplsStaffRole);
 
+        // Create office-specific Admin users
+        $mcrAdmin = User::firstOrCreate(
+            ['email' => 'mcr-admin@example.com'],
+            [
+                'first_name' => 'MCR',
+                'last_name' => 'Administrator',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $mcrAdmin->assignRole($mcrAdminRole);
+
+        $mtoAdmin = User::firstOrCreate(
+            ['email' => 'mto-admin@example.com'],
+            [
+                'first_name' => 'MTO',
+                'last_name' => 'Administrator',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $mtoAdmin->assignRole($mtoAdminRole);
+
+        $bplsAdmin = User::firstOrCreate(
+            ['email' => 'bpls-admin@example.com'],
+            [
+                'first_name' => 'BPLS',
+                'last_name' => 'Administrator',
+                'password' => Hash::make('password'),
+                'email_verified_at' => now(),
+            ]
+        );
+        $bplsAdmin->assignRole($bplsAdminRole);
 
         $this->command->info('Example users created and roles assigned successfully!');
     }

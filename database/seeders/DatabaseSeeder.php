@@ -1,12 +1,10 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Database\Seeders;
 
-use App\Models\User;
-// use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\DB;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,80 +13,50 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // User::factory(10)->create();
-        DB::table('users')->delete();
+        // Step 1: Seed roles and permissions (must be first)
+        $this->command->info('Seeding roles and permissions...');
+        $this->call(RolesAndPermissionsSeeder::class);
 
-        // Run other seeders
-        $this->call([
-            RolesAndPermissionsSeeder::class,
-            OfficeSeeder::class,
-        ]);
+        // Step 2: Seed offices and services (needed before appointments/document requests)
+        $this->command->info('Seeding offices and services...');
+        $this->call(OfficeSeeder::class);
 
-        // Create test users
-        $user1 = User::factory()->create([
-            'first_name' => 'John',
-            'last_name' => 'Doe',
-            'email' => 'test@test.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-        ]);
+        // Step 3: Seed users (needed before personal info, addresses, families, appointments, document requests)
+        $this->command->info('Seeding users...');
+        $this->call(UsersSeeder::class);
 
-        $user1->personalInformation()->create([
-            'user_id' => $user1->id,
-            'suffix' => 'Jr.',
-            'date_of_birth' => '1990-01-01',
-            'place_of_birth' => 'Anytown',
-            'sex_at_birth' => 'Male',
-            'civil_status' => 'Single',
-            'religion' => 'Catholic',
-            'nationality' => 'Filipino',
-            'contact_no' => '09123456789',
-            'government_id_type' => 'SSS',
-            'government_id_image_path' => 'ids/sss.pdf',
-        ]);
+        // Step 4: Seed personal information (needed before addresses and families)
+        $this->command->info('Seeding personal information...');
+        $this->call(PersonalInformationSeeder::class);
 
-        $user1->userAddresses()->create([
-            'personal_information_id' => $user1->personalInformation->id,
-            'address_type' => 'Permanent',
-            'address_line_1' => '123 Main St',
-            'address_line_2' => 'Apt 4B',
-            'region' => 'Region IV-A',
-            'province' => 'Batangas',
-            'city' => 'Batangas City',
-            'barangay' => 'Barangay 1',
-            'street' => 'Main St',
-            'zip_code' => '12345',
-        ]);
+        // Step 5: Seed user addresses (depends on personal information)
+        $this->command->info('Seeding user addresses...');
+        $this->call(UserAddressesSeeder::class);
 
-        $user1->userFamilies()->create([
-            'personal_information_id' => $user1->personalInformation->id,
-            'user_id' => $user1->id,
-            // Father's info
-            'father_last_name' => 'Doe',
-            'father_first_name' => 'John',
-            'father_middle_name' => 'M',
-            'father_suffix' => 'Sr.',
-            'father_birthdate' => '1960-01-01',
-            'father_nationality' => 'Filipino',
-            'father_religion' => 'Catholic',
-            'father_contact_no' => '09123456780',
-            // Mother's info
-            'mother_last_name' => 'Smith',
-            'mother_first_name' => 'Jane',
-            'mother_middle_name' => 'A',
-            'mother_suffix' => 'N/A',
-            'mother_birthdate' => '1965-01-01',
-            'mother_nationality' => 'Filipino',
-            'mother_religion' => 'Catholic',
-            'mother_contact_no' => '09123456781',
-        ]);
+        // Step 6: Seed user families (depends on personal information)
+        $this->command->info('Seeding user families...');
+        $this->call(UserFamiliesSeeder::class);
 
-        User::factory()->create([
-            'first_name' => 'Admin',
-            'last_name' => 'User',
-            'email' => 'admin@test.com',
-            'password' => Hash::make('password'),
-            'email_verified_at' => now(),
-        ]);
+        // Step 7: Seed appointments (depends on users and offices)
+        $this->command->info('Seeding appointments...');
+        $this->call(AppointmentsSeeder::class);
+
+        // Step 8: Seed appointment details (depends on appointments)
+        $this->command->info('Seeding appointment details...');
+        $this->call(AppointmentDetailsSeeder::class);
+
+        // Step 9: Seed document requests (depends on users, offices, and services)
+        $this->command->info('Seeding document requests...');
+        $this->call(DocumentRequestsSeeder::class);
+
+        // Step 10: Seed document request details (depends on document requests)
+        $this->command->info('Seeding document request details...');
+        $this->call(DocumentRequestDetailsSeeder::class);
+
+        // Step 11: Seed notifications (depends on users)
+        $this->command->info('Seeding notifications...');
+        $this->call(NotificationsSeeder::class);
+
+        $this->command->info('Database seeding completed successfully!');
     }
 }
