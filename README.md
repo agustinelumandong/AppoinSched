@@ -60,7 +60,7 @@ AppoinSched is a robust Laravel-based appointment scheduling and document reques
   - TailwindCSS with daisyUI for styling
 - **Database**: MySQL/SQLite
 - **Authentication**: Laravel Breeze
-- **Authorization**:  
+- **Authorization**:
 - **PDF Generation**: Laravel DomPDF
 - **Notification System**: Laravel Notifications
 
@@ -165,6 +165,10 @@ Default users are created through seeders with the following credentials:
 
 - Admin: `admin@example.com` (password: password)
 - Client: `user@example.com` (password: password)
+- Super Admin `superadmin@example.com` (password: password)
+- MCR`MCR@gmail.com` (password: password)
+- MTO `MTO@gmail.com` (password: password)
+- BPLS `BPLS@gmail.com` (password: password)
 
 ## 🛠️ Development
 
