@@ -1,12 +1,11 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\EmailsController;
+use App\Http\Controllers\ReportController;
 use App\Models\Offices;
 use Illuminate\Support\Facades\Route;
 use Livewire\Volt\Volt;
-use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\NotificationController;
-use App\Http\Controllers\EmailsController;
-use App\Http\Controllers\ReportController;
 
 Route::get('/', function () {
     return view('welcome');
@@ -17,12 +16,14 @@ Route::get('dashboard', [DashboardController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('dashboard');
 
-Route::middleware(['auth'])->group(function () {
+Route::middleware(['auth', 'verified'])->group(function () {
     Route::redirect('settings', 'settings/profile');
     Volt::route('settings/profile', 'settings.profile')->name('settings.profile');
     Volt::route('settings/password', 'settings.password')->name('settings.password');
     Volt::route('settings/appearance', 'settings.appearance')->name('settings.appearance');
-    Volt::route('userinfo', 'user.userinfo')->name('userinfo');
+    Volt::route('userinfo', 'user.userinfo')
+        ->middleware(['auth', 'verified'])
+        ->name('userinfo');
 
     // Notification routes
     Volt::route('notifications', 'notifications.index')->name('notifications.index');
@@ -47,7 +48,6 @@ Route::middleware(['auth'])->group(function () {
 
     // Staff, Admin, and SuperAdmin routes
     Route::middleware(['role:MCR-staff,MTO-staff,BPLS-staff,admin,super-admin'])->group(function () {
-
 
         Volt::route('staff/dashboard', 'staff.dashboard')->name('staff.dashboard');
         Volt::route('staff/appointments', 'staff.appointments')->name('staff.appointments');
@@ -84,4 +84,4 @@ Route::middleware(['auth'])->group(function () {
 
 Route::get('test-mail', [EmailsController::class, 'sendWelcomeMail'])->name('test.mail');
 
-require __DIR__ . '/auth.php';
+require __DIR__.'/auth.php';

@@ -93,6 +93,12 @@ new class extends Component {
     {
         $this->user = auth()->user();
 
+        // Ensure user is authenticated and verified
+        if (!$this->user || !$this->user->hasVerifiedEmail()) {
+            $this->redirect(route('verification.notice'), navigate: true);
+            return;
+        }
+
         // Create PersonalInformation if it doesn't exist yet
         if (!$this->user->personalInformation) {
             $personalInfo = new PersonalInformation();
