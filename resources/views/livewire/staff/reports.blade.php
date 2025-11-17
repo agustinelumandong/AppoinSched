@@ -50,7 +50,7 @@ new class extends Component {
         if (
             !auth()
                 ->user()
-                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'admin', 'super-admin'])
+                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'MCR-admin', 'MTO-admin', 'BPLS-admin', 'admin', 'super-admin'])
         ) {
             abort(403, 'Unauthorized access');
         }
@@ -63,16 +63,7 @@ new class extends Component {
 
     public function getOfficeIdForStaff(): ?int
     {
-        if (auth()->user()->hasRole('MCR-staff')) {
-            return Offices::where('slug', 'municipal-civil-registrar')->value('id');
-        }
-        if (auth()->user()->hasRole('MTO-staff')) {
-            return Offices::where('slug', 'municipal-treasurers-office')->value('id');
-        }
-        if (auth()->user()->hasRole('BPLS-staff')) {
-            return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
-        }
-        return null;
+        return auth()->user()->getOfficeIdForStaff();
     }
 
     public function updatedPeriodType(): void
@@ -123,14 +114,20 @@ new class extends Component {
         $period = $this->periodType !== 'custom' ? $this->periodType : null;
         $startDate = $this->isCustomRange ? $this->startDate : null;
         $endDate = $this->isCustomRange ? $this->endDate : null;
+        $user = auth()->user();
 
         // Initialize reportData as an empty array if no results are found
         $this->reportData = [];
 
         if ($this->selectedType === 'appointments') {
-            $query = Appointments::with(['office', 'user'])
-                ->where('office_id', $officeId)
-                ->when($status, fn($q) => $q->where('status', $status));
+            $query = Appointments::with(['office', 'user']);
+
+            // Super-admin sees all offices, others see only their assigned office
+            if (!$user->hasRole('super-admin') && $officeId) {
+                $query->where('office_id', $officeId);
+            }
+
+            $query->when($status, fn($q) => $q->where('status', $status));
             $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'booking_date');
             $results = $query->get();
 
@@ -149,9 +146,14 @@ new class extends Component {
                     ->toArray();
             }
         } else {
-            $query = DocumentRequest::with(['office', 'service', 'user'])
-                ->where('office_id', $officeId)
-                ->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
+            $query = DocumentRequest::with(['office', 'service', 'user']);
+
+            // Super-admin sees all offices, others see only their assigned office
+            if (!$user->hasRole('super-admin') && $officeId) {
+                $query->where('office_id', $officeId);
+            }
+
+            $query->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
                 ->when($status, fn($q) => $q->where('status', $status));
             $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'created_at');
             $results = $query->get();
@@ -235,13 +237,19 @@ new class extends Component {
         $period = $this->periodType !== 'custom' ? $this->periodType : null;
         $startDate = $this->isCustomRange ? $this->startDate : null;
         $endDate = $this->isCustomRange ? $this->endDate : null;
+        $user = auth()->user();
 
         $exportData = [];
 
         if ($this->selectedType === 'appointments') {
-            $query = Appointments::with(['office', 'user', 'appointmentDetails'])
-                ->where('office_id', $officeId)
-                ->when(
+            $query = Appointments::with(['office', 'user', 'appointmentDetails']);
+
+            // Super-admin sees all offices, others see only their assigned office
+            if (!$user->hasRole('super-admin') && $officeId) {
+                $query->where('office_id', $officeId);
+            }
+
+            $query->when(
                     !empty($this->selectedStatuses),
                     function ($q) {
                         return $q->whereIn('status', $this->selectedStatuses);
@@ -274,9 +282,14 @@ new class extends Component {
                 $exportData[] = $item;
             }
         } else {
-            $query = DocumentRequest::with(['office', 'service', 'user', 'details'])
-                ->where('office_id', $officeId)
-                ->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
+            $query = DocumentRequest::with(['office', 'service', 'user', 'details']);
+
+            // Super-admin sees all offices, others see only their assigned office
+            if (!$user->hasRole('super-admin') && $officeId) {
+                $query->where('office_id', $officeId);
+            }
+
+            $query->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
                 ->when(
                     !empty($this->selectedStatuses),
                     function ($q) {

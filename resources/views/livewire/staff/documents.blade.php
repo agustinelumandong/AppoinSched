@@ -20,11 +20,11 @@ new class extends Component {
 
     public function mount(): void
     {
-        // Check if user has staff role
+        // Check if user has staff or admin role
         if (
             !auth()
                 ->user()
-                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'admin', 'super-admin'])
+                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'MCR-admin', 'MTO-admin', 'BPLS-admin', 'admin', 'super-admin'])
         ) {
             abort(403, 'Unauthorized access');
         }
@@ -136,32 +136,32 @@ new class extends Component {
     }
     public function getOfficeIdForStaff(): ?int
     {
-        if (auth()->user()->hasRole('MCR-staff')) {
-            return Offices::where('slug', 'municipal-civil-registrar')->value('id');
-        }
-        if (auth()->user()->hasRole('MTO-staff')) {
-            return Offices::where('slug', 'municipal-treasurers-office')->value('id');
-        }
-        if (auth()->user()->hasRole('BPLS-staff')) {
-            return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
-        }
-        return null;
+        return auth()->user()->getOfficeIdForStaff();
     }
     public function with(): array
     {
+        $user = auth()->user();
+        $officeId = $user->getOfficeIdForStaff();
+
+        $query = DocumentRequest::with(['user', 'staff', 'office', 'service', 'details']);
+
+        // Super-admin sees all offices, others see only their assigned office
+        if (!$user->hasRole('super-admin') && $officeId) {
+            $query->where('office_id', $officeId);
+        }
+
         return [
-            'documentRequests' => DocumentRequest::with(['user', 'staff', 'office', 'service', 'details'])
-                ->where('office_id', auth()->user()->getOfficeIdForStaff())
-                ->when($this->search, function ($query) {
-                    $query->whereHas('user', function ($q) {
-                        $q->where('first_name', 'like', '%' . $this->search . '%')
+            'documentRequests' => $query
+                ->when($this->search, function ($q) {
+                    $q->whereHas('user', function ($userQuery) {
+                        $userQuery->where('first_name', 'like', '%' . $this->search . '%')
                             ->orWhere('last_name', 'like', '%' . $this->search . '%')
                             ->orWhere('email', 'like', '%' . $this->search . '%')
                             ->orWhere('reference_number', 'like', '%' . $this->search . '%');
                     });
                 })
-                ->when($this->status, function ($query) {
-                    $query->where('status', $this->status);
+                ->when($this->status, function ($q) {
+                    $q->where('status', $this->status);
                 })
                 ->latest()
                 ->paginate(10),

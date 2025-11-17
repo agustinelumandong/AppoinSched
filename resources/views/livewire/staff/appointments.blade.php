@@ -28,11 +28,11 @@ new class extends Component {
     {
         $this->resetAppointmentData();
 
-        // Check if user has staff role
+        // Check if user has staff or admin role
         if (
             !auth()
                 ->user()
-                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'admin', 'super-admin'])
+                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'MCR-admin', 'MTO-admin', 'BPLS-admin', 'admin', 'super-admin'])
         ) {
             abort(403, 'Unauthorized access');
         }
@@ -197,16 +197,7 @@ new class extends Component {
 
     public function getOfficeIdForStaff(): ?int
     {
-        if (auth()->user()->hasRole('MCR-staff')) {
-            return Offices::where('slug', 'municipal-civil-registrar')->value('id');
-        }
-        if (auth()->user()->hasRole('MTO-staff')) {
-            return Offices::where('slug', 'municipal-treasurers-office')->value('id');
-        }
-        if (auth()->user()->hasRole('BPLS-staff')) {
-            return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
-        }
-        return null;
+        return auth()->user()->getOfficeIdForStaff();
     }
 
     public function completeAppointment(int $id): void
@@ -242,12 +233,10 @@ new class extends Component {
                 $query->where('office_id', $this->selectedOfficeId);
             });
 
-        // Filter by staff's assigned office if not admin/super-admin
-        if (
-            !auth()
-                ->user()
-                ->hasAnyRole(['admin', 'super-admin'])
-        ) {
+        // Filter by staff's assigned office if not super-admin
+        // Super-admin sees all offices, others see only their assigned office
+        $user = auth()->user();
+        if (!$user->hasRole('super-admin')) {
             $officeId = $this->getOfficeIdForStaff();
             if ($officeId) {
                 $query->where('office_id', $officeId);
@@ -342,7 +331,7 @@ new class extends Component {
                                     </div>
                                 </div>
                             </td>
-                            
+
                             <td>
                                 <span
                                     class="flux-badge flux-badge-{{ $appointment->status == 'completed' ? 'success' : ($appointment->status == 'cancelled' ? 'danger' : 'warning') }}">

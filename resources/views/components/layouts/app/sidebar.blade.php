@@ -5,10 +5,10 @@
     @include('partials.head')
     <style>
         .d-header{
-            background: linear-gradient(269deg, rgba(196, 213, 255, 0.5) 0%, #fff 100%); 
+            background: linear-gradient(269deg, rgba(196, 213, 255, 0.5) 0%, #fff 100%);
         }
         .d-sidebar{
-            background: linear-gradient(0deg, rgba(196, 213, 255, 0.5) 0%, #fff 5%); 
+            background: linear-gradient(0deg, rgba(196, 213, 255, 0.5) 0%, #fff 5%);
         }
     </style>
 </head>
@@ -141,7 +141,7 @@
             <flux:navlist.group :heading="__('Platform')" class="grid">
                 <flux:navlist.item
                     icon="home"
-                    :href="route(auth()->user()->hasRole('super-admin|admin') ? 'admin.dashboard' : (auth()->user()->hasAnyRole('MCR-staff|MTO-staff|BPLS-staff') ? 'staff.dashboard' : 'client.dashboard'))"
+                    :href="route(auth()->user()->hasRole('super-admin|admin') ? 'admin.dashboard' : (auth()->user()->hasAnyRole('MCR-staff|MTO-staff|BPLS-staff|MCR-admin|MTO-admin|BPLS-admin') ? 'staff.dashboard' : 'client.dashboard'))"
                     :current="request()->routeIs('*.dashboard')"
                     wire:navigate
                     class="text-decoration-none text-black truncate h-12! w-full! mb-2!"
@@ -150,7 +150,7 @@
                 </flux:navlist.item>
 
             </flux:navlist.group>
-             
+
             {{-- Client Navigation --}}
             @hasrole('client')
             {{-- request()->routeIs('client.*'); --}}
@@ -169,7 +169,7 @@
             @endhasrole
 
             {{-- Staff Navigation --}}
-            @hasrole('MCR-staff|MTO-staff|BPLS-staff')
+            @hasrole('MCR-staff|MTO-staff|BPLS-staff|MCR-admin|MTO-admin|BPLS-admin')
             <flux:navlist.group expandable heading="Staff Management">
                 <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
                     :current="request()->routeIs('staff.appointments')" wire:navigate
@@ -242,8 +242,8 @@
 
         @hasrole('client')
         <flux:navlist variant="outline">
-            <flux:navlist.item 
-                icon="user" 
+            <flux:navlist.item
+                icon="user"
                 :href="route('userinfo')"
                 :current="request()->routeIs('userinfo')"
                 wire:navigate
@@ -332,7 +332,7 @@
             @endhasrole
 
             {{-- Staff Navigation --}}
-            @hasrole('MCR-staff|MTO-staff|BPLS-staff')
+            @hasrole('MCR-staff|MTO-staff|BPLS-staff|MCR-admin|MTO-admin|BPLS-admin')
             <flux:navlist.group expandable heading="Staff Management">
                 <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
                     :current="request()->routeIs('staff.appointments')" wire:navigate
@@ -343,6 +343,16 @@
                     :current="request()->routeIs('staff.documents')" wire:navigate
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Process Documents'), 14) }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="cog-6-tooth" :href="route('staff.services')"
+                    :current="request()->routeIs('staff.services')" wire:navigate
+                    class="text-decoration-none text-black truncate">
+                    {{ Str::limit(__('Services Management'), 14) }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="chart-bar" :href="route('staff.reports')"
+                    :current="request()->routeIs('staff.reports')" wire:navigate
+                    class="text-decoration-none text-black truncate">
+                    {{ Str::limit(__('Staff Reports'), 14) }}
                 </flux:navlist.item>
             </flux:navlist.group>
             @endhasrole

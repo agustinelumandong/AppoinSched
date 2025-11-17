@@ -23,7 +23,7 @@ new class extends Component {
 
   public function mount(): void
   {
-    if (!auth()->user()->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'admin', 'super-admin'])) {
+    if (!auth()->user()->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'MCR-admin', 'MTO-admin', 'BPLS-admin', 'admin', 'super-admin'])) {
       abort(403, 'Unauthorized access');
     }
     $this->office_id = $this->getOfficeIdForStaff();
@@ -31,30 +31,31 @@ new class extends Component {
 
   public function getOfficeIdForStaff(): ?int
   {
-    if (auth()->user()->hasRole('MCR-staff')) {
-      return Offices::where('slug', 'municipal-civil-registrar')->value('id');
-    }
-    if (auth()->user()->hasRole('MTO-staff')) {
-      return Offices::where('slug', 'municipal-treasurers-office')->value('id');
-    }
-    if (auth()->user()->hasRole('BPLS-staff')) {
-      return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
-    }
-    return null;
+    return auth()->user()->getOfficeIdForStaff();
   }
 
   public function with(): array
   {
     $officeId = $this->getOfficeIdForStaff();
+    $user = auth()->user();
+
+    // Super-admin sees all offices, others see only their assigned office
+    $query = Services::query();
+
+    if (!$user->hasRole('super-admin') && $officeId) {
+      $query->where('office_id', $officeId);
+    }
+
+    $services = $query->when($this->search, function ($q) {
+        $q->where('title', 'like', '%' . $this->search . '%')
+          ->orWhere('description', 'like', '%' . $this->search . '%');
+      })
+      ->orderBy('created_at', 'desc')
+      ->paginate(10);
+
     return [
-      'services' => Services::where('office_id', $officeId)
-        ->when($this->search, function ($query) {
-          $query->where('title', 'like', '%' . $this->search . '%')
-            ->orWhere('description', 'like', '%' . $this->search . '%');
-        })
-        ->orderBy('created_at', 'desc')
-        ->paginate(10),
-      'office' => Offices::find($officeId),
+      'services' => $services,
+      'office' => $officeId ? Offices::find($officeId) : null,
     ];
   }
 

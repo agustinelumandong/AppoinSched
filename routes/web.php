@@ -47,7 +47,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     });
 
     // Staff, Admin, and SuperAdmin routes
-    Route::middleware(['role:MCR-staff,MTO-staff,BPLS-staff,admin,super-admin'])->group(function () {
+    Route::middleware(['role:MCR-staff,MTO-staff,BPLS-staff,MCR-admin,MTO-admin,BPLS-admin,admin,super-admin'])->group(function () {
 
         Volt::route('staff/dashboard', 'staff.dashboard')->name('staff.dashboard');
         Volt::route('staff/appointments', 'staff.appointments')->name('staff.appointments');

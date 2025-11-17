@@ -338,6 +338,7 @@ class User extends Authenticatable
 
     public function getOfficeIdForStaff(): ?int
     {
+        // Check staff roles
         if ($this->hasRole('MCR-staff')) {
             return Offices::where('slug', 'municipal-civil-registrar')->value('id');
         }
@@ -347,6 +348,18 @@ class User extends Authenticatable
         if ($this->hasRole('BPLS-staff')) {
             return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
         }
+
+        // Check office-specific admin roles
+        if ($this->hasRole('MCR-admin')) {
+            return Offices::where('slug', 'municipal-civil-registrar')->value('id');
+        }
+        if ($this->hasRole('MTO-admin')) {
+            return Offices::where('slug', 'municipal-treasurers-office')->value('id');
+        }
+        if ($this->hasRole('BPLS-admin')) {
+            return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
+        }
+
         return null;
     }
 

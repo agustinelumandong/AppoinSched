@@ -13,7 +13,7 @@ new class extends Component {
         if (
             !auth()
                 ->user()
-                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'admin', 'super-admin'])
+                ->hasAnyRole(['MCR-staff', 'MTO-staff', 'BPLS-staff', 'MCR-admin', 'MTO-admin', 'BPLS-admin', 'admin', 'super-admin'])
         ) {
             abort(403, 'Unauthorized to access staff dashboard');
         }
@@ -21,51 +21,43 @@ new class extends Component {
 
     public function with(): array
     {
+        $user = auth()->user();
+        $officeId = $user->getOfficeIdForStaff();
+
+        // Super-admin sees all offices, others see only their assigned office
+        $appointmentsQuery = Appointments::with(['user', 'office']);
+        $documentsQuery = DocumentRequest::with(['user', 'office', 'service']);
+
+        if (!$user->hasRole('super-admin') && $officeId) {
+            $appointmentsQuery->where('office_id', $officeId);
+            $documentsQuery->where('office_id', $officeId);
+        }
+
         return [
-            'recentAppointments' => Appointments::with(['user', 'office'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'recentAppointments' => (clone $appointmentsQuery)
                 ->latest()
                 ->take(5)
                 ->get(),
-            'approvedAppointments' => Appointments::with(['user', 'office'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'approvedAppointments' => (clone $appointmentsQuery)
                 ->latest()
                 ->get(),
-            'pendingAppointments' => Appointments::with(['user', 'office'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'pendingAppointments' => (clone $appointmentsQuery)
                 ->where('status', 'pending')
                 ->get(),
-            'recentDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'recentDocumentRequests' => (clone $documentsQuery)
                 ->latest()
                 ->take(5)
                 ->get(),
-            'pendingDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'pendingDocumentRequests' => (clone $documentsQuery)
                 ->where('status', 'pending')
                 ->get(),
-            'approvedDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'approvedDocumentRequests' => (clone $documentsQuery)
                 ->where('status', 'approved')
                 ->get(),
-            'rejectedDocumentRequests' => DocumentRequest::with(['user', 'office', 'service'])
-                ->where('office_id', $this->getOfficeIdForStaff())
+            'rejectedDocumentRequests' => (clone $documentsQuery)
                 ->where('status', 'rejected')
                 ->get(),
         ];
-    }
-    public function getOfficeIdForStaff(): ?int
-    {
-        if (auth()->user()->hasRole('MCR-staff')) {
-            return Offices::where('slug', 'municipal-civil-registrar')->value('id');
-        }
-        if (auth()->user()->hasRole('MTO-staff')) {
-            return Offices::where('slug', 'municipal-treasurers-office')->value('id');
-        }
-        if (auth()->user()->hasRole('BPLS-staff')) {
-            return Offices::where('slug', 'business-permits-and-licensing-section')->value('id');
-        }
-        return null;
     }
 }; ?>
 <div title="Staff Dashboard">
