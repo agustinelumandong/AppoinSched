@@ -122,7 +122,7 @@ new class extends Component {
         // Create UserFamily if it doesn't exist yet
         if (!$this->user->userFamilies || $this->user->userFamilies->isEmpty()) {
             $userFamily = new UserFamily();
-            $userFamily->user_id = $this->user->getKey();
+            // $userFamily->user_id = $this->user->getKey();
             $userFamily->personal_information_id = $this->personalInformation->getKey();
             $userFamily->save();
             $this->user->refresh();
@@ -552,7 +552,7 @@ new class extends Component {
             // For nullable fields, save as 'N/A' if empty
             $this->userFamily
                 ->fill([
-                    'user_id' => $this->user->getKey(),
+                    // 'user_id' => $this->user->getKey(),
                     'personal_information_id' => $this->personalInformation->getKey(),
                     'father_last_name' => $this->father_is_unknown ? 'N/A' : ($this->father_last_name ?: 'N/A'),
                     'father_first_name' => $this->father_is_unknown ? 'N/A' : ($this->father_first_name ?: 'N/A'),

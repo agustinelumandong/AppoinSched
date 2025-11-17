@@ -9,7 +9,7 @@ class UserFamily extends Model
     protected $table = 'user_families';
 
     protected $fillable = [
-        'user_id',
+        // 'user_id',
         'personal_information_id',
         'father_last_name',
         'father_first_name',
@@ -42,7 +42,7 @@ class UserFamily extends Model
             strtolower($this->father_middle_name ?? '') !== 'n/a' ? $this->father_middle_name : null,
             strtolower($this->father_suffix ?? '') !== 'n/a' ? $this->father_suffix : null,
         ], function ($part) {
-            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+            return ! empty($part) && strtolower(trim($part)) !== 'n/a';
         });
 
         return trim(implode(' ', $parts));
@@ -56,11 +56,9 @@ class UserFamily extends Model
             strtolower($this->mother_middle_name ?? '') !== 'n/a' ? $this->mother_middle_name : null,
             strtolower($this->mother_suffix ?? '') !== 'n/a' ? $this->mother_suffix : null,
         ], function ($part) {
-            return !empty($part) && strtolower(trim($part)) !== 'n/a';
+            return ! empty($part) && strtolower(trim($part)) !== 'n/a';
         });
 
         return trim(implode(' ', $parts));
     }
-
-
 }

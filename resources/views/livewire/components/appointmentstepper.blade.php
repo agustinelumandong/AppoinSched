@@ -20,7 +20,6 @@ use App\Enums\RequestNotificationEvent;
 use App\Notifications\AdminEventNotification;
 use App\Enums\AdminNotificationEvent;
 
-
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
     public string $purpose = 'consultation';
@@ -95,8 +94,6 @@ new #[Title('Appointment')] class extends Component {
         $this->populateUserData();
     }
 
-
-
     public function termsAccepted()
     {
         if ($this->termsAccepted) {
@@ -107,7 +104,6 @@ new #[Title('Appointment')] class extends Component {
             session()->flash('error', 'You must accept the terms and conditions to proceed.');
         }
     }
-
 
     public function populateUserData(): void
     {
@@ -142,6 +138,8 @@ new #[Title('Appointment')] class extends Component {
                 if (!$this->office->slug === 'municipal-treasurers-office') {
                     if (!$this->includeCertificates) {
                         $this->step++; // Skip to next step
+                        // Enable editing when reaching personal information step
+                        $this->editPersonDetails = true;
                     }
                 }
                 break;
@@ -158,6 +156,8 @@ new #[Title('Appointment')] class extends Component {
                             "certificates.{$index}.middle_name" => 'nullable|string',
                         ]);
                     }
+                    // Enable editing when reaching personal information step (step 4 with certificates)
+                    $this->editPersonDetails = true;
                 }
                 break;
             case 4:
@@ -237,6 +237,15 @@ new #[Title('Appointment')] class extends Component {
                 break;
         }
         $this->step++;
+    }
+
+    public function updatedStep($value): void
+    {
+        // Automatically enable editing when reaching personal information step
+        $personalInfoStep = $this->includeCertificates ? 4 : 3;
+        if ($value == $personalInfoStep) {
+            $this->editPersonDetails = true;
+        }
     }
 
     public function previousStep(): void
@@ -356,7 +365,6 @@ new #[Title('Appointment')] class extends Component {
 
             // Process certificate requests if included
             if ($this->includeCertificates && count($this->certificates) > 0) {
-
                 $toWhom = [
                     'myself' => 'SF',
                     'spouse' => 'SP',
@@ -598,7 +606,8 @@ new #[Title('Appointment')] class extends Component {
 
     @include('components.alert')
 
-    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request an Appointment on <span class="font-bold">{{ $this->office->name }}</span> Office</h1>
+    <h1 class="text-2xl font-semibold text-base-content mt-3 py-2 text-center">Request an Appointment on <span
+            class="font-bold">{{ $this->office->name }}</span> Office</h1>
 
     {{-- Stepper Header --}}
     <div class="px-5 py-2 mt-5">
@@ -615,7 +624,7 @@ new #[Title('Appointment')] class extends Component {
                     <div class="step-description text-sm text-gray-500">State your purpose</div>
                 </div>
             </li>
-            @if($this->includeCertificates)
+            @if ($this->includeCertificates)
                 <li class="step {{ $step >= 3 ? 'step-info' : '' }}">
                     <div class="step-content">
                         <div class="step-title">Certificate Requests</div>
@@ -694,8 +703,8 @@ new #[Title('Appointment')] class extends Component {
 
                 </div>
                 <footer class="my-6 flex justify-end gap-2" wire:loading.remove>
-                    <button class="flux-btn flux-btn-primary" wire:click="nextStep" @if (!$termsAccepted) disabled
-                    @endif>Next</button>
+                    <button class="flux-btn flux-btn-primary" wire:click="nextStep"
+                        @if (!$termsAccepted) disabled @endif>Next</button>
                 </footer>
             </div>
         </div>
