@@ -30,7 +30,7 @@ class DocumentRequestsSeeder extends Seeder
             return;
         }
 
-        $statuses = ['pending', 'approved', 'rejected', 'completed', 'cancelled', 'in-progress', 'ready-for-pickup'];
+        $statuses = ['pending', 'in-progress', 'cancelled'];
         $paymentStatuses = ['unpaid', 'paid', 'failed'];
         $paymentMethods = ['Cash', 'GCash', 'PayMaya', 'Bank Transfer', 'Credit Card'];
 
@@ -41,8 +41,16 @@ class DocumentRequestsSeeder extends Seeder
 
             for ($i = 0; $i < $requestCount; $i++) {
                 $client = $clients->random();
-                $status = fake()->randomElement($statuses);
                 $paymentStatus = fake()->randomElement($paymentStatuses);
+
+                // Determine status based on payment status
+                // If paid, status should be in-progress (will be automatically set by model)
+                // Otherwise, can be pending or cancelled
+                if ($paymentStatus === 'paid') {
+                    $status = 'in-progress';
+                } else {
+                    $status = fake()->randomElement(['pending', 'cancelled']);
+                }
 
                 // Assign staff member based on office
                 $officeStaff = $staffMembers->filter(function ($staff) use ($office) {
@@ -51,7 +59,7 @@ class DocumentRequestsSeeder extends Seeder
                 });
 
                 $staffId = null;
-                if ($officeStaff->isNotEmpty() && in_array($status, ['approved', 'in-progress', 'ready-for-pickup', 'completed'])) {
+                if ($officeStaff->isNotEmpty() && $status === 'in-progress') {
                     $staffId = $officeStaff->random()->id;
                 }
 
@@ -60,8 +68,9 @@ class DocumentRequestsSeeder extends Seeder
                 $completedDate = null;
                 $paymentDate = null;
 
-                if (in_array($status, ['completed', 'ready-for-pickup'])) {
-                    $completedDate = fake()->dateTimeBetween($requestedDate, 'now');
+                // Only set completed_date for in-progress requests that have payment
+                if ($status === 'in-progress' && $paymentStatus === 'paid') {
+                    $completedDate = fake()->optional(0.3)->dateTimeBetween($requestedDate, 'now');
                 }
 
                 if ($paymentStatus === 'paid') {

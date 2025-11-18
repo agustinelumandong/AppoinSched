@@ -898,15 +898,11 @@
                 </div>
                 <span
                     class="flux-badge
-                    @if ($documentRequest->status === 'approved') flux-badge-success
-                    @elseif ($documentRequest->status === 'pending') flux-badge-warning
-                    @elseif ($documentRequest->status === 'rejected') flux-badge-danger
-                    @elseif ($documentRequest->status === 'completed') flux-badge-success
-                    @elseif ($documentRequest->status === 'cancelled') flux-badge-danger
+                    @if ($documentRequest->status === 'pending') flux-badge-warning
                     @elseif ($documentRequest->status === 'in-progress') flux-badge-info
-                    @elseif ($documentRequest->status === 'ready-for-pickup') flux-badge-primary
+                    @elseif ($documentRequest->status === 'cancelled') flux-badge-danger
                     @else flux-badge-secondary @endif">
-                    {{ ucfirst($documentRequest->status ?? 'Pending') }}
+                    {{ ucfirst(str_replace('-', ' ', $documentRequest->status ?? 'Pending')) }}
                 </span>
             </div>
         </div>
@@ -914,7 +910,7 @@
         <!-- Status Update Buttons -->
         <div class="space-y-3">
             <h5 class="text-sm font-medium text-gray-700 mb-3">Update Document Request Status:</h5>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-2">
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
                 <button wire:click="setDocumentStatusToUpdate('pending')" wire:prevent-scroll
                     class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'pending') flux-btn-warning @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -922,42 +918,6 @@
                             d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                     </svg>
                     <span class="text-xs">Pending</span>
-                </button>
-
-                <button wire:click="setDocumentStatusToUpdate('approved')" wire:prevent-scroll
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'approved') flux-btn-success @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7">
-                        </path>
-                    </svg>
-                    <span class="text-xs">Approved</span>
-                </button>
-
-                <button wire:click="setDocumentStatusToUpdate('rejected')" wire:prevent-scroll
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'rejected') flux-btn-danger @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    <span class="text-xs">Rejected</span>
-                </button>
-
-                <button wire:click="setDocumentStatusToUpdate('completed')" wire:prevent-scroll
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'completed') flux-btn-success @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span class="text-xs">Completed</span>
-                </button>
-
-                <button wire:click="setDocumentStatusToUpdate('cancelled')" wire:prevent-scroll
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'cancelled') flux-btn-danger @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M6 18L18 6M6 6l12 12"></path>
-                    </svg>
-                    <span class="text-xs">Cancelled</span>
                 </button>
 
                 <button wire:click="setDocumentStatusToUpdate('in-progress')" wire:prevent-scroll
@@ -969,16 +929,14 @@
                     <span class="text-xs">In Progress</span>
                 </button>
 
-                <button wire:click="setDocumentStatusToUpdate('ready-for-pickup')" wire:prevent-scroll
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'ready-for-pickup') flux-btn-primary @else flux-btn-outline @endif">
+                <button wire:click="setDocumentStatusToUpdate('cancelled')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'cancelled') flux-btn-danger @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path>
+                            d="M6 18L18 6M6 6l12 12"></path>
                     </svg>
-                    <span class="text-xs">Ready for Pickup</span>
+                    <span class="text-xs">Cancelled</span>
                 </button>
-
-
             </div>
         </div>
 

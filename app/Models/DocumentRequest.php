@@ -15,6 +15,11 @@ class DocumentRequest extends Model
 {
     use HasFactory;
 
+    /**
+     * Valid document request status values
+     */
+    public const VALID_STATUSES = ['pending', 'in-progress', 'cancelled'];
+
     protected $fillable = [
         'user_id',
         'staff_id',
@@ -54,29 +59,56 @@ class DocumentRequest extends Model
         return $this->belongsTo(Services::class, 'service_id');
     }
 
+    /**
+     * Boot the model.
+     */
+    protected static function boot(): void
+    {
+        parent::boot();
+
+        // Automatically set status to 'in-progress' when payment_status changes to 'paid'
+        static::updating(function ($documentRequest) {
+            // Check if payment_status is being changed to 'paid'
+            if ($documentRequest->isDirty('payment_status') && $documentRequest->payment_status === 'paid') {
+                // Only transition if current status is 'pending'
+                if ($documentRequest->getOriginal('status') === 'pending') {
+                    $documentRequest->status = 'in-progress';
+                }
+            }
+        });
+    }
+
     public function scopePending($query)
     {
         return $query->where('status', 'pending');
     }
 
+    // Deprecated: Use scopeInProgress() instead
     public function scopeApproved($query)
     {
-        return $query->where('status', 'approved');
+        return $query->where('status', 'in-progress');
     }
 
+    // Deprecated: Use scopeCancelled() instead
     public function scopeRejected($query)
     {
-        return $query->where('status', 'rejected');
+        return $query->where('status', 'cancelled');
     }
 
+    // Deprecated: Use scopeInProgress() instead
     public function scopeCompleted($query)
     {
-        return $query->where('status', 'completed');
+        return $query->where('status', 'in-progress');
     }
 
-    public function scopeNoShow($query)
+    public function scopeInProgress($query)
     {
-        return $query->where('status', 'no-show');
+        return $query->where('status', 'in-progress');
+    }
+
+    public function scopeCancelled($query)
+    {
+        return $query->where('status', 'cancelled');
     }
 
     public function details()
@@ -94,51 +126,84 @@ class DocumentRequest extends Model
         return $this->status === 'pending';
     }
 
+    // Deprecated: Use isInProgress() instead
     public function isCompleted()
     {
-        return $this->status === 'completed';
+        return $this->status === 'in-progress';
     }
 
+    // Deprecated: Use isCancelled() instead
     public function isRejected()
     {
-        return $this->status === 'rejected';
+        return $this->status === 'cancelled';
     }
 
+    // Deprecated: Use isCancelled() instead
     public function isNoShow()
     {
-        return $this->status === 'no-show';
+        return $this->status === 'cancelled';
     }
 
+    public function isInProgress()
+    {
+        return $this->status === 'in-progress';
+    }
+
+    public function isCancelled()
+    {
+        return $this->status === 'cancelled';
+    }
+
+    // Deprecated: Use isInProgress() instead
     public function isApproved()
     {
-        return $this->status === 'approved';
+        return $this->status === 'in-progress';
     }
 
+    // Deprecated: Use status update directly or new helper methods
     public function markAsCompleted()
     {
-        $this->status = 'completed';
+        $this->status = 'in-progress';
         $this->completed_date = now();
         $this->save();
     }
 
+    // Deprecated: Use markAsCancelled() instead
     public function markAsRejected($remarks = null)
     {
-        $this->status = 'rejected';
+        $this->status = 'cancelled';
         if ($remarks) {
             $this->remarks = $remarks;
         }
         $this->save();
     }
 
+    // Deprecated: Use markAsCancelled() instead
     public function markAsNoShow()
     {
-        $this->status = 'no-show';
+        $this->status = 'cancelled';
         $this->save();
     }
 
+    // Deprecated: Use markAsInProgress() instead
     public function markAsApproved()
     {
-        $this->status = 'approved';
+        $this->status = 'in-progress';
+        $this->save();
+    }
+
+    public function markAsInProgress()
+    {
+        $this->status = 'in-progress';
+        $this->save();
+    }
+
+    public function markAsCancelled($remarks = null)
+    {
+        $this->status = 'cancelled';
+        if ($remarks) {
+            $this->remarks = $remarks;
+        }
         $this->save();
     }
 
@@ -148,6 +213,12 @@ class DocumentRequest extends Model
         $this->payment_reference = $paymentReference;
         $this->payment_method = $paymentMethod;
         $this->payment_date = now();
+
+        // Automatically set status to 'in-progress' if currently 'pending'
+        if ($this->status === 'pending') {
+            $this->status = 'in-progress';
+        }
+
         $this->save();
     }
 
@@ -198,9 +269,14 @@ class DocumentRequest extends Model
         return self::count();
     }
 
-    public function totalCompletedRequests()
+    public function totalInProgressRequests()
     {
-        return self::where('status', 'completed')->count();
+        return self::where('status', 'in-progress')->count();
+    }
+
+    public function totalCancelledRequests()
+    {
+        return self::where('status', 'cancelled')->count();
     }
 
     public function totalPendingRequests()
@@ -208,19 +284,28 @@ class DocumentRequest extends Model
         return self::where('status', 'pending')->count();
     }
 
+    // Deprecated: Use totalInProgressRequests() instead
+    public function totalCompletedRequests()
+    {
+        return self::where('status', 'in-progress')->count();
+    }
+
+    // Deprecated: Use totalCancelledRequests() instead
     public function totalRejectedRequests()
     {
-        return self::where('status', 'rejected')->count();
+        return self::where('status', 'cancelled')->count();
     }
 
+    // Deprecated: Use totalCancelledRequests() instead
     public function totalNoShowRequests()
     {
-        return self::where('status', 'no-show')->count();
+        return self::where('status', 'cancelled')->count();
     }
 
+    // Deprecated: Use totalInProgressRequests() instead
     public function totalApprovedRequests()
     {
-        return self::where('status', 'approved')->count();
+        return self::where('status', 'in-progress')->count();
     }
 
     public function totalPaidRequests()
@@ -248,6 +333,6 @@ class DocumentRequest extends Model
         return $query->orderBy('created_at', 'desc')->limit($limit);
     }
 
-    
+
 
 }

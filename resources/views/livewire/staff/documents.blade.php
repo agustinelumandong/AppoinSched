@@ -84,7 +84,7 @@ new class extends Component {
             }
 
             // Validate the status parameter directly
-            if (!in_array($status, ['pending', 'approved', 'rejected', 'completed', 'canceled', 'in-progress', 'ready-for-pickup', 'cancelled'])) {
+            if (!in_array($status, \App\Models\DocumentRequest::VALID_STATUSES)) {
                 session()->flash('error', 'Invalid status value');
                 return;
             }
@@ -94,23 +94,19 @@ new class extends Component {
                 'staff_id' => auth()->id(),
             ];
 
-            if ($status === 'completed') {
-                $updateData['completed_date'] = now();
-            }
-
             $updated = $documentRequest->update($updateData);
 
             if ($updated) {
                 // Send notification to client for status changes
-                if ($status === 'completed') {
+                if ($status === 'in-progress') {
                     $documentRequest->user->notify(
-                        new RequestEventNotification(RequestNotificationEvent::DocumentCompleted, [
+                        new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
                             'reference_no' => $documentRequest->reference_number,
                         ])
                     );
-                } elseif ($status === 'ready-for-pickup') {
+                } elseif ($status === 'cancelled') {
                     $documentRequest->user->notify(
-                        new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCancelled, [
                             'reference_no' => $documentRequest->reference_number,
                         ])
                     );
@@ -149,10 +145,7 @@ new class extends Component {
                 'staff_id' => auth()->id(),
             ];
 
-            // Set completed_date if status is completed
-            if ($status === 'completed') {
-                $updateData['completed_date'] = now();
-            }
+            // Note: completed_date is no longer automatically set based on status
 
             $this->documentRequest->update($updateData);
 
@@ -266,9 +259,8 @@ new class extends Component {
                 <select id="status" wire:model.live="status" class="form-control">
                     <option value="">All Status</option>
                     <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                    <option value="rejected">Rejected</option>
-                    <option value="completed">Completed</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="cancelled">Cancelled</option>
                 </select>
             </div>
             <div class="flex-1">
@@ -339,15 +331,11 @@ new class extends Component {
                                             <td>
                                                 <span class="flux-badge flux-badge-{{ match ($documentRequest->status) {
                             'pending' => 'warning',
-                            'approved' => 'success',
-                            'rejected' => 'danger',
-                            'completed' => 'success',
-                            'in-progress' => 'warning',
-                            'ready-for-pickup' => 'success',
+                            'in-progress' => 'info',
                             'cancelled' => 'danger',
                             default => 'light',
                         } }}">
-                                                    {{ ucfirst($documentRequest->status) }}
+                                                    {{ ucfirst(str_replace('-', ' ', $documentRequest->status)) }}
                                                 </span>
                                             </td>
                                             <td>
@@ -361,16 +349,20 @@ new class extends Component {
                                                         wire:navigate class="flux-btn btn-sm flux-btn-primary" title="View Details">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
-                                                    <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'ready-for-pickup')"
-                                                        class="flux-btn btn-sm flux-btn-warning" title="Mark as Ready for Pickup"
-                                                        wire:loading.attr="disabled">
-                                                        <i class="bi bi-inbox"></i>
-                                                    </button>
-                                                    <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'completed')"
-                                                        class="flux-btn btn-sm flux-btn-success" title="Mark as Completed"
-                                                        wire:loading.attr="disabled">
-                                                        <i class="bi bi-check-circle"></i>
-                                                    </button>
+                                                    @if ($documentRequest->status !== 'in-progress')
+                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'in-progress')"
+                                                            class="flux-btn btn-sm flux-btn-info" title="Mark as In Progress"
+                                                            wire:loading.attr="disabled">
+                                                            <i class="bi bi-arrow-right-circle"></i>
+                                                        </button>
+                                                    @endif
+                                                    @if ($documentRequest->status !== 'cancelled')
+                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'cancelled')"
+                                                            class="flux-btn btn-sm flux-btn-danger" title="Cancel Request"
+                                                            wire:loading.attr="disabled">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    @endif
                                                 </div>
                                             </td>
                                         </tr>
@@ -410,17 +402,20 @@ new class extends Component {
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                         @if ($documentRequest->status === 'pending')
                             <div class="btn-group">
-                                <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'approved')"
-                                    class="btn btn-success">
-                                    <i class="bi bi-check-circle me-1"></i>Approve
+                                <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'in-progress')"
+                                    class="btn btn-info">
+                                    <i class="bi bi-arrow-right-circle me-1"></i>Mark as In Progress
                                 </button>
-                                <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'rejected')"
+                                <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'cancelled')"
                                     class="btn btn-danger">
-                                    <i class="bi bi-x-circle me-1"></i>Reject
+                                    <i class="bi bi-x-circle me-1"></i>Cancel
                                 </button>
-                                <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'completed')"
-                                    class="btn btn-primary">
-                                    <i class="bi bi-check2-all me-1"></i>Complete
+                            </div>
+                        @elseif ($documentRequest->status === 'in-progress')
+                            <div class="btn-group">
+                                <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'cancelled')"
+                                    class="btn btn-danger">
+                                    <i class="bi bi-x-circle me-1"></i>Cancel
                                 </button>
                             </div>
                         @endif

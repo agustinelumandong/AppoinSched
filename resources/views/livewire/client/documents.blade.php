@@ -108,12 +108,11 @@ new class extends Component {
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <span class="flux-badge flux-badge-{{ match ($request->status) {
                                                             'pending' => 'warning',
-                                                            'approved' => 'success',
-                                                            'rejected' => 'danger',
-                                                            'completed' => 'success',
+                                                            'in-progress' => 'info',
+                                                            'cancelled' => 'danger',
                                                             default => 'light',
                                                         } }}">
-                                                        {{ ucfirst($request->status) }}
+                                                        {{ ucfirst(str_replace('-', ' ', $request->status)) }}
                                                     </span>
                                                 </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">

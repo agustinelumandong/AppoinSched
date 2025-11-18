@@ -32,7 +32,7 @@ new class extends Component {
     public string $endDate;
     public bool $isCustomRange = false;
     public array $statusOptions = [];
-    public array $documentStatusOptions = ['pending', 'approved', 'rejected', 'completed', 'canceled', 'in-progress', 'ready-for-pickup', 'cancelled'];
+    public array $documentStatusOptions = ['pending', 'in-progress', 'cancelled'];
     public array $appointmentStatusOptions = ['on-going', 'cancelled', 'completed'];
     public array $paymentStatusOptions = ['unpaid', 'paid', 'failed'];
     public $reportData;
@@ -589,13 +589,8 @@ new class extends Component {
                                             class="flux-badge {{ match ($status) {
                                                 // Document request statuses
                                                 'pending' => 'flux-badge-warning',
-                                                'approved' => 'flux-badge-success',
-                                                'completed' => 'flux-badge-info',
-                                                'cancelled' => 'flux-badge-danger',
-                                                'canceled' => 'flux-badge-danger',
-                                                'rejected' => 'flux-badge-danger',
                                                 'in-progress' => 'flux-badge-info',
-                                                'ready-for-pickup' => 'flux-badge-success',
+                                                'cancelled' => 'flux-badge-danger',
                                                 // Appointment statuses
                                                 'on-going' => 'flux-badge-warning',
                                                 // Payment statuses
@@ -604,7 +599,7 @@ new class extends Component {
                                                 'failed' => 'flux-badge-danger',
                                                 default => 'flux-badge-warning',
                                             } }}">
-                                            {{ ucfirst($status) }}
+                                            {{ ucfirst(str_replace('-', ' ', $status)) }}
                                         </span>
                                     </td>
                                     <td>{{ $statusItems->count() }}</td>

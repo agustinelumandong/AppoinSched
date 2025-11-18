@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -19,7 +20,7 @@ return new class extends Migration {
             $table->string('to_whom')->nullable();
             $table->string('purpose')->nullable();
             $table->string('reference_number')->nullable();
-            $table->enum('status', ['pending', 'approved', 'rejected', 'completed', 'canceled', 'in-progress', 'ready-for-pickup', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'in-progress', 'cancelled'])->default('pending');
             $table->text('remarks')->nullable();
             $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
             $table->string('payment_reference')->nullable();
