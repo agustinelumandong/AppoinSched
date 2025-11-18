@@ -71,7 +71,7 @@ new #[Title('Appointment')] class extends Component {
         // Initialize certificates array with one empty certificate
         $this->certificates = [
             [
-                'certificate_type' => '',
+                'certificate_type' => 'special-permit',
                 'relationship' => '',
                 'first_name' => '',
                 'last_name' => '',
@@ -137,8 +137,8 @@ new #[Title('Appointment')] class extends Component {
                 // Skip the certificates step if includeCertificates is false
                 if (!$this->includeCertificates) {
                     $this->step++; // Skip to next step
-                    // Enable editing when reaching personal information step
-                    $this->editPersonDetails = true;
+                    // Default to locked state (shows Edit button)
+                    $this->editPersonDetails = false;
                 }
                 break;
             case 3:
@@ -154,8 +154,8 @@ new #[Title('Appointment')] class extends Component {
                             "certificates.{$index}.middle_name" => 'nullable|string',
                         ]);
                     }
-                    // Enable editing when reaching personal information step (step 4 with certificates)
-                    $this->editPersonDetails = true;
+                    // Default to locked state (shows Edit button) when reaching personal information step (step 4 with certificates)
+                    $this->editPersonDetails = false;
                 }
                 break;
             case 4:
@@ -239,10 +239,10 @@ new #[Title('Appointment')] class extends Component {
 
     public function updatedStep($value): void
     {
-        // Automatically enable editing when reaching personal information step
+        // Default to locked state (shows Edit button) when reaching personal information step
         $personalInfoStep = $this->includeCertificates ? 4 : 3;
         if ($value == $personalInfoStep) {
-            $this->editPersonDetails = true;
+            $this->editPersonDetails = false;
         }
     }
 
@@ -376,6 +376,7 @@ new #[Title('Appointment')] class extends Component {
                     'birth_certificate' => 'BC',
                     'marriage_certificate' => 'MC',
                     'death_certificate' => 'DC',
+                    'special-permit' => 'SP',
                 ];
                 // MC:OT - John Doe
                 AppointmentDetails::create([
@@ -391,7 +392,11 @@ new #[Title('Appointment')] class extends Component {
                             return [
                                 'number' => $index + 1,
                                 'certificate_request' => $certificate,
-                                'certificate_code' => $certificateTypeCodes[$certificate['certificate_type']] . ':' . $toWhom[$certificate['relationship']] . ' - ' . $this->first_name . ' ' . $this->last_name,
+                                'certificate_code' => $certificateTypeCodes[$certificate['certificate_type']]
+                                . ':' . $toWhom[$certificate['relationship']]
+                                . ' - ' . $certificate['first_name']
+                                . (!empty($certificate['middle_name']) ? ' ' . $certificate['middle_name'] : '')
+                                . ' ' . $certificate['last_name'],
                             ];
                         })
                         ->all(),
@@ -574,7 +579,7 @@ new #[Title('Appointment')] class extends Component {
     public function addCertificate(): void
     {
         $this->certificates[] = [
-            'certificate_type' => '',
+            'certificate_type' => 'special-permit',
             'relationship' => '',
             'first_name' => '',
             'last_name' => '',

@@ -1,9 +1,24 @@
 @php
-    $certificateTypes = [
-        'birth_certificate' => 'Birth Certificate',
-        'death_certificate' => 'Death Certificate',
-        'marriage_certificate' => 'Marriage Certificate',
-    ];
+    // Dynamically set certificate types based on office slug
+    $officeSlug = $this->office->slug ?? null;
+    if ($officeSlug === 'municipal-civil-registrar') {
+        $certificateTypes = [
+            'birth_certificate' => 'Birth Certificate',
+            'death_certificate' => 'Death Certificate',
+            'marriage_certificate' => 'Marriage Certificate',
+        ];
+    } elseif ($officeSlug === 'business-permits-and-licensing-section') {
+        $certificateTypes = [
+            'special-permit' => 'Special Permit',
+        ];
+    } else {
+        $certificateTypes = [
+            'birth_certificate' => 'Birth Certificate',
+            'death_certificate' => 'Death Certificate',
+            'marriage_certificate' => 'Marriage Certificate',
+            'special-permit' => 'Special Permit',
+        ];
+    }
 
     $relationshipTypes = [
         'myself' => 'Myself',
@@ -58,7 +73,7 @@
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <select wire:model="certificates.{{ $index }}.certificate_type"
-                                            class="flux-form-control" required>
+                                            class="flux-form-control cursor-pointer" required>
                                             <option value="">-- Select Certificate Type --</option>
                                             @foreach ($certificateTypes as $value => $label)
                                                 <option value="{{ $value }}">{{ $label }}</option>
@@ -75,7 +90,7 @@
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <select wire:model="certificates.{{ $index }}.relationship"
-                                            class="flux-form-control" required>
+                                            class="flux-form-control cursor-pointer" required>
                                             <option value="">-- Select Relationship --</option>
                                             @foreach ($relationshipTypes as $value => $label)
                                                 <option value="{{ $value }}">{{ $label }}</option>

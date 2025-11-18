@@ -3,7 +3,7 @@
     'title' => 'Modal Title',
     'backdrop' => true,
     'closable' => true,
-    'size' => 'max-w-2xl', 
+    'size' => 'max-w-2xl',
     'footerClass' => 'justify-end',
 ])
 

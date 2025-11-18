@@ -137,9 +137,14 @@
                                 'birth_certificate' => 'BC',
                                 'marriage_certificate' => 'MC',
                                 'death_certificate' => 'DC',
+                                'special-permit' => 'SP',
                             ];
 
-                            $certificateCode = $certificateTypeCodes[$certificate['certificate_type']] . ':' . $toWhom[$certificate['relationship']] . ' - ' . $first_name . ' ' . $last_name;
+                            $certificateCode = $certificateTypeCodes[$certificate['certificate_type']]
+                                . ':' . $toWhom[$certificate['relationship']]
+                                . ' - ' . $certificate['first_name']
+                                . (!empty($certificate['middle_name']) ? ' ' . $certificate['middle_name'] : '')
+                                . ' ' . $certificate['last_name'];
                         @endphp
                         <div class="flex flex-row mb-4 p-3 border border-gray-200 rounded-lg">
                             <h5 class="font-medium text-gray-700 mb-2" style="margin-right: 12px;"> #{{ $index + 1 }}</h5>

@@ -209,11 +209,11 @@
     </div>
 
 
-    {{-- <script src="{{ asset('js/qrcode.min.js') }}"></script>
+    {{-- <script src="{ { asset('js/qrcode.min.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             const qrElement = document.getElementById('qrcode');
-            const qrValue = "{{ $reference_number ?? 'appointment-request' }}";
+            const qrValue = "{ { $reference_number ?? 'appointment-request' }}";
 
             const qr = qrcode(0, 'H');
             qr.addData(qrValue);

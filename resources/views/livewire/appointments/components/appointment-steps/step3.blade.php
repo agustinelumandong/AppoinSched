@@ -108,7 +108,7 @@
 
                 <footer class="my-6 flex justify-between" wire:loading.remove>
                     <button class="flux-btn flux-btn-secondary" wire:click="previousStep">Previous</button>
-                    {{-- <button class="flux-btn flux-btn-primary" x-data x-on:click="$dispatch('open-modal-appoint-info-confirmation')" title="Appointment Confirmation">
+                    {{-- <button cl ass="flux-btn flux-btn-primary" x-data x- on:click="$dispatch('open-modal-appoint-info-confirmation')" title="Appointment Confirmation">
                         Next
                     </button> --}}
 
@@ -120,6 +120,29 @@
             </div>
         </div>
     </div>
+    <x-modal id="appointment-info" title="Request an Appointment on {{ $this->office->name }} Office" size="max-w-2xl">
+        <div class="modal-body">
+            <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
+                <h3 class="font-bold text-lg mb-2">Personal Information</h3>
+                <p class="text-base-content/70 mb-4">Your/Someone details</p>
+
+                <div class="bg-base-200 p-3 rounded-lg">
+                    <p>Please provide your complete personal information for the appointment. All fields marked as required must be filled out accurately.</p>
+                    <p class="mt-2">You can use the Edit button to modify your information, or Lock it to prevent accidental changes.</p>
+                </div>
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex gap-2">
+                <button type="button" class="flux-btn flux-btn-outline" x-data
+                    x-on:click="$dispatch('close-modal-appointment-info')">
+                    <i class="bi bi-x-lg me-1"></i>Close
+                </button>
+            </div>
+        </x-slot>
+    </x-modal>
+
     <x-modal id="consent-confirmation" title="Confirmation" size="max-w-2xl">
         <div class="modal-body">
             <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
