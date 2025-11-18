@@ -83,7 +83,7 @@ new class extends Component {
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                     @forelse ($offices as $office)
                         <a href="{{ route('offices.show', $office->slug) }}"
-                            class="flux-office-card relative p-4 border-blue-200 hover:bg-blue-50 hover:-translate-y-2 transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden block text-black no-underline"
+                            class="flux-office-card relative p-4 border-blue-200 hover:bg-blue-50 hover:-translate-y-2 transition-all duration-300 shadow-lg rounded-lg cursor-pointer overflow-hidden text-black no-underline flex flex-col"
                             id="office-{{ $office->id }}">
                             <div class="absolute" style="top: -50px; right: -80px;">
                                 @php
@@ -103,16 +103,16 @@ new class extends Component {
                                     style="width: 300px; height: 300px; filter: drop-shadow(0 0 10px rgba(0, 0, 0, 0.5)); opacity: 0.1;">
                             </div>
                             {{-- Header --}}
-                            <header class="flex flex-col">
+                            <header class="flex flex-col flex-grow">
                                 <div class="flex items-center justify-between">
-                                    <h5 class="text-lg font-bold text-black">{{ $office->name }}</h5>
+                                    <h5 class="text-lg font-bold text-black line-clamp-2">{{ $office->name }}</h5>
                                 </div>
-                                <p class="text-sm text-gray-500 mt-2 text-black">
+                                <p class="text-sm text-gray-600 mt-2 line-clamp-3">
                                     {{ $office->description }}
                                 </p>
                             </header>
                             {{-- Footer --}}
-                            <footer class="flex items-center justify-between pt-2">
+                            <footer class="flex items-center justify-between pt-2 mt-auto">
                                 <span class="text-blue-50 hover:text-blue-700 flux-btn flux-btn-primary">View Office</span>
                             </footer>
                         </a>
@@ -167,13 +167,22 @@ new class extends Component {
             </div>
         </div> --}}
     </div>
-    
+
 <style>
     .flux-office-card {
         /* background: linear-gradient(90deg, #C4D5FF 4%, #fff 100%); */
-        /* height: 230px; */
-        height: fit-content;
+        height: 180px;
+        width: 100%;
+        min-width: 280px;
         text-decoration: none;
+    }
+
+    @media (max-width: 640px) {
+        .flux-office-card {
+            height: 180px;
+            width: 100%;
+            min-width: 100%;
+        }
     }
 </style>
 </div>
