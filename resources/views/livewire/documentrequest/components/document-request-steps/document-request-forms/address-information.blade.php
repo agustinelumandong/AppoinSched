@@ -1,41 +1,4 @@
-<div class="flux-card p-6"
-    x-data="{
-        scrollPosition: 0,
-        init() {
-            // Save scroll position before Livewire updates
-            if (typeof Livewire !== 'undefined') {
-                Livewire.hook('morph.updating', () => {
-                    this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-                });
-
-                // Restore scroll position after Livewire updates
-                Livewire.hook('morph.updated', () => {
-                    setTimeout(() => {
-                        window.scrollTo({
-                            top: this.scrollPosition,
-                            behavior: 'instant'
-                        });
-                    }, 10);
-                });
-            }
-
-            // Fallback: also listen for Livewire initialization
-            document.addEventListener('livewire:init', () => {
-                Livewire.hook('morph.updating', () => {
-                    this.scrollPosition = window.pageYOffset || document.documentElement.scrollTop;
-                });
-
-                Livewire.hook('morph.updated', () => {
-                    setTimeout(() => {
-                        window.scrollTo({
-                            top: this.scrollPosition,
-                            behavior: 'instant'
-                        });
-                    }, 10);
-                });
-            });
-        }
-    }">
+<div class="flux-card p-6">
     @if ($to_whom === 'someone_else')
         <div class="alert alert-info flex items-center gap-2 mb-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="stroke-current shrink-0 w-5 h-5" fill="none"
@@ -92,8 +55,7 @@
                     <select id="region"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="region" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select Region</option>
                         @foreach ($regions as $region)
                             <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
@@ -105,8 +67,7 @@
                     <select id="province"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="province" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select Province</option>
                         @foreach ($provinces as $provinceKey => $provinceName)
                             <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
@@ -118,8 +79,7 @@
                     <select id="city"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="city" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select City</option>
                         @foreach ($cities as $cityKey => $cityName)
                             <option value="{{ $cityKey }}">{{ $cityName }}</option>
@@ -131,8 +91,7 @@
                     <select id="barangay"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="barangay" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select Barangay</option>
                         @foreach ($barangays as $barangay)
                             <option value="{{ $barangay }}">{{ $barangay }}</option>
@@ -216,8 +175,7 @@
                     <select id="region"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="region" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select Region</option>
                         @foreach ($regions as $region)
                             <option value="{{ $region['code'] }}">{{ $region['name'] }}</option>
@@ -229,8 +187,7 @@
                     <select id="province"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="province" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select Province</option>
                         @foreach ($provinces as $provinceKey => $provinceName)
                             <option value="{{ $provinceKey }}">{{ $provinceName }}</option>
@@ -242,8 +199,7 @@
                     <select id="city"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="city" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select City</option>
                         @foreach ($cities as $cityKey => $cityName)
                             <option value="{{ $cityKey }}">{{ $cityName }}</option>
@@ -255,8 +211,7 @@
                     <select id="barangay"
                         class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model.live="barangay" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
-                        @if ($same_as_personal_address) disabled @endif
-                        x-on:change="$el.closest('[x-data]').__x.$data.scrollPosition = window.pageYOffset || document.documentElement.scrollTop">
+                        @if ($same_as_personal_address) disabled @endif>
                         <option value="">Select Barangay</option>
                         @foreach ($barangays as $barangay)
                             <option value="{{ $barangay }}">{{ $barangay }}</option>
