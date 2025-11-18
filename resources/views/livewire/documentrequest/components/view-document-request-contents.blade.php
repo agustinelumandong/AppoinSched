@@ -530,7 +530,7 @@
                 <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Deceased Person
                     Information</h3>
                 <div class="space-y-4">
-                    <div class="grid md:grid-cols-4 gap-6">
+                    <div class="grid md:grid-cols-3 gap-6">
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
@@ -549,102 +549,33 @@
                                 {{ $documentRequest->details->deceased_middle_name ?? 'N/A' }}
                             </p>
                         </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Sex</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_sex ?? 'N/A' }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Religion</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_religion ?? 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Age</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_age ?? 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Occupation</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_occupation ?? 'N/A' }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Place of Birth</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_place_of_birth ?? 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Date of Birth</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_date_of_birth ? \Carbon\Carbon::parse($documentRequest->details->deceased_date_of_birth)->format('M d, Y') : 'N/A' }}
-                            </p>
-                        </div>
-                    </div>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Civil Status</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_civil_status ?? 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Residence</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->deceased_residence ?? 'N/A' }}
-                            </p>
-                        </div>
                     </div>
                     <!-- Parental Information -->
                     <div class="mb-4">
                         <h4 class="text-sm font-medium text-gray-700 mb-2">Father's Name</h4>
                         <div class="grid md:grid-cols-3 gap-4">
-                            <div>{{ $documentRequest->details->deceased_father_last_name ?? 'N/A' }}</div>
-                            <div>{{ $documentRequest->details->deceased_father_first_name ?? 'N/A' }}</div>
-                            <div>{{ $documentRequest->details->deceased_father_middle_name ?? 'N/A' }}</div>
+                            <div class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->deceased_father_last_name ?? 'N/A' }}
+                            </div>
+                            <div class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->deceased_father_first_name ?? 'N/A' }}
+                            </div>
+                            <div class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->deceased_father_middle_name ?? 'N/A' }}
+                            </div>
                         </div>
                         <h4 class="text-sm font-medium text-gray-700 mt-4 mb-2">Mother's Maiden Name</h4>
                         <div class="grid md:grid-cols-3 gap-4">
-                            <div>{{ $documentRequest->details->deceased_mother_last_name ?? 'N/A' }}</div>
-                            <div>{{ $documentRequest->details->deceased_mother_first_name ?? 'N/A' }}</div>
-                            <div>{{ $documentRequest->details->deceased_mother_middle_name ?? 'N/A' }}</div>
+                            <div class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->deceased_mother_last_name ?? 'N/A' }}
+                            </div>
+                            <div class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->deceased_mother_first_name ?? 'N/A' }}
+                            </div>
+                            <div class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
+                                {{ $documentRequest->details->deceased_mother_middle_name ?? 'N/A' }}
+                            </div>
                         </div>
-                    </div>
-                    <!-- Burial Details -->
-                    <div class="mb-4">
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Burial Details</h4>
-                        <div class="grid md:grid-cols-2 gap-4">
-                            <div><span class="font-semibold">Cemetery Name:</span>
-                                {{ $documentRequest->details->burial_cemetery_name ?? 'N/A' }}</div>
-                            <div><span class="font-semibold">Cemetery Address:</span>
-                                {{ $documentRequest->details->burial_cemetery_address ?? 'N/A' }}</div>
-                        </div>
-                    </div>
-                    <!-- Informant's Declaration -->
-                    <div class="mb-4">
-                        <h4 class="text-sm font-medium text-gray-700 mb-2">Informant's Declaration</h4>
-                        <div class="grid md:grid-cols-2 gap-4 mb-2">
-                            <div><span class="font-semibold">Name:</span>
-                                {{ $documentRequest->details->informant_name ?? 'N/A' }}</div>
-                            <div><span class="font-semibold">Address:</span>
-                                {{ $documentRequest->details->informant_address ?? 'N/A' }}</div>
-                        </div>
-                        <div class="grid md:grid-cols-2 gap-4 mb-2">
-                            <div><span class="font-semibold">Relationship:</span>
-                                {{ $documentRequest->details->informant_relationship ?? 'N/A' }}</div>
-                            <div><span class="font-semibold">Contact No:</span>
-                                {{ $documentRequest->details->informant_contact_no ?? 'N/A' }}</div>
-                        </div>
-
                     </div>
 
                 </div>
