@@ -141,12 +141,19 @@ new class extends Component {
     public function updatePaymentStatus(string $status): void
     {
         try {
+            // Get the current payment status before updating
+            $currentPaymentStatus = $this->documentRequest->payment_status;
+
             $updateData = [
                 'payment_status' => $status,
             ];
 
-            // Include remarks in update if provided
-            if (!empty(trim($this->remarks))) {
+            // If changing from failed to paid or unpaid, clear remarks
+            if ($currentPaymentStatus === 'failed' && ($status === 'paid' || $status === 'unpaid')) {
+                $updateData['remarks'] = null;
+                $this->remarks = ''; // Clear the component's remarks property as well
+            } elseif (!empty(trim($this->remarks))) {
+                // Include remarks in update if provided (and not clearing them)
                 $updateData['remarks'] = $this->remarks;
             }
 
@@ -177,6 +184,12 @@ new class extends Component {
 
             // Apply automatic transitions for all payment status changes
             $this->handleStatusTransitions('payment_status', $status);
+
+            // Refresh the document request to get updated data
+            $this->documentRequest = DocumentRequest::with(['user', 'staff', 'office', 'service', 'details'])->findOrFail($this->documentRequest->id);
+
+            // Update remarks property to match the database
+            $this->remarks = $this->documentRequest->remarks ?? '';
 
             session()->flash('success', 'Payment status updated to ' . ucfirst($status) . ' successfully.');
         } catch (\Exception $e) {
@@ -276,9 +289,33 @@ new class extends Component {
                         session()->flash('success', 'Payment verified. Document request status automatically updated to In Progress.');
                     }
                 } elseif ($newStatus === 'failed') {
-                    // When payment is marked as failed, keep document status as pending (don't change it)
-                    // Status should remain pending - no automatic status change
-                    // Remarks are required and should already be validated in updatePaymentStatus()
+                    // When payment is marked as failed, automatically set document status to cancelled
+                    if ($this->documentRequest->status !== 'cancelled') {
+                        $updateData = [
+                            'status' => 'cancelled',
+                        ];
+
+                        // Set staff_id if not already set
+                        if (!$this->documentRequest->staff_id) {
+                            $updateData['staff_id'] = auth()->id();
+                        }
+
+                        // Include remarks if provided
+                        if (!empty(trim($this->remarks))) {
+                            $updateData['remarks'] = $this->remarks;
+                        }
+
+                        $this->documentRequest->update($updateData);
+
+                        // Send cancellation notification
+                        $this->documentRequest->user->notify(
+                            new RequestEventNotification(RequestNotificationEvent::DocumentCancelled, [
+                                'reference_no' => $this->documentRequest->reference_number,
+                            ]),
+                        );
+
+                        session()->flash('info', 'Payment failed. Document request status automatically set to Cancelled.');
+                    }
                 } elseif ($newStatus === 'unpaid') {
                     // When payment is marked as unpaid, ensure document status reflects this
                     if ($this->documentRequest->status !== 'pending') {

@@ -10,7 +10,7 @@
                     </span>
                 @elseif($paymentStatusToUpdate === 'failed')
                     <span class="block mt-2 text-sm text-amber-600">
-                        Note: The document request status will remain as "Pending". Remarks are required.
+                        Note: The document request status will automatically be set to "Cancelled". Remarks are required.
                     </span>
                 @elseif($paymentStatusToUpdate === 'unpaid')
                     <span class="block mt-2 text-sm text-amber-600">
@@ -34,20 +34,17 @@
                                ($confirmRejected && $documentStatusToUpdate === 'cancelled');
         @endphp
 
-        @if ($remarksRequired || !empty($remarks))
+        @if ($remarksRequired)
             <div class="mt-4">
                 <label for="modal-remarks" class="block text-sm font-medium text-gray-700 mb-2">
-                    Remarks
-                    @if ($remarksRequired)
-                        <span class="text-red-600">*</span>
-                    @endif
+                    Remarks <span class="text-red-600">*</span>
                 </label>
                 <textarea
                     id="modal-remarks"
                     wire:model.live="remarks"
-                    class="flux-form-control w-full h-24 resize-none @if ($remarksRequired && empty(trim($remarks ?? ''))) border-red-300 @endif"
-                    placeholder="@if ($remarksRequired) Please provide remarks explaining the reason for this action... @else Add any remarks or notes about this request... @endif"></textarea>
-                @if ($remarksRequired && empty(trim($remarks ?? '')))
+                    class="flux-form-control w-full h-24 resize-none @if (empty(trim($remarks ?? ''))) border-red-300 @endif"
+                    placeholder="Please provide remarks explaining the reason for this action..."></textarea>
+                @if (empty(trim($remarks ?? '')))
                     <p class="text-xs text-red-600 mt-1">Remarks are required for this action.</p>
                 @endif
             </div>
