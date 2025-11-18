@@ -2,20 +2,27 @@
 
 declare(strict_types=1);
 
-use Livewire\Volt\Component;
+use App\Enums\RequestNotificationEvent;
 use App\Models\DocumentRequest;
-use Livewire\WithPagination;
+use App\Models\Offices;
+use App\Notifications\RequestEventNotification;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
-use App\Models\Offices;
+use Livewire\Volt\Component;
+use Livewire\WithPagination;
 
 new class extends Component {
     use WithPagination;
 
     public string $search = '';
+
     public string $status = '';
+
     public ?int $selectedOfficeId = null;
+
     public ?int $documentRequestId = null;
+
     public ?DocumentRequest $documentRequest = null;
 
     public function mount(): void
@@ -49,6 +56,7 @@ new class extends Component {
             // Check if staff is assigned to this document request's office
             if (!auth()->user()->isAssignedToOffice($documentRequest->office_id)) {
                 session()->flash('error', 'You are not authorized to view this document request');
+
                 return;
             }
 
@@ -64,17 +72,20 @@ new class extends Component {
     public function updateDocumentStatus(int $id, string $status): void
     {
         try {
-            $documentRequest = DocumentRequest::findOrFail($id);
+            $documentRequest = DocumentRequest::with('user')->findOrFail($id);
 
             // Check if staff is assigned to this document request's office
             if (!auth()->user()->isAssignedToOffice($documentRequest->office_id)) {
                 session()->flash('error', 'You are not authorized to update this document request');
+
                 return;
             }
 
-            $validated = $this->validate([
-                'status' => 'required|string|in:pending,approved,rejected,completed,canceled,in-progress,ready-for-pickup,cancelled',
-            ]);
+            // Validate the status parameter directly
+            if (!in_array($status, ['pending', 'approved', 'rejected', 'completed', 'canceled', 'in-progress', 'ready-for-pickup', 'cancelled'])) {
+                session()->flash('error', 'Invalid status value');
+                return;
+            }
 
             $updateData = [
                 'status' => $status,
@@ -88,14 +99,27 @@ new class extends Component {
             $updated = $documentRequest->update($updateData);
 
             if ($updated) {
-                $this->dispatch('documentRequestUpdated');
-                session()->flash('success', 'Document request status updated successfully');
+                // Send notification to client for status changes
+                if ($status === 'completed') {
+                    $documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCompleted, [
+                            'reference_no' => $documentRequest->reference_number,
+                        ])
+                    );
+                } elseif ($status === 'ready-for-pickup') {
+                    $documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
+                            'reference_no' => $documentRequest->reference_number,
+                        ])
+                    );
+                }
+
+                // Refresh the page data without losing the flash message
+                $this->resetPage();
+                session()->flash('success', 'Document request status updated to ' . ucfirst($status) . ' successfully. Client has been notified via email.');
             } else {
                 session()->flash('error', 'Failed to update document request status');
             }
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $errors = collect($e->errors())->flatten();
-            session()->flash('error', 'Validation failed: ' . $errors->first());
         } catch (\Exception $e) {
             Log::error('Document request status update failed: ' . $e->getMessage());
             session()->flash('error', 'An error occurred while updating the document request status');
@@ -107,12 +131,14 @@ new class extends Component {
         try {
             if (!$this->documentRequest) {
                 session()->flash('error', 'No document request selected.');
+
                 return;
             }
 
             // Check if staff is assigned to this document request's office
             if (!auth()->user()->isAssignedToOffice($this->documentRequest->office_id)) {
                 session()->flash('error', 'You are not authorized to update this document request');
+
                 return;
             }
 
@@ -134,10 +160,12 @@ new class extends Component {
             session()->flash('error', 'Failed to update document request status.');
         }
     }
+
     public function getOfficeIdForStaff(): ?int
     {
         return auth()->user()->getOfficeIdForStaff();
     }
+
     public function with(): array
     {
         $user = auth()->user();
@@ -173,12 +201,14 @@ new class extends Component {
         try {
             if (!$this->documentRequest) {
                 session()->flash('error', 'No document request selected.');
+
                 return;
             }
 
             // Check if staff is assigned to this document request's office
             if (!auth()->user()->isAssignedToOffice($this->documentRequest->office_id)) {
                 session()->flash('error', 'You are not authorized to update this document request');
+
                 return;
             }
 
@@ -192,8 +222,6 @@ new class extends Component {
             session()->flash('error', 'Failed to update payment status.');
         }
     }
-
-
 }; ?>
 
 <div>
@@ -251,9 +279,6 @@ new class extends Component {
 
     <!-- Document Requests Table -->
     <div class="flux-card" style="padding: 12px;">
-        <h1>
-            {{  $documentRequests->count() }}
-        </h1>
         <div class="overflow-x-auto">
             <table class="table flux-table w-full">
                 <thead>
@@ -282,9 +307,9 @@ new class extends Component {
                                             <td>
                                                 @if ($documentRequest->details)
                                                     @if (
-                                                        ($documentRequest->details->first_name === 'N/A' && $documentRequest->details->last_name === 'N/A') ||
-                                                        (empty($documentRequest->details->first_name) && empty($documentRequest->details->last_name))
-                                                    )
+                                                            ($documentRequest->details->first_name === 'N/A' && $documentRequest->details->last_name === 'N/A') ||
+                                                            (empty($documentRequest->details->first_name) && empty($documentRequest->details->last_name))
+                                                        )
                                                         {{-- Empty string if both are N/A or empty --}}
                                                     @else
                                                         {{ $documentRequest->details->first_name }}
@@ -327,6 +352,16 @@ new class extends Component {
                                                         wire:navigate class="flux-btn btn-sm flux-btn-primary" title="View Details">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
+                                                    <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'ready-for-pickup')"
+                                                        class="flux-btn btn-sm flux-btn-warning" title="Mark as Ready for Pickup"
+                                                        wire:loading.attr="disabled">
+                                                        <i class="bi bi-inbox"></i>
+                                                    </button>
+                                                    <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'completed')"
+                                                        class="flux-btn btn-sm flux-btn-success" title="Mark as Completed"
+                                                        wire:loading.attr="disabled">
+                                                        <i class="bi bi-check-circle"></i>
+                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
