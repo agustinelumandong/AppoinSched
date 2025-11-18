@@ -1808,14 +1808,14 @@ new #[Title('Document Request')] class extends Component {
             <div class="flex flex-col gap-4">
                 <div>
                     <div class="header mb-4">
-                        <h3 class="text-xl font-semibold text-base-content">Select a Service</h3>
+                        <h3 class="text-xl font-semibold text-base-content">Select a Certificate</h3>
                         <div class="flex items-center gap-2 text-sm text-base-content/70">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
-                            <span>Please select a service</span>
+                            <span>Please select a certificate</span>
                         </div>
                     </div>
 
