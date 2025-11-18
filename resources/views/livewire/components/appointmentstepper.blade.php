@@ -666,49 +666,237 @@ new #[Title('Appointment')] class extends Component {
     @if ($step == 1)
         <div class="px-5 py-2 mt-5">
             <div class="flex flex-col gap-4">
-                <div class="flex justify-center flex-col text-center">
-                    <div class="header mb-4 ">
-                        <h3 class="text-xl font-semibold text-base-content">Terms and Conditions</h3>
-                        <div class="flex justify-center items-center gap-2 text-sm text-base-content/70 ">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            <span>Please read and accept the terms and conditions.</span>
+                <div>
+                    <div class="modal-body">
+                        <div class="text-sm space-y-4 max-h-92 overflow-y-auto p-4">
+                            <h4 class="font-bold text-xl mb-2">Terms and Conditions</h4>
+                            <p>By using this system, you acknowledge that you have read, understood, and agreed to the
+                                following Terms and Disclaimer. These terms govern your use of our online document
+                                request and appointment scheduling system. Please read them carefully before proceeding.
+                            </p>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">1. Scope of Services</h5>
+                                <p>This system facilitates the <strong>online request and appointment
+                                        scheduling</strong> for official documents. The actual processing, verification,
+                                    and release of the requested documents are conducted <strong>solely by the
+                                        designated Municipal or Local Civil Registry Office (LCRO)</strong>.</p>
+                                <p class="mt-2">Our system <strong>does not provide delivery, mailing, or courier
+                                        services</strong>. All requested documents must be <strong>personally claimed by
+                                        the document owner or authorized representative</strong> at the designated
+                                    office during the appointed schedule.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">2. User Responsibilities</h5>
+                                <ul class="list-disc pl-6 space-y-1">
+                                    <li>You affirm that all information provided in your request is <strong>true,
+                                            complete, and accurate</strong>.</li>
+                                    <li>You understand that any errors, omissions, or false declarations may result in
+                                        processing delays or cancellation of your request.</li>
+                                    <li>You are required to bring <strong>valid government-issued
+                                            identification</strong> for verification upon claiming your document.</li>
+                                    <li>If you are an authorized representative, you must present an
+                                        <strong>authorization letter</strong> and valid IDs of both the requester and
+                                        the owner of the document.
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">3. Payment and Proof of Transaction</h5>
+                                <p>All payments must be made accurately to the <strong>official account details provided
+                                        by our system</strong>. You are required to upload a <strong>valid and clear
+                                        screenshot of your GCash payment receipt</strong> as proof of transaction.</p>
+                                <p class="mt-2 text-justify">Please note that we <strong>do not process refunds</strong>
+                                    for incorrect, incomplete, or misdirected payments. Any errors in the amount sent or
+                                    transfers made to the wrong account are the sole responsibility of the sender.
+                                    Payments will only be considered valid upon successful verification of the uploaded
+                                    receipt.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">4. Document Processing and Release</h5>
+                                <p>The processing of requested documents is performed by the authorized municipal
+                                    offices. Processing time may vary depending on the completeness of your requirements
+                                    and the verification procedures of the issuing office.</p>
+                                <p class="mt-2">You will be notified through the system or official communication
+                                    channels once your document is ready for pickup. Documents not claimed within the
+                                    prescribed period may be subject to cancellation or revalidation, depending on
+                                    office policy.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">5. Disclaimer of Liability</h5>
+                                <p>While we exercise reasonable care in maintaining this system, we make no warranty
+                                    that its operation will be uninterrupted, error-free, or secure at all times. We
+                                    shall not be held liable for any losses, damages, or inconveniences caused by:</p>
+                                <ul class="list-disc pl-6 mt-2 space-y-1">
+                                    <li>User's failure to provide accurate or complete information;</li>
+                                    <li>Improper or failed payment transactions;</li>
+                                    <li>System downtime, network issues, or other unforeseen technical problems;</li>
+                                    <li>Delays, errors, or decisions made by the municipal office during document
+                                        processing.</li>
+                                </ul>
+                                <p class="mt-2">The system serves only as an <strong>online facilitation and
+                                        appointment tool</strong>. The issuing government office retains full authority
+                                    and responsibility over the processing and release of all official documents.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">6. Data Privacy and Confidentiality</h5>
+                                <p>All personal information collected through this system is handled in accordance with
+                                    the <strong>Data Privacy Act of 2012 (RA 10173)</strong> and our <a
+                                        href="/privacy-policy" class="text-primary hover:underline">Data Privacy
+                                        Notice</a>. We ensure that your personal data is used only for legitimate
+                                    purposes and is protected against unauthorized access or disclosure.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">7. Policy Updates</h5>
+                                <p>We reserve the right to update or modify these Terms and Disclaimer at any time
+                                    without prior notice. Any changes will take effect immediately upon posting to this
+                                    page. Continued use of the system constitutes acceptance of the revised terms.</p>
+                            </div>
+                            <br />
+                            <br />
+                            <br />
+                            <br />
+                            <h4 class="font-bold text-xl mb-2">Data Privacy Notice</h4>
+                            <p>We respect your right to privacy and are committed to protecting the personal information
+                                you provide through this system. This notice explains how we collect, use, store, and
+                                secure your data in compliance with the <strong>Data Privacy Act of 2012 (Republic Act
+                                    No. 10173)</strong> and its Implementing Rules and Regulations (IRR).</p>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">1. Purpose of Data Collection</h5>
+                                <p>This system collects and processes personal information solely for legitimate
+                                    purposes related to the <strong>online request, scheduling, and processing of
+                                        official documents</strong>.</p>
+                                <ul class="list-disc pl-6 mt-2 space-y-1">
+                                    <li>Verify your identity and eligibility to request official documents;</li>
+                                    <li>Schedule appointments and manage request records;</li>
+                                    <li>Process and confirm payments;</li>
+                                    <li>Notify you of request or appointment updates; and</li>
+                                    <li>Comply with legal, auditing, and administrative requirements.</li>
+                                </ul>
+                                <p class="mt-2">We <strong>do not engage in courier or delivery services</strong>. All
+                                    requested documents must be <strong>personally claimed at the designated
+                                        office</strong> upon presentation of a valid government-issued ID and proof of
+                                    payment.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">2. Information We Collect</h5>
+                                <ul class="list-disc pl-6 space-y-1">
+                                    <li><strong>Personal information:</strong> Full name, date of birth, contact number,
+                                        email address, and other data required for document processing;</li>
+                                    <li><strong>Supporting documents:</strong> Valid identification cards and payment
+                                        receipts uploaded as proof of transaction;</li>
+                                    <li><strong>Technical information:</strong> IP address, browser type, access time,
+                                        and system logs for security and verification purposes.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">3. Data Usage and Processing</h5>
+                                <p>Your personal information shall be used <strong>only for official and lawful
+                                        purposes</strong>, including verification, appointment confirmation, and record
+                                    management. We ensure that your data is processed <strong>fairly, accurately, and
+                                        securely</strong>, and is retained <strong>only for as long as
+                                        necessary</strong> to fulfill its intended purpose.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">4. Data Storage and Security</h5>
+                                <p>All collected information is stored in <strong>secured databases</strong> accessible
+                                    only to authorized personnel. We implement organizational, physical, and technical
+                                    measures to protect your data against unauthorized access, alteration, disclosure,
+                                    or destruction.</p>
+                                <p class="mt-2">Uploaded files such as IDs and receipts are <strong>encrypted</strong>
+                                    and automatically deleted after completion of the document request or after the
+                                    legally required retention period.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">5. Data Sharing and Disclosure</h5>
+                                <p>Your information will <strong>not be shared</strong> with any third party outside of
+                                    our organization unless:</p>
+                                <ul class="list-disc pl-6 mt-2 space-y-1">
+                                    <li>Required by law, court order, or government regulation;</li>
+                                    <li>Necessary to comply with legal obligations; or</li>
+                                    <li>Authorized by you in writing.</li>
+                                </ul>
+                                <p class="mt-2">We do <strong>not sell, rent, or trade</strong> personal information
+                                    to any external entity.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">6. Your Rights Under the Data Privacy Act
+                                </h5>
+                                <p>As a data subject, you have the following rights under Republic Act No. 10173:</p>
+                                <ul class="list-disc pl-6 mt-2 space-y-1">
+                                    <li><strong>Right to be informed</strong> – to know how your personal data is
+                                        collected, processed, and stored;</li>
+                                    <li><strong>Right to access</strong> – to request a copy of your personal data in
+                                        our records;</li>
+                                    <li><strong>Right to rectification</strong> – to correct any inaccurate or outdated
+                                        information;</li>
+                                    <li><strong>Right to erasure or blocking</strong> – to request deletion or blocking
+                                        of data that is no longer necessary;</li>
+                                    <li><strong>Right to object</strong> – to refuse processing of your data under
+                                        certain conditions; and</li>
+                                    <li><strong>Right to file a complaint</strong> – to the <strong>National Privacy
+                                            Commission (NPC)</strong> in case of any privacy violation.</li>
+                                </ul>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">7. Data Retention Policy</h5>
+                                <p>Personal information shall be retained only for as long as necessary to complete the
+                                    service or as required by applicable laws and government regulations. After the
+                                    retention period, all personal data shall be <strong>securely disposed of or
+                                        anonymized</strong> to prevent unauthorized access.</p>
+                            </div>
+
+                            <div>
+                                <h5 class="font-semibold text-base mt-4 mb-2">Contact Information</h5>
+                                <p>For concerns or clarifications regarding these terms, you may contact:</p>
+                                <div class="bg-base-200 p-3 rounded-lg mt-2 text-sm">
+                                    <p><strong>Support Team</strong></p>
+                                    <p>📧 <a href="mailto:santotomasdavnor@gov.ph"
+                                            class="text-primary hover:underline">santotomasdavnor@gov.ph</a></p>
+                                    <p>📞 +6392-232-2332</p>
+                                    <p>🏢 santotomasdavnor@gov.ph</p>
+                                </div>
+                            </div>
+
+                            <p class="italic text-xs text-gray-500 mt-4">Last Updated: October 2025</p>
                         </div>
                     </div>
 
-                    <div class="terms-conditions-content mb-6">
-                        <p class="mb-4">By submitting this appointment request, you agree to the following terms and
-                            conditions:</p>
-                        <ul class="list-disc list-inside space-y-2 text-sm text-base-content/80">
-                            <li>You are requesting an appointment for yourself.</li>
-                            <li>You understand that the appointment is subject to availability and confirmation.</li>
-                            <li>You agree to provide accurate and truthful information.</li>
-                            <li>You acknowledge that the appointment details will be sent to the relevant staff.</li>
-                            <li>You agree to the terms of service and privacy policy of this platform.</li>
-                            <li>You understand that appointment times may be subject to change based on staff
-                                availability.
-                            </li>
-                            <li>You agree to arrive on time for your scheduled appointment.</li>
-                            <li>You acknowledge that failure to show up may affect future appointment scheduling.</li>
-                        </ul>
-                    </div>
 
-                    <div class=" mb-6">
-                        <label for="termsAccepted" class="flex items-center cursor-pointer">
-                            <input type="checkbox" id="termsAccepted" wire:model.live="termsAccepted"
-                                class="checkbox checkbox-sm">
-                            I accept the <a href="TERMS" class="text-blue-500">Terms and Conditions</a>
+                    <div class="flex justify-center mt-6">
+                        <label for="termsAccepted"
+                            class="flex items-center justify-center gap-2 cursor-pointer text-sm sm:text-base">
+                            <input type="checkbox" wire:model.live="termsAccepted" id="termsAccepted"
+                                class="checkbox checkbox-primary w-5 h-5 shrink-0" />
+                            <span class="text-lg font-medium">
+                                I accept the
+                                <a href="/terms-and-disclaimer" class="text-blue-500 hover:underline ml-1">
+                                    Terms and Conditions
+                                </a>
+                            </span>
                         </label>
                     </div>
 
+
+
+                    <footer class="my-6 flex justify-end gap-2">
+                        <button class="flux-btn flux-btn-primary" wire:click="nextStep"
+                            @if (!$termsAccepted) disabled @endif>Next</button>
+                    </footer>
                 </div>
-                <footer class="my-6 flex justify-end gap-2" wire:loading.remove>
-                    <button class="flux-btn flux-btn-primary" wire:click="nextStep"
-                        @if (!$termsAccepted) disabled @endif>Next</button>
-                </footer>
             </div>
         </div>
     @elseif($step == 2)

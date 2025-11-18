@@ -1,0 +1,44 @@
+{{-- Backup of original appointment stepper terms section (lines 666-714) --}}
+{{-- Created: 2025-01-XX --}}
+{{-- Reason: Replaced with comprehensive terms from document request stepper --}}
+
+                <div class="flex justify-center flex-col text-center">
+                    <div class="header mb-4 ">
+                        <h3 class="text-xl font-semibold text-base-content">Terms and Conditions</h3>
+                        <div class="flex justify-center items-center gap-2 text-sm text-base-content/70 ">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                                stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Please read and accept the terms and conditions.</span>
+                        </div>
+                    </div>
+
+                    <div class="terms-conditions-content mb-6">
+                        <p class="mb-4">By submitting this appointment request, you agree to the following terms and
+                            conditions:</p>
+                        <ul class="list-disc list-inside space-y-2 text-sm text-base-content/80">
+                            <li>You are requesting an appointment for yourself.</li>
+                            <li>You understand that the appointment is subject to availability and confirmation.</li>
+                            <li>You agree to provide accurate and truthful information.</li>
+                            <li>You acknowledge that the appointment details will be sent to the relevant staff.</li>
+                            <li>You agree to the terms of service and privacy policy of this platform.</li>
+                            <li>You understand that appointment times may be subject to change based on staff
+                                availability.
+                            </li>
+                            <li>You agree to arrive on time for your scheduled appointment.</li>
+                            <li>You acknowledge that failure to show up may affect future appointment scheduling.</li>
+                        </ul>
+                    </div>
+
+                    <div class=" mb-6">
+                        <label for="termsAccepted" class="flex items-center cursor-pointer">
+                            <input type="checkbox" id="termsAccepted" wire:model.live="termsAccepted"
+                                class="checkbox checkbox-sm">
+                            I accept the <a href="TERMS" class="text-blue-500">Terms and Conditions</a>
+                        </label>
+                    </div>
+
+                </div>
+
