@@ -23,6 +23,7 @@ use App\Enums\AdminNotificationEvent;
 new #[Title('Appointment')] class extends Component {
     public int $step = 1;
     public string $purpose = 'consultation';
+    public string $otherPurpose = '';
     public string $first_name = '';
     public string $middle_name = '';
     public string $last_name = '';
