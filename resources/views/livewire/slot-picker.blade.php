@@ -21,7 +21,7 @@ new class extends Component {
     public ?string $error = null;
 
     // Configuration - can be made configurable per office/service
-    public int $maxSlotsPerHour = 5;
+    public int $maxSlotsPerHour = 4;
     public int $slotDuration = 60;
     public string $startTime = '08:00';
     public string $endTime = '17:00';
@@ -667,7 +667,7 @@ new class extends Component {
                                         </div>
 
                                         @if (!$slot['available'])
-                                            <span class="text-xs text-red-500 font-medium">Fully Booked</span>
+                                            <span class="text-xs text-red-500 font-medium">UNAVAILABLE</span>
                                         @elseif ($slot['isPast'])
                                             <span class="text-xs text-gray-400">Past</span>
                                         @else
