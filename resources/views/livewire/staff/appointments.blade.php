@@ -14,6 +14,7 @@ new class extends Component {
     use WithPagination;
 
     public string $search = '';
+    public string $status = '';
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
     public string $notes = '';
@@ -229,6 +230,9 @@ new class extends Component {
                     });
                 });
             })
+            ->when($this->status, function ($query) {
+                $query->where('status', $this->status);
+            })
             ->when($this->selectedOfficeId, function ($query) {
                 $query->where('office_id', $this->selectedOfficeId);
             });
@@ -286,6 +290,15 @@ new class extends Component {
                 <label for="search" class="block text-sm font-medium text-gray-700 mb-1">Search</label>
                 <input type="text" id="search" wire:model.live="search" class="form-control"
                     placeholder="Search by reference number, client, or service...">
+            </div>
+            <div class="flex-1">
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+                <select id="status" wire:model.live="status" class="form-control">
+                    <option value="">All Status</option>
+                    <option value="on-going">On-going</option>
+                    <option value="cancelled">Cancelled</option>
+                    <option value="completed">Completed</option>
+                </select>
             </div>
             <div class="flex gap-2">
                 <button wire:click="searchs" class="btn btn-primary">
