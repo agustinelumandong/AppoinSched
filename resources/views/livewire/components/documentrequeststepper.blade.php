@@ -263,7 +263,7 @@ new #[Title('Document Request')] class extends Component {
                 // Set step based on payment status
                 if ($existingRequest->payment_status === 'unpaid') {
                     $this->step = 8;
-                } elseif (in_array($existingRequest->payment_status, ['processing', 'paid', 'completed'])) {
+                } elseif (in_array($existingRequest->payment_status, ['paid', 'completed'])) {
                     $this->step = 9;
                 } else {
                     $this->step = 1; // fallback
@@ -301,7 +301,7 @@ new #[Title('Document Request')] class extends Component {
                     // Set step based on payment status
                     if ($this->payment_status === 'unpaid') {
                         $this->step = 8;
-                    } elseif (in_array($this->payment_status, ['processing', 'paid', 'completed'], true)) {
+                    } elseif (in_array($this->payment_status, ['paid', 'completed'], true)) {
                         $this->step = 9;
                     } else {
                         $this->step = 1;
@@ -1226,7 +1226,8 @@ new #[Title('Document Request')] class extends Component {
             }
 
             // Update payment status using the model
-            $documentRequest->payment_status = 'processing';
+            // Payment proof upload sets status to 'unpaid' - staff will verify and update to 'paid' or 'failed'
+            $documentRequest->payment_status = 'unpaid';
 
             // Only set these fields if they exist in the database
             $documentRequest->payment_method = $this->selectedPaymentMethod;

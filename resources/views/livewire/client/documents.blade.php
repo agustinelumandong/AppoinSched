@@ -25,8 +25,8 @@ new class extends Component {
     }
 
     public function payNow()
-    { 
-        $id = $this->selectedDocumentRequest->id; 
+    {
+        $id = $this->selectedDocumentRequest->id;
         $request = DocumentRequest::findOrFail($id);
         $office = $request->office;
         $service = $request->service;
@@ -47,14 +47,14 @@ new class extends Component {
     public function resetPaymentMethodStates()
     {
         $this->dispatch('close-modal-payment-method');
-        $this->reset(); 
+        $this->reset();
     }
 }; ?>
 
 <div>
     <div class="flux-card mb-4">
         <div style="padding: 12px;">
-        
+
             <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
                 <h5 class="mb-0 fw-semibold">Document Requests</h5>
                 <div class="d-flex align-items-center gap-2">
@@ -137,11 +137,10 @@ new class extends Component {
                                                     <button
                                                         class="flux-btn btn-sm flux-btn-primary text-decoration-none {{   $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
                                                         wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
-                                                        @if($request->status === 'approved' && $request->payment_status === 'processing') disabled aria-disabled="true" @endif
                                                     >
                                                         Pay Now
                                                     </button>
-                                                    
+
                                                     <div class="d-flex gap-2">
                                                         {{-- <a href="#" class="flux-btn flux-btn-outline btn-sm" title="View Details">
                                                             <i class="bi bi-eye"></i>
@@ -171,7 +170,7 @@ new class extends Component {
         </div>
     </div>
 
-    
+
 
     @include('livewire.client.components.modal.payment-method-modal')
 

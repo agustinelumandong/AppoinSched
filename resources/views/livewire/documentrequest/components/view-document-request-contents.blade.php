@@ -826,7 +826,6 @@
                 <span
                     class="flux-badge
                     @if ($documentRequest->payment_status === 'paid') flux-badge-success
-                    @elseif ($documentRequest->payment_status === 'processing') flux-badge-warning
                     @elseif ($documentRequest->payment_status === 'failed') flux-badge-danger
                     @else flux-badge-secondary @endif">
                     {{ ucfirst($documentRequest->payment_status ?? 'Unpaid') }}
@@ -846,15 +845,6 @@
                         </path>
                     </svg>
                     <span class="text-xs">Unpaid</span>
-                </button>
-
-                <button wire:click="setPaymentStatusToUpdate('processing')" wire:prevent-scroll
-                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->payment_status === 'processing') flux-btn-warning @else flux-btn-outline @endif">
-                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                    <span class="text-xs">Processing</span>
                 </button>
 
                 <button wire:click="setPaymentStatusToUpdate('paid')" wire:prevent-scroll

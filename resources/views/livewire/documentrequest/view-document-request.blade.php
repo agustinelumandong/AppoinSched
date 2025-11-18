@@ -131,14 +131,6 @@ new class extends Component {
                     );
                     break;
 
-                case 'processing':
-                    $this->documentRequest->user->notify(
-                        new RequestEventNotification(RequestNotificationEvent::PaymentProcessing, [
-                            'reference_no' => $this->documentRequest->reference_number,
-                        ]),
-                    );
-                    break;
-
                 case 'failed':
                     $this->documentRequest->user->notify(
                         new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
@@ -291,20 +283,6 @@ new class extends Component {
 
                         session()->flash('info', 'Payment marked as unpaid. Document request status set to Pending.');
                     }
-                } elseif ($newStatus === 'processing') {
-                    // When payment is marked as processing, update remarks if needed
-                    if (!$this->remarks) {
-                        $this->documentRequest->update([
-                            'remarks' => 'Payment is being processed',
-                        ]);
-                    }
-
-                    // Set document status to pending if it's not in a more advanced state
-                    if (!in_array($this->documentRequest->status, ['in-progress', 'ready-for-pickup', 'completed'])) {
-                        $this->documentRequest->update([
-                            'status' => 'pending',
-                        ]);
-                    }
                 }
             }
             // Handle document status transitions
@@ -394,21 +372,8 @@ new class extends Component {
                             ]);
                         }
 
-                        // If not already paid or processing, set payment to processing
-                        if (!in_array($this->documentRequest->payment_status, ['paid', 'processing'])) {
-                            $this->documentRequest->update([
-                                'payment_status' => 'processing',
-                            ]);
-
-                            // Send payment notification
-                            $this->documentRequest->user->notify(
-                                new RequestEventNotification(RequestNotificationEvent::PaymentProcessing, [
-                                    'reference_no' => $this->documentRequest->reference_number,
-                                ]),
-                            );
-
-                            session()->flash('info', 'Payment status automatically updated to Processing.');
-                        }
+                        // Payment status is managed independently by staff during verification
+                        // No automatic payment status update when document moves to in-progress
                         break;
 
                     case 'rejected':
@@ -460,8 +425,8 @@ new class extends Component {
                             'pickup_ready_date' => null,
                         ]);
 
-                        // Set payment to unpaid if it's not already processing or paid
-                        if (!in_array($this->documentRequest->payment_status, ['processing', 'paid'])) {
+                        // Set payment to unpaid if it's not already paid
+                        if ($this->documentRequest->payment_status !== 'paid') {
                             $this->documentRequest->update([
                                 'payment_status' => 'unpaid',
                             ]);

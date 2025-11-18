@@ -34,7 +34,7 @@ new class extends Component {
     public array $statusOptions = [];
     public array $documentStatusOptions = ['pending', 'approved', 'rejected', 'completed', 'canceled', 'in-progress', 'ready-for-pickup', 'cancelled'];
     public array $appointmentStatusOptions = ['on-going', 'cancelled', 'completed'];
-    public array $paymentStatusOptions = ['unpaid', 'processing', 'paid', 'failed'];
+    public array $paymentStatusOptions = ['unpaid', 'paid', 'failed'];
     public $reportData;
 
     // Export related properties
@@ -601,7 +601,6 @@ new class extends Component {
                                                 // Payment statuses
                                                 'paid' => 'flux-badge-success',
                                                 'unpaid' => 'flux-badge-danger',
-                                                'processing' => 'flux-badge-info',
                                                 'failed' => 'flux-badge-danger',
                                                 default => 'flux-badge-warning',
                                             } }}">

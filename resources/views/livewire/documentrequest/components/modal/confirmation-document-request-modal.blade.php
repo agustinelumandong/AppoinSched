@@ -40,9 +40,7 @@
                         ? 'flux-btn-success'
                         : ($paymentStatusToUpdate === 'failed'
                             ? 'flux-btn-danger'
-                            : ($paymentStatusToUpdate === 'processing'
-                                ? 'flux-btn-warning'
-                                : 'flux-btn-secondary')))
+                            : 'flux-btn-secondary'))
                     : ($confirmApproved
                         ? 'flux-btn-success'
                         : ($confirmRejected
@@ -57,9 +55,7 @@
                                 ? 'bi-check-circle'
                                 : ($paymentStatusToUpdate === 'failed'
                                     ? 'bi-x-circle'
-                                    : ($paymentStatusToUpdate === 'processing'
-                                        ? 'bi-hourglass-split'
-                                        : 'bi-cash')) }} me-1"></i>
+                                    : 'bi-cash') }} me-1"></i>
                         Confirm
                     @else
                         <i

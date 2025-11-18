@@ -14,7 +14,6 @@ enum RequestNotificationEvent: string
 
   // Payment Status Update
   case PaymentVerified = 'payment_verified';
-  case PaymentProcessing = 'payment_processing'; 
   case PaymentFailed = 'payment_failed';
 
   // Document Status Update
@@ -25,9 +24,9 @@ enum RequestNotificationEvent: string
   case DocumentInProgress = 'document_in_progress';
   case DocumentReadyForPickup = 'document_ready_for_pickup';
 
-  
-  
-  // Appointment Status Update  
+
+
+  // Appointment Status Update
   case AppointmentApproved = 'appointment_approved';
   case AppointmentScheduled = 'appointment_scheduled';
   case AppointmentCancelled = 'appointment_cancelled';

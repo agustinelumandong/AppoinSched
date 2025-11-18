@@ -31,7 +31,7 @@ class DocumentRequestsSeeder extends Seeder
         }
 
         $statuses = ['pending', 'approved', 'rejected', 'completed', 'cancelled', 'in-progress', 'ready-for-pickup'];
-        $paymentStatuses = ['unpaid', 'processing', 'paid', 'failed'];
+        $paymentStatuses = ['unpaid', 'paid', 'failed'];
         $paymentMethods = ['Cash', 'GCash', 'PayMaya', 'Bank Transfer', 'Credit Card'];
 
         // Create document requests for each service
