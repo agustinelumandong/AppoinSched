@@ -15,6 +15,7 @@ new class extends Component {
 
     public string $search = '';
     public string $status = '';
+    public string $sortDirection = 'desc';
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
     public string $notes = '';
@@ -248,7 +249,7 @@ new class extends Component {
         }
 
         return [
-            'appointments' => $query->latest()->paginate(10),
+            'appointments' => $query->orderBy('created_at', $this->sortDirection)->paginate(10),
             'offices' => Offices::all(),
         ];
     }
@@ -298,6 +299,13 @@ new class extends Component {
                     <option value="on-going">On-going</option>
                     <option value="cancelled">Cancelled</option>
                     <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <label for="sortDirection" class="block text-sm font-medium text-gray-700 mb-1">Sort</label>
+                <select id="sortDirection" wire:model.live="sortDirection" class="form-control">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
                 </select>
             </div>
             <div class="flex gap-2">

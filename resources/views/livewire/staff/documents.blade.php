@@ -19,6 +19,8 @@ new class extends Component {
 
     public string $status = '';
 
+    public string $sortDirection = 'desc';
+
     public ?int $selectedOfficeId = null;
 
     public ?int $documentRequestId = null;
@@ -191,7 +193,7 @@ new class extends Component {
                 ->when($this->status, function ($q) {
                     $q->where('status', $this->status);
                 })
-                ->latest()
+                ->orderBy('created_at', $this->sortDirection)
                 ->paginate(10),
         ];
     }
@@ -267,6 +269,13 @@ new class extends Component {
                     <option value="approved">Approved</option>
                     <option value="rejected">Rejected</option>
                     <option value="completed">Completed</option>
+                </select>
+            </div>
+            <div class="flex-1">
+                <label for="sortDirection" class="block text-sm font-medium text-gray-700 mb-1">Sort</label>
+                <select id="sortDirection" wire:model.live="sortDirection" class="form-control">
+                    <option value="desc">Newest First</option>
+                    <option value="asc">Oldest First</option>
                 </select>
             </div>
             <div class="flex gap-2">
