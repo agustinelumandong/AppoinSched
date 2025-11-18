@@ -135,11 +135,11 @@ new #[Title('Appointment')] class extends Component {
                     'purpose' => 'required',
                 ]);
                 // Skip the certificates step if includeCertificates is false
-                if (!$this->includeCertificates) {
-                    $this->step++; // Skip to next step
-                    // Default to locked state (shows Edit button)
-                    $this->editPersonDetails = false;
-                }
+                // if (!$this->includeCertificates) {
+                //     $this->step++; // Skip to next step
+                //     // Default to locked state (shows Edit button)
+                //     $this->editPersonDetails = false;
+                // }
                 break;
             case 3:
                 $this->isLoading = true;
@@ -155,6 +155,17 @@ new #[Title('Appointment')] class extends Component {
                         ]);
                     }
                     // Default to locked state (shows Edit button) when reaching personal information step (step 4 with certificates)
+                    $this->editPersonDetails = false;
+                } else {
+                    // This is the personal information step when certificates are skipped
+                    $this->validate([
+                        'first_name' => 'string|required',
+                        'last_name' => 'string|required',
+                        'middle_name' => 'string|nullable',
+                        'email' => 'string|required|email',
+                        'phone' => 'required|numeric|digits_between:7,25',
+                    ]);
+                    // Default to locked state (shows Edit button)
                     $this->editPersonDetails = false;
                 }
                 break;
