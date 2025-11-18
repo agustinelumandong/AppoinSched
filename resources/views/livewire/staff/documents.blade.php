@@ -27,6 +27,20 @@ new class extends Component {
 
     public ?DocumentRequest $documentRequest = null;
 
+    public string $remarks = '';
+
+    public bool $confirmApproved = false;
+
+    public bool $confirmRejected = false;
+
+    public bool $confirmPending = false;
+
+    public bool $confirmPaymentStatus = false;
+
+    public string $paymentStatusToUpdate = '';
+
+    public string $documentStatusToUpdate = '';
+
     public function mount(): void
     {
         // Check if user has staff or admin role
@@ -71,6 +85,60 @@ new class extends Component {
         }
     }
 
+    public function setDocumentStatusToUpdate(int $id, string $status): void
+    {
+        // Validate status
+        if (!in_array($status, \App\Models\DocumentRequest::VALID_STATUSES)) {
+            session()->flash('error', 'Invalid status value');
+            return;
+        }
+
+        $this->documentRequestId = $id;
+        $this->documentStatusToUpdate = $status;
+
+        if ($status === 'cancelled') {
+            $this->confirmRejected = true;
+        }
+
+        $this->remarks = ''; // Reset remarks when opening modal
+        $this->dispatch('open-modal-confirm-document-request');
+    }
+
+    public function confirmDocumentRequest(): void
+    {
+        try {
+            // Validate remarks for required actions
+            if ($this->confirmRejected && $this->documentStatusToUpdate === 'cancelled') {
+                if (empty(trim($this->remarks))) {
+                    session()->flash('error', 'Remarks are required when cancelling a document request.');
+                    return;
+                }
+            }
+
+            if (!$this->documentRequestId) {
+                session()->flash('error', 'No document request selected.');
+                return;
+            }
+
+            $this->updateDocumentStatus($this->documentRequestId, $this->documentStatusToUpdate);
+            $this->resetConfirmationStates();
+            $this->dispatch('close-modal-confirm-document-request');
+        } catch (\Exception $e) {
+            Log::error('Error confirming document request: ' . $e->getMessage());
+            session()->flash('error', 'An error occurred while updating the document request.');
+        }
+    }
+
+    public function resetConfirmationStates(): void
+    {
+        $this->confirmApproved = false;
+        $this->confirmRejected = false;
+        $this->confirmPending = false;
+        $this->confirmPaymentStatus = false;
+        $this->paymentStatusToUpdate = '';
+        $this->documentStatusToUpdate = '';
+    }
+
     public function updateDocumentStatus(int $id, string $status): void
     {
         try {
@@ -93,6 +161,11 @@ new class extends Component {
                 'status' => $status,
                 'staff_id' => auth()->id(),
             ];
+
+            // Include remarks if provided
+            if (!empty(trim($this->remarks))) {
+                $updateData['remarks'] = $this->remarks;
+            }
 
             $updated = $documentRequest->update($updateData);
 
@@ -146,6 +219,7 @@ new class extends Component {
             ];
 
             // Note: completed_date is no longer automatically set based on status
+            // Note: Remarks should be handled via the confirmation modal in the detailed view
 
             $this->documentRequest->update($updateData);
 
@@ -207,6 +281,8 @@ new class extends Component {
                 return;
             }
 
+            // Note: For failed payment status, remarks should be provided via the detailed view modal
+            // This direct update method is kept for quick actions, but staff should use the detailed view for failed status
             $this->documentRequest->update([
                 'payment_status' => $status,
             ]);
@@ -357,7 +433,7 @@ new class extends Component {
                                                         </button>
                                                     @endif
                                                     @if ($documentRequest->status !== 'cancelled')
-                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'cancelled')"
+                                                        <button wire:click="setDocumentStatusToUpdate({{ $documentRequest->id }}, 'cancelled')"
                                                             class="flux-btn btn-sm flux-btn-danger" title="Cancel Request"
                                                             wire:loading.attr="disabled">
                                                             <i class="bi bi-x-circle"></i>
@@ -424,13 +500,16 @@ new class extends Component {
             </div>
         </div>
     @endif
-</div>
 
-<script>
-    document.addEventListener('livewire:init', () => {
-        Livewire.on('viewDocumentRequest', (id) => {
-            const modal = new bootstrap.Modal(document.getElementById('documentRequestModal'));
-            modal.show();
+    <!-- Document Request Confirmation Modal -->
+    @include('livewire.documentrequest.components.modal.confirmation-document-request-modal')
+
+    <script>
+        document.addEventListener('livewire:init', () => {
+            Livewire.on('viewDocumentRequest', (id) => {
+                const modal = new bootstrap.Modal(document.getElementById('documentRequestModal'));
+                modal.show();
+            });
         });
-    });
-</script>
+    </script>
+</div>

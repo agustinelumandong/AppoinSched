@@ -943,14 +943,16 @@
 
     </div>
 
-    <div class="flux-card p-6 mb-6">
-        <div class="flex items-center space-x-2 mb-4">
-            <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Remarks</h4>
-            <span class="text-sm text-gray-500">(Optional)</span>
+    @if (!empty($documentRequest->remarks))
+        <div class="flux-card p-6 mb-6">
+            <div class="flex items-center space-x-2 mb-4">
+                <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Remarks</h4>
+            </div>
+            <div class="bg-gray-50 rounded-lg p-4">
+                <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ $documentRequest->remarks }}</p>
+            </div>
         </div>
-        <textarea wire:model="remarks" class="flux-form-control w-full h-24 resize-none"
-            placeholder="Add any remarks or notes about this request..."></textarea>
-    </div>
+    @endif
 
     <!-- Navigation -->
     <div class="flux-card p-6 mb-6">

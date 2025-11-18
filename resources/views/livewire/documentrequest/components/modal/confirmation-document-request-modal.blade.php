@@ -8,27 +8,59 @@
                     <span class="block mt-2 text-sm text-blue-600">
                         Note: This will automatically update the document status to "In Progress".
                     </span>
-                @elseif($paymentStatusToUpdate === 'failed' || $paymentStatusToUpdate === 'unpaid')
+                @elseif($paymentStatusToUpdate === 'failed')
+                    <span class="block mt-2 text-sm text-amber-600">
+                        Note: The document request status will remain as "Pending". Remarks are required.
+                    </span>
+                @elseif($paymentStatusToUpdate === 'unpaid')
                     <span class="block mt-2 text-sm text-amber-600">
                         Note: This will set the document status to "Pending".
                     </span>
                 @endif
             @else
                 Are you sure you want to
-                {{ $confirmApproved ? 'approve' : ($confirmRejected ? 'reject' : 'set to pending') }} this document
+                {{ $confirmApproved ? 'approve' : ($confirmRejected ? 'cancel' : 'set to pending') }} this document
                 request?
+                @if ($confirmRejected)
+                    <span class="block mt-2 text-sm text-amber-600">
+                        Note: Remarks are required when cancelling a document request.
+                    </span>
+                @endif
             @endif
         </p>
 
-        @if (!empty($remarks))
+        @php
+            $remarksRequired = ($confirmPaymentStatus && $paymentStatusToUpdate === 'failed') ||
+                               ($confirmRejected && $documentStatusToUpdate === 'cancelled');
+        @endphp
+
+        @if ($remarksRequired || !empty($remarks))
             <div class="mt-4">
-                <h4 class="text-sm font-medium text-gray-700">Remarks:</h4>
-                <p class="text-sm text-gray-600 bg-gray-50 p-2 rounded mt-1">{{ $remarks }}</p>
+                <label for="modal-remarks" class="block text-sm font-medium text-gray-700 mb-2">
+                    Remarks
+                    @if ($remarksRequired)
+                        <span class="text-red-600">*</span>
+                    @endif
+                </label>
+                <textarea
+                    id="modal-remarks"
+                    wire:model.live="remarks"
+                    class="flux-form-control w-full h-24 resize-none @if ($remarksRequired && empty(trim($remarks ?? ''))) border-red-300 @endif"
+                    placeholder="@if ($remarksRequired) Please provide remarks explaining the reason for this action... @else Add any remarks or notes about this request... @endif"></textarea>
+                @if ($remarksRequired && empty(trim($remarks ?? '')))
+                    <p class="text-xs text-red-600 mt-1">Remarks are required for this action.</p>
+                @endif
             </div>
         @endif
     </div>
 
     <x-slot name="footer">
+        @php
+            $remarksRequired = ($confirmPaymentStatus && $paymentStatusToUpdate === 'failed') ||
+                               ($confirmRejected && $documentStatusToUpdate === 'cancelled');
+            $remarksEmpty = empty(trim($remarks ?? ''));
+            $isDisabled = $remarksRequired && $remarksEmpty;
+        @endphp
         <div class="gap-2">
             <button type="button" class="flux-btn flux-btn-outline" x-data="{}"
                 x-on:click="$dispatch('close-modal-confirm-document-request'); $wire.resetConfirmationStates()">
@@ -45,9 +77,10 @@
                         ? 'flux-btn-success'
                         : ($confirmRejected
                             ? 'flux-btn-danger'
-                            : 'flux-btn-warning')) }}"
-                x-data="{}" wire:loading.attr="disabled"
-                x-on:click="$dispatch('close-modal-confirm-document-request'); $wire.confirmDocumentRequest()">
+                            : 'flux-btn-warning')) }} @if ($isDisabled) opacity-50 cursor-not-allowed @endif"
+                @if ($isDisabled) disabled title="Please fill in the remarks field before confirming" @endif
+                wire:loading.attr="disabled"
+                wire:click="confirmDocumentRequest">
                 <span wire:loading.remove>
                     @if ($confirmPaymentStatus)
                         <i

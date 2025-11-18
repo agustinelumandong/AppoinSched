@@ -19,6 +19,7 @@ new class extends Component {
     public $confirmPending = false;
     public $confirmPaymentStatus = false;
     public $paymentStatusToUpdate = '';
+    public $documentStatusToUpdate = '';
     public $personalInformation;
     public $userFamily;
     public $userAddresses;
@@ -77,6 +78,23 @@ new class extends Component {
     public function confirmDocumentRequest()
     {
         try {
+            // Validate remarks for required actions
+            if ($this->confirmPaymentStatus && $this->paymentStatusToUpdate === 'failed') {
+                if (empty(trim($this->remarks))) {
+                    session()->flash('error', 'Remarks are required when marking payment as failed.');
+                    $this->dispatch('keep-modal-open');
+                    return;
+                }
+            }
+
+            if ($this->confirmRejected && $this->documentStatusToUpdate === 'cancelled') {
+                if (empty(trim($this->remarks))) {
+                    session()->flash('error', 'Remarks are required when cancelling a document request.');
+                    $this->dispatch('keep-modal-open');
+                    return;
+                }
+            }
+
             // Handle document status confirmations
             if ($this->confirmApproved == true) {
                 $this->updateDocumentStatusModal('in-progress');
@@ -94,9 +112,12 @@ new class extends Component {
                 session()->flash('success', 'Payment status updated to ' . ucfirst($this->paymentStatusToUpdate) . ' successfully.');
             }
 
+            // Only close modal and reset if we got here (validation passed)
+            $this->dispatch('close-modal-confirm-document-request');
             $this->resetConfirmationStates();
         } catch (\Exception $e) {
             session()->flash('error', 'An error occurred while updating the request: ' . $e->getMessage());
+            $this->dispatch('keep-modal-open');
         }
     }
 
@@ -107,6 +128,7 @@ new class extends Component {
         $this->confirmPending = false;
         $this->confirmPaymentStatus = false;
         $this->paymentStatusToUpdate = '';
+        $this->documentStatusToUpdate = '';
     }
 
     public function setPaymentStatusToUpdate(string $status): void
@@ -119,9 +141,16 @@ new class extends Component {
     public function updatePaymentStatus(string $status): void
     {
         try {
-            $this->documentRequest->update([
+            $updateData = [
                 'payment_status' => $status,
-            ]);
+            ];
+
+            // Include remarks in update if provided
+            if (!empty(trim($this->remarks))) {
+                $updateData['remarks'] = $this->remarks;
+            }
+
+            $this->documentRequest->update($updateData);
 
             // Send appropriate notification based on payment status
             switch ($status) {
@@ -204,6 +233,8 @@ new class extends Component {
             return;
         }
 
+        $this->documentStatusToUpdate = $status;
+
         if ($status === 'in-progress') {
             $this->confirmApproved = true; // Reuse confirmApproved for in-progress
         } elseif ($status === 'cancelled') {
@@ -245,15 +276,9 @@ new class extends Component {
                         session()->flash('success', 'Payment verified. Document request status automatically updated to In Progress.');
                     }
                 } elseif ($newStatus === 'failed') {
-                    // When payment is marked as failed, update document status to pending
-                    if ($this->documentRequest->status !== 'pending') {
-                        $this->documentRequest->update([
-                            'status' => 'pending',
-                            'remarks' => $this->remarks ? $this->remarks : 'Set to pending due to payment failure',
-                        ]);
-
-                        session()->flash('info', 'Payment failed. Document request status set to Pending.');
-                    }
+                    // When payment is marked as failed, keep document status as pending (don't change it)
+                    // Status should remain pending - no automatic status change
+                    // Remarks are required and should already be validated in updatePaymentStatus()
                 } elseif ($newStatus === 'unpaid') {
                     // When payment is marked as unpaid, ensure document status reflects this
                     if ($this->documentRequest->status !== 'pending') {
@@ -306,24 +331,6 @@ new class extends Component {
                         }
                         break;
 
-                    case 'cancelled':
-                        // If cancelled, ensure staff_id is set
-                        if (!$this->documentRequest->staff_id) {
-                            $this->documentRequest->update([
-                                'staff_id' => auth()->id(),
-                            ]);
-                        }
-
-                        // If payment is not unpaid, set it to unpaid
-                        if ($this->documentRequest->payment_status !== 'unpaid') {
-                            $this->documentRequest->update([
-                                'payment_status' => 'unpaid',
-                            ]);
-
-                            session()->flash('info', 'Payment status automatically updated to Unpaid.');
-                        }
-                        break;
-
                     case 'pending':
                         // Reset certain fields when moving back to pending
                         $this->documentRequest->update([
@@ -355,8 +362,12 @@ new class extends Component {
         try {
             $updateData = [
                 'status' => $status,
-                'remarks' => $this->remarks,
             ];
+
+            // Include remarks in update if provided
+            if (!empty(trim($this->remarks))) {
+                $updateData['remarks'] = $this->remarks;
+            }
 
             // Set staff_id if not already set
             if (!$this->documentRequest->staff_id) {
