@@ -100,10 +100,17 @@
                             class="flux-input-primary flux-btn cursor-pointer {{ $relationship === 'my_daughter' ? 'flux-btn-active-primary' : '' }} p-2">My
                             Daughter</label>
 
-                        <input type="radio" id="others_relationship" name="relationship" value="others"
-                            wire:model.live="relationship" hidden />
-                        <label for="others_relationship"
-                            class="flux-input-primary flux-btn cursor-pointer {{ $relationship === 'others' ? 'flux-btn-active-primary' : '' }} p-2">Others</label>
+                        @if($this->service->title !== 'Death Certificate')
+                            <input type="radio" id="others_relationship" name="relationship" value="others"
+                                wire:model.live="relationship" hidden />
+                            <label for="others_relationship"
+                                class="flux-input-primary flux-btn cursor-pointer {{ $relationship === 'others' ? 'flux-btn-active-primary' : '' }} p-2">Others</label>
+                        @else
+                            <input type="radio" id="my_wife" name="relationship" value="my_wife"
+                                wire:model.live="relationship" hidden />
+                            <label for="my_wife"
+                                class="flux-input-primary flux-btn cursor-pointer {{ $relationship === 'my_wife' ? 'flux-btn-active-primary' : '' }} p-2">My Wife</label>
+                        @endif
                     </div>
 
                     @if ($relationship === 'others')

@@ -19,7 +19,7 @@
                 <p class="text-gray-600">Loading...</p>
             </div>
 
-            <div class="flex flex-col gap-2 w-full" wire:loading.remove>
+            <div class="flex flex-col gap-2 w-full">
                 <p class="text-sm text-base-content/70 mb-2">Please review and confirm your contact details:
                 </p>
 
@@ -44,7 +44,7 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_last_name" placeholder="Requester's Last Name"
-                                    name="contact_last_name" id="contact_last_name"
+                                    name="contact_last_name" id="contact_last_name" required
                                     x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -55,7 +55,7 @@
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
                                     wire:model="contact_first_name" placeholder="Requester's First Name"
-                                    name="contact_first_name" id="contact_first_name"
+                                    name="contact_first_name" id="contact_first_name" required
                                     x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -78,7 +78,7 @@
                             <div>
                                 <label class="font-medium text-sm">Email Address:</label>
                                 <input class="flux-form-control " wire:model="contact_email" placeholder="Email Address"
-                                    name="contact_email" id="contact_email">
+                                    name="contact_email" id="contact_email" required>
                                 @error('contact_email')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -88,7 +88,7 @@
                                 <input class="flux-form-control" wire:model="contact_phone" type="tel"
                                     inputmode="numeric" pattern="[0-9]*"
                                     x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
-                                    placeholder="Phone Number" name="contact_phone" id="contact_phone">
+                                    placeholder="Phone Number" name="contact_phone" id="contact_phone" required>
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -102,8 +102,8 @@
                                 <label for="contact_last_name" class="block text-xs font-medium mb-1">Requester's Last
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_last_name" placeholder="Requester's Last Name"
-                                    name="contact_last_name" id="contact_last_name"
+                                    wire:model.live="contact_last_name" placeholder="Requester's Last Name"
+                                    name="contact_last_name" id="contact_last_name" required
                                     x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_last_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -113,8 +113,8 @@
                                 <label for="contact_first_name" class="block text-xs font-medium mb-1">Requester's First
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_first_name" placeholder="Requester's First Name"
-                                    name="contact_first_name" id="contact_first_name"
+                                    wire:model.live="contact_first_name" placeholder="Requester's First Name"
+                                    name="contact_first_name" id="contact_first_name" required
                                     x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_first_name')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -125,7 +125,7 @@
                                     Middle
                                     Name</label>
                                 <input class="flux-form-control md:col-span-3 w-full" type="text"
-                                    wire:model="contact_middle_name" placeholder="Requester's Middle Name"
+                                    wire:model.live="contact_middle_name" placeholder="Requester's Middle Name"
                                     name="contact_middle_name" id="contact_middle_name"
                                     x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                                 @error('contact_middle_name')
@@ -136,18 +136,18 @@
                         <div class=" grid grid-cols-1 gap-2">
                             <div>
                                 <label class="font-medium text-sm">Email Address:</label>
-                                <input class="flux-form-control " wire:model="contact_email"
-                                    placeholder="Email Address" name="contact_email" id="contact_email">
+                                <input class="flux-form-control " wire:model.live="contact_email"
+                                    placeholder="Email Address" name="contact_email" id="contact_email" required>
                                 @error('contact_email')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
                             </div>
                             <div>
                                 <label class="font-medium text-sm">Phone Number:</label>
-                                <input class="flux-form-control" wire:model="contact_phone" type="tel"
+                                <input class="flux-form-control" wire:model.live="contact_phone" type="tel"
                                     inputmode="numeric" pattern="[0-9]*"
                                     x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
-                                    placeholder="Phone Number" name="contact_phone" id="contact_phone">
+                                    placeholder="Phone Number" name="contact_phone" id="contact_phone" required>
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
                                 @enderror
@@ -167,8 +167,8 @@
 
             <footer class="my-6 flex justify-end gap-2">
                 <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                <button class="flux-btn btn-sm flux-btn-primary" type="button" x-data="{}"
-                    x-on:click="$dispatch('open-modal-consent-confirmation')" title="Confirmation">
+                <button class="flux-btn btn-sm flux-btn-primary" type="button"
+                    wire:click="validateContactInfo" x-on:click="$dispatch('open-modal-consent-confirmation')" title="Validate" >
                     <i class="bi bi-check"></i>Next
                 </button>
                 {{-- <button class="btn btn-primary" wire:click="nextStep">Next</button> --}}

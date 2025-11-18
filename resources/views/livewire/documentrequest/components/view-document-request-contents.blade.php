@@ -650,46 +650,12 @@
                 </div>
             </div>
 
-            <!-- Death Information -->
-            <div class="mb-8">
-                <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Death Information</h3>
-                <div class="space-y-4">
-                    <div class="grid md:grid-cols-3 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Date of Death</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details && $documentRequest->details->death_date ? \Carbon\Carbon::parse($documentRequest->details->death_date)->format('M d, Y') : 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Time of Death</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details && $documentRequest->details->death_time ? \Carbon\Carbon::parse($documentRequest->details->death_time)->format('h:i A') : 'N/A' }}
-                            </p>
-                        </div>
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Place of Death</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->death_place ?? 'N/A' }}
-                            </p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Requester Information -->
             <div class="mb-8">
                 <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Requester Information
                 </h3>
                 <div class="space-y-4">
                     <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Relationship to
-                                Deceased</label>
-                            <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
-                                {{ $documentRequest->details->relationship_to_deceased ?? 'N/A' }}
-                            </p>
-                        </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-600 mb-1">Request Type</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">

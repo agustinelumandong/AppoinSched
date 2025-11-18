@@ -76,18 +76,6 @@ class DocumentRequestDetails extends Model
         'deceased_last_name',
         'deceased_first_name',
         'deceased_middle_name',
-        'deceased_sex',
-        'deceased_religion',
-        'deceased_age',
-        'deceased_place_of_birth',
-        'deceased_date_of_birth',
-        'deceased_civil_status',
-        'deceased_residence',
-        'deceased_occupation',
-        'death_date',
-        'death_time',
-        'death_place',
-        'relationship_to_deceased',
         // Deceased's parents
         'deceased_father_last_name',
         'deceased_father_first_name',
@@ -95,14 +83,6 @@ class DocumentRequestDetails extends Model
         'deceased_mother_last_name',
         'deceased_mother_first_name',
         'deceased_mother_middle_name',
-        // Burial details
-        'burial_cemetery_name',
-        'burial_cemetery_address',
-        // Informant's declaration
-        'informant_name',
-        'informant_address',
-        'informant_relationship',
-        'informant_contact_no',
 
         // Contact person information
         'contact_first_name',
@@ -179,9 +159,6 @@ class DocumentRequestDetails extends Model
         'date_of_birth' => 'date',
         'father_birthdate' => 'date',
         'mother_birthdate' => 'date',
-        'death_date' => 'date', // For death certificates
-        'deceased_date_of_birth' => 'date',
-        'deceased_age' => 'integer',
     ];
 
     public function documentRequest(): BelongsTo

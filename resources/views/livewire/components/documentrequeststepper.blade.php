@@ -81,31 +81,12 @@ new #[Title('Document Request')] class extends Component {
     public string $deceased_last_name = '';
     public string $deceased_first_name = '';
     public string $deceased_middle_name = '';
-    public string $death_date = '';
-    public string $death_time = '';
-    public string $death_place = '';
-    public string $relationship_to_deceased = '';
-    public mixed $deceased_sex = null;
-    public string $deceased_religion = '';
-    public int $deceased_age = 0;
-    public string $deceased_place_of_birth = '';
-    public string $deceased_date_of_birth = '';
-    public string $deceased_civil_status = '';
-    public string $deceased_residence = '';
-    public string $deceased_occupation = '';
     public string $deceased_father_last_name = '';
     public string $deceased_father_first_name = '';
     public string $deceased_father_middle_name = '';
     public string $deceased_mother_last_name = '';
     public string $deceased_mother_first_name = '';
     public string $deceased_mother_middle_name = '';
-    // Burial Details
-    public string $burial_cemetery_name = '';
-    public string $burial_cemetery_address = '';
-    public string $informant_name = '';
-    public string $informant_address = '';
-    public string $informant_relationship = '';
-    public string $informant_contact_no = '';
 
     // Contact Information
     public string $contact_first_name = '';
@@ -450,16 +431,6 @@ new #[Title('Document Request')] class extends Component {
         $this->deceased_last_name = '';
         $this->deceased_first_name = '';
         $this->deceased_middle_name = '';
-        $this->death_date = '';
-        $this->death_time = '';
-        $this->death_place = '';
-        $this->relationship_to_deceased = '';
-        $this->deceased_sex = null;
-        $this->deceased_religion = '';
-        $this->deceased_age = 0;
-        $this->deceased_place_of_birth = '';
-        $this->deceased_date_of_birth = '';
-        $this->deceased_civil_status = '';
     }
 
     public function updatedSameAsPersonalAddress($value)
@@ -503,7 +474,7 @@ new #[Title('Document Request')] class extends Component {
             $this->contact_last_name = $user->last_name ?? '';
             $this->contact_middle_name = $user->middle_name ?? '';
             $this->contact_email = $user->email ?? '';
-            $this->contact_phone = $user->phone ?? '';
+            $this->contact_phone = preg_replace('/[^0-9]/', '', $user->phone ?? '');
         }
     }
 
@@ -559,18 +530,10 @@ new #[Title('Document Request')] class extends Component {
             $this->deceased_last_name = 'N/A';
             $this->deceased_first_name = 'N/A';
             $this->deceased_middle_name = 'N/A';
-            $this->death_date = '0001-01-01';
-            $this->death_time = '00:00';
-            $this->death_place = 'N/A';
-            $this->relationship_to_deceased = 'N/A';
         } else {
             $this->deceased_last_name = '';
             $this->deceased_first_name = '';
             $this->deceased_middle_name = '';
-            $this->death_date = '';
-            $this->death_time = '';
-            $this->death_place = '';
-            $this->relationship_to_deceased = '';
         }
     }
 
@@ -591,7 +554,7 @@ new #[Title('Document Request')] class extends Component {
                 } else {
                     $this->validate([
                         'to_whom' => 'required',
-                        'relationship' => $this->to_whom === 'someone_else' ? 'required|in:my_father,my_mother,my_son,my_daughter,others' : 'nullable|in:my_father,my_mother,my_son,my_daughter,others',
+                        'relationship' => $this->to_whom === 'someone_else' ? 'required|in:my_father,my_mother,my_son,my_daughter,others,my_wife' : 'nullable|in:my_father,my_mother,my_son,my_daughter,others,my_wife',
                     ]);
                 }
                 do {
@@ -615,18 +578,6 @@ new #[Title('Document Request')] class extends Component {
                         'deceased_last_name' => 'required|string|max:255',
                         'deceased_first_name' => 'required|string|max:255',
                         'deceased_middle_name' => 'nullable|string|max:255',
-                        'deceased_sex' => 'required|in:Male,Female',
-                        'deceased_religion' => 'required|string|max:100',
-                        'deceased_age' => 'required|integer|min:0',
-                        'deceased_place_of_birth' => 'required|string|max:150',
-                        'deceased_date_of_birth' => 'required|date|before_or_equal:today',
-                        'deceased_civil_status' => 'required|in:Single,Married,Widowed,Divorced,Separated',
-                        'deceased_residence' => 'required|string|max:255',
-                        'deceased_occupation' => 'required|string|max:100',
-                        'death_date' => 'required|date|before_or_equal:today',
-                        'death_time' => 'nullable|date_format:H:i',
-                        'death_place' => 'required|string|max:150',
-                        'relationship_to_deceased' => 'required|in:Spouse,Child,Parent,Sibling,Grandchild,Grandparent,Other Relative,Legal Representative,Other',
                         // Parental Information
                         'deceased_father_last_name' => 'required|string|max:100',
                         'deceased_father_first_name' => 'required|string|max:100',
@@ -634,14 +585,6 @@ new #[Title('Document Request')] class extends Component {
                         'deceased_mother_last_name' => 'required|string|max:100',
                         'deceased_mother_first_name' => 'required|string|max:100',
                         'deceased_mother_middle_name' => 'nullable|string|max:100',
-                        // Burial Details
-                        'burial_cemetery_name' => 'required|string|max:150',
-                        'burial_cemetery_address' => 'required|string|max:255',
-                        // Informant's Declaration
-                        'informant_name' => 'required|string|max:100',
-                        'informant_address' => 'required|string|max:255',
-                        'informant_relationship' => 'required|string|max:100',
-                        'informant_contact_no' => 'required|string|max:50',
                     ];
                 } elseif ($this->service->slug === 'marriage-certificate') {
                     $rules = $this->marriageLicenseRules();
@@ -769,13 +712,13 @@ new #[Title('Document Request')] class extends Component {
             case 7:
                 $this->isLoading = true;
                 if ($this->service->slug === 'death-certificate') {
+                    // For death certificate, validate contact information (requester's details)
                     $this->validate([
-                        'last_name' => 'required|string|max:255',
-                        'first_name' => 'required|string|max:255',
-                        'middle_name' => 'nullable|string|max:255',
-                        'suffix' => 'nullable|string|max:10',
-                        'email' => 'required|email|max:255',
-                        'phone' => 'required|numeric|digits_between:7,25',
+                        'contact_last_name' => 'required|string|max:255',
+                        'contact_first_name' => 'required|string|max:255',
+                        'contact_middle_name' => 'nullable|string|max:255',
+                        'contact_email' => 'required|email|max:255',
+                        'contact_phone' => 'required|numeric|digits_between:7,25',
                     ]);
                 } elseif ($this->service->slug === 'special-permit') {
                     // For special permit, skip contact validation as it's not needed
@@ -793,6 +736,22 @@ new #[Title('Document Request')] class extends Component {
         }
         $this->step++;
         $this->isLoading = false;
+    }
+
+    public function validateContactInfo(): void
+    {
+        if ($this->service->slug === 'special-permit') {
+            // For special permit, skip contact validation as it's not needed
+            // The special permit form is self-contained
+            return;
+        }
+
+        $this->validate([
+            'contact_first_name' => 'required|string|max:255',
+            'contact_last_name' => 'required|string|max:255',
+            'contact_email' => 'required|email|max:255',
+            'contact_phone' => 'required|numeric|digits_between:7,25',
+        ]);
     }
 
     private function fillFamilyDefaults(): void
@@ -859,42 +818,6 @@ new #[Title('Document Request')] class extends Component {
         if (empty($this->deceased_middle_name)) {
             $this->deceased_middle_name = 'N/A';
         }
-        if (empty($this->death_date)) {
-            $this->death_date = '0001-01-01';
-        }
-        if (empty($this->death_time)) {
-            $this->death_time = '00:00';
-        }
-        if (empty($this->death_place)) {
-            $this->death_place = 'N/A';
-        }
-        if (empty($this->relationship_to_deceased)) {
-            $this->relationship_to_deceased = 'N/A';
-        }
-        if (empty($this->deceased_sex)) {
-            $this->deceased_sex = 'Male';
-        }
-        if (empty($this->deceased_religion)) {
-            $this->deceased_religion = 'N/A';
-        }
-        if (empty($this->deceased_age)) {
-            $this->deceased_age = 0;
-        }
-        if (empty($this->deceased_place_of_birth)) {
-            $this->deceased_place_of_birth = 'N/A';
-        }
-        if (empty($this->deceased_date_of_birth)) {
-            $this->deceased_date_of_birth = '0001-01-01';
-        }
-        if (empty($this->deceased_civil_status)) {
-            $this->deceased_civil_status = 'Single';
-        }
-        if (empty($this->deceased_residence)) {
-            $this->deceased_residence = 'N/A';
-        }
-        if (empty($this->deceased_occupation)) {
-            $this->deceased_occupation = 'N/A';
-        }
         if (empty($this->deceased_father_last_name)) {
             $this->deceased_father_last_name = 'N/A';
         }
@@ -912,24 +835,6 @@ new #[Title('Document Request')] class extends Component {
         }
         if (empty($this->deceased_mother_middle_name)) {
             $this->deceased_mother_middle_name = 'N/A';
-        }
-        if (empty($this->burial_cemetery_name)) {
-            $this->burial_cemetery_name = 'N/A';
-        }
-        if (empty($this->burial_cemetery_address)) {
-            $this->burial_cemetery_address = 'N/A';
-        }
-        if (empty($this->informant_name)) {
-            $this->informant_name = 'N/A';
-        }
-        if (empty($this->informant_address)) {
-            $this->informant_address = 'N/A';
-        }
-        if (empty($this->informant_relationship)) {
-            $this->informant_relationship = 'N/A';
-        }
-        if (empty($this->informant_contact_no)) {
-            $this->informant_contact_no = 'N/A';
         }
     }
 
@@ -1135,8 +1040,8 @@ new #[Title('Document Request')] class extends Component {
                 ]);
             }
 
-            // Existing logic for other document types (excluding special permit)
-            if ($this->service->slug !== 'special-permit') {
+            // Existing logic for other document types (excluding special permit and death certificate)
+            if ($this->service->slug !== 'special-permit' && $this->service->slug !== 'death-certificate') {
                 $detailsData = array_merge($detailsData, [
                     // Personal Information
                     'last_name' => $this->last_name,
@@ -1190,36 +1095,21 @@ new #[Title('Document Request')] class extends Component {
                     'mother_nationality' => $this->mother_nationality,
                     'mother_religion' => $this->mother_religion,
                     'mother_contact_no' => $this->mother_contact_no,
+                ]);
+            }
 
-                    // Death Certificate specific fields
-
+            // Death Certificate specific fields
+            if ($this->service->slug === 'death-certificate') {
+                $detailsData = array_merge($detailsData, [
                     'deceased_last_name' => $this->deceased_last_name,
                     'deceased_first_name' => $this->deceased_first_name,
                     'deceased_middle_name' => !empty(trim($this->deceased_middle_name)) ? $this->deceased_middle_name : 'N/A',
-                    'death_date' => $this->death_date ? Carbon::parse($this->death_date) : null,
-                    'death_time' => $this->death_time,
-                    'death_place' => $this->death_place,
-                    'relationship_to_deceased' => $this->relationship_to_deceased,
-                    'deceased_sex' => $this->deceased_sex,
-                    'deceased_religion' => $this->deceased_religion,
-                    'deceased_age' => $this->deceased_age,
-                    'deceased_place_of_birth' => $this->deceased_place_of_birth,
-                    'deceased_date_of_birth' => $this->deceased_date_of_birth,
-                    'deceased_civil_status' => $this->deceased_civil_status,
-                    'deceased_residence' => $this->deceased_residence,
-                    'deceased_occupation' => $this->deceased_occupation,
                     'deceased_father_last_name' => $this->deceased_father_last_name,
                     'deceased_father_first_name' => $this->deceased_father_first_name,
                     'deceased_father_middle_name' => !empty(trim($this->deceased_father_middle_name)) ? $this->deceased_father_middle_name : 'N/A',
                     'deceased_mother_last_name' => $this->deceased_mother_last_name,
                     'deceased_mother_first_name' => $this->deceased_mother_first_name,
                     'deceased_mother_middle_name' => !empty(trim($this->deceased_mother_middle_name)) ? $this->deceased_mother_middle_name : 'N/A',
-                    'burial_cemetery_name' => $this->burial_cemetery_name,
-                    'burial_cemetery_address' => $this->burial_cemetery_address,
-                    'informant_name' => $this->informant_name,
-                    'informant_address' => $this->informant_address,
-                    'informant_relationship' => $this->informant_relationship,
-                    'informant_contact_no' => $this->informant_contact_no,
                 ]);
             }
 
@@ -1245,6 +1135,8 @@ new #[Title('Document Request')] class extends Component {
             // Prepare notification summary based on service type
             if ($this->service->slug === 'special-permit') {
                 $summary = $this->service->title . ' for ' . $this->establishment_name;
+            } elseif ($this->service->slug === 'death-certificate') {
+                $summary = $this->service->title . ' for ' . $this->deceased_first_name . ' ' . $this->deceased_last_name;
             } else {
                 $summary = $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name;
             }
@@ -1349,6 +1241,14 @@ new #[Title('Document Request')] class extends Component {
             // Prepare notification summary based on service type
             if ($this->service->slug === 'special-permit') {
                 $summary = $this->service->title . ' for ' . $this->establishment_name;
+            } elseif ($this->service->slug === 'death-certificate') {
+                // Get deceased name from document request details
+                $details = $documentRequest->details;
+                if ($details) {
+                    $summary = $this->service->title . ' for ' . $details->deceased_first_name . ' ' . $details->deceased_last_name;
+                } else {
+                    $summary = $this->service->title . ' for ' . ($this->deceased_first_name ?? '') . ' ' . ($this->deceased_last_name ?? '');
+                }
             } else {
                 $summary = $this->service->title . ' for ' . $this->first_name . ' ' . $this->last_name;
             }
