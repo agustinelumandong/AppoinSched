@@ -470,40 +470,101 @@ new class extends Component {
                 <input type="text" id="search" wire:model.live="search" class="form-control"
                     placeholder="Search by client name or email...">
             </div>
-            <div class="flex-1">
+            <div class="flex-1" x-data="{ open: false }">
                 <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select id="status" wire:model.live="status" class="form-control">
+                <div class="relative">
+                    <button type="button"
+                            @click="open = !open"
+                            class="form-control w-full text-left flex items-center justify-between"
+                            :class="{ 'border-blue-500': open }">
+                            <div class="flex items-center justify-between">
+                        <span>
+                            @if($status === '')
+                                All Status
+                            @else
+                                {{ ucfirst(str_replace('-', ' ', $status)) }}
+                                @if(isset($statusCounts[$status]))
+                                    <span class="inline-flex items-center justify-center w-5 h-5 ml-2 text-xs font-bold text-white bg-red-500 rounded-full">
+                                        {{ $statusCounts[$status] }}
+                                    </span>
+                                @endif
+                            @endif
+                        </span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                        </svg>
+                        </div>
+                    </button>
+
+                    <div x-show="open"
+                         @click.away="open = false"
+                         x-transition
+                         class="absolute z-10 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+                        <div wire:click="$set('status', '')"
+                             @click="open = false"
+                             class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                            <span>All Status</span>
+                        </div>
+                        <div wire:click="$set('status', 'pending')"
+                             @click="open = false"
+                             class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                            <span>Pending</span>
+                            @if(isset($statusCounts['pending']) && $statusCounts['pending'] > 0)
+                                <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                                    {{ $statusCounts['pending'] }}
+                                </span>
+                            @endif
+                        </div>
+                        <div wire:click="$set('status', 'in-progress')"
+                             @click="open = false"
+                             class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                            <span>In Progress</span>
+                            @if(isset($statusCounts['in-progress']) && $statusCounts['in-progress'] > 0)
+                                <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-blue-500 rounded-full">
+                                    {{ $statusCounts['in-progress'] }}
+                                </span>
+                            @endif
+                        </div>
+                        <div wire:click="$set('status', 'ready-for-pickup')"
+                             @click="open = false"
+                             class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                            <span>Ready for Pickup</span>
+                            @if(isset($statusCounts['ready-for-pickup']) && $statusCounts['ready-for-pickup'] > 0)
+                                <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-green-500 rounded-full">
+                                    {{ $statusCounts['ready-for-pickup'] }}
+                                </span>
+                            @endif
+                        </div>
+                        <div wire:click="$set('status', 'complete')"
+                             @click="open = false"
+                             class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                            <span>Complete</span>
+                            @if(isset($statusCounts['complete']) && $statusCounts['complete'] > 0)
+                                <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-green-500 rounded-full">
+                                    {{ $statusCounts['complete'] }}
+                                </span>
+                            @endif
+                        </div>
+                        <div wire:click="$set('status', 'cancelled')"
+                             @click="open = false"
+                             class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
+                            <span>Cancelled</span>
+                            @if(isset($statusCounts['cancelled']) && $statusCounts['cancelled'] > 0)
+                                <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
+                                    {{ $statusCounts['cancelled'] }}
+                                </span>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <!-- Hidden select for Livewire binding -->
+                <select wire:model.live="status" class="hidden">
                     <option value="">All Status</option>
-                    <option value="pending">
-                        Pending
-                        @if(isset($statusCounts['pending']))
-                            ({{ $statusCounts['pending'] }})
-                        @endif
-                    </option>
-                    <option value="in-progress">
-                        In Progress
-                        @if(isset($statusCounts['in-progress']))
-                            ({{ $statusCounts['in-progress'] }})
-                        @endif
-                    </option>
-                    <option value="ready-for-pickup">
-                        Ready for Pickup
-                        @if(isset($statusCounts['ready-for-pickup']))
-                            ({{ $statusCounts['ready-for-pickup'] }})
-                        @endif
-                    </option>
-                    <option value="complete">
-                        Complete
-                        @if(isset($statusCounts['complete']))
-                            ({{ $statusCounts['complete'] }})
-                        @endif
-                    </option>
-                    <option value="cancelled">
-                        Cancelled
-                        @if(isset($statusCounts['cancelled']))
-                            ({{ $statusCounts['cancelled'] }})
-                        @endif
-                    </option>
+                    <option value="pending">Pending</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="ready-for-pickup">Ready for Pickup</option>
+                    <option value="complete">Complete</option>
+                    <option value="cancelled">Cancelled</option>
                 </select>
             </div>
             <div class="flex-1">
