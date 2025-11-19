@@ -14,7 +14,7 @@ new class extends Component {
     use WithPagination;
 
     public string $search = '';
-    public string $status = '';
+    public string $status = 'on-going';
     public string $sortDirection = 'desc';
     public ?string $selectedDate = null;
     public ?string $selectedTime = null;
@@ -295,10 +295,10 @@ new class extends Component {
             <div class="flex-1">
                 <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select id="status" wire:model.live="status" class="form-control">
-                    <option value="">All Status</option>
-                    <option value="on-going">On-going</option>
+                    <option selected value="on-going">On-going</option>
                     <option value="cancelled">Cancelled</option>
                     <option value="completed">Completed</option>
+                    <option value="">All Status</option>
                 </select>
             </div>
             <div class="flex-1">
