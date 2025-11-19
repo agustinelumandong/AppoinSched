@@ -18,5 +18,5 @@ new #[Title('Request')] class extends Component {
 
 <div>
     @include('components.alert')
-    <livewire:components.documentrequeststepper :office="$office" :reference_number="$reference_number" />
+    <livewire:components.documentrequeststepper :office="$office" :reference_number="$reference_number" :key="'documentrequeststepper-' . $office->id . '-' . $reference_number" />
 </div>
