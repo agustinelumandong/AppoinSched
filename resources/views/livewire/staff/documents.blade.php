@@ -270,6 +270,34 @@ new class extends Component {
         return auth()->user()->getOfficeIdForStaff();
     }
 
+    /**
+     * Get base query with office filtering applied
+     */
+    private function getBaseQuery()
+    {
+        $user = auth()->user();
+        $officeId = $user->getOfficeIdForStaff();
+
+        $query = DocumentRequest::query();
+
+        // Super-admin sees all offices, others see only their assigned office
+        if (!$user->hasRole('super-admin') && $officeId) {
+            $query->where('office_id', $officeId);
+        }
+
+        return $query;
+    }
+
+    /**
+     * Get count of document requests by status
+     */
+    private function getStatusCount(string $status): int
+    {
+        return $this->getBaseQuery()
+            ->where('status', $status)
+            ->count();
+    }
+
     public function with(): array
     {
         $user = auth()->user();
@@ -297,6 +325,13 @@ new class extends Component {
                 })
                 ->orderBy('created_at', $this->sortDirection)
                 ->paginate(10),
+            'statusCounts' => [
+                'pending' => $this->getStatusCount('pending'),
+                'in-progress' => $this->getStatusCount('in-progress'),
+                'ready-for-pickup' => $this->getStatusCount('ready-for-pickup'),
+                'complete' => $this->getStatusCount('complete'),
+                'cancelled' => $this->getStatusCount('cancelled'),
+            ],
         ];
     }
 
@@ -439,11 +474,36 @@ new class extends Component {
                 <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
                 <select id="status" wire:model.live="status" class="form-control">
                     <option value="">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="in-progress">In Progress</option>
-                    <option value="ready-for-pickup">Ready for Pickup</option>
-                    <option value="complete">Complete</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">
+                        Pending
+                        @if(isset($statusCounts['pending']))
+                            ({{ $statusCounts['pending'] }})
+                        @endif
+                    </option>
+                    <option value="in-progress">
+                        In Progress
+                        @if(isset($statusCounts['in-progress']))
+                            ({{ $statusCounts['in-progress'] }})
+                        @endif
+                    </option>
+                    <option value="ready-for-pickup">
+                        Ready for Pickup
+                        @if(isset($statusCounts['ready-for-pickup']))
+                            ({{ $statusCounts['ready-for-pickup'] }})
+                        @endif
+                    </option>
+                    <option value="complete">
+                        Complete
+                        @if(isset($statusCounts['complete']))
+                            ({{ $statusCounts['complete'] }})
+                        @endif
+                    </option>
+                    <option value="cancelled">
+                        Cancelled
+                        @if(isset($statusCounts['cancelled']))
+                            ({{ $statusCounts['cancelled'] }})
+                        @endif
+                    </option>
                 </select>
             </div>
             <div class="flex-1">
