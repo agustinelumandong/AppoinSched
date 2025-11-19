@@ -51,6 +51,16 @@ new class extends Component {
         ) {
             abort(403, 'Unauthorized access');
         }
+
+        // Initialize seen counts in session if not exists
+        $seenCounts = session('document_status_seen_counts', []);
+        if (!isset($seenCounts['complete'])) {
+            $seenCounts['complete'] = 0;
+        }
+        if (!isset($seenCounts['cancelled'])) {
+            $seenCounts['cancelled'] = 0;
+        }
+        session(['document_status_seen_counts' => $seenCounts]);
     }
 
     #[On('documentRequestUpdated')]
@@ -62,6 +72,42 @@ new class extends Component {
     public function searchs(): void
     {
         $this->resetPage();
+    }
+
+    /**
+     * Mark a status as seen and filter by that status (called when user clicks on complete or cancelled filter)
+     */
+    public function markStatusAsSeen(string $status): void
+    {
+        if (!in_array($status, ['complete', 'cancelled'])) {
+            return;
+        }
+
+        // Mark current count as seen
+        $currentCount = $this->getStatusCount($status);
+        $seenCounts = session('document_status_seen_counts', []);
+        $seenCounts[$status] = $currentCount;
+        session(['document_status_seen_counts' => $seenCounts]);
+
+        // Set the status filter
+        $this->status = $status;
+        $this->resetPage(); // Reset pagination when filtering
+    }
+
+    /**
+     * Get unseen count for a status (for complete and cancelled only)
+     */
+    private function getUnseenCount(string $status): int
+    {
+        if (!in_array($status, ['complete', 'cancelled'])) {
+            return 0;
+        }
+
+        $currentCount = $this->getStatusCount($status);
+        $seenCounts = session('document_status_seen_counts', []);
+        $seenCount = $seenCounts[$status] ?? 0;
+
+        return max(0, $currentCount - $seenCount);
     }
 
     public function viewDocumentRequest(int $id): void
@@ -329,8 +375,12 @@ new class extends Component {
                 'pending' => $this->getStatusCount('pending'),
                 'in-progress' => $this->getStatusCount('in-progress'),
                 'ready-for-pickup' => $this->getStatusCount('ready-for-pickup'),
-                'complete' => $this->getStatusCount('complete'),
-                'cancelled' => $this->getStatusCount('cancelled'),
+                // 'complete' => $this->getStatusCount('complete'),
+                // 'cancelled' => $this->getStatusCount('cancelled'),
+            ],
+            'unseenCounts' => [
+                'complete' => $this->getUnseenCount('complete'),
+                'cancelled' => $this->getUnseenCount('cancelled'),
             ],
         ];
     }
@@ -535,23 +585,23 @@ new class extends Component {
                                 </span>
                             @endif
                         </div>
-                        <div wire:click="$set('status', 'complete')"
+                        <div wire:click="markStatusAsSeen('complete')"
                              @click="open = false"
                              class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
                             <span>Complete</span>
-                            @if(isset($statusCounts['complete']) && $statusCounts['complete'] > 0)
+                            @if(isset($unseenCounts['complete']) && $unseenCounts['complete'] > 0)
                                 <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-green-500 rounded-full">
-                                    {{ $statusCounts['complete'] }}
+                                    {{ $unseenCounts['complete'] }}
                                 </span>
                             @endif
                         </div>
-                        <div wire:click="$set('status', 'cancelled')"
+                        <div wire:click="markStatusAsSeen('cancelled')"
                              @click="open = false"
                              class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between">
                             <span>Cancelled</span>
-                            @if(isset($statusCounts['cancelled']) && $statusCounts['cancelled'] > 0)
+                            @if(isset($unseenCounts['cancelled']) && $unseenCounts['cancelled'] > 0)
                                 <span class="inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full">
-                                    {{ $statusCounts['cancelled'] }}
+                                    {{ $unseenCounts['cancelled'] }}
                                 </span>
                             @endif
                         </div>

@@ -190,23 +190,14 @@
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Manage Appointments'), 14) }}
                 </flux:navlist.item>
-                <div class="relative"
-                     x-data="{
-                         dismissed: localStorage.getItem('documents-notification-dismissed') === 'true',
-                         dismiss() {
-                             this.dismissed = true;
-                             localStorage.setItem('documents-notification-dismissed', 'true');
-                         }
-                     }"
-                     @click="dismiss()">
+                <div class="relative">
                     <flux:navlist.item icon="document-duplicate" :href="route('staff.documents')"
                         :current="request()->routeIs('staff.documents')" wire:navigate
                         class="text-decoration-none text-black truncate">
                         {{ Str::limit(__('Process Documents'), 14) }}
                     </flux:navlist.item>
-                    @if($pendingCount > 0)
+                    @if($pendingCount > 0 && !request()->routeIs('staff.documents'))
                         <span
-                            x-show="!dismissed"
                             class="absolute top-0 right-0 -mt-1 -mr-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full z-10 pointer-events-none">
                             {{ $pendingCount > 99 ? '99+' : $pendingCount }}
                         </span>
@@ -384,23 +375,14 @@
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Manage Appointments'), 14) }}
                 </flux:navlist.item>
-                <div class="relative"
-                     x-data="{
-                         dismissed: localStorage.getItem('documents-notification-dismissed') === 'true',
-                         dismiss() {
-                             this.dismissed = true;
-                             localStorage.setItem('documents-notification-dismissed', 'true');
-                         }
-                     }"
-                     @click="dismiss()">
+                <div class="relative">
                     <flux:navlist.item icon="document-duplicate" :href="route('staff.documents')"
                         :current="request()->routeIs('staff.documents')" wire:navigate
                         class="text-decoration-none text-black truncate">
                         {{ Str::limit(__('Process Documents'), 14) }}
                     </flux:navlist.item>
-                    @if($pendingCount > 0)
+                    @if($pendingCount > 0 && !request()->routeIs('staff.documents'))
                         <span
-                            x-show="!dismissed"
                             class="absolute top-0 right-0 -mt-1 -mr-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full z-10 pointer-events-none">
                             {{ $pendingCount > 99 ? '99+' : $pendingCount }}
                         </span>

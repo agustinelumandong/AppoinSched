@@ -3928,6 +3928,15 @@ new #[Title('Document Request')] class extends Component {
                                     d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
                             </svg>
                             <span>Once confirmed, your payment information cannot be changed.</span>
+                            <div class="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-400 rounded">
+                                <p class="text-sm text-gray-700">
+                                    <strong>Disclaimer:</strong> Please ensure that all payments are made accurately to the official
+                                    account details provided by our system. Clients must upload a clear and valid screenshot of their
+                                    GCash payment receipt as proof of transaction. Refunds will not be issued for payments that are
+                                    incorrect, incomplete, or sent to the wrong account. The client assumes full responsibility for any
+                                    errors in the payment amount or account details used during the transaction.
+                                </p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -3944,7 +3953,7 @@ new #[Title('Document Request')] class extends Component {
         ">
                             <span wire:loading.remove>
                                 <i class="bi bi-check-circle me-1"></i>
-                                Confirm
+                                I Understand
                             </span>
                             <span wire:loading>
                                 <span class="spinner-border spinner-border-sm me-1" role="status"></span>
