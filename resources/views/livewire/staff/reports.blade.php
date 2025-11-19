@@ -270,13 +270,13 @@ new class extends Component {
                     'time' => $appointment->booking_time,
                     'status' => ucfirst($appointment->status),
                     'purpose' => $appointment->purpose,
-                    'office' => $appointment->office->name ?? 'N/A',
+                    'office' => $appointment->office?->name ?? 'N/A',
                 ];
 
                 if ($this->includeUserDetails) {
-                    $item['user_name'] = $appointment->user->first_name . ' ' . $appointment->user->last_name;
-                    $item['user_email'] = $appointment->user->email;
-                    $item['user_phone'] = $appointment->user->phone ?? 'N/A';
+                    $item['user_name'] = ($appointment->user?->first_name ?? '') . ' ' . ($appointment->user?->last_name ?? '');
+                    $item['user_email'] = $appointment->user?->email ?? 'N/A';
+                    $item['user_phone'] = $appointment->user?->phone ?? 'N/A';
                 }
 
                 $exportData[] = $item;
@@ -320,18 +320,18 @@ new class extends Component {
                     'date' => $request->created_at->format('Y-m-d'),
                     'status' => ucfirst($request->status),
                     'purpose' => $request->purpose,
-                    'office' => $request->office->name ?? 'N/A',
+                    'office' => $request->office?->name ?? 'N/A',
                 ];
 
                 if ($this->includeServiceDetails) {
-                    $item['service'] = $request->service->title ?? 'N/A';
+                    $item['service'] = $request->service?->title ?? 'N/A';
                     $item['payment_status'] = ucfirst($request->payment_status ?? 'N/A');
                 }
 
                 if ($this->includeUserDetails) {
-                    $item['user_name'] = $request->user->first_name . ' ' . $request->user->last_name;
-                    $item['user_email'] = $request->user->email;
-                    $item['user_phone'] = $request->user->phone ?? 'N/A';
+                    $item['user_name'] = ($request->user?->first_name ?? '') . ' ' . ($request->user?->last_name ?? '');
+                    $item['user_email'] = $request->user?->email ?? 'N/A';
+                    $item['user_phone'] = $request->user?->phone ?? 'N/A';
                 }
 
                 $exportData[] = $item;
@@ -461,12 +461,12 @@ new class extends Component {
         document.addEventListener('livewire:initialized', () => {
             Livewire.on('pdf-export-ready', (data) => {
                 // Open PDF in new window
-                window.open('{{ route('reports.export.pdf') }}', '_blank');
+                window.open("{{ route('reports.export.pdf') }}", '_blank');
             });
 
             Livewire.on('csv-download-ready', (data) => {
                 // Open CSV download in new window
-                window.open('{{ route('reports.export.csv') }}', '_blank');
+                window.open("{{ route('reports.export.csv') }}", '_blank');
             });
         });
     </script>
