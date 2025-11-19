@@ -144,7 +144,7 @@
                                     </div>
                                     <div class="flex items-center mt-1">
                                         <span
-                                            class="inline-flex px-2 py-1 text-xs font-semibold rounded-full 
+                                            class="inline-flex px-2 py-1 text-xs font-semibold rounded-full
                                                                                                                     {{ $request->details->request_for === 'myself' ? 'bg-blue-100 text-blue-800' : 'bg-amber-100 text-amber-800' }}">
                                             {{ $request->details->request_for === 'myself' ? 'Self' : 'Someone-Else' }}
                                         </span>
@@ -184,8 +184,15 @@
                             <!-- Status column -->
                             <td class="px-6 py-4 whitespace-nowrap">
                                 <span
-                                    class="flux-badge flux-badge-{{ $request->status === 'pending' ? 'warning text-amber-800' : ($request->status === 'approved' ? 'success' : 'danger') }}">
-                                    {{ ucfirst($request->status) }}
+                                    class="flux-badge flux-badge-{{ match ($request->status) {
+                                        'pending' => 'warning text-amber-800',
+                                        'in-progress' => 'info',
+                                        'ready-for-pickup' => 'success',
+                                        'complete' => 'success',
+                                        'cancelled' => 'danger',
+                                        default => 'light',
+                                    } }}">
+                                    {{ ucfirst(str_replace('-', ' ', $request->status)) }}
                                 </span>
                             </td>
 

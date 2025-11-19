@@ -18,7 +18,7 @@ class DocumentRequest extends Model
     /**
      * Valid document request status values
      */
-    public const VALID_STATUSES = ['pending', 'in-progress', 'cancelled'];
+    public const VALID_STATUSES = ['pending', 'in-progress', 'ready-for-pickup', 'complete', 'cancelled'];
 
     protected $fillable = [
         'user_id',
@@ -111,6 +111,16 @@ class DocumentRequest extends Model
         return $query->where('status', 'cancelled');
     }
 
+    public function scopeReadyForPickup($query)
+    {
+        return $query->where('status', 'ready-for-pickup');
+    }
+
+    public function scopeComplete($query)
+    {
+        return $query->where('status', 'complete');
+    }
+
     public function details()
     {
         return $this->hasOne(DocumentRequestDetails::class);
@@ -152,6 +162,16 @@ class DocumentRequest extends Model
     public function isCancelled()
     {
         return $this->status === 'cancelled';
+    }
+
+    public function isReadyForPickup()
+    {
+        return $this->status === 'ready-for-pickup';
+    }
+
+    public function isComplete()
+    {
+        return $this->status === 'complete';
     }
 
     // Deprecated: Use isInProgress() instead
@@ -204,6 +224,19 @@ class DocumentRequest extends Model
         if ($remarks) {
             $this->remarks = $remarks;
         }
+        $this->save();
+    }
+
+    public function markAsReadyForPickup()
+    {
+        $this->status = 'ready-for-pickup';
+        $this->save();
+    }
+
+    public function markAsComplete()
+    {
+        $this->status = 'complete';
+        $this->completed_date = now();
         $this->save();
     }
 

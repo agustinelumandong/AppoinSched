@@ -20,7 +20,7 @@ return new class extends Migration
             $table->string('to_whom')->nullable();
             $table->string('purpose')->nullable();
             $table->string('reference_number')->nullable();
-            $table->enum('status', ['pending', 'in-progress', 'cancelled'])->default('pending');
+            $table->enum('status', ['pending', 'in-progress', 'ready-for-pickup', 'complete', 'cancelled'])->default('pending');
             $table->text('remarks')->nullable();
             $table->enum('payment_status', ['unpaid', 'paid', 'failed'])->default('unpaid');
             $table->string('payment_reference')->nullable();

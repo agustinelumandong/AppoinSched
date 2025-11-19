@@ -109,6 +109,8 @@ new class extends Component {
                                                     <span class="flux-badge flux-badge-{{ match ($request->status) {
                                                             'pending' => 'warning',
                                                             'in-progress' => 'info',
+                                                            'ready-for-pickup' => 'success',
+                                                            'complete' => 'success',
                                                             'cancelled' => 'danger',
                                                             default => 'light',
                                                         } }}">

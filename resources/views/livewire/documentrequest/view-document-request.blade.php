@@ -419,11 +419,32 @@ new class extends Component {
 
             $this->documentRequest->update($updateData);
 
+            // Set completed_date when status is complete
+            if ($status === 'complete') {
+                $this->documentRequest->update(['completed_date' => now()]);
+            }
+
             // Send appropriate notification based on status
             switch ($status) {
                 case 'in-progress':
                     $this->documentRequest->user->notify(
                         new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'ready-for-pickup':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
+                            'reference_no' => $this->documentRequest->reference_number,
+                        ]),
+                    );
+                    break;
+
+                case 'complete':
+                    $this->documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCompleted, [
                             'reference_no' => $this->documentRequest->reference_number,
                         ]),
                     );
@@ -502,6 +523,8 @@ new class extends Component {
                     class="flux-badge flux-badge-{{ match ($documentRequest->status) {
                         'pending' => 'warning',
                         'in-progress' => 'info',
+                        'ready-for-pickup' => 'success',
+                        'complete' => 'success',
                         'cancelled' => 'danger',
                         default => 'light',
                     } }}">

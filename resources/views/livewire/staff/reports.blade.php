@@ -590,6 +590,8 @@ new class extends Component {
                                                 // Document request statuses
                                                 'pending' => 'flux-badge-warning',
                                                 'in-progress' => 'flux-badge-info',
+                                                'ready-for-pickup' => 'flux-badge-success',
+                                                'complete' => 'flux-badge-success',
                                                 'cancelled' => 'flux-badge-danger',
                                                 // Appointment statuses
                                                 'on-going' => 'flux-badge-warning',

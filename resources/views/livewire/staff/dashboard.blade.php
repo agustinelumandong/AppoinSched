@@ -253,14 +253,15 @@ new class extends Component {
                                                             {{ \Illuminate\Support\Carbon::parse($documentRequest->booking_time)->format('h:i A') }}
                                                         </td>
                                                         <td>
-                                                            <span class="flux-badge {{ $documentRequest->status === 'pending'
-                                ? 'flux-badge-warning'
-                                : ($documentRequest->status === 'approved'
-                                    ? 'flux-badge-success'
-                                    : ($documentRequest->status === 'cancelled'
-                                        ? 'flux-badge-danger'
-                                        : 'flux-badge-info')) }}">
-                                                                {{ ucfirst($documentRequest->status) }}
+                                                            <span class="flux-badge {{ match ($documentRequest->status) {
+                                'pending' => 'flux-badge-warning',
+                                'in-progress' => 'flux-badge-info',
+                                'ready-for-pickup' => 'flux-badge-success',
+                                'complete' => 'flux-badge-success',
+                                'cancelled' => 'flux-badge-danger',
+                                default => 'flux-badge-info',
+                            } }}">
+                                                                {{ ucfirst(str_replace('-', ' ', $documentRequest->status)) }}
                                                             </span>
                                                         </td>
 

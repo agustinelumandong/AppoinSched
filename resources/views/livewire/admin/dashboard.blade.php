@@ -302,16 +302,15 @@ new class extends Component {
               <div class="text-right">
                   <span
                 class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-          {{ $request->status === 'pending'
-              ? 'bg-yellow-100 text-yellow-800'
-              : ($request->status === 'approved'
-            ? 'bg-green-100 text-green-800'
-            : ($request->status === 'cancelled'
-                ? 'bg-red-100 text-red-800'
-                : ($request->status === 'completed'
-              ? 'bg-green-100 text-green-800'
-              : 'bg-gray-100 text-gray-800'))) }}">
-                {{ ucfirst($request->status) }}
+          {{ match ($request->status) {
+            'pending' => 'bg-yellow-100 text-yellow-800',
+            'in-progress' => 'bg-blue-100 text-blue-800',
+            'ready-for-pickup' => 'bg-green-100 text-green-800',
+            'complete' => 'bg-green-100 text-green-800',
+            'cancelled' => 'bg-red-100 text-red-800',
+            default => 'bg-gray-100 text-gray-800',
+          } }}">
+                {{ ucfirst(str_replace('-', ' ', $request->status)) }}
                   </span>
                   <p class="text-xs text-gray-500 mt-1">{{ $request->requested_date }}</p>
               </div>

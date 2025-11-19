@@ -17,7 +17,7 @@ new class extends Component {
 
     public string $search = '';
 
-    public string $status = '';
+    public string $status = 'pending';
 
     public string $sortDirection = 'desc';
 
@@ -170,10 +170,27 @@ new class extends Component {
             $updated = $documentRequest->update($updateData);
 
             if ($updated) {
+                // Set completed_date when status is complete
+                if ($status === 'complete') {
+                    $documentRequest->update(['completed_date' => now()]);
+                }
+
                 // Send notification to client for status changes
                 if ($status === 'in-progress') {
                     $documentRequest->user->notify(
                         new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
+                            'reference_no' => $documentRequest->reference_number,
+                        ])
+                    );
+                } elseif ($status === 'ready-for-pickup') {
+                    $documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
+                            'reference_no' => $documentRequest->reference_number,
+                        ])
+                    );
+                } elseif ($status === 'complete') {
+                    $documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCompleted, [
                             'reference_no' => $documentRequest->reference_number,
                         ])
                     );
@@ -192,8 +209,12 @@ new class extends Component {
                 session()->flash('error', 'Failed to update document request status');
             }
         } catch (\Exception $e) {
-            Log::error('Document request status update failed: ' . $e->getMessage());
-            session()->flash('error', 'An error occurred while updating the document request status');
+            Log::error('Document request status update failed: ' . $e->getMessage(), [
+                'exception' => $e,
+                'status' => $status,
+                'document_request_id' => $id,
+            ]);
+            session()->flash('error', 'An error occurred while updating the document request status: ' . $e->getMessage());
         }
     }
 
@@ -293,6 +314,50 @@ new class extends Component {
             session()->flash('error', 'Failed to update payment status.');
         }
     }
+
+    public function updatePaymentStatusFromTable(int $id, string $status): void
+    {
+        try {
+            $documentRequest = DocumentRequest::with('user')->findOrFail($id);
+
+            // Check if staff is assigned to this document request's office
+            if (!auth()->user()->isAssignedToOffice($documentRequest->office_id)) {
+                session()->flash('error', 'You are not authorized to update this document request');
+                return;
+            }
+
+            $documentRequest->update([
+                'payment_status' => $status,
+            ]);
+
+            // If payment is marked as paid and status is pending, automatically transition to in-progress
+            if ($status === 'paid' && $documentRequest->status === 'pending') {
+                $documentRequest->update(['status' => 'in-progress']);
+                $documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::PaymentVerified, [
+                        'reference_no' => $documentRequest->reference_number,
+                    ])
+                );
+                $documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::DocumentInProgress, [
+                        'reference_no' => $documentRequest->reference_number,
+                    ])
+                );
+            } elseif ($status === 'paid') {
+                $documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::PaymentVerified, [
+                        'reference_no' => $documentRequest->reference_number,
+                    ])
+                );
+            }
+
+            $this->resetPage();
+            session()->flash('success', 'Payment status updated to ' . ucfirst($status) . ' successfully.');
+        } catch (\Exception $e) {
+            Log::error('Payment status update failed: ' . $e->getMessage());
+            session()->flash('error', 'Failed to update payment status.');
+        }
+    }
 }; ?>
 
 <div>
@@ -336,6 +401,8 @@ new class extends Component {
                     <option value="">All Status</option>
                     <option value="pending">Pending</option>
                     <option value="in-progress">In Progress</option>
+                    <option value="ready-for-pickup">Ready for Pickup</option>
+                    <option value="complete">Complete</option>
                     <option value="cancelled">Cancelled</option>
                 </select>
             </div>
@@ -408,6 +475,8 @@ new class extends Component {
                                                 <span class="flux-badge flux-badge-{{ match ($documentRequest->status) {
                             'pending' => 'warning',
                             'in-progress' => 'info',
+                            'ready-for-pickup' => 'success',
+                            'complete' => 'success',
                             'cancelled' => 'danger',
                             default => 'light',
                         } }}">
@@ -425,18 +494,33 @@ new class extends Component {
                                                         wire:navigate class="flux-btn btn-sm flux-btn-primary" title="View Details">
                                                         <i class="bi bi-eye"></i>
                                                     </a>
-                                                    @if ($documentRequest->status !== 'in-progress')
-                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'in-progress')"
-                                                            class="flux-btn btn-sm flux-btn-info" title="Mark as In Progress"
+                                                    @if ($documentRequest->status === 'pending')
+                                                        <button wire:click="updatePaymentStatusFromTable({{ $documentRequest->id }}, 'paid')"
+                                                            class="flux-btn btn-sm flux-btn-success" title="Mark as Paid"
                                                             wire:loading.attr="disabled">
-                                                            <i class="bi bi-arrow-right-circle"></i>
+                                                            <i class="bi bi-check-circle"></i>
                                                         </button>
-                                                    @endif
-                                                    @if ($documentRequest->status !== 'cancelled')
                                                         <button wire:click="setDocumentStatusToUpdate({{ $documentRequest->id }}, 'cancelled')"
                                                             class="flux-btn btn-sm flux-btn-danger" title="Cancel Request"
                                                             wire:loading.attr="disabled">
                                                             <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    @elseif ($documentRequest->status === 'in-progress')
+                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'ready-for-pickup')"
+                                                            class="flux-btn btn-sm flux-btn-success" title="Ready for Pick Up"
+                                                            wire:loading.attr="disabled">
+                                                            <i class="bi bi-box-arrow-up"></i>
+                                                        </button>
+                                                        <button wire:click="setDocumentStatusToUpdate({{ $documentRequest->id }}, 'cancelled')"
+                                                            class="flux-btn btn-sm flux-btn-danger" title="Cancel Request"
+                                                            wire:loading.attr="disabled">
+                                                            <i class="bi bi-x-circle"></i>
+                                                        </button>
+                                                    @elseif ($documentRequest->status === 'ready-for-pickup')
+                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'complete')"
+                                                            class="flux-btn btn-sm flux-btn-success" title="Mark as Complete"
+                                                            wire:loading.attr="disabled">
+                                                            <i class="bi bi-check2-circle"></i>
                                                         </button>
                                                     @endif
                                                 </div>

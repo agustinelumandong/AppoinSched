@@ -831,6 +831,8 @@
                     class="flux-badge
                     @if ($documentRequest->status === 'pending') flux-badge-warning
                     @elseif ($documentRequest->status === 'in-progress') flux-badge-info
+                    @elseif ($documentRequest->status === 'ready-for-pickup') flux-badge-success
+                    @elseif ($documentRequest->status === 'complete') flux-badge-success
                     @elseif ($documentRequest->status === 'cancelled') flux-badge-danger
                     @else flux-badge-secondary @endif">
                     {{ ucfirst(str_replace('-', ' ', $documentRequest->status ?? 'Pending')) }}
@@ -841,7 +843,7 @@
         <!-- Status Update Buttons -->
         <div class="space-y-3">
             <h5 class="text-sm font-medium text-gray-700 mb-3">Update Document Request Status:</h5>
-            <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-2">
                 <button wire:click="setDocumentStatusToUpdate('pending')" wire:prevent-scroll
                     class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'pending') flux-btn-warning @else flux-btn-outline @endif">
                     <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -858,6 +860,24 @@
                             d="M13 10V3L4 14h7v7l9-11h-7z"></path>
                     </svg>
                     <span class="text-xs">In Progress</span>
+                </button>
+
+                <button wire:click="setDocumentStatusToUpdate('ready-for-pickup')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'ready-for-pickup') flux-btn-success @else flux-btn-outline @endif">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+                    </svg>
+                    <span class="text-xs">Ready for Pickup</span>
+                </button>
+
+                <button wire:click="setDocumentStatusToUpdate('complete')" wire:prevent-scroll
+                    class="flex items-center justify-center flux-btn flux-btn-sm @if ($documentRequest->status === 'complete') flux-btn-success @else flux-btn-outline @endif">
+                    <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M5 13l4 4L19 7"></path>
+                    </svg>
+                    <span class="text-xs">Complete</span>
                 </button>
 
                 <button wire:click="setDocumentStatusToUpdate('cancelled')" wire:prevent-scroll
