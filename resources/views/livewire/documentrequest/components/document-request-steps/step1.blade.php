@@ -1,4 +1,4 @@
-<div class="px-5 py-2 mt-5">
+<div class="px-5 py-2 mt-5" wire:key="document-request-step-1">
     <div class="flex flex-col gap-4">
         <div>
             <div class="header mb-4">
@@ -126,8 +126,8 @@
             @endif
 
             <footer class="my-6 flex justify-end gap-2">
-                <button class="btn btn-ghost" wire:click="previousStep">Previous</button>
-                <button class="btn btn-primary" wire:click="nextStep">Next</button>
+                <button class="btn btn-ghost" type="button" wire:click="previousStep">Previous</button>
+                <button class="btn btn-primary" type="button" wire:click="nextStep">Next</button>
             </footer>
         </div>
     </div>
