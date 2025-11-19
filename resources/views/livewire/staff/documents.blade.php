@@ -17,7 +17,7 @@ new class extends Component {
 
     public string $search = '';
 
-    public string $status = 'pending';
+    public string $status = 'in-progress';
 
     public string $sortDirection = 'desc';
 
@@ -167,12 +167,26 @@ new class extends Component {
                 $updateData['remarks'] = $this->remarks;
             }
 
+            // When document status is cancelled, automatically set payment_status to failed
+            if ($status === 'cancelled' && $documentRequest->payment_status !== 'failed') {
+                $updateData['payment_status'] = 'failed';
+            }
+
             $updated = $documentRequest->update($updateData);
 
             if ($updated) {
                 // Set completed_date when status is complete
                 if ($status === 'complete') {
                     $documentRequest->update(['completed_date' => now()]);
+                }
+
+                // Send payment failed notification if payment status was automatically set to failed
+                if ($status === 'cancelled' && isset($updateData['payment_status']) && $updateData['payment_status'] === 'failed') {
+                    $documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
+                            'reference_no' => $documentRequest->reference_number,
+                        ])
+                    );
                 }
 
                 // Send notification to client for status changes
@@ -326,9 +340,20 @@ new class extends Component {
                 return;
             }
 
-            $documentRequest->update([
+            $updateData = [
                 'payment_status' => $status,
-            ]);
+            ];
+
+            // When payment status is failed, automatically set document status to cancelled
+            if ($status === 'failed' && $documentRequest->status !== 'cancelled') {
+                $updateData['status'] = 'cancelled';
+                // Set staff_id if not already set
+                if (!$documentRequest->staff_id) {
+                    $updateData['staff_id'] = auth()->id();
+                }
+            }
+
+            $documentRequest->update($updateData);
 
             // If payment is marked as paid and status is pending, automatically transition to in-progress
             if ($status === 'paid' && $documentRequest->status === 'pending') {
@@ -349,6 +374,21 @@ new class extends Component {
                         'reference_no' => $documentRequest->reference_number,
                     ])
                 );
+            } elseif ($status === 'failed') {
+                // Send payment failed notification
+                $documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
+                        'reference_no' => $documentRequest->reference_number,
+                    ])
+                );
+                // Send cancellation notification if document status was automatically set to cancelled
+                if (isset($updateData['status']) && $updateData['status'] === 'cancelled') {
+                    $documentRequest->user->notify(
+                        new RequestEventNotification(RequestNotificationEvent::DocumentCancelled, [
+                            'reference_no' => $documentRequest->reference_number,
+                        ])
+                    );
+                }
             }
 
             $this->resetPage();

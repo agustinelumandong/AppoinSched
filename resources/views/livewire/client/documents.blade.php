@@ -9,6 +9,8 @@ new class extends Component {
 
     public $selectedPaymentMethod = null;
     public $selectedDocumentRequest = null;
+    public $selectedRemarksRequest = null;
+
     public function with()
     {
         return [
@@ -49,6 +51,18 @@ new class extends Component {
         $this->dispatch('close-modal-payment-method');
         $this->reset();
     }
+
+    public function openRemarksModal($id)
+    {
+        $this->selectedRemarksRequest = DocumentRequest::findOrFail($id);
+        $this->dispatch('open-modal-view-remarks');
+    }
+
+    public function closeRemarksModal()
+    {
+        $this->dispatch('close-modal-view-remarks');
+        $this->selectedRemarksRequest = null;
+    }
 }; ?>
 
 <div>
@@ -68,6 +82,9 @@ new class extends Component {
                 <table class="table flux-table mb-0">
                     <thead>
                         <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                                Reference Number
+                            </th>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                                 Office
                             </th>
@@ -90,6 +107,11 @@ new class extends Component {
                     <tbody>
                         @forelse($requests as $request)
                                             <tr>
+                                                <td class="px-6 py-4 whitespace-nowrap">
+                                                    <div class="text-sm font-medium text-gray-900">
+                                                        {{ $request->reference_number ?? 'N/A' }}
+                                                    </div>
+                                                </td>
                                                 <td class="px-6 py-4 whitespace-nowrap">
                                                     <div class="text-sm font-medium text-gray-900">
                                                         {{ $request->office->name }}
@@ -134,13 +156,21 @@ new class extends Component {
                                                     </p>
                                                 </td>
                                                 <td>
-                                                    {{--  --}}
-                                                    <button
-                                                        class="flux-btn btn-sm flux-btn-primary text-decoration-none {{   $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
-                                                        wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
-                                                    >
-                                                        Pay Now
-                                                    </button>
+                                                    @if ($request->status === 'cancelled' || $request->payment_status === 'failed')
+                                                        <button
+                                                            class="flux-btn btn-sm flux-btn-outline flux-btn-info text-decoration-none"
+                                                            wire:click="openRemarksModal({{ $request->id }})"
+                                                        >
+                                                            View Remarks from staff
+                                                        </button>
+                                                    @else
+                                                        <button
+                                                            class="flux-btn btn-sm flux-btn-primary text-decoration-none {{   $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
+                                                            wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
+                                                        >
+                                                            Pay Now
+                                                        </button>
+                                                    @endif
 
                                                     <div class="d-flex gap-2">
                                                         {{-- <a href="#" class="flux-btn flux-btn-outline btn-sm" title="View Details">
@@ -151,7 +181,7 @@ new class extends Component {
                                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="text-center py-5">
+                                <td colspan="8" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="bi bi-person-badge display-4 mb-3"></i>
                                         <div>No document requests found. Create your first document request to get started.
@@ -174,5 +204,6 @@ new class extends Component {
 
 
     @include('livewire.client.components.modal.payment-method-modal')
+    @include('livewire.client.components.modal.view-remarks-modal')
 
 </div>

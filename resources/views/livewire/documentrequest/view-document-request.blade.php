@@ -351,13 +351,13 @@ new class extends Component {
                             ]);
                         }
 
-                        // If payment is not failed, set it to failed
-                        if ($this->documentRequest->payment_status !== 'failed' && $this->documentRequest->payment_status !== 'unpaid') {
+                        // When document status is cancelled, automatically set payment_status to failed
+                        if ($this->documentRequest->payment_status !== 'failed') {
                             $this->documentRequest->update([
                                 'payment_status' => 'failed',
                             ]);
 
-                            // Send payment notification
+                            // Send payment failed notification
                             $this->documentRequest->user->notify(
                                 new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
                                     'reference_no' => $this->documentRequest->reference_number,
@@ -411,6 +411,11 @@ new class extends Component {
                 $updateData['staff_id'] = auth()->id();
             }
 
+            // When document status is cancelled, automatically set payment_status to failed
+            if ($status === 'cancelled' && $this->documentRequest->payment_status !== 'failed') {
+                $updateData['payment_status'] = 'failed';
+            }
+
             // Validate status
             if (!in_array($status, \App\Models\DocumentRequest::VALID_STATUSES)) {
                 session()->flash('error', 'Invalid status value');
@@ -418,6 +423,15 @@ new class extends Component {
             }
 
             $this->documentRequest->update($updateData);
+
+            // Send payment failed notification if payment status was automatically set to failed
+            if ($status === 'cancelled' && isset($updateData['payment_status']) && $updateData['payment_status'] === 'failed') {
+                $this->documentRequest->user->notify(
+                    new RequestEventNotification(RequestNotificationEvent::PaymentFailed, [
+                        'reference_no' => $this->documentRequest->reference_number,
+                    ]),
+                );
+            }
 
             // Set completed_date when status is complete
             if ($status === 'complete') {
