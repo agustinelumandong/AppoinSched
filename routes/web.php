@@ -44,6 +44,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         Volt::route('admin/services', 'services.services-management')->name('admin.services');
         Volt::route('admin/appointments-management', 'appointments.appointments-management')->name('admin.appointments-management');
         Volt::route('admin/document-request', 'documentrequest.document-request')->name('admin.document-request');
+        Volt::route('admin/reports', 'admin.reports')->name('admin.reports');
     });
 
     // Staff, Admin, and SuperAdmin routes
@@ -58,7 +59,6 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
         // Report export routes
         Route::get('reports/export/pdf', [ReportController::class, 'generatePdf'])->name('reports.export.pdf');
-        Route::get('reports/export/csv', [ReportController::class, 'generateCsv'])->name('reports.export.csv');
     });
 
     // Client routes (all authenticated users with complete profile)

@@ -309,6 +309,11 @@
                         </span>
                     @endif
                 </div>
+                <flux:navlist.item icon="chart-bar-square" :href="route('admin.reports')"
+                    :current="request()->routeIs('admin.reports')" wire:navigate
+                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
+                    {{ Str::limit(__('Admin Reports'), 14) }}
+                </flux:navlist.item>
             </flux:navlist.group>
             @endhasrole
 
@@ -501,6 +506,11 @@
                     :current="request()->routeIs('admin.services')" wire:navigate
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Services Management'), 14) }}
+                </flux:navlist.item>
+                <flux:navlist.item icon="chart-bar-square" :href="route('admin.reports')"
+                    :current="request()->routeIs('admin.reports')" wire:navigate
+                    class="text-decoration-none text-black truncate">
+                    {{ Str::limit(__('Admin Reports'), 14) }}
                 </flux:navlist.item>
                 @php
                     // Calculate new appointments count for admin

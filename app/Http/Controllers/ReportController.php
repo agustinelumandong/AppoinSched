@@ -16,48 +16,37 @@ class ReportController extends Controller
         $exportParams = session('pdf_export_params');
 
         if (!$exportParams) {
-            return redirect()->back()->with('error', 'No export parameters found.');
+            $redirectRoute = auth()->user()->hasAnyRole(['admin', 'super-admin'])
+                ? 'admin.reports'
+                : 'staff.reports';
+            return redirect()->route($redirectRoute)->with('error', 'No export parameters found. Please generate the report again.');
         }
 
-        $data = $exportParams['data'];
-        $officeInfo = $exportParams['officeInfo'];
-        $reportTitle = $exportParams['reportTitle'];
-        $reportPeriod = $exportParams['reportPeriod'];
-        $filename = $exportParams['filename'];
+        try {
+            // Determine which template to use
+            $isAdminReport = $exportParams['is_admin_report'] ?? false;
+            $viewName = $isAdminReport ? 'reports.export-pdf-admin' : 'reports.export-pdf-analytics';
 
-        // Generate PDF
-        $pdf = PDF::loadView('reports.export-pdf', [
-            'data' => $data,
-            'officeInfo' => $officeInfo,
-            'reportTitle' => $reportTitle,
-            'reportPeriod' => $reportPeriod,
-            'generatedDate' => now()->format('F d, Y h:i A'),
-        ]);
+            // Generate PDF with analytics format
+            $pdf = PDF::loadView($viewName, $exportParams);
 
-        // Clear export parameters from session
-        session()->forget('pdf_export_params');
+            // Clear export parameters from session
+            session()->forget('pdf_export_params');
 
-        // Return PDF for download
-        return $pdf->download($filename);
-    }
+            // Generate filename
+            $periodType = $exportParams['period_type'] ?? 'monthly';
+            $filename = ($isAdminReport ? 'admin_' : '') . 'service_report_' . $periodType . '_' . now()->format('Y-m-d_H-i-s') . '.pdf';
 
-    public function generateCsv(Request $request)
-    {
-        // Get CSV export parameters from session
-        $csvContent = session('csv_export_content');
-        $filename = session('csv_export_filename');
-
-        if (!$csvContent || !$filename) {
-            return redirect()->back()->with('error', 'No CSV export data found.');
+            // Return PDF for download
+            return $pdf->download($filename);
+        } catch (\Exception $e) {
+            // Log error and redirect back
+            \Log::error('PDF generation failed: ' . $e->getMessage());
+            $redirectRoute = auth()->user()->hasAnyRole(['admin', 'super-admin'])
+                ? 'admin.reports'
+                : 'staff.reports';
+            return redirect()->route($redirectRoute)->with('error', 'Failed to generate PDF. Please try again.');
         }
-
-        // Clear CSV export parameters from session
-        session()->forget(['csv_export_content', 'csv_export_filename']);
-
-        // Return CSV for download
-        return response($csvContent, 200, [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '"',
-        ]);
     }
+
 }

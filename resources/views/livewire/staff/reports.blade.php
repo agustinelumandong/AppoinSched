@@ -11,38 +11,24 @@ use Livewire\WithPagination;
 use Livewire\Attributes\On;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
-use Barryvdh\DomPDF\Facade\Pdf;
 
 new class extends Component {
     use WithPagination;
 
-    #[On('pdf-export-ready')]
-    public function handlePdfExport($data): void
-    {
-        // Redirect to PDF generation route
-        $this->redirect(route('reports.export.pdf'));
-    }
-
     public ?string $selectedType = 'appointments';
     public ?int $selectedOfficeId = null;
     public ?int $selectedServiceId = null;
-    public ?string $selectedStatus = null;
-    public string $periodType = 'daily';
+    public string $periodType = 'monthly';
     public string $startDate;
     public string $endDate;
     public bool $isCustomRange = false;
-    public array $statusOptions = [];
-    public array $documentStatusOptions = ['pending', 'in-progress', 'cancelled'];
-    public array $appointmentStatusOptions = ['on-going', 'cancelled', 'completed'];
-    public array $paymentStatusOptions = ['unpaid', 'paid', 'failed'];
-    public $reportData;
 
-    // Export related properties
-    public array $selectedStatuses = [];
-    public array $selectedPaymentStatuses = [];
-    public string $exportType = '';
-    public bool $includeUserDetails = true;
-    public bool $includeServiceDetails = true;
+    // Analytics data
+    public array $analyticsData = [];
+    public array $documentRequestsAnalytics = [];
+    public array $appointmentsAnalytics = [];
+    public array $performanceAnalysis = [];
+    public array $overallSummary = [];
     public bool $isExporting = false;
 
     public function mount(): void
@@ -54,11 +40,22 @@ new class extends Component {
         ) {
             abort(403, 'Unauthorized access');
         }
-        $this->selectedOfficeId = $this->getOfficeIdForStaff();
-        $this->startDate = Carbon::now()->startOfWeek()->format('Y-m-d');
-        $this->endDate = Carbon::now()->endOfWeek()->format('Y-m-d');
-        $this->updateStatusOptions();
-        $this->generateReport();
+
+        $user = auth()->user();
+
+        // Set initial office - admins/super-admins can see all, staff see their assigned office
+        if ($user->hasRole('super-admin') || $user->hasRole('admin')) {
+            $this->selectedOfficeId = null; // null means all offices
+        } else {
+            $this->selectedOfficeId = $this->getOfficeIdForStaff();
+        }
+
+        // Set default to current month
+        $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d');
+        $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d');
+        $this->periodType = 'monthly';
+
+        $this->generateAnalytics();
     }
 
     public function getOfficeIdForStaff(): ?int
@@ -69,32 +66,46 @@ new class extends Component {
     public function updatedPeriodType(): void
     {
         $this->isCustomRange = $this->periodType === 'custom';
-        $this->generateReport();
+
+        if (!$this->isCustomRange) {
+            $this->updateDatesForPeriod();
+        }
+
+        $this->generateAnalytics();
     }
 
     public function updatedSelectedServiceId(): void
     {
-        $this->generateReport();
-    }
-
-    public function updatedSelectedStatus(): void
-    {
-        $this->generateReport();
+        $this->generateAnalytics();
     }
 
     public function updatedSelectedType(): void
     {
-        $this->updateStatusOptions();
-        $this->generateReport();
+        $this->generateAnalytics();
     }
 
-    protected function updateStatusOptions(): void
+    public function updatedSelectedOfficeId(): void
     {
-        if ($this->selectedType === 'appointments') {
-            $this->statusOptions = $this->appointmentStatusOptions;
-        } else {
-            $this->statusOptions = $this->documentStatusOptions;
-        }
+        $this->generateAnalytics();
+    }
+
+    protected function updateDatesForPeriod(): void
+    {
+        match ($this->periodType) {
+            'daily' => [
+                $this->startDate = Carbon::today()->format('Y-m-d'),
+                $this->endDate = Carbon::today()->format('Y-m-d'),
+            ],
+            'weekly' => [
+                $this->startDate = Carbon::now()->startOfWeek()->format('Y-m-d'),
+                $this->endDate = Carbon::now()->endOfWeek()->format('Y-m-d'),
+            ],
+            'monthly' => [
+                $this->startDate = Carbon::now()->startOfMonth()->format('Y-m-d'),
+                $this->endDate = Carbon::now()->endOfMonth()->format('Y-m-d'),
+            ],
+            default => null,
+        };
     }
 
     public function applyDateFilter(): void
@@ -103,331 +114,344 @@ new class extends Component {
             'startDate' => 'required|date',
             'endDate' => 'required|date|after_or_equal:startDate',
         ]);
-        $this->generateReport();
+        $this->generateAnalytics();
     }
 
-    public function generateReport(): void
+    public function generateAnalytics(): void
     {
+        $user = auth()->user();
         $officeId = $this->selectedOfficeId;
         $serviceId = $this->selectedServiceId;
-        $status = $this->selectedStatus;
-        $period = $this->periodType !== 'custom' ? $this->periodType : null;
-        $startDate = $this->isCustomRange ? $this->startDate : null;
-        $endDate = $this->isCustomRange ? $this->endDate : null;
-        $user = auth()->user();
+        $startDate = Carbon::parse($this->startDate)->startOfDay();
+        $endDate = Carbon::parse($this->endDate)->endOfDay();
 
-        // Initialize reportData as an empty array if no results are found
-        $this->reportData = [];
+        // Reset analytics data
+        $this->documentRequestsAnalytics = [];
+        $this->appointmentsAnalytics = [];
+        $this->performanceAnalysis = [];
+        $this->overallSummary = [];
 
-        if ($this->selectedType === 'appointments') {
-            $query = Appointments::with(['office', 'user']);
+        // Determine which offices to query
+        $officeIds = $this->getOfficeIdsToQuery($user, $officeId);
 
-            // Super-admin sees all offices, others see only their assigned office
-            if (!$user->hasRole('super-admin') && $officeId) {
-                $query->where('office_id', $officeId);
-            }
+        // Generate document requests analytics
+        $this->documentRequestsAnalytics = $this->calculateDocumentRequestsAnalytics($officeIds, $serviceId, $startDate, $endDate);
 
-            $query->when($status, fn($q) => $q->where('status', $status));
-            $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'booking_date');
-            $results = $query->get();
+        // Generate appointments analytics
+        $this->appointmentsAnalytics = $this->calculateAppointmentsAnalytics($officeIds, $startDate, $endDate);
 
-            if ($results->isNotEmpty()) {
-                $this->reportData = $results
-                    ->groupBy(function ($item) use ($period) {
-                        if ($period === 'daily') {
-                            return $item->booking_date->format('Y-m-d');
-                        } elseif ($period === 'weekly') {
-                            return $item->booking_date->format('Y-W');
-                        } elseif ($period === 'monthly') {
-                            return $item->booking_date->format('Y-m');
-                        }
-                        return 'all';
-                    })
-                    ->toArray();
-            }
-        } else {
-            $query = DocumentRequest::with(['office', 'service', 'user']);
+        // Generate performance analysis
+        $this->performanceAnalysis = $this->calculatePerformanceAnalysis($officeIds, $serviceId, $startDate, $endDate);
 
-            // Super-admin sees all offices, others see only their assigned office
-            if (!$user->hasRole('super-admin') && $officeId) {
-                $query->where('office_id', $officeId);
-            }
-
-            $query->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
-                ->when($status, fn($q) => $q->where('status', $status));
-            $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'created_at');
-            $results = $query->get();
-
-            if ($results->isNotEmpty()) {
-                $this->reportData = $results
-                    ->groupBy(function ($item) use ($period) {
-                        if ($period === 'daily') {
-                            return $item->created_at->format('Y-m-d');
-                        } elseif ($period === 'weekly') {
-                            return $item->created_at->format('Y-W');
-                        } elseif ($period === 'monthly') {
-                            return $item->created_at->format('Y-m');
-                        }
-                        return 'all';
-                    })
-                    ->toArray();
-            }
-        }
+        // Generate overall summary
+        $this->overallSummary = $this->calculateOverallSummary($officeIds, $startDate, $endDate);
     }
 
-    private function applyDateFilters($query, ?string $period, ?string $startDate, ?string $endDate, string $dateField)
+    public function getOfficeIdsToQuery($user, ?int $selectedOfficeId): array
     {
-        if ($startDate && $endDate) {
-            return $query->whereBetween($dateField, [$startDate, $endDate]);
+        // Super-admin or admin with no office selected = all offices
+        if (($user->hasRole('super-admin') || $user->hasRole('admin')) && $selectedOfficeId === null) {
+            return Offices::pluck('id')->toArray();
         }
-        if ($period === 'daily') {
-            return $query->whereDate($dateField, Carbon::today());
+
+        // Admin with specific office selected
+        if (($user->hasRole('super-admin') || $user->hasRole('admin')) && $selectedOfficeId !== null) {
+            return [$selectedOfficeId];
         }
-        if ($period === 'weekly') {
-            return $query->whereBetween($dateField, [Carbon::now()->startOfWeek(), Carbon::now()->endOfWeek()]);
-        }
-        if ($period === 'monthly') {
-            return $query->whereBetween($dateField, [Carbon::now()->startOfMonth(), Carbon::now()->endOfMonth()]);
-        }
-        return $query;
+
+        // Staff members - only their assigned office
+        $officeId = $this->getOfficeIdForStaff();
+        return $officeId ? [$officeId] : [];
     }
 
-    public function showExportModal(string $type): void
+    protected function calculateDocumentRequestsAnalytics(array $officeIds, ?int $serviceId, Carbon $startDate, Carbon $endDate): array
     {
-        $this->exportType = $type;
-        // Initialize with all statuses if none selected
-        $this->selectedStatuses = $this->selectedStatus ? [$this->selectedStatus] : $this->statusOptions;
-        // Initialize payment statuses for document requests
-        if ($this->selectedType === 'documents') {
-            $this->selectedPaymentStatuses = $this->paymentStatusOptions;
-        } else {
-            $this->selectedPaymentStatuses = [];
+        $query = DocumentRequest::with(['office', 'service'])
+            ->whereIn('office_id', $officeIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('status', ['complete', 'cancelled']);
+
+        if ($serviceId) {
+            $query->where('service_id', $serviceId);
         }
-        $this->dispatch('open-modal-export-options');
+
+        $results = $query->get();
+
+        // Group by service/document type
+        $byService = $results->groupBy('service_id');
+        $analytics = [];
+
+        foreach ($byService as $serviceId => $requests) {
+            $service = $requests->first()->service;
+            $completed = $requests->where('status', 'complete')->count();
+            $cancelled = $requests->where('status', 'cancelled')->count();
+            $total = $completed + $cancelled;
+            $completionRate = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
+
+            $analytics[] = [
+                'document_type' => $service->title ?? 'N/A',
+                'completed' => $completed,
+                'cancelled' => $cancelled,
+                'completion_rate' => $completionRate,
+                'total' => $total,
+            ];
+        }
+
+        return $analytics;
     }
 
-    public function exportToCsv(): void
+    protected function calculateAppointmentsAnalytics(array $officeIds, Carbon $startDate, Carbon $endDate): array
     {
-        $this->showExportModal('csv');
+        $query = Appointments::with(['office'])
+            ->whereIn('office_id', $officeIds)
+            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->whereIn('status', ['completed', 'cancelled']);
+
+        $results = $query->get();
+
+        // Group by purpose
+        $byPurpose = $results->groupBy('purpose');
+        $analytics = [];
+
+        foreach ($byPurpose as $purpose => $appointments) {
+            $completed = $appointments->where('status', 'completed')->count();
+            $cancelled = $appointments->where('status', 'cancelled')->count();
+            $total = $completed + $cancelled;
+            $completionRate = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
+
+            $analytics[] = [
+                'purpose' => $purpose ?: 'N/A',
+                'completed' => $completed,
+                'cancelled' => $cancelled,
+                'completion_rate' => $completionRate,
+                'total' => $total,
+            ];
+        }
+
+        return $analytics;
+    }
+
+    protected function calculatePerformanceAnalysis(array $officeIds, ?int $serviceId, Carbon $startDate, Carbon $endDate): array
+    {
+        $analysis = [
+            'most_requested_documents' => null,
+            'highest_completion_rate_purpose' => null,
+            'increases' => [],
+            'decreases' => [],
+        ];
+
+        // Get previous period for comparison
+        $periodDays = $startDate->diffInDays($endDate) + 1;
+        $previousStartDate = $startDate->copy()->subDays($periodDays);
+        $previousEndDate = $startDate->copy()->subDay();
+
+        // Most requested documents
+        $docQuery = DocumentRequest::with(['service'])
+            ->whereIn('office_id', $officeIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('status', ['complete', 'cancelled']);
+
+        if ($serviceId) {
+            $docQuery->where('service_id', $serviceId);
+        }
+
+        $docRequests = $docQuery->get();
+        if ($docRequests->isNotEmpty()) {
+            $byService = $docRequests->groupBy('service_id');
+            $mostRequested = $byService->sortByDesc(fn($group) => $group->count())->first();
+            if ($mostRequested) {
+                $analysis['most_requested_documents'] = $mostRequested->first()->service->title ?? 'N/A';
+            }
+        }
+
+        // Highest completion rate purpose
+        $appQuery = Appointments::whereIn('office_id', $officeIds)
+            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->whereIn('status', ['completed', 'cancelled']);
+
+        $appointments = $appQuery->get();
+        if ($appointments->isNotEmpty()) {
+            $byPurpose = $appointments->groupBy('purpose');
+            $highestRate = 0;
+            $highestPurpose = null;
+
+            foreach ($byPurpose as $purpose => $apps) {
+                $completed = $apps->where('status', 'completed')->count();
+                $total = $apps->count();
+                $rate = $total > 0 ? ($completed / $total) * 100 : 0;
+
+                if ($rate > $highestRate) {
+                    $highestRate = $rate;
+                    $highestPurpose = $purpose ?: 'N/A';
+                }
+            }
+
+            if ($highestPurpose) {
+                $analysis['highest_completion_rate_purpose'] = $highestPurpose . ' (' . round($highestRate, 1) . '%)';
+            }
+        }
+
+        // Period-over-period comparison for document requests
+        $currentDocCount = DocumentRequest::whereIn('office_id', $officeIds)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('status', ['complete', 'cancelled'])
+            ->count();
+
+        $previousDocCount = DocumentRequest::whereIn('office_id', $officeIds)
+            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
+            ->whereIn('status', ['complete', 'cancelled'])
+            ->count();
+
+        if ($previousDocCount > 0) {
+            $docChange = (($currentDocCount - $previousDocCount) / $previousDocCount) * 100;
+            if ($docChange > 0) {
+                $analysis['increases'][] = 'Document requests +' . round($docChange, 1) . '%';
+            } elseif ($docChange < 0) {
+                $analysis['decreases'][] = 'Document requests ' . round($docChange, 1) . '%';
+            }
+        }
+
+        // Period-over-period comparison for appointments
+        $currentAppCount = Appointments::whereIn('office_id', $officeIds)
+            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+            ->whereIn('status', ['completed', 'cancelled'])
+            ->count();
+
+        $previousAppCount = Appointments::whereIn('office_id', $officeIds)
+            ->whereBetween('booking_date', [$previousStartDate->format('Y-m-d'), $previousEndDate->format('Y-m-d')])
+            ->whereIn('status', ['completed', 'cancelled'])
+            ->count();
+
+        if ($previousAppCount > 0) {
+            $appChange = (($currentAppCount - $previousAppCount) / $previousAppCount) * 100;
+            if ($appChange > 0) {
+                $analysis['increases'][] = 'Appointments +' . round($appChange, 1) . '%';
+            } elseif ($appChange < 0) {
+                $analysis['decreases'][] = 'Appointments ' . round($appChange, 1) . '%';
+            }
+        }
+
+        return $analysis;
+    }
+
+    protected function calculateOverallSummary(array $officeIds, Carbon $startDate, Carbon $endDate): array
+    {
+        $summary = [];
+
+        // Get data per office
+        foreach ($officeIds as $officeId) {
+            $office = Offices::find($officeId);
+            if (!$office) {
+                continue;
+            }
+
+            // Document requests
+            $docCompleted = DocumentRequest::where('office_id', $officeId)
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', 'complete')
+                ->count();
+
+            $docCancelled = DocumentRequest::where('office_id', $officeId)
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->where('status', 'cancelled')
+                ->count();
+
+            $docTotal = $docCompleted + $docCancelled;
+            $docRate = $docTotal > 0 ? round(($docCompleted / $docTotal) * 100, 1) : 0;
+
+            // Appointments
+            $appCompleted = Appointments::where('office_id', $officeId)
+                ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->where('status', 'completed')
+                ->count();
+
+            $appCancelled = Appointments::where('office_id', $officeId)
+                ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
+                ->where('status', 'cancelled')
+                ->count();
+
+            $appTotal = $appCompleted + $appCancelled;
+            $appRate = $appTotal > 0 ? round(($appCompleted / $appTotal) * 100, 1) : 0;
+
+            // Overall for this office
+            $totalCompleted = $docCompleted + $appCompleted;
+            $totalCancelled = $docCancelled + $appCancelled;
+            $totalTransactions = $totalCompleted + $totalCancelled;
+            $overallRate = $totalTransactions > 0 ? round(($totalCompleted / $totalTransactions) * 100, 1) : 0;
+
+            $summary[] = [
+                'office' => $office->name,
+                'completed' => $totalCompleted,
+                'cancelled' => $totalCancelled,
+                'total_transactions' => $totalTransactions,
+                'completion_rate' => $overallRate,
+            ];
+        }
+
+        // Calculate grand total if multiple offices
+        if (count($summary) > 1) {
+            $grandCompleted = array_sum(array_column($summary, 'completed'));
+            $grandCancelled = array_sum(array_column($summary, 'cancelled'));
+            $grandTotal = $grandCompleted + $grandCancelled;
+            $grandRate = $grandTotal > 0 ? round(($grandCompleted / $grandTotal) * 100, 1) : 0;
+
+            $summary['grand_total'] = [
+                'office' => 'Grand Total',
+                'completed' => $grandCompleted,
+                'cancelled' => $grandCancelled,
+                'total_transactions' => $grandTotal,
+                'completion_rate' => $grandRate,
+            ];
+        }
+
+        return $summary;
     }
 
     public function exportToPdf(): void
     {
-        $this->showExportModal('pdf');
-    }
+        // Ensure analytics are generated
+        $this->generateAnalytics();
 
-    public function processExport(): void
-    {
         $this->isExporting = true;
 
-        // Collect data based on selected filters and statuses
-        $data = $this->collectExportData();
-
-        if ($this->exportType === 'csv') {
-            $this->generateCsvExport($data);
-        } else {
-            $this->generatePdfExport($data);
-        }
-    }
-
-    protected function collectExportData(): array
-    {
-        $officeId = $this->selectedOfficeId;
-        $serviceId = $this->selectedServiceId;
-        $period = $this->periodType !== 'custom' ? $this->periodType : null;
-        $startDate = $this->isCustomRange ? $this->startDate : null;
-        $endDate = $this->isCustomRange ? $this->endDate : null;
         $user = auth()->user();
+        $officeId = $this->selectedOfficeId;
+        $officeIds = $this->getOfficeIdsToQuery($user, $officeId);
 
-        $exportData = [];
-
-        if ($this->selectedType === 'appointments') {
-            $query = Appointments::with(['office', 'user', 'appointmentDetails']);
-
-            // Super-admin sees all offices, others see only their assigned office
-            if (!$user->hasRole('super-admin') && $officeId) {
-                $query->where('office_id', $officeId);
-            }
-
-            $query->when(
-                    !empty($this->selectedStatuses),
-                    function ($q) {
-                        return $q->whereIn('status', $this->selectedStatuses);
-                    },
-                    function ($q) {
-                        // If no statuses selected, don't filter by status
-                        return $q;
-                    },
-                );
-
-            $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'booking_date');
-            $results = $query->get();
-
-            foreach ($results as $appointment) {
-                $item = [
-                    'reference' => $appointment->reference_number,
-                    'date' => $appointment->booking_date->format('Y-m-d'),
-                    'time' => $appointment->booking_time,
-                    'status' => ucfirst($appointment->status),
-                    'purpose' => $appointment->purpose,
-                    'office' => $appointment->office?->name ?? 'N/A',
-                ];
-
-                if ($this->includeUserDetails) {
-                    $item['user_name'] = ($appointment->user?->first_name ?? '') . ' ' . ($appointment->user?->last_name ?? '');
-                    $item['user_email'] = $appointment->user?->email ?? 'N/A';
-                    $item['user_phone'] = $appointment->user?->phone ?? 'N/A';
-                }
-
-                $exportData[] = $item;
-            }
+        // Get office info
+        $officeInfo = [];
+        if (count($officeIds) === 1) {
+            $office = Offices::find($officeIds[0]);
+            $officeInfo = [
+                'name' => $office->name ?? 'N/A',
+            ];
         } else {
-            $query = DocumentRequest::with(['office', 'service', 'user', 'details']);
-
-            // Super-admin sees all offices, others see only their assigned office
-            if (!$user->hasRole('super-admin') && $officeId) {
-                $query->where('office_id', $officeId);
-            }
-
-            $query->when($serviceId, fn($q) => $q->where('service_id', $serviceId))
-                ->when(
-                    !empty($this->selectedStatuses),
-                    function ($q) {
-                        return $q->whereIn('status', $this->selectedStatuses);
-                    },
-                    function ($q) {
-                        // If no statuses selected, don't filter by status
-                        return $q;
-                    },
-                )
-                ->when(
-                    !empty($this->selectedPaymentStatuses),
-                    function ($q) {
-                        return $q->whereIn('payment_status', $this->selectedPaymentStatuses);
-                    },
-                    function ($q) {
-                        // If no payment statuses selected, don't filter by payment status
-                        return $q;
-                    },
-                );
-
-            $query = $this->applyDateFilters($query, $period, $startDate, $endDate, 'created_at');
-            $results = $query->get();
-
-            foreach ($results as $request) {
-                $item = [
-                    'reference' => $request->reference_number,
-                    'date' => $request->created_at->format('Y-m-d'),
-                    'status' => ucfirst($request->status),
-                    'purpose' => $request->purpose,
-                    'office' => $request->office?->name ?? 'N/A',
-                ];
-
-                if ($this->includeServiceDetails) {
-                    $item['service'] = $request->service?->title ?? 'N/A';
-                    $item['payment_status'] = ucfirst($request->payment_status ?? 'N/A');
-                }
-
-                if ($this->includeUserDetails) {
-                    $item['user_name'] = ($request->user?->first_name ?? '') . ' ' . ($request->user?->last_name ?? '');
-                    $item['user_email'] = $request->user?->email ?? 'N/A';
-                    $item['user_phone'] = $request->user?->phone ?? 'N/A';
-                }
-
-                $exportData[] = $item;
-            }
+            $officeInfo = [
+                'name' => 'All Offices',
+            ];
         }
 
-        return $exportData;
-    }
+        // Prepare analytics data for PDF
+        $pdfData = [
+            'document_requests' => $this->documentRequestsAnalytics,
+            'appointments' => $this->appointmentsAnalytics,
+            'performance_analysis' => $this->performanceAnalysis,
+            'overall_summary' => $this->overallSummary,
+            'office_info' => $officeInfo,
+            'report_period' => $this->getReportPeriodText(),
+            'generated_date' => now()->format('F d, Y'),
+            'period_type' => $this->periodType,
+            'selected_type' => $this->selectedType,
+        ];
 
-    protected function generateCsvExport(array $data): void
-    {
-        if (empty($data)) {
-            session()->flash('error', 'No data available to export.');
-            $this->isExporting = false;
-            return;
-        }
-
-        $filename = $this->selectedType . '_report_' . now()->format('Y-m-d_H-i-s') . '.csv';
-        $headers = array_keys($data[0]);
-
-        $csvContent = '';
-        // Add BOM to fix UTF-8 in Excel
-        $csvContent .= "\xEF\xBB\xBF";
-
-        // Add headers
-        $csvContent .=
-            implode(
-                ',',
-                array_map(function ($header) {
-                    return '"' . ucfirst(str_replace('_', ' ', $header)) . '"';
-                }, $headers),
-            ) . "\n";
-
-        // Add data rows
-        foreach ($data as $row) {
-            $csvContent .=
-                implode(
-                    ',',
-                    array_map(function ($value) {
-                        return '"' . str_replace('"', '""', $value) . '"';
-                    }, $row),
-                ) . "\n";
-        }
+        // Store in session for PDF generation
+        session(['pdf_export_params' => $pdfData]);
+        session()->save(); // Ensure session is saved before redirect
 
         $this->isExporting = false;
 
-        // Store CSV content in session for download
-        session(['csv_export_content' => $csvContent, 'csv_export_filename' => $filename]);
-
-        // Trigger download via JavaScript
-        $this->dispatch('csv-download-ready', ['filename' => $filename]);
-
-        session()->flash('success', 'CSV export has been generated successfully.');
-    }
-
-    protected function generatePdfExport(array $data): void
-    {
-        if (empty($data)) {
-            session()->flash('error', 'No data available to export.');
-            $this->isExporting = false;
-            return;
-        }
-
-        $filename = $this->selectedType . '_report_' . now()->format('Y-m-d_H-i-s') . '.pdf';
-        $officeInfo = $this->getOfficeInfo();
-        $reportTitle = ucfirst($this->selectedType) . ' Report';
-        $reportPeriod = $this->getReportPeriodText();
-
-        // Generate PDF in a separate request to avoid memory issues with Livewire
-        $exportParams = [
-            'data' => $data,
-            'officeInfo' => $officeInfo,
-            'reportTitle' => $reportTitle,
-            'reportPeriod' => $reportPeriod,
-            'filename' => $filename,
-        ];
-
-        // Store export parameters in session
-        session(['pdf_export_params' => $exportParams]);
-
-        $this->isExporting = false;
-
-        // Redirect to a dedicated route for PDF generation
-        $this->dispatch('pdf-export-ready', ['filename' => $filename]);
-
-        session()->flash('success', 'PDF export has been generated successfully.');
-    }
-
-    protected function getOfficeInfo(): array
-    {
-        $office = Offices::find($this->selectedOfficeId);
-        return [
-            'name' => $office->name ?? 'All Offices',
-            'address' => $office->address ?? '',
-            'contact' => $office->contact ?? '',
-        ];
+        // Use JavaScript to trigger download to avoid redirect issues
+        $this->dispatch('pdf-export-ready', ['url' => route('reports.export.pdf')]);
     }
 
     protected function getReportPeriodText(): string
@@ -437,19 +461,35 @@ new class extends Component {
         }
 
         return match ($this->periodType) {
-            'daily' => 'Daily Report - ' . Carbon::today()->format('M d, Y'),
-            'weekly' => 'Weekly Report - ' . Carbon::now()->startOfWeek()->format('M d, Y') . ' to ' . Carbon::now()->endOfWeek()->format('M d, Y'),
-            'monthly' => 'Monthly Report - ' . Carbon::now()->format('F Y'),
+            'daily' => Carbon::parse($this->startDate)->format('F d, Y'),
+            'weekly' => 'Week of ' . Carbon::parse($this->startDate)->format('M d, Y') . ' to ' . Carbon::parse($this->endDate)->format('M d, Y'),
+            'monthly' => Carbon::parse($this->startDate)->format('F Y'),
             default => 'Custom Period Report',
         };
     }
 
     public function with(): array
     {
+        $user = auth()->user();
         $officeId = $this->getOfficeIdForStaff();
+
+        // For admins/super-admins, show all offices; for staff, show only their office
+        if ($user->hasRole('super-admin') || $user->hasRole('admin')) {
+            $offices = Offices::all();
+        } else {
+            $offices = Offices::where('id', $officeId)->get();
+        }
+
+        // Get services for selected office or all offices
+        if ($this->selectedOfficeId) {
+            $services = Services::where('office_id', $this->selectedOfficeId)->get();
+        } else {
+            $services = Services::all();
+        }
+
         return [
-            'offices' => Offices::where('id', $officeId)->get(),
-            'services' => Services::where('office_id', $officeId)->get()->all(),
+            'offices' => $offices,
+            'services' => $services,
         ];
     }
 }; ?>
@@ -459,34 +499,51 @@ new class extends Component {
 
     <script>
         document.addEventListener('livewire:initialized', () => {
-            Livewire.on('pdf-export-ready', (data) => {
-                // Open PDF in new window
-                window.open("{{ route('reports.export.pdf') }}", '_blank');
-            });
-
-            Livewire.on('csv-download-ready', (data) => {
-                // Open CSV download in new window
-                window.open("{{ route('reports.export.csv') }}", '_blank');
+            Livewire.on('pdf-export-ready', (event) => {
+                // Create a temporary link and click it to trigger download
+                const url = event[0]?.url || "{{ route('reports.export.pdf') }}";
+                const link = document.createElement('a');
+                link.href = url;
+                link.target = '_blank';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             });
         });
     </script>
+
     <div class="flux-card p-6 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <h1 class="text-2xl font-bold text-gray-900">Staff Reports</h1>
-                <p class="text-gray-600 mt-1">Generate and export reports for your assigned office</p>
+                <h1 class="text-2xl font-bold text-gray-900">Service Reports</h1>
+                <p class="text-gray-600 mt-1">Analytics and performance metrics for appointments and document requests</p>
             </div>
         </div>
     </div>
+
     <div class="flux-card p-6 mb-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Type</label>
                 <select wire:model.live="selectedType" class="form-select">
                     <option value="appointments">Appointments</option>
                     <option value="documents">Document Requests</option>
+                    <option value="both">Both</option>
                 </select>
             </div>
+
+            @if(auth()->user()->hasRole('super-admin') || auth()->user()->hasRole('admin'))
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Office</label>
+                <select wire:model.live="selectedOfficeId" class="form-select">
+                    <option value="">All Offices</option>
+                    @foreach ($offices as $office)
+                        <option value="{{ $office->id }}">{{ $office->name }}</option>
+                    @endforeach
+                </select>
+            </div>
+            @endif
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Service</label>
                 <select wire:model.live="selectedServiceId" class="form-select">
@@ -496,15 +553,7 @@ new class extends Component {
                     @endforeach
                 </select>
             </div>
-            <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
-                <select wire:model.live="selectedStatus" class="form-select">
-                    <option value="">All Statuses</option>
-                    @foreach ($statusOptions as $status)
-                        <option value="{{ $status }}">{{ ucfirst($status) }}</option>
-                    @endforeach
-                </select>
-            </div>
+
             <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Period</label>
                 <select wire:model.live="periodType" class="form-select">
@@ -514,31 +563,23 @@ new class extends Component {
                     <option value="custom">Custom Range</option>
                 </select>
             </div>
-            <div class="mt-4 flex gap-2">
-                <button type="button" wire:click="exportToCsv" class="flux-btn flux-btn-success text-sm"
-                    style="font-size: 12px;">
-                    <span wire:loading.remove wire:target="exportToCsv">
-                        <i class="bi bi-file-earmark-spreadsheet mr-1"></i> Export to CSV
-                    </span>
-                    <span wire:loading wire:target="exportToCsv">
-                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                        Loading...
-                    </span>
-                </button>
-                <button type="button" wire:click="exportToPdf" class="flux-btn flux-btn-danger text-sm"
+
+            <div class="mt-4">
+                <button type="button" wire:click="exportToPdf" class="flux-btn flux-btn-danger text-sm w-full"
                     style="font-size: 12px;">
                     <span wire:loading.remove wire:target="exportToPdf">
                         <i class="bi bi-file-earmark-pdf mr-1"></i> Export to PDF
                     </span>
                     <span wire:loading wire:target="exportToPdf">
                         <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                        Loading...
+                        Generating...
                     </span>
                 </button>
             </div>
         </div>
+
         @if ($isCustomRange)
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
                     <input type="date" wire:model="startDate" class="form-input">
@@ -547,174 +588,210 @@ new class extends Component {
                     <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
                     <input type="date" wire:model="endDate" class="form-input">
                 </div>
-                <div>
+                <div class="flex items-end">
                     <button type="button" wire:click="applyDateFilter" class="flux-btn flux-btn-primary">
                         Apply
                     </button>
                 </div>
             </div>
         @endif
-
     </div>
-    <div class="flux-card p-6">
-        <div class="overflow-x-auto">
-            <table class="flux-table w-full">
-                <thead>
-                    <tr>
-                        <th>Period</th>
-                        <th>Service</th>
-                        <th>Status</th>
-                        <th>Count</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($reportData as $period => $items)
-                        @php
-                            $groupedByService = collect($items)->groupBy(function ($item) {
-                                return isset($item['service']) && isset($item['service']['title'])
-                                    ? $item['service']['title']
-                                    : 'N/A';
-                            });
-                        @endphp
-                        @foreach ($groupedByService as $serviceName => $serviceItems)
-                            @php
-                                $groupedByStatus = collect($serviceItems)->groupBy('status');
-                            @endphp
-                            @foreach ($groupedByStatus as $status => $statusItems)
+
+    @if(empty($documentRequestsAnalytics) && empty($appointmentsAnalytics))
+        <div class="flux-card p-6">
+            <div class="text-center py-8">
+                <div class="text-gray-500">
+                    <i class="bi bi-bar-chart text-4xl mb-2"></i>
+                    <p>No report data available for the selected filters.</p>
+                    <p class="text-sm mt-2">Only Completed and Cancelled transactions are included in reports.</p>
+                </div>
+            </div>
+        </div>
+    @else
+        @php
+            $user = auth()->user();
+            $officeId = $this->selectedOfficeId ?? null;
+            $officeIds = $this->getOfficeIdsToQuery($user, $officeId);
+            $isMultiOffice = count($officeIds) > 1;
+        @endphp
+
+        <!-- Document Requests Section -->
+        @if(($selectedType === 'documents' || $selectedType === 'both') && !empty($documentRequestsAnalytics))
+            @php
+                $office = $isMultiOffice ? null : Offices::find($officeIds[0] ?? null);
+            @endphp
+            <div class="flux-card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    {{ $isMultiOffice ? 'All Offices' : ($office->name ?? 'Office') }} - Document Requests
+                </h2>
+
+                <div class="overflow-x-auto mb-4">
+                    <table class="flux-table w-full">
+                        <thead>
+                            <tr>
+                                <th>Document Type</th>
+                                <th>Completed</th>
+                                <th>Cancelled</th>
+                                <th>Completion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($documentRequestsAnalytics as $item)
                                 <tr>
-                                    <td>{{ $period }}</td>
-                                    <td>{{ $serviceName ?? 'N/A' }}</td>
-                                    <td>
-                                        <span
-                                            class="flux-badge {{ match ($status) {
-                                                // Document request statuses
-                                                'pending' => 'flux-badge-warning',
-                                                'in-progress' => 'flux-badge-info',
-                                                'ready-for-pickup' => 'flux-badge-success',
-                                                'complete' => 'flux-badge-success',
-                                                'cancelled' => 'flux-badge-danger',
-                                                // Appointment statuses
-                                                'on-going' => 'flux-badge-warning',
-                                                // Payment statuses
-                                                'paid' => 'flux-badge-success',
-                                                'unpaid' => 'flux-badge-danger',
-                                                'failed' => 'flux-badge-danger',
-                                                default => 'flux-badge-warning',
-                                            } }}">
-                                            {{ ucfirst(str_replace('-', ' ', $status)) }}
-                                        </span>
-                                    </td>
-                                    <td>{{ $statusItems->count() }}</td>
+                                    <td>{{ $item['document_type'] }}</td>
+                                    <td>{{ $item['completed'] }}</td>
+                                    <td>{{ $item['cancelled'] }}</td>
+                                    <td>{{ $item['completion_rate'] }}%</td>
                                 </tr>
                             @endforeach
-                        @endforeach
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center py-8">
-                                <div class="text-gray-500">
-                                    <i class="bi bi-bar-chart text-4xl mb-2"></i>
-                                    <p>No report data available for the selected filters.</p>
-                                </div>
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- Export Options Modal -->
-    <x-modal id="export-options" title="Export Options" size="max-w-2xl">
-        <div class="modal-body">
-            <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
-                <h3 class="font-bold text-lg mb-2">Select Export Options</h3>
-
-                <div class="bg-base-200 p-3 rounded-lg">
-                    <p>Please select which statuses you want to include in your
-                        {{ $exportType === 'csv' ? 'CSV' : 'PDF' }} export.</p>
+                            @if(!empty($documentRequestsAnalytics))
+                                <tr class="font-bold">
+                                    <td>Total Document Requests</td>
+                                    <td>{{ array_sum(array_column($documentRequestsAnalytics, 'completed')) }}</td>
+                                    <td>{{ array_sum(array_column($documentRequestsAnalytics, 'cancelled')) }}</td>
+                                    <td>
+                                        @php
+                                            $totalCompleted = array_sum(array_column($documentRequestsAnalytics, 'completed'));
+                                            $totalCancelled = array_sum(array_column($documentRequestsAnalytics, 'cancelled'));
+                                            $total = $totalCompleted + $totalCancelled;
+                                            $rate = $total > 0 ? round(($totalCompleted / $total) * 100, 1) : 0;
+                                        @endphp
+                                        {{ $rate }}%
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
+            </div>
+        @endif
 
-                <div class="mt-4">
-                    <h4 class="font-semibold text-base mb-2">Status Filters</h4>
-                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        @foreach ($statusOptions as $status)
-                            <label class="flex items-center space-x-2">
-                                <input type="checkbox" wire:model.live="selectedStatuses" value="{{ $status }}"
-                                    class="checkbox checkbox-sm">
-                                <span>{{ ucfirst($status) }}</span>
-                            </label>
-                        @endforeach
-                    </div>
-                </div>
+        <!-- Appointments Section -->
+        @if(($selectedType === 'appointments' || $selectedType === 'both') && !empty($appointmentsAnalytics))
+            @php
+                $office = $isMultiOffice ? null : Offices::find($officeIds[0] ?? null);
+            @endphp
+            <div class="flux-card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">
+                    {{ $isMultiOffice ? 'All Offices' : ($office->name ?? 'Office') }} - Appointments
+                </h2>
 
-                @if ($selectedType === 'documents')
-                    <div class="mt-4">
-                        <h4 class="font-semibold text-base mb-2">Payment Status Filters</h4>
-                        <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                            @foreach ($paymentStatusOptions as $status)
-                                <label class="flex items-center space-x-2">
-                                    <input type="checkbox" wire:model.live="selectedPaymentStatuses"
-                                        value="{{ $status }}" class="checkbox checkbox-sm">
-                                    <span>{{ ucfirst($status) }}</span>
-                                </label>
+                <div class="overflow-x-auto mb-4">
+                    <table class="flux-table w-full">
+                        <thead>
+                            <tr>
+                                <th>Purpose</th>
+                                <th>Completed</th>
+                                <th>Cancelled</th>
+                                <th>Completion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($appointmentsAnalytics as $item)
+                                <tr>
+                                    <td>{{ $item['purpose'] }}</td>
+                                    <td>{{ $item['completed'] }}</td>
+                                    <td>{{ $item['cancelled'] }}</td>
+                                    <td>{{ $item['completion_rate'] }}%</td>
+                                </tr>
                             @endforeach
-                        </div>
-                    </div>
-                @endif
-
-                <div class="mt-4">
-                    <h4 class="font-semibold text-base mb-2">Include Additional Information</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model.live="includeUserDetails" class="checkbox checkbox-sm">
-                            <span>User Details</span>
-                        </label>
-                        <label class="flex items-center space-x-2">
-                            <input type="checkbox" wire:model.live="includeServiceDetails"
-                                class="checkbox checkbox-sm">
-                            <span>Service Details</span>
-                        </label>
-                    </div>
-                </div>
-
-                <div class="bg-base-200 p-3 rounded-lg mt-4">
-                    <p class="text-sm">The export will include data based on your current filters:</p>
-                    <ul class="list-disc list-inside text-sm mt-2">
-                        <li>Type: {{ ucfirst($selectedType) }}</li>
-                        <li>Period: {{ ucfirst($periodType) }}</li>
-                        @if ($isCustomRange)
-                            <li>Date Range: {{ $startDate }} to {{ $endDate }}</li>
-                        @endif
-                        @if ($selectedServiceId)
-                            <li>Service:
-                                {{ collect($services)->firstWhere('id', $selectedServiceId)?->title ?? 'N/A' }}</li>
-                        @endif
-                    </ul>
+                            @if(!empty($appointmentsAnalytics))
+                                <tr class="font-bold">
+                                    <td>Total Appointments</td>
+                                    <td>{{ array_sum(array_column($appointmentsAnalytics, 'completed')) }}</td>
+                                    <td>{{ array_sum(array_column($appointmentsAnalytics, 'cancelled')) }}</td>
+                                    <td>
+                                        @php
+                                            $totalCompleted = array_sum(array_column($appointmentsAnalytics, 'completed'));
+                                            $totalCancelled = array_sum(array_column($appointmentsAnalytics, 'cancelled'));
+                                            $total = $totalCompleted + $totalCancelled;
+                                            $rate = $total > 0 ? round(($totalCompleted / $total) * 100, 1) : 0;
+                                        @endphp
+                                        {{ $rate }}%
+                                    </td>
+                                </tr>
+                            @endif
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
+        @endif
 
-        <x-slot name="footer">
-            <div class="gap-2">
-                <button type="button" class="flux-btn flux-btn-outline" x-data
-                    x-on:click="$dispatch('close-modal-export-options')">
-                    <i class="bi bi-x-lg me-1"></i>Cancel
-                </button>
-                <button type="button" class="flux-btn btn-sm flux-btn-success" x-data="{}"
-                    x-on:click="
-                    $dispatch('close-modal-export-options');
-                    $wire.processExport();
-                ">
-                    <span wire:loading.remove wire:target="processExport">
-                        <i class="bi bi-check-circle me-1"></i>
-                        Export {{ $exportType === 'csv' ? 'CSV' : 'PDF' }}
-                    </span>
-                    <span wire:loading wire:target="processExport">
-                        <span class="spinner-border spinner-border-sm me-1" role="status"></span>
-                        Generating...
-                    </span>
-                </button>
+        <!-- Performance Analysis Section -->
+        @if(!empty($performanceAnalysis))
+            <div class="flux-card p-6 mb-6">
+                <h2 class="text-xl font-bold mb-4">Performance Analysis</h2>
+                <div class="space-y-2">
+                    @if($performanceAnalysis['most_requested_documents'])
+                        <p><strong>Most Requested Documents:</strong> {{ $performanceAnalysis['most_requested_documents'] }}</p>
+                    @endif
+                    @if($performanceAnalysis['highest_completion_rate_purpose'])
+                        <p><strong>Appointment Purpose with Highest Completion Rate:</strong> {{ $performanceAnalysis['highest_completion_rate_purpose'] }}</p>
+                    @endif
+                    @if(!empty($performanceAnalysis['increases']))
+                        <p><strong>Increases Compared to Last Period:</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            @foreach($performanceAnalysis['increases'] as $increase)
+                                <li>{{ $increase }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    @if(!empty($performanceAnalysis['decreases']))
+                        <p><strong>Decreases Compared to Last Period:</strong></p>
+                        <ul class="list-disc list-inside ml-4">
+                            @foreach($performanceAnalysis['decreases'] as $decrease)
+                                <li>{{ $decrease }}</li>
+                            @endforeach
+                        </ul>
+                    @endif
+                    @if(empty($performanceAnalysis['increases']) && empty($performanceAnalysis['decreases']))
+                        <p class="text-gray-500">No period-over-period comparison available (insufficient historical data).</p>
+                    @endif
+                </div>
             </div>
-        </x-slot>
-    </x-modal>
+        @endif
+
+        <!-- Overall Summary Section -->
+        @if(!empty($overallSummary))
+            <div class="flux-card p-6">
+                <h2 class="text-xl font-bold mb-4">
+                    {{ $isMultiOffice ? 'Overall Summary (All Offices)' : 'Overall Summary' }}
+                </h2>
+                <div class="overflow-x-auto">
+                    <table class="flux-table w-full">
+                        <thead>
+                            <tr>
+                                <th>Office</th>
+                                <th>Completed</th>
+                                <th>Cancelled</th>
+                                <th>Total Transactions</th>
+                                <th>Overall Completion Rate</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($overallSummary as $key => $item)
+                                @if($key === 'grand_total')
+                                    <tr class="font-bold bg-gray-100">
+                                        <td>{{ $item['office'] }}</td>
+                                        <td>{{ $item['completed'] }}</td>
+                                        <td>{{ $item['cancelled'] }}</td>
+                                        <td>{{ $item['total_transactions'] }}</td>
+                                        <td>{{ $item['completion_rate'] }}%</td>
+                                    </tr>
+                                @else
+                                    <tr>
+                                        <td>{{ $item['office'] }}</td>
+                                        <td>{{ $item['completed'] }}</td>
+                                        <td>{{ $item['cancelled'] }}</td>
+                                        <td>{{ $item['total_transactions'] }}</td>
+                                        <td>{{ $item['completion_rate'] }}%</td>
+                                    </tr>
+                                @endif
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        @endif
+    @endif
 </div>
