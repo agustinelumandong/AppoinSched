@@ -225,36 +225,16 @@ new class extends Component {
     protected function calculateOfficePerformanceAnalysis(int $officeId, ?int $serviceId, Carbon $startDate, Carbon $endDate): array
     {
         $analysis = [
-            'most_requested_documents' => null,
-            'highest_completion_rate_purpose' => null,
+            'most_scheduled_appointment' => null,
         ];
 
-        // Most requested documents
-        $docQuery = DocumentRequest::with(['service'])
-            ->where('office_id', $officeId)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereIn('status', ['complete', 'cancelled']);
-
-        if ($serviceId) {
-            $docQuery->where('service_id', $serviceId);
-        }
-
-        $docRequests = $docQuery->get();
-        if ($docRequests->isNotEmpty()) {
-            $byService = $docRequests->groupBy('service_id');
-            $mostRequested = $byService->sortByDesc(fn($group) => $group->count())->first();
-            if ($mostRequested) {
-                $analysis['most_requested_documents'] = $mostRequested->first()->service->title ?? 'N/A';
-            }
-        }
-
-        // Highest completion rate purpose
+        // Get all appointments (including all statuses to find most scheduled)
         $appQuery = Appointments::with(['appointmentDetails'])
             ->where('office_id', $officeId)
-            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->whereIn('status', ['completed', 'cancelled']);
+            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
 
         $appointments = $appQuery->get();
+
         if ($appointments->isNotEmpty()) {
             // Process purposes - handle "others" case
             $purposeMap = [];
@@ -279,27 +259,20 @@ new class extends Component {
                 }
 
                 if (!isset($purposeMap[$purpose])) {
-                    $purposeMap[$purpose] = [];
+                    $purposeMap[$purpose] = 0;
                 }
-                $purposeMap[$purpose][] = $appointment;
+                $purposeMap[$purpose]++;
             }
 
-            $highestRate = 0;
-            $highestPurpose = null;
+            // Find the most scheduled purpose
+            if (!empty($purposeMap)) {
+                arsort($purposeMap);
+                $mostScheduledPurpose = array_key_first($purposeMap);
+                $count = $purposeMap[$mostScheduledPurpose];
 
-            foreach ($purposeMap as $purpose => $apps) {
-                $completed = collect($apps)->where('status', 'completed')->count();
-                $total = count($apps);
-                $rate = $total > 0 ? ($completed / $total) * 100 : 0;
-
-                if ($rate > $highestRate) {
-                    $highestRate = $rate;
-                    $highestPurpose = $purpose ?: 'N/A';
+                if ($mostScheduledPurpose) {
+                    $analysis['most_scheduled_appointment'] = $this->formatPurpose($mostScheduledPurpose) . ' (' . $count . ' appointment' . ($count > 1 ? 's' : '') . ')';
                 }
-            }
-
-            if ($highestPurpose) {
-                $analysis['highest_completion_rate_purpose'] = $this->formatPurpose($highestPurpose) . ' (' . round($highestRate, 1) . '%)';
             }
         }
 
@@ -641,11 +614,10 @@ new class extends Component {
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold mb-3">Performance Analysis</h3>
                         <div class="bg-gray-50 p-4 rounded-lg">
-                            @if($performanceAnalysis['most_requested_documents'])
-                                <p class="mb-2"><strong>Most Requested Documents:</strong> {{ $performanceAnalysis['most_requested_documents'] }}</p>
-                            @endif
-                            @if($performanceAnalysis['highest_completion_rate_purpose'])
-                                <p><strong>Appointment Purpose with Highest Completion Rate:</strong> {{ $performanceAnalysis['highest_completion_rate_purpose'] }}</p>
+                            @if($performanceAnalysis['most_scheduled_appointment'])
+                                <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
+                            @else
+                                <p class="text-gray-500">No appointment data available for the selected period.</p>
                             @endif
                         </div>
                     </div>

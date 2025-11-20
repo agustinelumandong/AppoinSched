@@ -235,30 +235,10 @@
         <div class="section">
             <div class="section-title">Performance Analysis</div>
             <div class="performance-analysis">
-                @if(!empty($performanceAnalysis['most_requested_documents']))
-                    <p><strong>Most Requested Documents:</strong> {{ $performanceAnalysis['most_requested_documents'] }}</p>
-                @endif
-                @if(!empty($performanceAnalysis['highest_completion_rate_purpose']))
-                    <p><strong>Appointment Purpose with Highest Completion Rate:</strong> {{ $performanceAnalysis['highest_completion_rate_purpose'] }}</p>
-                @endif
-                @if(!empty($performanceAnalysis['increases']))
-                    <p><strong>Increases Compared to Last Period:</strong></p>
-                    <ul>
-                        @foreach($performanceAnalysis['increases'] as $increase)
-                            <li>{{ $increase }}</li>
-                        @endforeach
-                    </ul>
-                @endif
-                @if(!empty($performanceAnalysis['decreases']))
-                    <p><strong>Decreases Compared to Last Period:</strong></p>
-                    <ul>
-                        @foreach($performanceAnalysis['decreases'] as $decrease)
-                            <li>{{ $decrease }}</li>
-                        @endforeach
-                    </ul>
-                @endif
-                @if(empty($performanceAnalysis['increases']) && empty($performanceAnalysis['decreases']))
-                    <p>No period-over-period comparison available (insufficient historical data).</p>
+                @if(!empty($performanceAnalysis['most_scheduled_appointment']))
+                    <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
+                @else
+                    <p>No appointment data available for the selected period.</p>
                 @endif
             </div>
         </div>

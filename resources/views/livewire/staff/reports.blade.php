@@ -279,43 +279,16 @@ new class extends Component {
     protected function calculatePerformanceAnalysis(array $officeIds, ?int $serviceId, Carbon $startDate, Carbon $endDate): array
     {
         $analysis = [
-            'most_requested_documents' => null,
-            'highest_completion_rate_purpose' => null,
-            'increases' => [],
-            'decreases' => [],
+            'most_scheduled_appointment' => null,
         ];
 
-        // Get previous period for comparison
-        $periodDays = $startDate->diffInDays($endDate) + 1;
-        $previousStartDate = $startDate->copy()->subDays($periodDays);
-        $previousEndDate = $startDate->copy()->subDay();
-
-        // Most requested documents
-        $docQuery = DocumentRequest::with(['service'])
-            ->whereIn('office_id', $officeIds)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereIn('status', ['complete', 'cancelled']);
-
-        if ($serviceId) {
-            $docQuery->where('service_id', $serviceId);
-        }
-
-        $docRequests = $docQuery->get();
-        if ($docRequests->isNotEmpty()) {
-            $byService = $docRequests->groupBy('service_id');
-            $mostRequested = $byService->sortByDesc(fn($group) => $group->count())->first();
-            if ($mostRequested) {
-                $analysis['most_requested_documents'] = $mostRequested->first()->service->title ?? 'N/A';
-            }
-        }
-
-        // Highest completion rate purpose
+        // Get all appointments (including all statuses to find most scheduled)
         $appQuery = Appointments::with(['appointmentDetails'])
             ->whereIn('office_id', $officeIds)
-            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->whereIn('status', ['completed', 'cancelled']);
+            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')]);
 
         $appointments = $appQuery->get();
+
         if ($appointments->isNotEmpty()) {
             // Process purposes - handle "others" case
             $purposeMap = [];
@@ -340,67 +313,20 @@ new class extends Component {
                 }
 
                 if (!isset($purposeMap[$purpose])) {
-                    $purposeMap[$purpose] = [];
+                    $purposeMap[$purpose] = 0;
                 }
-                $purposeMap[$purpose][] = $appointment;
+                $purposeMap[$purpose]++;
             }
 
-            $highestRate = 0;
-            $highestPurpose = null;
+            // Find the most scheduled purpose
+            if (!empty($purposeMap)) {
+                arsort($purposeMap);
+                $mostScheduledPurpose = array_key_first($purposeMap);
+                $count = $purposeMap[$mostScheduledPurpose];
 
-            foreach ($purposeMap as $purpose => $apps) {
-                $completed = collect($apps)->where('status', 'completed')->count();
-                $total = count($apps);
-                $rate = $total > 0 ? ($completed / $total) * 100 : 0;
-
-                if ($rate > $highestRate) {
-                    $highestRate = $rate;
-                    $highestPurpose = $purpose ?: 'N/A';
+                if ($mostScheduledPurpose) {
+                    $analysis['most_scheduled_appointment'] = $this->formatPurpose($mostScheduledPurpose) . ' (' . $count . ' appointment' . ($count > 1 ? 's' : '') . ')';
                 }
-            }
-
-            if ($highestPurpose) {
-                $analysis['highest_completion_rate_purpose'] = $this->formatPurpose($highestPurpose) . ' (' . round($highestRate, 1) . '%)';
-            }
-        }
-
-        // Period-over-period comparison for document requests
-        $currentDocCount = DocumentRequest::whereIn('office_id', $officeIds)
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->whereIn('status', ['complete', 'cancelled'])
-            ->count();
-
-        $previousDocCount = DocumentRequest::whereIn('office_id', $officeIds)
-            ->whereBetween('created_at', [$previousStartDate, $previousEndDate])
-            ->whereIn('status', ['complete', 'cancelled'])
-            ->count();
-
-        if ($previousDocCount > 0) {
-            $docChange = (($currentDocCount - $previousDocCount) / $previousDocCount) * 100;
-            if ($docChange > 0) {
-                $analysis['increases'][] = 'Document requests +' . round($docChange, 1) . '%';
-            } elseif ($docChange < 0) {
-                $analysis['decreases'][] = 'Document requests ' . round($docChange, 1) . '%';
-            }
-        }
-
-        // Period-over-period comparison for appointments
-        $currentAppCount = Appointments::whereIn('office_id', $officeIds)
-            ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
-            ->whereIn('status', ['completed', 'cancelled'])
-            ->count();
-
-        $previousAppCount = Appointments::whereIn('office_id', $officeIds)
-            ->whereBetween('booking_date', [$previousStartDate->format('Y-m-d'), $previousEndDate->format('Y-m-d')])
-            ->whereIn('status', ['completed', 'cancelled'])
-            ->count();
-
-        if ($previousAppCount > 0) {
-            $appChange = (($currentAppCount - $previousAppCount) / $previousAppCount) * 100;
-            if ($appChange > 0) {
-                $analysis['increases'][] = 'Appointments +' . round($appChange, 1) . '%';
-            } elseif ($appChange < 0) {
-                $analysis['decreases'][] = 'Appointments ' . round($appChange, 1) . '%';
             }
         }
 
@@ -786,30 +712,10 @@ new class extends Component {
             <div class="flux-card p-6 mb-6">
                 <h2 class="text-xl font-bold mb-4">Performance Analysis</h2>
                 <div class="space-y-2">
-                    @if($performanceAnalysis['most_requested_documents'])
-                        <p><strong>Most Requested Documents:</strong> {{ $performanceAnalysis['most_requested_documents'] }}</p>
-                    @endif
-                    @if($performanceAnalysis['highest_completion_rate_purpose'])
-                        <p><strong>Appointment Purpose with Highest Completion Rate:</strong> {{ $performanceAnalysis['highest_completion_rate_purpose'] }}</p>
-                    @endif
-                    @if(!empty($performanceAnalysis['increases']))
-                        <p><strong>Increases Compared to Last Period:</strong></p>
-                        <ul class="list-disc list-inside ml-4">
-                            @foreach($performanceAnalysis['increases'] as $increase)
-                                <li>{{ $increase }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    @if(!empty($performanceAnalysis['decreases']))
-                        <p><strong>Decreases Compared to Last Period:</strong></p>
-                        <ul class="list-disc list-inside ml-4">
-                            @foreach($performanceAnalysis['decreases'] as $decrease)
-                                <li>{{ $decrease }}</li>
-                            @endforeach
-                        </ul>
-                    @endif
-                    @if(empty($performanceAnalysis['increases']) && empty($performanceAnalysis['decreases']))
-                        <p class="text-gray-500">No period-over-period comparison available (insufficient historical data).</p>
+                    @if($performanceAnalysis['most_scheduled_appointment'])
+                        <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
+                    @else
+                        <p class="text-gray-500">No appointment data available for the selected period.</p>
                     @endif
                 </div>
             </div>

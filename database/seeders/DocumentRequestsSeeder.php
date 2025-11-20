@@ -77,20 +77,57 @@ class DocumentRequestsSeeder extends Seeder
                     $paymentDate = fake()->dateTimeBetween($requestedDate, $completedDate ?? 'now');
                 }
 
+                // Determine purpose based on service type
+                $purpose = null;
+                if ($service->title === 'Death Certificate') {
+                    // Death Certificate purposes
+                    $purpose = fake()->randomElement([
+                        'Legal Proceedings',
+                        'Insurance Claims',
+                        'Property Transfer',
+                        'Social Security Benefits',
+                        'Veterans Benefits',
+                        'Genealogy Research',
+                        'Personal Records',
+                        'Other',
+                    ]);
+
+                    // If "Other", set purpose to custom text
+                    if ($purpose === 'Other') {
+                        $purpose = fake()->randomElement([
+                            'Estate Settlement',
+                            'Beneficiary Claim',
+                            'Family Records',
+                        ]);
+                    }
+                } else {
+                    // Non-Death Certificate purposes
+                    $purpose = fake()->randomElement([
+                        'school_requirement',
+                        'employment',
+                        'government_id',
+                        'hospital_use',
+                        'others',
+                    ]);
+
+                    // If "others", set purpose to custom text
+                    if ($purpose === 'others') {
+                        $purpose = fake()->randomElement([
+                            'Travel Documentation',
+                            'Business Registration',
+                            'Personal Records',
+                            'Legal Documentation',
+                        ]);
+                    }
+                }
+
                 DocumentRequest::create([
                     'user_id' => $client->id,
                     'staff_id' => $staffId,
                     'office_id' => $office->id,
                     'service_id' => $service->id,
                     'to_whom' => fake()->optional(0.6)->name(),
-                    'purpose' => fake()->randomElement([
-                        'Personal Use',
-                        'Employment Requirements',
-                        'Legal Documentation',
-                        'School Requirements',
-                        'Travel Documentation',
-                        'Business Registration',
-                    ]),
+                    'purpose' => $purpose,
                     'reference_number' => 'DR-' . strtoupper(Str::random(10)),
                     'status' => $status,
                     'remarks' => fake()->optional(0.5)->sentence(),
