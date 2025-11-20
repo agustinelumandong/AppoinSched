@@ -33,23 +33,11 @@
                   <div class="invalid-feedback">{{ $message }}</div>
               @enderror
           </div>
-          <div class="mb-3">
-              <label for="password" class="form-label fw-semibold">Password</label>
-              <input type="password" class="form-control @error('password') is-invalid @enderror" id="password"
-                  wire:model.defer="password" placeholder="Enter password" required>
-              @error('password')
-                  <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
+          <div class="alert alert-info mb-3">
+              <i class="bi bi-info-circle me-2"></i>
+              <strong>Note:</strong> A login code will be automatically generated and sent to the user's email. The user will be required to set their password on first login.
           </div>
           <div class="mb-3">
-              <label for="password_confirmation" class="form-label fw-semibold">Confirm Password</label>
-              <input type="password" class="form-control @error('password_confirmation') is-invalid @enderror" id="password_confirmation"
-                  wire:model.defer="password_confirmation" placeholder="Confirm password" required>
-              @error('password_confirmation')
-                  <div class="invalid-feedback">{{ $message }}</div>
-              @enderror
-          </div>
-          <div class="mb-3">  
               <label for="role" class="form-label fw-semibold">Role</label>
               <select class="form-select @error('role') is-invalid @enderror" id="role" wire:model.defer="role" required>
                   <option value="">Select Role</option>

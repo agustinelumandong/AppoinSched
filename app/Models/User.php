@@ -28,6 +28,10 @@ class User extends Authenticatable
         'last_name',
         'email',
         'password',
+        'login_code',
+        'login_code_expires_at',
+        'password_set_at',
+        'last_viewed_users_at',
         'email_otp',
         'email_otp_expires_at',
         'notification_settings',
@@ -54,6 +58,9 @@ class User extends Authenticatable
     {
         return [
             'email_otp_expires_at' => 'datetime',
+            'login_code_expires_at' => 'datetime',
+            'password_set_at' => 'datetime',
+            'last_viewed_users_at' => 'datetime',
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'notification_settings' => 'array',
@@ -584,6 +591,58 @@ class User extends Authenticatable
     public function updateNotificationSettings(array $settings): void
     {
         $this->update(['notification_settings' => $settings]);
+    }
+
+    /**
+     * Generate and store a login code for the user
+     */
+    public function generateLoginCode(): string
+    {
+        do {
+            $code = Str::upper(Str::random(6));
+        } while (self::where('login_code', $code)->where('login_code_expires_at', '>', now())->exists());
+
+        $this->update([
+            'login_code' => $code,
+            'login_code_expires_at' => now()->addDays(7),
+        ]);
+
+        return $code;
+    }
+
+    /**
+     * Check if user has set a password
+     */
+    public function hasPasswordSet(): bool
+    {
+        return !empty($this->password);
+    }
+
+    /**
+     * Validate if the provided login code is valid
+     */
+    public function isLoginCodeValid(string $code): bool
+    {
+        if (empty($this->login_code) || empty($this->login_code_expires_at)) {
+            return false;
+        }
+
+        if (now()->isAfter($this->login_code_expires_at)) {
+            return false;
+        }
+
+        return strtoupper(trim($code)) === strtoupper(trim($this->login_code));
+    }
+
+    /**
+     * Clear the login code after password setup
+     */
+    public function clearLoginCode(): void
+    {
+        $this->update([
+            'login_code' => null,
+            'login_code_expires_at' => null,
+        ]);
     }
 
     protected static function boot()

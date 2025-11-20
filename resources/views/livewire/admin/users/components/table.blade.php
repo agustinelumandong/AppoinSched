@@ -28,7 +28,16 @@
                           <td>
                               <div class="d-flex flex-wrap gap-1">
                                   @forelse($user->roles as $role)
-                                      <span class="flux-badge flux-badge-primary">{{ $role->name }}</span>
+                                      @php
+                                          $badgeClass = match(strtolower($role->name)) {
+                                              'client' => 'flux-badge-primary',
+                                              'mcr-staff', 'mto-staff', 'bpls-staff' => 'flux-badge-success',
+                                              'admin' => 'flux-badge-warning',
+                                              'super-admin' => 'flux-badge-danger',
+                                              default => 'flux-badge-primary',
+                                          };
+                                      @endphp
+                                      <span class="flux-badge {{ $badgeClass }}">{{ $role->name }}</span>
                                   @empty
                                       <span class="text-muted">No roles assigned</span>
                                   @endforelse

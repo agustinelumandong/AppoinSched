@@ -29,21 +29,72 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         $this->ensureIsNotRateLimited();
 
-        if (!Auth::attempt(['email' => $this->email, 'password' => $this->password], $this->remember)) {
-            RateLimiter::hit($this->throttleKey());
+        $user = \App\Models\User::where('email', $this->email)->first();
 
+        if (!$user) {
+            RateLimiter::hit($this->throttleKey());
             throw ValidationException::withMessages([
                 'email' => __('auth.failed'),
             ]);
         }
 
-        $user = Auth::user();
-        if ($user && !$user->hasVerifiedEmail()) {
+        $authenticated = false;
+        $inputValue = trim($this->password);
+
+        // Check if input looks like a login code (exactly 6 alphanumeric characters)
+        $isLoginCode = strlen($inputValue) === 6 && ctype_alnum($inputValue);
+
+        // Try login code first if it matches the pattern
+        if ($isLoginCode) {
+            if ($user->isLoginCodeValid($inputValue)) {
+                // Check if user already has password set
+                if ($user->hasPasswordSet()) {
+                    RateLimiter::hit($this->throttleKey());
+                    throw ValidationException::withMessages([
+                        'password' => 'You have already set your password. Please use your password to log in.',
+                    ]);
+                }
+                // Authenticate user with login code
+                Auth::login($user, $this->remember);
+                $authenticated = true;
+            } else {
+                // Login code invalid - try as password instead
+                if (Auth::attempt(['email' => $this->email, 'password' => $inputValue], $this->remember)) {
+                    $authenticated = true;
+                } else {
+                    RateLimiter::hit($this->throttleKey());
+                    throw ValidationException::withMessages([
+                        'password' => 'Invalid login code or password.',
+                    ]);
+                }
+            }
+        } else {
+            // Input doesn't look like login code, try as password
+            if (Auth::attempt(['email' => $this->email, 'password' => $inputValue], $this->remember)) {
+                $authenticated = true;
+            } else {
+                RateLimiter::hit($this->throttleKey());
+                throw ValidationException::withMessages([
+                    'email' => __('auth.failed'),
+                ]);
+            }
+        }
+
+        $authenticatedUser = Auth::user();
+
+        if ($authenticatedUser && !$authenticatedUser->hasVerifiedEmail()) {
             $this->redirectIntended(route('verification.notice', absolute: false));
+            return;
         }
 
         RateLimiter::clear($this->throttleKey());
         Session::regenerate();
+
+        // Check if password needs to be set
+        if (!$authenticatedUser->hasPasswordSet()) {
+            $this->redirectIntended(route('password.setup', absolute: false));
+            return;
+        }
 
         $this->redirectIntended(default: route('dashboard', absolute: false));
     }
@@ -84,25 +135,34 @@ new #[Layout('components.layouts.auth')] class extends Component {
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
 
-    <form wire:submit="login" class="flex flex-col gap-6">
+    <form wire:submit="login" class="flex flex-col gap-2">
         <!-- Email Address -->
         <flux:input wire:model="email" :label="__('Email address')" type="email" required autofocus autocomplete="email"
             placeholder="email@example.com" />
 
-        <!-- Password -->
+        <!-- Password or Login Code -->
         <div class="relative">
             <flux:input wire:model="password" :label="__('Password')" type="password" required
-                autocomplete="current-password" :placeholder="__('Password')" viewable />
+                autocomplete="current-password" :placeholder="__('Enter your password...')" viewable />
+
+            @error('password')
+                <div class="text-sm text-red-600 dark:text-red-400 mt-1">{{ $message }}</div>
+            @enderror
+
+            <!-- Remember Me -->
+             <div class="flex items-center justify-between mt-4 mb-2">
+             <flux:checkbox wire:model="remember" :label="__('Remember me')" />
 
             @if (Route::has('password.request'))
-                <flux:link class="absolute end-0 top-0 text-sm" :href="route('password.request')" wire:navigate>
+                <flux:link class=" text-sm" :href="route('password.request')" wire:navigate>
                     {{ __('Forgot your password?') }}
                 </flux:link>
             @endif
+             </div>
+            
         </div>
 
-        <!-- Remember Me -->
-        <flux:checkbox wire:model="remember" :label="__('Remember me')" />
+
 
         <div class="flex items-center justify-end">
             <flux:button variant="primary" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white">

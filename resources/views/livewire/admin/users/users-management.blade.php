@@ -8,6 +8,7 @@ use Livewire\Volt\Component;
 use App\Models\User;
 use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 new class extends Component {
     use WithPagination;
@@ -17,9 +18,8 @@ new class extends Component {
     public string $middleName = '';
     public string $lastName = '';
     public string $email = '';
-    public string $password = '';
-    public string $password_confirmation = '';
     public mixed $role = null;
+    public mixed $roleFilter = null;
     public mixed $user = null;
     public bool $confirmDeletion = false;
 
@@ -32,6 +32,9 @@ new class extends Component {
         ) {
             abort(403, 'Unauthorized to manage users');
         }
+
+        // Update last viewed timestamp when admin visits users management page
+        auth()->user()->update(['last_viewed_users_at' => now()]);
     }
 
     public function saveUser()
@@ -41,8 +44,6 @@ new class extends Component {
             'middleName' => 'nullable|string|max:255',
             'lastName' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:8',
-            'password_confirmation' => 'required|string|min:8|same:password',
             'role' => 'required|exists:roles,id',
         ]);
         if ($validated) {
@@ -51,14 +52,40 @@ new class extends Component {
                 'middle_name' => $this->middleName ?? null,
                 'last_name' => $this->lastName,
                 'email' => $this->email,
-                'password' => Hash::make($this->password),
+                'password' => null, // User will set password on first login
             ]);
             if ($user) {
                 $role = Role::where('id', $this->role)->first();
                 $user->assignRole($role->name);
+
+                // Generate login code and send email (using same method as OTP email)
+                $loginCode = $user->generateLoginCode();
+                try {
+                    $loginUrl = route('login', absolute: true);
+                    $emailBody = "Hello {$user->first_name} {$user->last_name}!\n\n";
+                    $emailBody .= "Your account has been created. Please use the login code below to access your account for the first time.\n\n";
+                    $emailBody .= "Your Login Code: {$loginCode}\n\n";
+                    $emailBody .= "How to use your login code:\n";
+                    $emailBody .= "1. Go to the login page: {$loginUrl}\n";
+                    $emailBody .= "2. Enter your email address: {$user->email}\n";
+                    $emailBody .= "3. Enter the login code shown above\n";
+                    $emailBody .= "4. After logging in, you will be asked to set your password\n\n";
+                    $emailBody .= "Important: This login code will expire in 7 days. After you set your password, you can use your email and password to log in.\n\n";
+                    $emailBody .= "This is an automated message from " . config('app.name') . ". Please do not reply to this email.\n";
+                    $emailBody .= "If you did not request this account, please contact support immediately.";
+
+                    Mail::raw($emailBody, function ($message) use ($user) {
+                        $message->to($user->email)
+                                ->subject('Your Login Code - ' . config('app.name'));
+                    });
+                } catch (\Exception $e) {
+                    // Log error but don't fail user creation
+                    \Log::error('Failed to send login code email: ' . $e->getMessage());
+                }
+
                 $this->reset();
                 $this->dispatch('close-modal-add-user');
-                session()->flash('success', 'User created successfully');
+                session()->flash('success', 'User created successfully. Login code has been sent to the user\'s email.');
             } else {
                 session()->flash('error', 'User creation failed');
             }
@@ -130,12 +157,30 @@ new class extends Component {
 
     public function with()
     {
+        $query = User::query();
+
+        // Search functionality
+        if (!empty($this->search)) {
+            $query->where(function ($q) {
+                $q->where('first_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('middle_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('last_name', 'like', '%' . $this->search . '%')
+                    ->orWhere('email', 'like', '%' . $this->search . '%');
+            });
+        }
+
+        // Role filter
+        if (!empty($this->roleFilter)) {
+            $query->whereHas('roles', function ($q) {
+                $q->where('id', $this->roleFilter);
+            });
+        }
+
+        // Sort by newest first
+        $query->orderBy('created_at', 'desc');
+
         return [
-            'users' => User::where('first_name', 'like', '%' . $this->search . '%')
-                ->orWhere('middle_name', 'like', '%' . $this->search . '%')
-                ->orWhere('last_name', 'like', '%' . $this->search . '%')
-                ->orWhere('email', 'like', '%' . $this->search . '%')
-                ->paginate(5),
+            'users' => $query->paginate(5),
             'roles' => Role::all(),
         ];
     }

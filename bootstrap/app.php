@@ -15,6 +15,12 @@ return Application::configure(basePath: dirname(__DIR__))
             'profile.complete' => \App\Http\Middleware\CheckProfileCompletion::class,
             'role' => \App\Http\Middleware\CheckRole::class,
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
+            'password.setup' => \App\Http\Middleware\RequirePasswordSetup::class,
+        ]);
+
+        // Apply password setup middleware to all authenticated routes except password setup itself
+        $middleware->web(append: [
+            \App\Http\Middleware\RequirePasswordSetup::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {

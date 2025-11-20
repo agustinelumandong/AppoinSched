@@ -4,7 +4,8 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration {
+return new class extends Migration
+{
     /**
      * Run the migrations.
      */
@@ -21,9 +22,17 @@ return new class extends Migration {
             $table->timestamp('email_verified_at')->nullable();
             // $table->json('notification_settings')->nullable()->after('remember_token');
             $table->json('notification_settings')->nullable();
-            $table->string('password');
+            $table->string('password')->nullable();
+            $table->string('login_code', 6)->nullable();
+            $table->timestamp('login_code_expires_at')->nullable();
+            $table->timestamp('password_set_at')->nullable();
+            $table->timestamp('last_viewed_users_at')->nullable();
+            $table->timestamp('last_viewed_document_requests_at')->nullable();
+            $table->timestamp('last_viewed_appointments_at')->nullable();
             $table->rememberToken();
             $table->timestamps();
+
+            $table->index('login_code');
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {

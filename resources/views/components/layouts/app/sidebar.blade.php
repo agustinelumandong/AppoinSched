@@ -240,11 +240,26 @@
                     class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
                     {{ Str::limit(__('Document Request Management'), 14) }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
-                    :current="request()->routeIs('admin.users.users-management')" wire:navigate
-                    class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
-                    {{ Str::limit(__('Users Management'), 14) }}
-                </flux:navlist.item>
+                @php
+                    // Calculate new users count (users created since last visit)
+                    $lastViewedAt = auth()->user()->last_viewed_users_at;
+                    $newUsersCount = $lastViewedAt
+                        ? \App\Models\User::where('created_at', '>', $lastViewedAt)->count()
+                        : \App\Models\User::count();
+                @endphp
+                <div class="relative">
+                    <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
+                        :current="request()->routeIs('admin.users.users-management')" wire:navigate
+                        class="text-decoration-none text-black truncate h-10! w-full! mb-2!">
+                        {{ Str::limit(__('Users Management'), 14) }}
+                    </flux:navlist.item>
+                    @if($newUsersCount > 0 && !request()->routeIs('admin.users.users-management'))
+                        <span
+                            class="absolute top-0 right-0 -mt-1 -mr-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full z-10 pointer-events-none">
+                            {{ $newUsersCount > 99 ? '99+' : $newUsersCount }}
+                        </span>
+                    @endif
+                </div>
             </flux:navlist.group>
             @endhasrole
 
@@ -429,11 +444,26 @@
                     class="text-decoration-none text-black truncate">
                     {{ Str::limit(__('Document Request Management'), 14) }}
                 </flux:navlist.item>
-                <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
-                    :current="request()->routeIs('admin.users.users-management')" wire:navigate
-                    class="text-decoration-none text-black truncate">
-                    {{ Str::limit(__('Users Management'), 14) }}
-                </flux:navlist.item>
+                @php
+                    // Calculate new users count (users created since last visit)
+                    $lastViewedAt = auth()->user()->last_viewed_users_at;
+                    $newUsersCount = $lastViewedAt
+                        ? \App\Models\User::where('created_at', '>', $lastViewedAt)->count()
+                        : \App\Models\User::count();
+                @endphp
+                <div class="relative">
+                    <flux:navlist.item icon="user" :href="route('admin.users.users-management')"
+                        :current="request()->routeIs('admin.users.users-management')" wire:navigate
+                        class="text-decoration-none text-black truncate">
+                        {{ Str::limit(__('Users Management'), 14) }}
+                    </flux:navlist.item>
+                    @if($newUsersCount > 0 && !request()->routeIs('admin.users.users-management'))
+                        <span
+                            class="absolute top-0 right-0 -mt-1 -mr-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full z-10 pointer-events-none">
+                            {{ $newUsersCount > 99 ? '99+' : $newUsersCount }}
+                        </span>
+                    @endif
+                </div>
             </flux:navlist.group>
             @endhasrole
 
