@@ -121,17 +121,49 @@ new class extends Component {
             }
 
             // Appointments Analytics
-            $appQuery = Appointments::where('office_id', $officeId)
+            $appQuery = Appointments::with(['appointmentDetails'])
+                ->where('office_id', $officeId)
                 ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
                 ->whereIn('status', ['completed', 'cancelled']);
 
             $appointments = $appQuery->get();
-            $appByPurpose = $appointments->groupBy('purpose');
-            $appointmentsAnalytics = [];
 
-            foreach ($appByPurpose as $purpose => $apps) {
-                $completed = $apps->where('status', 'completed')->count();
-                $cancelled = $apps->where('status', 'cancelled')->count();
+            // Process purposes - handle "others" case
+            $purposeMap = [];
+            foreach ($appointments as $appointment) {
+                $purpose = $appointment->purpose;
+
+                // If purpose is "others", try to get actual purpose from notes or appointment details
+                if (strtolower($purpose) === 'others' || strtolower($purpose) === 'other') {
+                    // Check notes field for actual purpose
+                    $notes = $appointment->notes ?? '';
+                    // Check appointment details
+                    $detailsPurpose = $appointment->appointmentDetails?->purpose ?? '';
+
+                    // Try to extract actual purpose from notes (format: "Appointment for myself - {actual purpose}")
+                    if (str_contains($notes, ' - ')) {
+                        $parts = explode(' - ', $notes);
+                        if (count($parts) > 1 && strtolower(trim($parts[1])) !== 'others') {
+                            $purpose = trim($parts[1]);
+                        } elseif (!empty($detailsPurpose) && strtolower($detailsPurpose) !== 'others') {
+                            $purpose = $detailsPurpose;
+                        }
+                    } elseif (!empty($detailsPurpose) && strtolower($detailsPurpose) !== 'others') {
+                        $purpose = $detailsPurpose;
+                    }
+                }
+
+                // Use purpose as key for grouping
+                if (!isset($purposeMap[$purpose])) {
+                    $purposeMap[$purpose] = [];
+                }
+                $purposeMap[$purpose][] = $appointment;
+            }
+
+            $appointmentsAnalytics = [];
+            foreach ($purposeMap as $purpose => $apps) {
+                $completed = collect($apps)->where('status', 'completed')->count();
+                $cancelled = collect($apps)->where('status', 'cancelled')->count();
                 $total = $completed + $cancelled;
                 $completionRate = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
 
@@ -181,6 +213,11 @@ new class extends Component {
             return 'N/A';
         }
 
+        // If it's already a sentence or custom text (contains spaces and not kebab-case), return as is
+        if (str_contains($purpose, ' ') && !str_contains($purpose, '-')) {
+            return ucfirst($purpose);
+        }
+
         // Convert kebab-case to Title Case
         return ucwords(str_replace('-', ' ', $purpose));
     }
@@ -212,19 +249,47 @@ new class extends Component {
         }
 
         // Highest completion rate purpose
-        $appQuery = Appointments::where('office_id', $officeId)
+        $appQuery = Appointments::with(['appointmentDetails'])
+            ->where('office_id', $officeId)
             ->whereBetween('booking_date', [$startDate->format('Y-m-d'), $endDate->format('Y-m-d')])
             ->whereIn('status', ['completed', 'cancelled']);
 
         $appointments = $appQuery->get();
         if ($appointments->isNotEmpty()) {
-            $byPurpose = $appointments->groupBy('purpose');
+            // Process purposes - handle "others" case
+            $purposeMap = [];
+            foreach ($appointments as $appointment) {
+                $purpose = $appointment->purpose;
+
+                // If purpose is "others", try to get actual purpose from notes or appointment details
+                if (strtolower($purpose) === 'others' || strtolower($purpose) === 'other') {
+                    $notes = $appointment->notes ?? '';
+                    $detailsPurpose = $appointment->appointmentDetails?->purpose ?? '';
+
+                    if (str_contains($notes, ' - ')) {
+                        $parts = explode(' - ', $notes);
+                        if (count($parts) > 1 && strtolower(trim($parts[1])) !== 'others') {
+                            $purpose = trim($parts[1]);
+                        } elseif (!empty($detailsPurpose) && strtolower($detailsPurpose) !== 'others') {
+                            $purpose = $detailsPurpose;
+                        }
+                    } elseif (!empty($detailsPurpose) && strtolower($detailsPurpose) !== 'others') {
+                        $purpose = $detailsPurpose;
+                    }
+                }
+
+                if (!isset($purposeMap[$purpose])) {
+                    $purposeMap[$purpose] = [];
+                }
+                $purposeMap[$purpose][] = $appointment;
+            }
+
             $highestRate = 0;
             $highestPurpose = null;
 
-            foreach ($byPurpose as $purpose => $apps) {
-                $completed = $apps->where('status', 'completed')->count();
-                $total = $apps->count();
+            foreach ($purposeMap as $purpose => $apps) {
+                $completed = collect($apps)->where('status', 'completed')->count();
+                $total = count($apps);
                 $rate = $total > 0 ? ($completed / $total) * 100 : 0;
 
                 if ($rate > $highestRate) {
