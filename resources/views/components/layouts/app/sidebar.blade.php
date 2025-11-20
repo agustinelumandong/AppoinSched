@@ -171,35 +171,54 @@
             {{-- Staff Navigation --}}
             @hasrole('MCR-staff|MTO-staff|BPLS-staff|MCR-admin|MTO-admin|BPLS-admin')
             @php
-                // Calculate pending document requests for staff's assigned office
+                // Calculate new appointments and document requests for staff's assigned office
                 $user = auth()->user();
                 $officeId = $user->getOfficeIdForStaff();
-                $query = \App\Models\DocumentRequest::query();
 
-                // Super-admin sees all offices, others see only their assigned office
+                // Appointments query
+                $appointmentsQuery = \App\Models\Appointments::query();
                 if (!$user->hasRole('super-admin') && $officeId) {
-                    $query->where('office_id', $officeId);
+                    $appointmentsQuery->where('office_id', $officeId);
                 }
+                $lastViewedAppointmentsAt = $user->last_viewed_appointments_at;
+                $newAppointmentsCount = $lastViewedAppointmentsAt
+                    ? $appointmentsQuery->where('created_at', '>', $lastViewedAppointmentsAt)->count()
+                    : $appointmentsQuery->count();
 
-                // Count only pending requests
-                $pendingCount = $query->where('status', 'pending')->count();
+                // Document requests query
+                $docRequestsQuery = \App\Models\DocumentRequest::query();
+                if (!$user->hasRole('super-admin') && $officeId) {
+                    $docRequestsQuery->where('office_id', $officeId);
+                }
+                $lastViewedDocRequestsAt = $user->last_viewed_document_requests_at;
+                $newDocRequestsCount = $lastViewedDocRequestsAt
+                    ? $docRequestsQuery->where('created_at', '>', $lastViewedDocRequestsAt)->count()
+                    : $docRequestsQuery->count();
             @endphp
             <flux:navlist.group expandable heading="Staff Management">
-                <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
-                    :current="request()->routeIs('staff.appointments')" wire:navigate
-                    class="text-decoration-none text-black truncate">
-                    {{ Str::limit(__('Manage Appointments'), 14) }}
-                </flux:navlist.item>
+                <div class="relative">
+                    <flux:navlist.item icon="calendar-days" :href="route('staff.appointments')"
+                        :current="request()->routeIs('staff.appointments')" wire:navigate
+                        class="text-decoration-none text-black truncate">
+                        {{ Str::limit(__('Manage Appointments'), 14) }}
+                    </flux:navlist.item>
+                    @if($newAppointmentsCount > 0 && !request()->routeIs('staff.appointments'))
+                        <span
+                            class="absolute top-0 right-0 -mt-1 -mr-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full z-10 pointer-events-none">
+                            {{ $newAppointmentsCount > 99 ? '99+' : $newAppointmentsCount }}
+                        </span>
+                    @endif
+                </div>
                 <div class="relative">
                     <flux:navlist.item icon="document-duplicate" :href="route('staff.documents')"
                         :current="request()->routeIs('staff.documents')" wire:navigate
                         class="text-decoration-none text-black truncate">
                         {{ Str::limit(__('Process Documents'), 14) }}
                     </flux:navlist.item>
-                    @if($pendingCount > 0 && !request()->routeIs('staff.documents'))
+                    @if($newDocRequestsCount > 0 && !request()->routeIs('staff.documents'))
                         <span
                             class="absolute top-0 right-0 -mt-1 -mr-1 inline-flex items-center justify-center min-w-[1.25rem] h-5 px-1.5 text-xs font-bold text-white bg-red-500 rounded-full z-10 pointer-events-none">
-                            {{ $pendingCount > 99 ? '99+' : $pendingCount }}
+                            {{ $newDocRequestsCount > 99 ? '99+' : $newDocRequestsCount }}
                         </span>
                     @endif
                 </div>
