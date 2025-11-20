@@ -11,6 +11,14 @@ new class extends Component {
     public $id;
     public $documentRequest;
 
+    public function mount(): void
+    {
+        // Update last viewed timestamp when admin visits document requests page
+        if (auth()->check() && auth()->user()->hasAnyRole(['admin', 'super-admin'])) {
+            auth()->user()->update(['last_viewed_document_requests_at' => now()]);
+        }
+    }
+
     public function with()
     {
         return [

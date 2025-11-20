@@ -25,6 +25,11 @@ new class extends Component {
     public function mount(): void
     {
         $this->resetAppointmentData();
+
+        // Update last viewed timestamp when admin visits appointments page
+        if (auth()->check() && auth()->user()->hasAnyRole(['admin', 'super-admin'])) {
+            auth()->user()->update(['last_viewed_appointments_at' => now()]);
+        }
     }
 
     #[On('appointmentUpdated')]

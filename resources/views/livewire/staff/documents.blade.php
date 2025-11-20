@@ -52,15 +52,8 @@ new class extends Component {
             abort(403, 'Unauthorized access');
         }
 
-        // Initialize seen counts in session if not exists
-        $seenCounts = session('document_status_seen_counts', []);
-        if (!isset($seenCounts['complete'])) {
-            $seenCounts['complete'] = 0;
-        }
-        if (!isset($seenCounts['cancelled'])) {
-            $seenCounts['cancelled'] = 0;
-        }
-        session(['document_status_seen_counts' => $seenCounts]);
+        // Update last viewed timestamp when staff visits document requests page
+        auth()->user()->update(['last_viewed_document_requests_at' => now()]);
     }
 
     #[On('documentRequestUpdated')]

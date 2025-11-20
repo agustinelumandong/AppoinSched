@@ -38,6 +38,9 @@ new class extends Component {
         ) {
             abort(403, 'Unauthorized access');
         }
+
+        // Update last viewed timestamp when staff visits appointments page
+        auth()->user()->update(['last_viewed_appointments_at' => now()]);
     }
 
     #[On('appointmentUpdated')]
