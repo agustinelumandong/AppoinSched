@@ -213,13 +213,14 @@ new class extends Component {
         session()->flash('success', 'Appointment completed successfully');
     }
 
-    public function cancelAppointment(int $id): void
-    {
-        $appointment = Appointments::findOrFail($id);
-        $appointment->status = 'cancelled';
-        $appointment->save();
-        session()->flash('success', 'Appointment cancelled successfully');
-    }
+    // Removed cancelAppointment method - appointments are now auto-cancelled
+    // public function cancelAppointment(int $id): void
+    // {
+    //     $appointment = Appointments::findOrFail($id);
+    //     $appointment->status = 'cancelled';
+    //     $appointment->save();
+    //     session()->flash('success', 'Appointment cancelled successfully');
+    // }
 
     public function with(): array
     {
@@ -372,22 +373,16 @@ new class extends Component {
                             </td>
                             <td>
                                 <div class="d-flex gap-2">
-                                    {{-- <button wire:click="openEditAppointmentModal({{ $appointment->id }})"
-                                        class="flux-btn flux-btn-primary flux-btn-outline btn-sm">
-                                        <i class="bi bi-pencil me-1"></i>Edit
-                                    </button> --}}
                                     <button wire:click="openShowAppointmentModal({{ $appointment->id }})"
                                         class="flux-btn btn-sm flux-btn-primary">
                                         <i class="bi bi-eye me-1"></i>
                                     </button>
-                                    <button wire:click="completeAppointment({{ $appointment->id }})"
-                                        class="flux-btn btn-sm flux-btn-success">
-                                        <i class="bi bi-check-circle me-1"></i>
-                                    </button>
-                                    <button wire:click="cancelAppointment({{ $appointment->id }})"
-                                        class="flux-btn btn-sm flux-btn-danger">
-                                        <i class="bi bi-trash me-1"></i>
-                                    </button>
+                                    @if($appointment->status === 'on-going')
+                                        <button wire:click="completeAppointment({{ $appointment->id }})"
+                                            class="flux-btn btn-sm flux-btn-success">
+                                            <i class="bi bi-check-circle me-1"></i>
+                                        </button>
+                                    @endif
                                 </div>
                             </td>
                         </tr>
