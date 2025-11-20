@@ -31,13 +31,27 @@
         }
 
         .hero-section {
-            background: linear-gradient(rgba(37, 99, 235, 0.5), rgba(59, 130, 246, 0.3)),
-                url("{{ asset('images/MUNICIPAL_HALL.jpg') }}");
+            background: linear-gradient(rgba(37, 99, 235, 0.5), rgba(59, 130, 246, 0.3));
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             color: white;
             position: relative;
+        }
+
+        .hero-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-image: url("{{ asset('images/MUNICIPAL_HALL.jpg') }}");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            opacity: 0.7;
+            z-index: -1;
         }
 
         .service-card {
@@ -94,6 +108,14 @@
             50% {
                 transform: translateY(-20px);
             }
+        }
+
+        .hero-title {
+            text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7), 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-description {
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(0, 0, 0, 0.6);
         }
     </style>
 </head>
@@ -174,10 +196,10 @@
                 </div>
                 <div class="text-center lg:w-full w-full flex flex-col items-center justify-center">
 
-                    <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight">
+                    <h1 class="text-4xl lg:text-6xl font-bold mb-6 leading-tight hero-title">
                         Book Your Municipal <br>Appointment Online
                     </h1>
-                    <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto lg:mx-0 text-center">
+                    <p class="text-xl mb-8 opacity-90 max-w-2xl mx-auto lg:mx-0 text-center hero-description">
                         Access government services faster and easier with our new digital scheduling system.
                         Set up your appointment today.
                     </p>
