@@ -200,6 +200,16 @@ new class extends Component {
         return $analytics;
     }
 
+    protected function formatPurpose(string $purpose): string
+    {
+        if (empty($purpose)) {
+            return 'N/A';
+        }
+
+        // Convert kebab-case to Title Case
+        return ucwords(str_replace('-', ' ', $purpose));
+    }
+
     protected function calculateAppointmentsAnalytics(array $officeIds, Carbon $startDate, Carbon $endDate): array
     {
         $query = Appointments::with(['office'])
@@ -220,7 +230,8 @@ new class extends Component {
             $completionRate = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
 
             $analytics[] = [
-                'purpose' => $purpose ?: 'N/A',
+                'purpose' => $this->formatPurpose($purpose),
+                'purpose_raw' => $purpose, // Keep raw for grouping
                 'completed' => $completed,
                 'cancelled' => $cancelled,
                 'completion_rate' => $completionRate,
@@ -287,7 +298,7 @@ new class extends Component {
             }
 
             if ($highestPurpose) {
-                $analysis['highest_completion_rate_purpose'] = $highestPurpose . ' (' . round($highestRate, 1) . '%)';
+                $analysis['highest_completion_rate_purpose'] = $this->formatPurpose($highestPurpose) . ' (' . round($highestRate, 1) . '%)';
             }
         }
 
@@ -409,49 +420,54 @@ new class extends Component {
 
     public function exportToPdf(): void
     {
-        // Ensure analytics are generated
-        $this->generateAnalytics();
+        try {
+            $this->isExporting = true;
 
-        $this->isExporting = true;
+            // Ensure analytics are generated
+            $this->generateAnalytics();
 
-        $user = auth()->user();
-        $officeId = $this->selectedOfficeId;
-        $officeIds = $this->getOfficeIdsToQuery($user, $officeId);
+            $user = auth()->user();
+            $officeId = $this->selectedOfficeId;
+            $officeIds = $this->getOfficeIdsToQuery($user, $officeId);
 
-        // Get office info
-        $officeInfo = [];
-        if (count($officeIds) === 1) {
-            $office = Offices::find($officeIds[0]);
-            $officeInfo = [
-                'name' => $office->name ?? 'N/A',
+            // Get office info
+            $officeInfo = [];
+            if (count($officeIds) === 1) {
+                $office = Offices::find($officeIds[0]);
+                $officeInfo = [
+                    'name' => $office->name ?? 'N/A',
+                ];
+            } else {
+                $officeInfo = [
+                    'name' => 'All Offices',
+                ];
+            }
+
+            // Prepare analytics data for PDF
+            $pdfData = [
+                'document_requests' => $this->documentRequestsAnalytics,
+                'appointments' => $this->appointmentsAnalytics,
+                'performance_analysis' => $this->performanceAnalysis,
+                'overall_summary' => $this->overallSummary,
+                'office_info' => $officeInfo,
+                'report_period' => $this->getReportPeriodText(),
+                'generated_date' => now()->format('F d, Y'),
+                'period_type' => $this->periodType,
+                'selected_type' => $this->selectedType,
             ];
-        } else {
-            $officeInfo = [
-                'name' => 'All Offices',
-            ];
+
+            // Store in session for PDF generation
+            session(['pdf_export_params' => $pdfData]);
+            session()->save(); // Ensure session is saved
+
+            $this->isExporting = false;
+
+            // Dispatch event to trigger PDF download
+            $this->dispatch('trigger-pdf-download', url: route('reports.export.pdf'));
+        } catch (\Exception $e) {
+            $this->isExporting = false;
+            session()->flash('error', 'Failed to prepare PDF export: ' . $e->getMessage());
         }
-
-        // Prepare analytics data for PDF
-        $pdfData = [
-            'document_requests' => $this->documentRequestsAnalytics,
-            'appointments' => $this->appointmentsAnalytics,
-            'performance_analysis' => $this->performanceAnalysis,
-            'overall_summary' => $this->overallSummary,
-            'office_info' => $officeInfo,
-            'report_period' => $this->getReportPeriodText(),
-            'generated_date' => now()->format('F d, Y'),
-            'period_type' => $this->periodType,
-            'selected_type' => $this->selectedType,
-        ];
-
-        // Store in session for PDF generation
-        session(['pdf_export_params' => $pdfData]);
-        session()->save(); // Ensure session is saved before redirect
-
-        $this->isExporting = false;
-
-        // Use JavaScript to trigger download to avoid redirect issues
-        $this->dispatch('pdf-export-ready', ['url' => route('reports.export.pdf')]);
     }
 
     protected function getReportPeriodText(): string
@@ -494,23 +510,9 @@ new class extends Component {
     }
 }; ?>
 
-<div>
+<div x-data x-on:trigger-pdf-download.window="setTimeout(() => window.open($event.detail.url, '_blank'), 150)">
     @include('components.alert')
 
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('pdf-export-ready', (event) => {
-                // Create a temporary link and click it to trigger download
-                const url = event[0]?.url || "{{ route('reports.export.pdf') }}";
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-        });
-    </script>
 
     <div class="flux-card p-6 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">

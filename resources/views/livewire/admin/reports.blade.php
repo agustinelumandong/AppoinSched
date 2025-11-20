@@ -136,7 +136,8 @@ new class extends Component {
                 $completionRate = $total > 0 ? round(($completed / $total) * 100, 1) : 0;
 
                 $appointmentsAnalytics[] = [
-                    'purpose' => $purpose ?: 'N/A',
+                    'purpose' => $this->formatPurpose($purpose),
+                    'purpose_raw' => $purpose, // Keep raw for grouping
                     'completed' => $completed,
                     'cancelled' => $cancelled,
                     'completion_rate' => $completionRate,
@@ -172,6 +173,16 @@ new class extends Component {
                 'performance_analysis' => $performanceAnalysis,
             ];
         }
+    }
+
+    protected function formatPurpose(string $purpose): string
+    {
+        if (empty($purpose)) {
+            return 'N/A';
+        }
+
+        // Convert kebab-case to Title Case
+        return ucwords(str_replace('-', ' ', $purpose));
     }
 
     protected function calculateOfficePerformanceAnalysis(int $officeId, ?int $serviceId, Carbon $startDate, Carbon $endDate): array
@@ -223,7 +234,7 @@ new class extends Component {
             }
 
             if ($highestPurpose) {
-                $analysis['highest_completion_rate_purpose'] = $highestPurpose . ' (' . round($highestRate, 1) . '%)';
+                $analysis['highest_completion_rate_purpose'] = $this->formatPurpose($highestPurpose) . ' (' . round($highestRate, 1) . '%)';
             }
         }
 
@@ -232,29 +243,37 @@ new class extends Component {
 
     public function exportToPdf(): void
     {
-        $this->isExporting = true;
+        try {
+            $this->isExporting = true;
 
-        // Calculate overall statistics across all offices
-        $overallStats = $this->calculateOverallStatistics();
+            // Ensure analytics are generated
+            $this->generateAllOfficesAnalytics();
 
-        // Prepare analytics data for PDF
-        $pdfData = [
-            'offices_analytics' => $this->officesAnalytics,
-            'overall_statistics' => $overallStats,
-            'report_period' => $this->getReportPeriodText(),
-            'generated_date' => now()->format('F d, Y'),
-            'period_type' => $this->periodType,
-            'is_admin_report' => true,
-        ];
+            // Calculate overall statistics across all offices
+            $overallStats = $this->calculateOverallStatistics();
 
-        // Store in session for PDF generation
-        session(['pdf_export_params' => $pdfData]);
-        session()->save();
+            // Prepare analytics data for PDF
+            $pdfData = [
+                'offices_analytics' => $this->officesAnalytics,
+                'overall_statistics' => $overallStats,
+                'report_period' => $this->getReportPeriodText(),
+                'generated_date' => now()->format('F d, Y'),
+                'period_type' => $this->periodType,
+                'is_admin_report' => true,
+            ];
 
-        $this->isExporting = false;
+            // Store in session for PDF generation
+            session(['pdf_export_params' => $pdfData]);
+            session()->save();
 
-        // Trigger PDF download
-        $this->dispatch('pdf-export-ready', ['url' => route('reports.export.pdf')]);
+            $this->isExporting = false;
+
+            // Dispatch event to trigger PDF download
+            $this->dispatch('trigger-pdf-download', url: route('reports.export.pdf'));
+        } catch (\Exception $e) {
+            $this->isExporting = false;
+            session()->flash('error', 'Failed to prepare PDF export: ' . $e->getMessage());
+        }
     }
 
     protected function calculateOverallStatistics(): array
@@ -318,7 +337,8 @@ new class extends Component {
             $total = $counts['completed'] + $counts['cancelled'];
             $rate = $total > 0 ? round(($counts['completed'] / $total) * 100, 1) : 0;
             $purposesSummary[] = [
-                'purpose' => $purpose,
+                'purpose' => $this->formatPurpose($purpose),
+                'purpose_raw' => $purpose,
                 'completed' => $counts['completed'],
                 'cancelled' => $counts['cancelled'],
                 'completion_rate' => $rate,
@@ -372,22 +392,9 @@ new class extends Component {
     }
 }; ?>
 
-<div>
+<div x-data x-on:trigger-pdf-download.window="setTimeout(() => window.open($event.detail.url, '_blank'), 150)">
     @include('components.alert')
 
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('pdf-export-ready', (event) => {
-                const url = event[0]?.url || "{{ route('reports.export.pdf') }}";
-                const link = document.createElement('a');
-                link.href = url;
-                link.target = '_blank';
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-            });
-        });
-    </script>
 
     <div class="flux-card p-6 mb-6">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
