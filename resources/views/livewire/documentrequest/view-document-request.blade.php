@@ -87,7 +87,7 @@ new class extends Component {
                 }
             }
 
-            if ($this->confirmRejected && $this->documentStatusToUpdate === 'cancelled') {
+            if ($this->documentStatusToUpdate === 'cancelled') {
                 if (empty(trim($this->remarks))) {
                     session()->flash('error', 'Remarks are required when cancelling a document request.');
                     $this->dispatch('keep-modal-open');
@@ -96,15 +96,9 @@ new class extends Component {
             }
 
             // Handle document status confirmations
-            if ($this->confirmApproved == true) {
-                $this->updateDocumentStatusModal('in-progress');
-                session()->flash('success', 'Document request set to in-progress successfully.');
-            } elseif ($this->confirmRejected == true) {
-                $this->updateDocumentStatusModal('cancelled');
-                session()->flash('error', 'Document request cancelled successfully.');
-            } elseif ($this->confirmPending == true) {
-                $this->updateDocumentStatusModal('pending');
-                session()->flash('success', 'Document request set to pending successfully.');
+            if (!empty($this->documentStatusToUpdate)) {
+                $this->updateDocumentStatusModal($this->documentStatusToUpdate);
+                session()->flash('success', 'Document request status updated to ' . ucfirst(str_replace('-', ' ', $this->documentStatusToUpdate)) . ' successfully. Client has been notified via email.');
             }
             // Handle payment status confirmations
             elseif ($this->confirmPaymentStatus == true && !empty($this->paymentStatusToUpdate)) {

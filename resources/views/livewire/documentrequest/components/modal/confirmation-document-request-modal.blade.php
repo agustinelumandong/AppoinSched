@@ -18,20 +18,30 @@
                     </span>
                 @endif
             @else
-                Are you sure you want to
-                {{ $confirmApproved ? 'approve' : ($confirmRejected ? 'cancel' : 'set to pending') }} this document
-                request?
-                @if ($confirmRejected)
-                    <span class="block mt-2 text-sm text-amber-600">
-                        Note: Remarks are required when cancelling a document request.
-                    </span>
+                @if (!empty($documentStatusToUpdate))
+                    Are you sure you want to set this document request status to
+                    <strong>{{ ucfirst(str_replace('-', ' ', $documentStatusToUpdate)) }}</strong>?
+                    @if ($documentStatusToUpdate === 'cancelled')
+                        <span class="block mt-2 text-sm text-amber-600">
+                            Note: Remarks are required when cancelling a document request.
+                        </span>
+                    @endif
+                @else
+                    Are you sure you want to
+                    {{ $confirmApproved ? 'approve' : ($confirmRejected ? 'cancel' : 'set to pending') }} this document
+                    request?
+                    @if ($confirmRejected)
+                        <span class="block mt-2 text-sm text-amber-600">
+                            Note: Remarks are required when cancelling a document request.
+                        </span>
+                    @endif
                 @endif
             @endif
         </p>
 
         @php
             $remarksRequired = ($confirmPaymentStatus && $paymentStatusToUpdate === 'failed') ||
-                               ($confirmRejected && $documentStatusToUpdate === 'cancelled');
+                               ($documentStatusToUpdate === 'cancelled');
         @endphp
 
         @if ($remarksRequired)
@@ -54,7 +64,7 @@
     <x-slot name="footer">
         @php
             $remarksRequired = ($confirmPaymentStatus && $paymentStatusToUpdate === 'failed') ||
-                               ($confirmRejected && $documentStatusToUpdate === 'cancelled');
+                               ($documentStatusToUpdate === 'cancelled');
             $remarksEmpty = empty(trim($remarks ?? ''));
             $isDisabled = $remarksRequired && $remarksEmpty;
         @endphp
@@ -70,11 +80,23 @@
                         : ($paymentStatusToUpdate === 'failed'
                             ? 'flux-btn-danger'
                             : 'flux-btn-secondary'))
-                    : ($confirmApproved
-                        ? 'flux-btn-success'
-                        : ($confirmRejected
-                            ? 'flux-btn-danger'
-                            : 'flux-btn-warning')) }} @if ($isDisabled) opacity-50 cursor-not-allowed @endif"
+                    : (!empty($documentStatusToUpdate)
+                        ? ($documentStatusToUpdate === 'in-progress'
+                            ? 'flux-btn-info'
+                            : ($documentStatusToUpdate === 'ready-for-pickup'
+                                ? 'flux-btn-success'
+                                : ($documentStatusToUpdate === 'complete'
+                                    ? 'flux-btn-success'
+                                    : ($documentStatusToUpdate === 'cancelled'
+                                        ? 'flux-btn-danger'
+                                        : ($documentStatusToUpdate === 'pending'
+                                            ? 'flux-btn-warning'
+                                            : 'flux-btn-secondary')))))
+                        : ($confirmApproved
+                            ? 'flux-btn-success'
+                            : ($confirmRejected
+                                ? 'flux-btn-danger'
+                                : 'flux-btn-warning'))) }} @if ($isDisabled) opacity-50 cursor-not-allowed @endif"
                 @if ($isDisabled) disabled title="Please fill in the remarks field before confirming" @endif
                 wire:loading.attr="disabled"
                 wire:click="confirmDocumentRequest">
@@ -88,9 +110,15 @@
                                     : 'bi-cash') }} me-1"></i>
                         Confirm
                     @else
-                        <i
-                            class="bi {{ $confirmApproved ? 'bi-check-circle' : ($confirmRejected ? 'bi-x-circle' : 'bi-clock') }} me-1"></i>
-                        {{ $confirmApproved ? 'Confirm' : ($confirmRejected ? 'Reject' : 'Set Pending') }}
+                        @if (!empty($documentStatusToUpdate))
+                            <i
+                                class="bi {{ $documentStatusToUpdate === 'in-progress' ? 'bi-arrow-right-circle' : ($documentStatusToUpdate === 'ready-for-pickup' ? 'bi-box-arrow-up' : ($documentStatusToUpdate === 'complete' ? 'bi-check2-circle' : ($documentStatusToUpdate === 'cancelled' ? 'bi-x-circle' : 'bi-clock'))) }} me-1"></i>
+                            Confirm
+                        @else
+                            <i
+                                class="bi {{ $confirmApproved ? 'bi-check-circle' : ($confirmRejected ? 'bi-x-circle' : 'bi-clock') }} me-1"></i>
+                            {{ $confirmApproved ? 'Confirm' : ($confirmRejected ? 'Reject' : 'Set Pending') }}
+                        @endif
                     @endif
                 </span>
                 <span wire:loading>

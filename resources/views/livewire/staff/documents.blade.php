@@ -147,7 +147,7 @@ new class extends Component {
     {
         try {
             // Validate remarks for required actions
-            if ($this->confirmRejected && $this->documentStatusToUpdate === 'cancelled') {
+            if ($this->documentStatusToUpdate === 'cancelled') {
                 if (empty(trim($this->remarks))) {
                     session()->flash('error', 'Remarks are required when cancelling a document request.');
                     return;
