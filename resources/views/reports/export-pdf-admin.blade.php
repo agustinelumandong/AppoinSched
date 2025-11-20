@@ -221,8 +221,12 @@
                     <div class="performance-analysis">
                         @if(!empty($performanceAnalysis['most_scheduled_appointment']))
                             <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
-                        @else
-                            <p class="text-gray-500">No appointment data available for the selected period.</p>
+                        @endif
+                        @if(!empty($performanceAnalysis['most_requested_document']))
+                            <p><strong>Most Requested Document:</strong> {{ $performanceAnalysis['most_requested_document'] }}</p>
+                        @endif
+                        @if(empty($performanceAnalysis['most_scheduled_appointment']) && empty($performanceAnalysis['most_requested_document']))
+                            <p>No data available for the selected period.</p>
                         @endif
                     </div>
                 </div>

@@ -226,7 +226,28 @@ new class extends Component {
     {
         $analysis = [
             'most_scheduled_appointment' => null,
+            'most_requested_document' => null,
         ];
+
+        // Get most requested document
+        $docQuery = DocumentRequest::with(['service'])
+            ->where('office_id', $officeId)
+            ->whereBetween('created_at', [$startDate, $endDate])
+            ->whereIn('status', ['complete', 'cancelled']);
+
+        if ($serviceId) {
+            $docQuery->where('service_id', $serviceId);
+        }
+
+        $docRequests = $docQuery->get();
+        if ($docRequests->isNotEmpty()) {
+            $byService = $docRequests->groupBy('service_id');
+            $mostRequested = $byService->sortByDesc(fn($group) => $group->count())->first();
+            if ($mostRequested) {
+                $count = $mostRequested->count();
+                $analysis['most_requested_document'] = ($mostRequested->first()->service->title ?? 'N/A') . ' (' . $count . ' request' . ($count > 1 ? 's' : '') . ')';
+            }
+        }
 
         // Get all appointments (including all statuses to find most scheduled)
         $appQuery = Appointments::with(['appointmentDetails'])
@@ -613,11 +634,15 @@ new class extends Component {
                 @if(!empty($performanceAnalysis))
                     <div class="mb-6">
                         <h3 class="text-lg font-semibold mb-3">Performance Analysis</h3>
-                        <div class="bg-gray-50 p-4 rounded-lg">
+                        <div class="bg-gray-50 p-4 rounded-lg space-y-2">
                             @if($performanceAnalysis['most_scheduled_appointment'])
                                 <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
-                            @else
-                                <p class="text-gray-500">No appointment data available for the selected period.</p>
+                            @endif
+                            @if($performanceAnalysis['most_requested_document'])
+                                <p><strong>Most Requested Document:</strong> {{ $performanceAnalysis['most_requested_document'] }}</p>
+                            @endif
+                            @if(empty($performanceAnalysis['most_scheduled_appointment']) && empty($performanceAnalysis['most_requested_document']))
+                                <p class="text-gray-500">No data available for the selected period.</p>
                             @endif
                         </div>
                     </div>

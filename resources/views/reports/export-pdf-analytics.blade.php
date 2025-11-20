@@ -235,10 +235,22 @@
         <div class="section">
             <div class="section-title">Performance Analysis</div>
             <div class="performance-analysis">
-                @if(!empty($performanceAnalysis['most_scheduled_appointment']))
-                    <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
-                @else
-                    <p>No appointment data available for the selected period.</p>
+                @php
+                    $selectedType = $selected_type ?? 'both';
+                @endphp
+                @if($selectedType === 'appointments' || $selectedType === 'both')
+                    @if(!empty($performanceAnalysis['most_scheduled_appointment']))
+                        <p><strong>Most Scheduled Appointment:</strong> {{ $performanceAnalysis['most_scheduled_appointment'] }}</p>
+                    @else
+                        <p>No appointment data available for the selected period.</p>
+                    @endif
+                @endif
+                @if($selectedType === 'documents' || $selectedType === 'both')
+                    @if(!empty($performanceAnalysis['most_requested_document']))
+                        <p><strong>Most Requested Document:</strong> {{ $performanceAnalysis['most_requested_document'] }}</p>
+                    @else
+                        <p>No document request data available for the selected period.</p>
+                    @endif
                 @endif
             </div>
         </div>
