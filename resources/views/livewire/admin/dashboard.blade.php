@@ -210,13 +210,13 @@ new class extends Component {
         </div>
 
         {{-- Recent Users and Appointments List --}}
-        <div class="flex flex-row w-full gap-6">
+        <div class="flex flex-col md:flex-row w-full gap-6">
             {{-- Total Users List --}}
-            <div class="bg-white rounded-lg shadow flex-1 min-w-0">
-          <div class="p-6 border-b border-gray-200 bg-yellow-100">
-              <h3 class="text-lg font-semibold text-gray-900">Recent Users</h3>
+            <div class="bg-white rounded-lg shadow flex-1 min-w-0 max-h-[600px] flex flex-col">
+          <div class="p-6 border-b border-gray-200 bg-yellow-100 flex-shrink-0">
+              <h4 class="text-sm font-semibold text-gray-900">Recent Users</h4>
           </div>
-          <div class="p-6">
+          <div class="p-6 overflow-y-auto flex-1 min-h-0">
               <div class="space-y-4">
             @forelse(User::latest()->take(5)->get() as $user)
                 <div class="flex items-center justify-between">
@@ -242,11 +242,11 @@ new class extends Component {
             </div>
 
             {{-- Recent Appointments List --}}
-            <div class="bg-white rounded-lg shadow flex-1 min-w-0">
-          <div class="p-6 border-b border-gray-200 bg-blue-100">
-              <h3 class="text-lg font-semibold text-gray-900 ">Recent Appointments</h3>
+            <div class="bg-white rounded-lg shadow flex-1 min-w-0 max-h-[600px] flex flex-col">
+          <div class="p-6 border-b border-gray-200 bg-blue-100 flex-shrink-0">
+              <h4 class="text-sm font-semibold text-gray-900 ">Recent Appointments</h4>
           </div>
-          <div class="p-6">
+          <div class="p-6 overflow-y-auto flex-1 min-h-0">
               <div class="space-y-4">
             @forelse($recentAppointments as $appointment)
                 <div class="flex items-center justify-between">
@@ -283,11 +283,11 @@ new class extends Component {
             </div>
 
             {{-- Recent Document Request List --}}
-            <div class="bg-white rounded-lg shadow flex-1 min-w-0">
-          <div class="p-6 border-b border-gray-200 bg-green-100">
-              <h3 class="text-lg font-semibold text-gray-900 ">Recent Document Requests</h3>
+            <div class="bg-white rounded-lg shadow flex-1 min-w-0 max-h-[600px] flex flex-col">
+          <div class="p-6 border-b border-gray-200 bg-green-100 flex-shrink-0">
+              <h4 class="text-sm font-semibold text-gray-900 ">Recent Document Requests</h4>
           </div>
-          <div class="p-6">
+          <div class="p-6 overflow-y-auto flex-1 min-h-0">
               <div class="space-y-4">
             @forelse($recentDocumentRequests as $request)
                 <div class="flex items-center justify-between">
