@@ -6,6 +6,7 @@ use App\Enums\RequestNotificationEvent;
 use App\Models\DocumentRequest;
 use App\Models\Offices;
 use App\Notifications\RequestEventNotification;
+use App\Notifications\DocumentClaimSlipNotification;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\On;
@@ -240,6 +241,10 @@ new class extends Component {
                         new RequestEventNotification(RequestNotificationEvent::DocumentReadyForPickup, [
                             'reference_no' => $documentRequest->reference_number,
                         ])
+                    );
+                    // Send claim slip notification
+                    $documentRequest->user->notify(
+                        new DocumentClaimSlipNotification($documentRequest)
                     );
                 } elseif ($status === 'complete') {
                     $documentRequest->user->notify(

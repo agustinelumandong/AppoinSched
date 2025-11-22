@@ -156,26 +156,32 @@ new class extends Component {
                                                     </p>
                                                 </td>
                                                 <td>
-                                                    @if ($request->status === 'cancelled' || $request->payment_status === 'failed')
-                                                        <button
-                                                            class="flux-btn btn-sm flux-btn-outline flux-btn-info text-decoration-none"
-                                                            wire:click="openRemarksModal({{ $request->id }})"
-                                                        >
-                                                            View Remarks from staff
-                                                        </button>
-                                                    @else
-                                                        <button
-                                                            class="flux-btn btn-sm flux-btn-primary text-decoration-none {{   $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
-                                                            wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
-                                                        >
-                                                            Pay Now
-                                                        </button>
-                                                    @endif
+                                                    <div class="d-flex gap-2 flex-column">
+                                                        @if ($request->status === 'cancelled' || $request->payment_status === 'failed')
+                                                            <button
+                                                                class="flux-btn btn-sm flux-btn-outline flux-btn-info text-decoration-none"
+                                                                wire:click="openRemarksModal({{ $request->id }})"
+                                                            >
+                                                                View Remarks from staff
+                                                            </button>
+                                                        @else
+                                                            <button
+                                                                class="flux-btn btn-sm flux-btn-primary text-decoration-none {{   $request->payment_status === 'unpaid' ? '' : 'opacity-50 cursor-not-allowed' }}"
+                                                                wire:click="$dispatch('open-modal-payment-method'); $wire.setSelectedDocumentRequest({{ $request->id }})"
+                                                            >
+                                                                Pay Now
+                                                            </button>
+                                                        @endif
 
-                                                    <div class="d-flex gap-2">
-                                                        {{-- <a href="#" class="flux-btn flux-btn-outline btn-sm" title="View Details">
-                                                            <i class="bi bi-eye"></i>
-                                                        </a> --}}
+                                                        @if (in_array($request->status, ['ready-for-pickup', 'complete']))
+                                                            <a href="{{ route('client.document-request.claim-slip', $request->reference_number) }}"
+                                                                class="flux-btn btn-sm flux-btn-success text-decoration-none"
+                                                                title="Download Claim Slip"
+                                                                target="_blank">
+                                                                <i class="bi bi-download me-1"></i>
+                                                                Download Claim Slip
+                                                            </a>
+                                                        @endif
                                                     </div>
                                                 </td>
                                             </tr>

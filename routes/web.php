@@ -80,6 +80,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Appointment slip download route
     Route::get('appointment-slip/{reference_number}/download', [App\Http\Controllers\AppointmentSlipController::class, 'downloadPdf'])
         ->name('appointment-slip.download');
+
+    // Document claim slip download route
+    Route::get('document-request/{reference_number}/claim-slip', [App\Http\Controllers\DocumentClaimSlipController::class, 'downloadPdf'])
+        ->middleware(['auth', 'verified', 'profile.complete'])
+        ->name('client.document-request.claim-slip');
 });
 
 Route::get('test-mail', [EmailsController::class, 'sendWelcomeMail'])->name('test.mail');

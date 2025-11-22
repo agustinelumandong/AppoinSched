@@ -448,6 +448,10 @@ new class extends Component {
                             'reference_no' => $this->documentRequest->reference_number,
                         ]),
                     );
+                    // Send claim slip notification
+                    $this->documentRequest->user->notify(
+                        new \App\Notifications\DocumentClaimSlipNotification($this->documentRequest)
+                    );
                     break;
 
                 case 'complete':

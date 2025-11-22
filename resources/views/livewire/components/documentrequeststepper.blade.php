@@ -4007,6 +4007,7 @@ new #[Title('Document Request')] class extends Component {
                         <div class="font-medium text-amber-600">Payment Verification in Progress</div>
                     </div>
                 </div>
+
                 <div class="flex gap-4">
                     <a href="{{ route('client.documents') }}" class="flux-btn flux-btn-outline">
                         View My Requests
