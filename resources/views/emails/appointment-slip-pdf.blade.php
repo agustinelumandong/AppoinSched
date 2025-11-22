@@ -205,6 +205,7 @@
             <li>Please arrive 15 minutes before your scheduled appointment.</li>
             <li>Bring a valid ID for verification.</li>
             <li>For cancellations, please contact us at least 24 hours in advance.</li>
+            <li>Please proceed to the <strong>@php echo strtoupper(str_replace('-', ' ', $purpose)); @endphp</strong> window at <strong>@php echo strtoupper($office->name); @endphp</strong> upon arrival.</li>
         </ul>
     </div>
 
