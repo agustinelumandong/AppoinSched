@@ -804,6 +804,40 @@ new class extends Component {
 
     {{-- Save Button --}}
     <div class="flex justify-end">
-        <button class="flux-btn flux-btn-primary mt-4" wire:click="updateAll">Save All</button>
+        <button class="flux-btn flux-btn-primary mt-4" x-data x-on:click="$dispatch('open-modal-confirm-save-all')">
+            Save All
+        </button>
     </div>
+
+    {{-- Confirmation Modal --}}
+    <x-modal id="confirm-save-all" title="Confirm Save" size="max-w-2xl">
+        <div class="modal-body">
+            <div class="text-sm space-y-4 p-2">
+                <h3 class="font-semibold text-lg">Are you sure all the details are correct and up to date?</h3>
+                <p>Please review all the information you have provided. If everything is correct, click "Confirm" to save all your information. If you need to make any changes, click "Cancel" to return to the form.</p>
+                <p class="font-bold text-amber-600">Note: Once you confirm, your information will be saved and updated.</p>
+            </div>
+        </div>
+
+        <x-slot name="footer">
+            <div class="flex gap-2">
+                <button type="button" class="flux-btn flux-btn-outline" x-data
+                    x-on:click="$dispatch('close-modal-confirm-save-all')">
+                    <i class="bi bi-x-lg me-1"></i>Cancel
+                </button>
+                <button type="button" class="flux-btn flux-btn-primary"
+                    wire:click="updateAll" wire:loading.attr="disabled"
+                    x-on:click="$dispatch('close-modal-confirm-save-all')">
+                    <span wire:loading.remove>
+                        <i class="bi bi-check-circle me-1"></i>
+                        Confirm & Save
+                    </span>
+                    <span wire:loading>
+                        <span class="loading loading-spinner me-1"></span>
+                        Saving...
+                    </span>
+                </button>
+            </div>
+        </x-slot>
+    </x-modal>
 </div>
