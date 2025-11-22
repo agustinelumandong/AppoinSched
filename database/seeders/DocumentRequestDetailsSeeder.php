@@ -192,10 +192,6 @@ class DocumentRequestDetailsSeeder extends Seeder
                         'Food Service',
                         'Retail Operation',
                     ]),
-                    'consent_person' => fake()->name(),
-                    'consent_relationship' => fake()->randomElement(['Owner', 'Manager', 'Authorized Representative']),
-                    'consent_citizenship' => 'Filipino',
-                    'consent_residence' => fake()->randomElement($cities) . ', ' . fake()->randomElement($provinces),
                 ]);
             }
 

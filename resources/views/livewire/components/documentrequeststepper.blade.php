@@ -272,15 +272,6 @@ new #[Title('Document Request')] class extends Component {
 
     public string $bride_mother_residence = '';
 
-    // Consent Section
-    public string $consent_person = '';
-
-    public string $consent_relationship = '';
-
-    public string $consent_citizenship = '';
-
-    public string $consent_residence = '';
-
     public bool $editPersonDetails = false;
 
     // Special Permit Fields
@@ -1029,12 +1020,6 @@ new #[Title('Document Request')] class extends Component {
         $this->bride_mother_suffix = $this->bride_mother_suffix ?: 'N/A';
         $this->bride_mother_citizenship = $this->bride_mother_citizenship ?: 'N/A';
         $this->bride_mother_residence = $this->bride_mother_residence ?: 'N/A';
-
-        // Consent Section (if applicable)
-        $this->consent_person = $this->consent_person ?: 'N/A';
-        $this->consent_relationship = $this->consent_relationship ?: 'N/A';
-        $this->consent_citizenship = $this->consent_citizenship ?: 'N/A';
-        $this->consent_residence = $this->consent_residence ?: 'N/A';
     }
 
     // Check if the service requires family information
@@ -1152,11 +1137,6 @@ new #[Title('Document Request')] class extends Component {
                     'bride_mother_suffix' => !empty(trim($this->bride_mother_suffix)) ? $this->bride_mother_suffix : 'N/A',
                     'bride_mother_citizenship' => $this->bride_mother_citizenship,
                     'bride_mother_residence' => $this->bride_mother_residence,
-                    // Consent Section
-                    'consent_person' => !empty(trim($this->consent_person)) ? $this->consent_person : 'N/A',
-                    'consent_relationship' => !empty(trim($this->consent_relationship)) ? $this->consent_relationship : 'N/A',
-                    'consent_citizenship' => !empty(trim($this->consent_citizenship)) ? $this->consent_citizenship : 'N/A',
-                    'consent_residence' => !empty(trim($this->consent_residence)) ? $this->consent_residence : 'N/A',
                 ]);
             }
 
@@ -1478,11 +1458,6 @@ new #[Title('Document Request')] class extends Component {
             'bride_mother_suffix' => 'nullable|string|max:10',
             'bride_mother_citizenship' => 'required|string|max:255',
             'bride_mother_residence' => 'required|string|max:255',
-            // Consent Section (optional)
-            'consent_person' => 'nullable|string|max:255',
-            'consent_relationship' => 'nullable|string|max:255',
-            'consent_citizenship' => 'nullable|string|max:255',
-            'consent_residence' => 'nullable|string|max:255',
         ];
     }
 
@@ -3141,8 +3116,6 @@ new #[Title('Document Request')] class extends Component {
                             {{-- Bride Section (Read-Only) --}}
                             @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form-bride')
                         </div>
-                        {{-- Consent Section (Read-Only, if applicable) --}}
-                        @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form-consent')
                         {{-- Requirements Checklist (Read-Only) --}}
                         {{--
                         @include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form-requirements',

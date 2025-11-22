@@ -27,8 +27,6 @@
         {{-- Bride Section (Read-Only) --}}
         @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form-bride')
     </div>
-    {{-- Consent Section (Read-Only, if applicable) --}}
-    @include('livewire.documentrequest.components.document-request-steps.document-request-forms.mirrage-form-consent')
     {{-- Requirements Checklist (Read-Only) --}}
     {{--
     @include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form-requirements',

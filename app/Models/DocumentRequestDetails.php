@@ -148,11 +148,6 @@ class DocumentRequestDetails extends Model
         'establishment_name',
         'establishment_address',
         'establishment_purpose',
-        // Consent Section
-        'consent_person',
-        'consent_relationship',
-        'consent_citizenship',
-        'consent_residence',
     ];
 
     protected $casts = [
