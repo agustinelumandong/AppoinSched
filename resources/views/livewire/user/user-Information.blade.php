@@ -4,28 +4,28 @@
 
     <div class="grid grid-cols-1 md:grid-cols-10 gap-4 mb-4">
         <div class="flex flex-col md:col-span-3">
-            <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
+            <label for="last_name" class="text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
             <input id="last_name" class="flux-form-control w-full" type="text" wire:model="last_name"
                 placeholder="Last Name"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col md:col-span-3">
-            <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
+            <label for="first_name" class="text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
             <input id="first_name" class="flux-form-control w-full" type="text" wire:model="first_name"
                 placeholder="First Name"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col md:col-span-3">
-            <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
+            <label for="middle_name" class="text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
             <input id="middle_name" class="flux-form-control w-full" type="text" wire:model="middle_name"
                 placeholder="Middle Name"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
         <div class="flex flex-col md:col-span-1">
-            <label for="suffix" class="text-xs font-medium mb-1">Suffix</label>
+            <label for="suffix" class="text-xs font-medium mb-1">{{ label_with_bisaya('Suffix', 'suffix') }}</label>
             <select id="suffix" class="flux-form-control w-full" wire:model="suffix">
                 <option value="">Suffix</option>
                 <option value="N/A">N/A</option>
@@ -40,19 +40,20 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         <div class="flex flex-col">
-            <label for="email" class="text-xs font-medium mb-1">Email</label>
+            <label for="email" class="text-xs font-medium mb-1">{{ label_with_bisaya('Email', 'email') }}</label>
             <input id="email" class="flux-form-control" type="email" wire:model="email" placeholder="Email">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
-            <label for="contact_no" class="text-xs font-medium mb-1">Contact No</label>
+            <label for="contact_no" class="text-xs font-medium mb-1">{{ label_with_bisaya('Contact No', 'contact_no') }}</label>
             <input id="contact_no" class="flux-form-control" type="tel" inputmode="numeric" pattern="[0-9]*"
-                x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="contact_no"
+                minlength="11" maxlength="11"
+                x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)" wire:model="contact_no"
                 placeholder="Contact No">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
-            <label for="sex_at_birth" class="text-xs font-medium mb-1">Sex at Birth</label>
+            <label for="sex_at_birth" class="text-xs font-medium mb-1">{{ label_with_bisaya('Sex at Birth', 'sex_at_birth') }}</label>
             <select id="sex_at_birth" class="flux-form-control" wire:model="sex_at_birth">
                 <option value="">Select Sex at Birth</option>
                 <option value="Male">Male</option>
@@ -61,20 +62,20 @@
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
-            <label for="date_of_birth" class="text-xs font-medium mb-1">Date of Birth</label>
+            <label for="date_of_birth" class="text-xs font-medium mb-1">{{ label_with_bisaya('Date of Birth', 'date_of_birth') }}</label>
             <input id="date_of_birth" class="flux-form-control" type="date" wire:model="date_of_birth"
                 placeholder="Date of Birth">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
-            <label for="place_of_birth" class="text-xs font-medium mb-1">Place of Birth</label>
+            <label for="place_of_birth" class="text-xs font-medium mb-1">{{ label_with_bisaya('Place of Birth', 'place_of_birth') }}</label>
             <input id="place_of_birth" class="flux-form-control" type="text" wire:model="place_of_birth"
                 placeholder="Place of Birth"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
-            <label for="civil_status" class="text-xs font-medium mb-1">Civil Status</label>
+            <label for="civil_status" class="text-xs font-medium mb-1">{{ label_with_bisaya('Civil Status', 'civil_status') }}</label>
             <select id="civil_status" class="flux-form-control" wire:model="civil_status">
                 <option value="">Civil Status</option>
                 <option value="Single">Single</option>
@@ -88,7 +89,7 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="flex flex-col">
-            <label for="religion" class="text-xs font-medium mb-1">Religion</label>
+            <label for="religion" class="text-xs font-medium mb-1">{{ label_with_bisaya('Religion', 'religion') }}</label>
             <input id="religion" class="flux-form-control" type="text" wire:model="religion"
                 placeholder="Religion"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -96,7 +97,7 @@
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col">
-            <label for="nationality" class="text-xs font-medium mb-1">Nationality</label>
+            <label for="nationality" class="text-xs font-medium mb-1">{{ label_with_bisaya('Nationality', 'nationality') }}</label>
             <input id="nationality" class="flux-form-control" type="text" wire:model="nationality"
                 placeholder="Nationality"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -106,7 +107,7 @@
     </div>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
         <div class="flex flex-col">
-            <label for="government_id_type" class="text-xs font-medium mb-1">Government ID Type</label>
+            <label for="government_id_type" class="text-xs font-medium mb-1">{{ label_with_bisaya('Government ID Type', 'government_id_type') }}</label>
             <select id="government_id_type" class="flux-form-control" wire:model="government_id_type">
                 <option value="">Select Government ID Type</option>
                 <option value="SSS">SSS</option>

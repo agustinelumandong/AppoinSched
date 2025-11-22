@@ -76,7 +76,7 @@
                         </div>
                         <div class=" grid grid-cols-1 gap-2">
                             <div>
-                                <label class="font-medium text-sm">Email Address:</label>
+                                <label class="font-medium text-sm">{{ label_with_bisaya('Email Address', 'email_address') }}:</label>
                                 <input class="flux-form-control " wire:model="contact_email" placeholder="Email Address"
                                     name="contact_email" id="contact_email" required>
                                 @error('contact_email')
@@ -84,10 +84,11 @@
                                 @enderror
                             </div>
                             <div>
-                                <label class="font-medium text-sm">Phone Number:</label>
+                                <label class="font-medium text-sm">{{ label_with_bisaya('Phone Number', 'phone_number') }}:</label>
                                 <input class="flux-form-control" wire:model="contact_phone" type="tel"
                                     inputmode="numeric" pattern="[0-9]*"
-                                    x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                    minlength="11" maxlength="11"
+                                    x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                                     placeholder="Phone Number" name="contact_phone" id="contact_phone" required>
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -135,7 +136,7 @@
                         </div>
                         <div class=" grid grid-cols-1 gap-2">
                             <div>
-                                <label class="font-medium text-sm">Email Address:</label>
+                                <label class="font-medium text-sm">{{ label_with_bisaya('Email Address', 'email_address') }}:</label>
                                 <input class="flux-form-control " wire:model.live="contact_email"
                                     placeholder="Email Address" name="contact_email" id="contact_email" required>
                                 @error('contact_email')
@@ -143,10 +144,11 @@
                                 @enderror
                             </div>
                             <div>
-                                <label class="font-medium text-sm">Phone Number:</label>
+                                <label class="font-medium text-sm">{{ label_with_bisaya('Phone Number', 'phone_number') }}:</label>
                                 <input class="flux-form-control" wire:model.live="contact_phone" type="tel"
                                     inputmode="numeric" pattern="[0-9]*"
-                                    x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                    minlength="11" maxlength="11"
+                                    x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                                     placeholder="Phone Number" name="contact_phone" id="contact_phone" required>
                                 @error('contact_phone')
                                     <span class="text-red-500 text-sm">{{ $message }}</span>

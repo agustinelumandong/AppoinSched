@@ -1,22 +1,22 @@
 <div>
     <!-- Permanent Address Information -->
     <div class="flux-card p-6 mb-8">
-        <h2 class="text-xl font-bold mb-4">Permanent Address</h2>
+        <h2 class="text-xl font-bold mb-4">{{ label_with_bisaya('Permanent Address', 'permanent_address') }}</h2>
         <div class="flex flex-col mb-4">
-            <label for="address_type" class="text-xs font-medium mb-1">Address Type</label>
+            <label for="address_type" class="text-xs font-medium mb-1">{{ label_with_bisaya('Address Type', 'address_type') }}</label>
             <select id="address_type" class="flux-form-control bg-gray-100" wire:model="address_type" disabled>
                 <option value="Permanent" selected>Permanent</option>
             </select>
         </div>
         <div class="flex flex-col mb-4">
-            <label for="address_line_1" class="text-xs font-medium mb-1">Address Line 1</label>
+            <label for="address_line_1" class="text-xs font-medium mb-1">{{ label_with_bisaya('Address Line 1', 'address_line_1') }}</label>
             <input id="address_line_1" class="flux-form-control" type="text" wire:model="address_line_1"
                 placeholder="Address Line 1"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="flex flex-col mb-4">
-            <label for="address_line_2" class="text-xs font-medium mb-1">Address Line 2</label>
+            <label for="address_line_2" class="text-xs font-medium mb-1">{{ label_with_bisaya('Address Line 2', 'address_line_2') }}</label>
             <input id="address_line_2" class="flux-form-control" type="text" wire:model="address_line_2"
                 placeholder="Address Line 2"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -24,7 +24,7 @@
         </div>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div class="flex flex-col">
-                <label for="region" class="text-xs font-medium mb-1">Region</label>
+                <label for="region" class="text-xs font-medium mb-1">{{ label_with_bisaya('Region', 'region') }}</label>
                 <select id="region" class="flux-form-control" wire:model.live="region">
                     <option value="">Select Region</option>
                     @foreach ($regions as $region)
@@ -34,7 +34,7 @@
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
-                <label for="province" class="text-xs font-medium mb-1">Province</label>
+                <label for="province" class="text-xs font-medium mb-1">{{ label_with_bisaya('Province', 'province') }}</label>
                 <select id="province" class="flux-form-control" wire:model.live="province">
                     <option value="">Select Province</option>
                     @foreach ($provinces as $provinceKey => $provinceName)
@@ -44,7 +44,7 @@
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
-                <label for="city" class="text-xs font-medium mb-1">City</label>
+                <label for="city" class="text-xs font-medium mb-1">{{ label_with_bisaya('City', 'city') }}</label>
                 <select id="city" class="flux-form-control" wire:model.live="city">
                     <option value="">Select City</option>
                     @foreach ($cities as $cityKey => $cityName)
@@ -54,7 +54,7 @@
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
-                <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
+                <label for="barangay" class="text-xs font-medium mb-1">{{ label_with_bisaya('Barangay', 'barangay') }}</label>
                 <select id="barangay" class="flux-form-control" wire:model.live="barangay">
                     <option value="">Select Barangay</option>
                     @foreach ($barangays as $barangay)
@@ -64,13 +64,13 @@
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="flex flex-col">
-                <label for="street" class="text-xs font-medium mb-1">Street</label>
+                <label for="street" class="text-xs font-medium mb-1">{{ label_with_bisaya('Street', 'street') }}</label>
                 <input id="street" class="flux-form-control" type="text" wire:model="street" placeholder="Street"
                     x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="flex flex-col">
-                <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
+                <label for="zip_code" class="text-xs font-medium mb-1">{{ label_with_bisaya('Zip Code', 'zip_code') }}</label>
                 <input id="zip_code" class="flux-form-control" type="tel" inputmode="numeric" pattern="[0-9]*"
                     x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')" wire:model="zip_code"
                     placeholder="Zip Code">
@@ -83,11 +83,11 @@
     <div class="flux-card p-6">
         <div class="flex items-center justify-between mb-4">
             <div>
-                <h2 class="text-xl font-bold">Present Address</h2>
+                <h2 class="text-xl font-bold">{{ label_with_bisaya('Present Address', 'present_address') }}</h2>
             </div>
             <div>
                 <label class="label cursor-pointer">
-                    <span class="label-text text-sm">Same as Permanent Address</span>
+                    <span class="label-text text-sm">{{ label_with_bisaya('Same as Permanent Address', 'same_as_personal_address') }}</span>
                     <input type="checkbox" wire:model.live="same_as_permanent" class="checkbox checkbox-primary" />
                 </label>
             </div>

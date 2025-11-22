@@ -10,13 +10,13 @@
             <span>If a field is not applicable, you may enter <span class="font-semibold">"N/A"</span>.</span>
         </div>
     @endif
-    <h4 class="text-lg font-bold mb-4">Family Information</h4>
+    <h4 class="text-lg font-bold mb-4">{{ label_with_bisaya('Family Information', 'family_information') }}</h4>
     {{-- Father --}}
     <div>
-        <h5 class="text-md font-bold mb-4">Father</h5>
+        <h5 class="text-md font-bold mb-4">{{ label_with_bisaya('Father', 'father') }}</h5>
         <div class="form-control ">
             <label class="label cursor-pointer">
-                <span class="label-text">Father is Unknown</span>
+                <span class="label-text">{{ label_with_bisaya('Father is Unknown', 'father_is_unknown') }}</span>
                 <input type="checkbox" wire:model.live="father_is_unknown"
                     class="checkbox @if ($editPersonDetails === false) bg-gray-100 @endif"
                     @if ($editPersonDetails === false) disabled @endif />
@@ -24,7 +24,7 @@
         </div>
         <div class="flex flex-row md:flex-col gap-4 mb-4">
             <div class="w-full md:w-1/3">
-                <label for="father_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                <label for="father_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'father_last_name') }}</label>
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="father_last_name" placeholder="Last Name" name="father_last_name"
@@ -37,7 +37,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="father_first_name" class="block text-xs font-medium mb-1">First Name</label>
+                <label for="father_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'father_first_name') }}</label>
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="father_first_name" placeholder="First Name" name="father_first_name"
@@ -50,7 +50,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="father_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                <label for="father_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'father_middle_name') }}</label>
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="father_middle_name" placeholder="Middle Name" name="father_middle_name"
@@ -63,7 +63,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-1/7">
-                <label for="father_suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                <label for="father_suffix" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Suffix', 'father_suffix') }}</label>
                 <select
                     class="flux-form-control md:col-span-1 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     wire:model="father_suffix" name="father_suffix" id="father_suffix"
@@ -84,7 +84,7 @@
         </div>
         <div class="flex flex-row md:flex-col gap-4 mb-4">
             <div class="w-full md:w-1/3">
-                <label for="father_birthdate" class="block text-xs font-medium mb-1">Date of Birth</label>
+                <label for="father_birthdate" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Date of Birth', 'father_birthdate') }}</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="date"
                     wire:model="father_birthdate" name="father_birthdate" id="father_birthdate"
                     {{ $father_is_unknown ? 'disabled' : '' }} @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -94,7 +94,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="father_nationality" class="block text-xs font-medium mb-1">Nationality</label>
+                <label for="father_nationality" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Nationality', 'father_nationality') }}</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="father_nationality" placeholder="Nationality" name="father_nationality"
                     id="father_nationality" required {{ $father_is_unknown ? 'disabled' : '' }}
@@ -106,7 +106,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="father_religion" class="block text-xs font-medium mb-1">Religion</label>
+                <label for="father_religion" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Religion', 'father_religion') }}</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="father_religion" placeholder="Religion" name="father_religion" id="father_religion"
                     required {{ $father_is_unknown ? 'disabled' : '' }}
@@ -134,10 +134,10 @@
     </div>
     {{-- Mother --}}
     <div>
-        <h5 class="text-md font-bold mb-4">Mother</h5>
+        <h5 class="text-md font-bold mb-4">{{ label_with_bisaya('Mother', 'mother') }}</h5>
         <div class="form-control">
             <label class="label cursor-pointer">
-                <span class="label-text">Mother is Unknown</span>
+                <span class="label-text">{{ label_with_bisaya('Mother is Unknown', 'mother_is_unknown') }}</span>
                 <input type="checkbox" wire:model.live="mother_is_unknown"
                     class="checkbox @if ($editPersonDetails === false) bg-gray-100 @endif"
                     @if ($editPersonDetails === false) disabled @endif />
@@ -146,7 +146,7 @@
         </div>
         <div class="flex flex-row md:flex-col gap-4 mb-4">
             <div class="w-full md:w-1/3">
-                <label for="mother_last_name" class="block text-xs font-medium mb-1">Last Maiden Name</label>
+                <label for="mother_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Maiden Name', 'last_maiden_name') }}</label>
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="mother_last_name" placeholder="Last Name" name="mother_last_name"
@@ -158,7 +158,7 @@
                 <span class="text-xs text-gray-500 mt-1">Required</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="mother_first_name" class="block text-xs font-medium mb-1">First Maiden Name</label>
+                <label for="mother_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Maiden Name', 'first_maiden_name') }}</label>
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="mother_first_name" placeholder="First Name" name="mother_first_name"
@@ -170,7 +170,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Maiden Name</label>
+                <label for="mother_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Maiden Name', 'middle_maiden_name') }}</label>
                 <input
                     class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                     type="text" wire:model="mother_middle_name" placeholder="Middle Name"
@@ -185,7 +185,7 @@
         </div>
         <div class="flex flex-row md:flex-col gap-4 mb-4">
             <div class="w-full md:w-1/3">
-                <label for="mother_birthdate" class="block text-xs font-medium mb-1">Mother's Birthdate</label>
+                <label for="mother_birthdate" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Birthdate', 'mother_birthdate') }}</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="date"
                     wire:model="mother_birthdate" placeholder="Mother's Birthdate" name="mother_birthdate"
                     id="mother_birthdate" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -195,7 +195,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's Nationality</label>
+                <label for="mother_nationality" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Nationality', 'mother_nationality') }}</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="mother_nationality" placeholder="Mother's Nationality" name="mother_nationality"
                     id="mother_nationality" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -206,7 +206,7 @@
                 <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
             </div>
             <div class="w-full md:w-1/3">
-                <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's Religion</label>
+                <label for="mother_religion" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Religion', 'mother_religion') }}</label>
                 <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif" type="text"
                     wire:model="mother_religion" placeholder="Mother's Religion" name="mother_religion"
                     id="mother_religion" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif

@@ -1,8 +1,8 @@
 <div class="mb-4">
-    <h6 class="font-semibold mb-2">{{ $label ?? 'Parent' }} {{ isset($maiden) && $maiden ? '(Maiden Name)' : '' }}</h6>
+    <h6 class="font-semibold mb-2">{{ $label ?? label_with_bisaya('Parent', 'father') }} {{ isset($maiden) && $maiden ? '(' . label_with_bisaya('Maiden Name', 'maiden_name') . ')' : '' }}</h6>
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div class="col-span-2">
-            <label class="block text-xs font-medium mb-1">Last Name</label>
+            <label class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
             <input class="flux-form-control" type="text" wire:model="{{ $prefix }}_last_name"
                 placeholder="Last Name"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -12,7 +12,7 @@
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="col-span-2">
-            <label class="block text-xs font-medium mb-1">First Name</label>
+            <label class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
             <input class="flux-form-control" type="text" wire:model="{{ $prefix }}_first_name"
                 placeholder="First Name"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -22,7 +22,7 @@
             <span class="text-xs text-gray-500 mt-1">Required</span>
         </div>
         <div class="col-span-2">
-            <label class="block text-xs font-medium mb-1">Middle Name</label>
+            <label class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
             <input class="flux-form-control" type="text" wire:model="{{ $prefix }}_middle_name"
                 placeholder="Middle Name"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -33,7 +33,7 @@
         </div>
         @if (!isset($maiden) || !$maiden)
             <div class="col-span-2">
-                <label class="block text-xs font-medium mb-1">Suffix</label>
+                <label class="block text-xs font-medium mb-1">{{ label_with_bisaya('Suffix', 'suffix') }}</label>
                 <select class="flux-form-control" wire:model="{{ $prefix }}_suffix">
                     <option value="">Suffix</option>
                     <option value="N/A">N/A</option>
@@ -50,7 +50,7 @@
             </div>
         @endif
         <div>
-            <label class="block text-xs font-medium mb-1">Citizenship</label>
+            <label class="block text-xs font-medium mb-1">{{ label_with_bisaya('Citizenship', 'citizenship') }}</label>
             <input class="flux-form-control" type="text" wire:model="{{ $prefix }}_citizenship"
                 placeholder="Citizenship"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -60,7 +60,7 @@
             <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
         </div>
         <div>
-            <label class="block text-xs font-medium mb-1">Residence</label>
+            <label class="block text-xs font-medium mb-1">{{ label_with_bisaya('Residence', 'residence') }}</label>
             <input class="flux-form-control" type="text" wire:model="{{ $prefix }}_residence"
                 placeholder="Residence"
                 x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">

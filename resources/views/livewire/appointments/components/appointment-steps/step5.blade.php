@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-4">
         <div>
             <div class="header mb-4">
-                <h3 class="text-xl font-semibold text-base-content">Contact Information</h3>
+                <h3 class="text-xl font-semibold text-base-content">{{ label_with_bisaya('Contact Information', 'contact_information') }}</h3>
                 <div class="flex items-center gap-2 text-sm text-base-content/70">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -25,11 +25,11 @@
                 <div class="bg-base-200 p-4 rounded-lg">
                     <div class=" grid grid-cols-1 gap-2">
                         <div>
-                            <label class="font-medium text-sm">Email:</label>
+                            <label class="font-medium text-sm">{{ label_with_bisaya('Email', 'email') }}:</label>
                             <p class="text-base-content">{{ $email }}</p>
                         </div>
                         <div>
-                            <label class=" font-medium text-sm">Phone:</label>
+                            <label class=" font-medium text-sm">{{ label_with_bisaya('Phone', 'phone') }}:</label>
                             <p class="text-base-content">{{ $phone }}</p>
                         </div>
                     </div>

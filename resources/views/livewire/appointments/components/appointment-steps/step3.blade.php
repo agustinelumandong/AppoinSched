@@ -4,7 +4,7 @@
             <div class="header mb-4 flex flex-row justify-between items-center">
                 <div>
 
-                    <h3 class="text-xl font-semibold text-base-content">Your details</h3>
+                    <h3 class="text-xl font-semibold text-base-content">{{ label_with_bisaya('Your details', 'your_details') }}</h3>
                     <div class="flex items-center gap-2 text-sm text-base-content/70">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                             stroke="currentColor">
@@ -47,7 +47,7 @@
             <div class="flex flex-col gap-2 w-full" wire:loading.remove>
                 <div class="flex flex-row gap-2 w-full">
                     <div class="w-full">
-                        <label for="last_name" class="text-xs font-medium mb-1">Last Name</label>
+                        <label for="last_name" class="text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
                         <input type="text" placeholder="Last Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                             wire:model="last_name" @if ($editPersonDetails === false) disabled @endif x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="w-full">
-                        <label for="first_name" class="text-xs font-medium mb-1">First Name</label>
+                        <label for="first_name" class="text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
                         <input type="text" placeholder="First Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                             wire:model="first_name" @if ($editPersonDetails === false) disabled @endif x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="w-full">
-                        <label for="middle_name" class="text-xs font-medium mb-1">Middle Name</label>
+                        <label for="middle_name" class="text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
                         <input type="text" placeholder="Middle Name"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                             wire:model="middle_name" @if ($editPersonDetails === false) disabled @endif x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
@@ -82,7 +82,7 @@
 
                 <div class="flex flex-row gap-2 w-full">
                     <div class=" w-full">
-                        <label for="email" class="text-xs font-medium mb-1">Email</label>
+                        <label for="email" class="text-xs font-medium mb-1">{{ label_with_bisaya('Email', 'email') }}</label>
                         <input type="email" placeholder="Email"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                             wire:model="email" @if ($editPersonDetails === false) disabled @endif />
@@ -93,9 +93,10 @@
                     </div>
 
                     <div class="w-full">
-                        <label for="phone" class="text-xs font-medium mb-1">Phone</label>
+                        <label for="phone" class="text-xs font-medium mb-1">{{ label_with_bisaya('Phone', 'phone') }}</label>
                         <input type="tel" inputmode="numeric" pattern="[0-9]*"
-                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                            minlength="11" maxlength="11"
+                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                             placeholder="Phone"
                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                             wire:model="phone" @if ($editPersonDetails === false) disabled @endif />
@@ -123,7 +124,7 @@
     <x-modal id="appointment-info" title="Request an Appointment on {{ $this->office->name }} Office" size="max-w-2xl">
         <div class="modal-body">
             <div class="text-sm space-y-4 max-h-[60vh] overflow-y-auto p-2">
-                <h3 class="font-bold text-lg mb-2">Personal Information</h3>
+                <h3 class="font-bold text-lg mb-2">{{ label_with_bisaya('Personal Information', 'personal_information') }}</h3>
                 <p class="text-base-content/70 mb-4">Your/Someone details</p>
 
                 <div class="bg-base-200 p-3 rounded-lg">

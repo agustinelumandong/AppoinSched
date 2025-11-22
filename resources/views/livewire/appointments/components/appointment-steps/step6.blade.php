@@ -1,6 +1,6 @@
 <div class="px-5 py-2 mt-5">
     <div class="header mb-4">
-        <h3 class="text-xl font-semibold text-base-content">Confirmation</h3>
+                <h3 class="text-xl font-semibold text-base-content">{{ label_with_bisaya('Confirmation', 'confirmation') }}</h3>
 
         @if ($error)
             <div class="alert alert-error flex items-center gap-2 mb-4">
@@ -35,24 +35,24 @@
 
             <div class="flux-card p-6 {{ $office->slug === 'municipal-treasurers-office' ? 'w-full' : 'w-1/2' }}">
                 <div>
-                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Appointment Summary</h3>
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">{{ label_with_bisaya('Appointment Summary', 'appointment_details') }}</h3>
                     <div class="grid grid-cols-1 gap-6">
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Office</label>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Office', 'office') }}</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $office->name }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Purpose', 'purpose') }}</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $purpose }}</p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Date</label>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Date', 'date') }}</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                 {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}
                             </p>
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-600 mb-1">Time</label>
+                            <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Time', 'time') }}</label>
                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                 {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}
                             </p>
@@ -60,33 +60,33 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Personal Information</h3>
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">{{ label_with_bisaya('Personal Information', 'personal_information') }}</h3>
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">First Name</label>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $first_name }}
                                 </p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Middle Name</label>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                     {{ $middle_name ?? 'N/A' }}</p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Last Name</label>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $last_name }}
                                 </p>
                             </div>
                         </div>
                         <div class="grid grid-cols-1 gap-6">
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Email', 'email') }}</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $email }}
                                 </p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-gray-600 mb-1">Phone</label>
+                                <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Phone', 'phone') }}</label>
                                 <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $phone }}
                                 </p>
                             </div>
@@ -94,11 +94,11 @@
                     </div>
                 </div>
                 <div>
-                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Request Details</h3>
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">{{ label_with_bisaya('Request Details', 'request_details') }}</h3>
                             <div class="space-y-4">
                                 <div class="grid grid-cols-1 gap-6">
                                     <div>
-                                        <label class="block text-sm font-medium text-gray-600 mb-1">Purpose</label>
+                                        <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Purpose', 'purpose') }}</label>
                                         <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">{{ $purpose }}
                                         </p>
                                     </div>
@@ -106,7 +106,7 @@
                                 @if ($message)
                                     <div class="grid grid-cols-1 gap-6">
                                         <div>
-                                            <label class="block text-sm font-medium text-gray-600 mb-1">Additional Notes</label>
+                                            <label class="block text-sm font-medium text-gray-600 mb-1">{{ label_with_bisaya('Additional Notes', 'additional_notes') }}</label>
                                             <p class="text-gray-900 pb-2 border-b border-gray-300 form-field-underline">
                                                 {{ $message }}</p>
                                         </div>
@@ -119,7 +119,7 @@
             @if ($this->includeCertificates && count($certificates) > 0)
                 <!-- Certificate Requests -->
                 <div class="flux-card p-6 w-1/2">
-                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Certificate Requests
+                    <h3 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">{{ label_with_bisaya('Certificate Requests', 'certificate_requests') }}
                     </h3>
 
                     @foreach ($certificates as $index => $certificate)

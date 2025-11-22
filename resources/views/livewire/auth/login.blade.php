@@ -137,12 +137,12 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     <form wire:submit="login" class="flex flex-col gap-2">
         <!-- Email Address -->
-        <flux:input wire:model="email" :label="__('Email address')" type="email" required autofocus autocomplete="email"
+        <flux:input wire:model="email" :label="label_with_bisaya(__('Email address'), 'email_address')" type="email" required autofocus autocomplete="email"
             placeholder="email@example.com" />
 
         <!-- Password or Login Code -->
         <div class="relative">
-            <flux:input wire:model="password" :label="__('Password')" type="password" required
+            <flux:input wire:model="password" :label="label_with_bisaya(__('Password'), 'password')" type="password" required
                 autocomplete="current-password" :placeholder="__('Enter your password...')" viewable />
 
             @error('password')
@@ -159,7 +159,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
                 </flux:link>
             @endif
              </div>
-            
+
         </div>
 
 

@@ -54,21 +54,21 @@
                 <div>
                     <h3 class="text-md font-semibold text-gray-700">Appointment Details</h3>
                     <div class="mt-2 space-y-1">
-                        <p><span class="font-medium">Office:</span> {{ $office->name }}</p>
-                        <p><span class="font-medium">Purpose:</span> {{ $purpose }}</p>
-                        <p><span class="font-medium">Date:</span>
+                        <p><span class="font-medium">{{ label_with_bisaya('Office', 'office') }}:</span> {{ $office->name }}</p>
+                        <p><span class="font-medium">{{ label_with_bisaya('Purpose', 'purpose') }}:</span> {{ $purpose }}</p>
+                        <p><span class="font-medium">{{ label_with_bisaya('Date', 'date') }}:</span>
                             {{ \Carbon\Carbon::parse($selectedDate)->format('M d, Y') }}
                         </p>
-                        <p><span class="font-medium">Time:</span>
+                        <p><span class="font-medium">{{ label_with_bisaya('Time', 'time') }}:</span>
                             {{ \Carbon\Carbon::parse($selectedTime)->format('h:i A') }}
                         </p>
                     </div>
                 </div>
 
                 <div>
-                    <h3 class="text-md font-semibold text-gray-700">Client Information</h3>
+                    <h3 class="text-md font-semibold text-gray-700">{{ label_with_bisaya('Client Information', 'client_information') }}</h3>
                     <div class="mt-2 space-y-1">
-                        <p><span class="font-medium">Name:</span>
+                        <p><span class="font-medium">{{ label_with_bisaya('Name', 'name') }}:</span>
                             @php
                                 $middleName = strtolower($middle_name ?? '') !== 'n/a' && !empty(trim($middle_name ?? '')) ? $middle_name : null;
                                 $nameParts = array_filter([$first_name, $middleName], function ($part) {
@@ -78,8 +78,8 @@
                             @endphp
                             {{ $name }}
                         </p>
-                        <p><span class="font-medium">Email:</span> {{ $email }}</p>
-                        <p><span class="font-medium">Phone:</span> {{ $phone }}</p>
+                        <p><span class="font-medium">{{ label_with_bisaya('Email', 'email') }}:</span> {{ $email }}</p>
+                        <p><span class="font-medium">{{ label_with_bisaya('Phone', 'phone') }}:</span> {{ $phone }}</p>
                     </div>
                 </div>
             </div>
@@ -87,7 +87,7 @@
             @if ($this->includeCertificates && count($certificates) > 0)
                 <!-- Certificate Requests -->
                 <div class="border-t pt-4">
-                    <h3 class="text-md font-semibold text-gray-700 mb-3">Certificate Requests</h3>
+                    <h3 class="text-md font-semibold text-gray-700 mb-3">{{ label_with_bisaya('Certificate Requests', 'certificate_requests') }}</h3>
                     <div class="space-y-2">
                         @foreach ($certificates as $index => $certificate)
                             @php

@@ -718,7 +718,7 @@ new #[Title('Document Request')] class extends Component {
                         'last_name' => 'required|string|max:255',
                         'suffix' => 'nullable|string|max:10',
                         'email' => 'required|email|max:255',
-                        'phone' => 'required|numeric|digits_between:7,25',
+                        'phone' => 'required|numeric|digits:11',
                         'sex_at_birth' => 'required|in:Male,Female',
                         'date_of_birth' => 'required|date|before:today',
                         'place_of_birth' => 'required|string|max:255',
@@ -733,6 +733,11 @@ new #[Title('Document Request')] class extends Component {
                         'city' => 'required|string|max:255',
                         'barangay' => 'required|string|max:255',
                         'zip_code' => 'required|string|max:10',
+                    ];
+                    $messages = [
+                        'phone.digits' => 'The contact number must be exactly 11 digits.',
+                        'phone.required' => 'The contact number field is required.',
+                        'phone.numeric' => 'The contact number must contain only numbers.',
 
                         // 'temporary_address_type' => 'required|in:Permanent,Temporary',
                         // 'temporary_address_line_1' => 'required|string|max:255',
@@ -755,7 +760,7 @@ new #[Title('Document Request')] class extends Component {
                                 'father_birthdate' => 'nullable|date',
                                 'father_nationality' => 'required|string|max:255',
                                 'father_religion' => 'required|string|max:255',
-                                'father_contact_no' => 'required|string|max:20',
+                                'father_contact_no' => ['required', 'string', 'regex:/^(\d{11}|N\/A)$/'],   // 11 digits or N/A
                             ]);
 
                             $rules = array_merge($rules, [
@@ -766,13 +771,13 @@ new #[Title('Document Request')] class extends Component {
                                 'mother_birthdate' => 'nullable|date',
                                 'mother_nationality' => 'required|string|max:255',
                                 'mother_religion' => 'required|string|max:255',
-                                'mother_contact_no' => 'required|string|max:20',
+                                'mother_contact_no' => ['required', 'string', 'regex:/^(\d{11}|N\/A)$/'],   // 11 digits or N/A
                             ]);
                         }
                     }
                 }
 
-                $this->validate($rules);
+                $this->validate($rules, $messages ?? []);
 
                 // Add info redundancy validation for someone else (skip for special permit)
                 if ($this->to_whom === 'someone_else' && $this->service->slug !== 'special-permit') {
@@ -824,7 +829,11 @@ new #[Title('Document Request')] class extends Component {
                         'contact_first_name' => 'required|string|max:255',
                         'contact_last_name' => 'required|string|max:255',
                         'contact_email' => 'required|email|max:255',
-                        'contact_phone' => 'required|numeric|digits_between:7,25',
+                        'contact_phone' => 'required|numeric|digits:11',
+                    ], [
+                        'contact_phone.digits' => 'The phone number must be exactly 11 digits.',
+                        'contact_phone.required' => 'The phone number field is required.',
+                        'contact_phone.numeric' => 'The phone number must contain only numbers.',
                     ]);
                 }
                 break;
@@ -837,7 +846,7 @@ new #[Title('Document Request')] class extends Component {
                         'contact_first_name' => 'required|string|max:255',
                         'contact_middle_name' => 'nullable|string|max:255',
                         'contact_email' => 'required|email|max:255',
-                        'contact_phone' => 'required|numeric|digits_between:7,25',
+                        'contact_phone' => 'required|numeric|digits:11',
                     ]);
                 } elseif ($this->service->slug === 'special-permit') {
                     // For special permit, skip contact validation as it's not needed
@@ -848,7 +857,11 @@ new #[Title('Document Request')] class extends Component {
                         'contact_first_name' => 'required|string|max:255',
                         'contact_last_name' => 'required|string|max:255',
                         'contact_email' => 'required|email|max:255',
-                        'contact_phone' => 'required|numeric|digits_between:7,25',
+                        'contact_phone' => 'required|numeric|digits:11',
+                    ], [
+                        'contact_phone.digits' => 'The phone number must be exactly 11 digits.',
+                        'contact_phone.required' => 'The phone number field is required.',
+                        'contact_phone.numeric' => 'The phone number must contain only numbers.',
                     ]);
                 }
                 break;
@@ -2249,7 +2262,7 @@ new #[Title('Document Request')] class extends Component {
                                 <h4 class="text-lg font-bold mb-4">Basic Information</h4>
                                 <div class="flex flex-row md:flex-col gap-4 mb-4">
                                     <div class="w-full md:w-1/3">
-                                        <label for="last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                                        <label for="last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="last_name" placeholder="Last Name" name="last_name"
@@ -2262,7 +2275,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="first_name" class="block text-xs font-medium mb-1">First Name</label>
+                                        <label for="first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="first_name" placeholder="First Name" name="first_name"
@@ -2275,7 +2288,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                                        <label for="middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="middle_name" placeholder="Middle Name" name="middle_name"
@@ -2288,7 +2301,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-1/7">
-                                        <label for="suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                                        <label for="suffix" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Suffix', 'suffix') }}</label>
                                         <select
                                             class="flux-form-control md:col-span-1 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model="suffix" name="suffix" id="suffix" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -2308,7 +2321,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <div>
-                                        <label for="email" class="block text-xs font-medium mb-1">Email</label>
+                                        <label for="email" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Email', 'email') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             name="email" type="email" wire:model="email" placeholder="Email" id="email" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
                                         @error('email')
@@ -2317,10 +2330,11 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div>
-                                        <label for="phone" class="block text-xs font-medium mb-1">Contact No</label>
+                                        <label for="phone" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Contact No', 'contact_no') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             name="phone" type="tel" inputmode="numeric" pattern="[0-9]*"
-                                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                            minlength="11" maxlength="11"
+                                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                                             wire:model="phone" placeholder="Contact No" id="phone" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
                                         @error('phone')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -2328,7 +2342,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div>
-                                        <label for="sex_at_birth" class="block text-xs font-medium mb-1">Sex at Birth</label>
+                                        <label for="sex_at_birth" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Sex at Birth', 'sex_at_birth') }}</label>
                                         <select
                                             class="flux-form-control w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model="sex_at_birth" name="sex_at_birth" id="sex_at_birth"
@@ -2346,7 +2360,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                                     <div>
-                                        <label for="date_of_birth" class="block text-xs font-medium mb-1">Date of Birth</label>
+                                        <label for="date_of_birth" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Date of Birth', 'date_of_birth') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="date" wire:model="date_of_birth" placeholder="Date of Birth"
                                             name="date_of_birth" id="date_of_birth" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -2356,8 +2370,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div>
-                                        <label for="place_of_birth" class="block text-xs font-medium mb-1">Place of
-                                            Birth</label>
+                                        <label for="place_of_birth" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Place of Birth', 'place_of_birth') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="place_of_birth" placeholder="Place of Birth"
                                             name="place_of_birth" id="place_of_birth" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2368,7 +2381,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div>
-                                        <label for="civil_status" class="block text-xs font-medium mb-1">Civil Status</label>
+                                        <label for="civil_status" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Civil Status', 'civil_status') }}</label>
                                         <select class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model="civil_status" name="civil_status" id="civil_status" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
                                             <option value="">Civil Status</option>
@@ -2386,7 +2399,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div>
-                                        <label for="religion" class="block text-xs font-medium mb-1">Religion</label>
+                                        <label for="religion" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Religion', 'religion') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="religion" placeholder="Religion" name="religion"
                                             id="religion" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled
@@ -2398,7 +2411,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div>
-                                        <label for="nationality" class="block text-xs font-medium mb-1">Nationality</label>
+                                        <label for="nationality" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Nationality', 'nationality') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="nationality" placeholder="Nationality" name="nationality"
                                             id="nationality" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled
@@ -2412,8 +2425,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                                     <div>
-                                        <label for="government_id_type" class="block text-xs font-medium mb-1">Government ID
-                                            Type</label>
+                                        <label for="government_id_type" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Government ID Type', 'government_id_type') }}</label>
                                         <select class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model="government_id_type" name="government_id_type" id="government_id_type"
                                             @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -2436,9 +2448,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div>
-                                        <label for="government_id_image_file" class="block text-xs font-medium mb-1">Government
-                                            ID
-                                            PDF</label>
+                                        <label for="government_id_image_file" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Government ID PDF', 'government_id_pdf') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="file" wire:model="government_id_image_file" name="government_id_image_file"
                                             id="government_id_image_file" accept=".pdf" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -2470,9 +2480,9 @@ new #[Title('Document Request')] class extends Component {
                         @endif
                         {{-- Permanent Address --}}
                         <div>
-                            <h4 class="text-lg font-bold mb-4">Permanent Address</h4>
+                            <h4 class="text-lg font-bold mb-4">{{ label_with_bisaya('Permanent Address', 'permanent_address') }}</h4>
                             <div>
-                                <label for="address_type" class="block text-xs font-medium mb-1">Address Type</label>
+                                <label for="address_type" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Address Type', 'address_type') }}</label>
                                 <select class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                                     wire:model="address_type" name="address_type" id="address_type" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled @endif>
                                     <option value="">Address Type</option>
@@ -2485,7 +2495,7 @@ new #[Title('Document Request')] class extends Component {
                                 <span class="text-xs text-gray-500 mt-1">Required</span>
                             </div>
                             <div>
-                                <label for="address_line_1" class="block text-xs font-medium mb-1">Address Line 1</label>
+                                <label for="address_line_1" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Address Line 1', 'address_line_1') }}</label>
                                 <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                                     type="text" wire:model="address_line_1" name="address_line_1" placeholder="Address Line 1"
                                     id="address_line_1" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2497,7 +2507,7 @@ new #[Title('Document Request')] class extends Component {
                                 <span class="text-xs text-gray-500 mt-1">Required</span>
                             </div>
                             <div>
-                                <label for="address_line_2" class="block text-xs font-medium mb-1">Address Line 2</label>
+                                <label for="address_line_2" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Address Line 2', 'address_line_2') }}</label>
                                 <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                                     type="text" wire:model="address_line_2" name="address_line_2" placeholder="Address Line 2"
                                     id="address_line_2" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2511,7 +2521,7 @@ new #[Title('Document Request')] class extends Component {
                             <div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div class="flex flex-col">
-                                        <label for="region" class="text-xs font-medium mb-1">Region</label>
+                                        <label for="region" class="text-xs font-medium mb-1">{{ label_with_bisaya('Region', 'region') }}</label>
                                         <select id="region"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="region" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2523,7 +2533,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="province" class="text-xs font-medium mb-1">Province</label>
+                                        <label for="province" class="text-xs font-medium mb-1">{{ label_with_bisaya('Province', 'province') }}</label>
                                         <select id="province"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="province" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2535,7 +2545,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="city" class="text-xs font-medium mb-1">City</label>
+                                        <label for="city" class="text-xs font-medium mb-1">{{ label_with_bisaya('City', 'city') }}</label>
                                         <select id="city"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="city" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2547,7 +2557,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
+                                        <label for="barangay" class="text-xs font-medium mb-1">{{ label_with_bisaya('Barangay', 'barangay') }}</label>
                                         <select id="barangay"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="barangay" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2559,7 +2569,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="street" class="text-xs font-medium mb-1">Street</label>
+                                        <label for="street" class="text-xs font-medium mb-1">{{ label_with_bisaya('Street', 'street') }}</label>
                                         <input id="street"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="street" placeholder="Street" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled
@@ -2569,7 +2579,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
+                                        <label for="zip_code" class="text-xs font-medium mb-1">{{ label_with_bisaya('Zip Code', 'zip_code') }}</label>
                                         <input id="zip_code"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="tel" inputmode="numeric" pattern="[0-9]*"
@@ -2584,14 +2594,14 @@ new #[Title('Document Request')] class extends Component {
                         </div>
                         {{-- Present Address --}}
                         <div>
-                            <h4 class="text-lg font-bold mb-4">Present Address</h4>
+                            <h4 class="text-lg font-bold mb-4">{{ label_with_bisaya('Present Address', 'present_address') }}</h4>
                             <div class="flex items-center mb-4">
                                 <input type="checkbox" id="same_as_personal_address" wire:model="same_as_personal_address"
                                     class="checkbox checkbox-primary mr-2" />
-                                <label for="same_as_personal_address" class="text-sm">Same as personal address</label>
+                                <label for="same_as_personal_address" class="text-sm">{{ label_with_bisaya('Same as personal address', 'same_as_personal_address') }}</label>
                             </div>
                             <div>
-                                <label for="address_type" class="block text-xs font-medium mb-1">Address Type</label>
+                                <label for="address_type" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Address Type', 'address_type') }}</label>
                                 <select class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                                     wire:model="address_type" name="address_type" id="address_type" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled @endif>
                                     <option value="">Address Type</option>
@@ -2604,7 +2614,7 @@ new #[Title('Document Request')] class extends Component {
                                 <span class="text-xs text-gray-500 mt-1">Required</span>
                             </div>
                             <div>
-                                <label for="address_line_1" class="block text-xs font-medium mb-1">Address Line 1</label>
+                                <label for="address_line_1" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Address Line 1', 'address_line_1') }}</label>
                                 <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                                     type="text" wire:model="address_line_1" name="address_line_1" placeholder="Address Line 1"
                                     id="address_line_1" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2616,7 +2626,7 @@ new #[Title('Document Request')] class extends Component {
                                 <span class="text-xs text-gray-500 mt-1">Required</span>
                             </div>
                             <div>
-                                <label for="address_line_2" class="block text-xs font-medium mb-1">Address Line 2</label>
+                                <label for="address_line_2" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Address Line 2', 'address_line_2') }}</label>
                                 <input class="flux-form-control mb-4 @if ($editPersonDetails === false) bg-gray-100 @endif"
                                     type="text" wire:model="address_line_2" name="address_line_2" placeholder="Address Line 2"
                                     id="address_line_2" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2630,7 +2640,7 @@ new #[Title('Document Request')] class extends Component {
                             <div>
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div class="flex flex-col">
-                                        <label for="region" class="text-xs font-medium mb-1">Region</label>
+                                        <label for="region" class="text-xs font-medium mb-1">{{ label_with_bisaya('Region', 'region') }}</label>
                                         <select id="region"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="region" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2642,7 +2652,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="province" class="text-xs font-medium mb-1">Province</label>
+                                        <label for="province" class="text-xs font-medium mb-1">{{ label_with_bisaya('Province', 'province') }}</label>
                                         <select id="province"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="province" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2654,7 +2664,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="city" class="text-xs font-medium mb-1">City</label>
+                                        <label for="city" class="text-xs font-medium mb-1">{{ label_with_bisaya('City', 'city') }}</label>
                                         <select id="city"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="city" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2666,7 +2676,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="barangay" class="text-xs font-medium mb-1">Barangay</label>
+                                        <label for="barangay" class="text-xs font-medium mb-1">{{ label_with_bisaya('Barangay', 'barangay') }}</label>
                                         <select id="barangay"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model.live="barangay" @if ($to_whom === 'myself' && $editPersonDetails === false)
@@ -2678,7 +2688,7 @@ new #[Title('Document Request')] class extends Component {
                                         </select>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="street" class="text-xs font-medium mb-1">Street</label>
+                                        <label for="street" class="text-xs font-medium mb-1">{{ label_with_bisaya('Street', 'street') }}</label>
                                         <input id="street"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="street" placeholder="Street" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif @if ($same_as_personal_address) disabled
@@ -2688,7 +2698,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div class="flex flex-col">
-                                        <label for="zip_code" class="text-xs font-medium mb-1">Zip Code</label>
+                                        <label for="zip_code" class="text-xs font-medium mb-1">{{ label_with_bisaya('Zip Code', 'zip_code') }}</label>
                                         <input id="zip_code"
                                             class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="tel" inputmode="numeric" pattern="[0-9]*"
@@ -2719,20 +2729,20 @@ new #[Title('Document Request')] class extends Component {
                                     <span>If a field is not applicable, you may enter <span class="font-semibold">"N/A"</span>.</span>
                                 </div>
                             @endif
-                            <h4 class="text-lg font-bold mb-4">Family Information</h4>
+                            <h4 class="text-lg font-bold mb-4">{{ label_with_bisaya('Family Information', 'family_information') }}</h4>
                             {{-- Father --}}
                             <div>
-                                <h5 class="text-md font-bold mb-4">Father</h5>
+                                <h5 class="text-md font-bold mb-4">{{ label_with_bisaya('Father', 'father') }}</h5>
                                 <div class="form-control ">
                                     <label class="label cursor-pointer">
-                                        <span class="label-text">Father is Unknown</span>
+                                        <span class="label-text">{{ label_with_bisaya('Father is Unknown', 'father_is_unknown') }}</span>
                                         <input type="checkbox" wire:model.live="father_is_unknown"
                                             class="checkbox @if ($editPersonDetails === false) bg-gray-100 @endif" @if ($editPersonDetails === false) disabled @endif />
                                     </label>
                                 </div>
                                 <div class="flex flex-row md:flex-col gap-4 mb-4">
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                                        <label for="father_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'father_last_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="father_last_name" placeholder="Last Name"
@@ -2745,7 +2755,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_first_name" class="block text-xs font-medium mb-1">First Name</label>
+                                        <label for="father_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'father_first_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="father_first_name" placeholder="First Name"
@@ -2758,7 +2768,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                                        <label for="father_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'father_middle_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="father_middle_name" placeholder="Middle Name"
@@ -2771,7 +2781,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-1/7">
-                                        <label for="father_suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                                        <label for="father_suffix" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Suffix', 'father_suffix') }}</label>
                                         <select
                                             class="flux-form-control md:col-span-1 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             wire:model="father_suffix" name="father_suffix" id="father_suffix" {{ $father_is_unknown ? 'disabled' : '' }} @if ($to_whom === 'myself' && $editPersonDetails === false) disabled
@@ -2792,7 +2802,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="flex flex-row md:flex-col gap-4 mb-4">
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_birthdate" class="block text-xs font-medium mb-1">Date of Birth</label>
+                                        <label for="father_birthdate" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Date of Birth', 'father_birthdate') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="date" wire:model="father_birthdate" name="father_birthdate" id="father_birthdate"
                                             {{ $father_is_unknown ? 'disabled' : '' }} @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -2802,7 +2812,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_nationality" class="block text-xs font-medium mb-1">Nationality</label>
+                                        <label for="father_nationality" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Nationality', 'father_nationality') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="father_nationality" placeholder="Nationality"
                                             name="father_nationality" id="father_nationality" required {{ $father_is_unknown ? 'disabled' : '' }} @if ($to_whom === 'myself' && $editPersonDetails === false) disabled
@@ -2814,7 +2824,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_religion" class="block text-xs font-medium mb-1">Religion</label>
+                                        <label for="father_religion" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Religion', 'father_religion') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="father_religion" placeholder="Religion" name="father_religion"
                                             id="father_religion" required {{ $father_is_unknown ? 'disabled' : '' }} @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2825,10 +2835,11 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="father_contact_no" class="block text-xs font-medium mb-1">Contact No.</label>
+                                        <label for="father_contact_no" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Contact No.', 'father_contact_no') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="tel" inputmode="numeric" pattern="[0-9]*"
-                                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                            maxlength="11"
+                                            x-on:input="$event.target.value = $event.target.value === 'N/A' ? 'N/A' : $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                                             wire:model="father_contact_no" placeholder="Contact Number" name="father_contact_no"
                                             id="father_contact_no" required {{ $father_is_unknown ? 'disabled' : '' }} @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
                                         @error('father_contact_no')
@@ -2840,10 +2851,10 @@ new #[Title('Document Request')] class extends Component {
                             </div>
                             {{-- Mother --}}
                             <div>
-                                <h5 class="text-md font-bold mb-4">Mother</h5>
+                                <h5 class="text-md font-bold mb-4">{{ label_with_bisaya('Mother', 'mother') }}</h5>
                                 <div class="form-control">
                                     <label class="label cursor-pointer">
-                                        <span class="label-text">Mother is Unknown</span>
+                                        <span class="label-text">{{ label_with_bisaya('Mother is Unknown', 'mother_is_unknown') }}</span>
                                         <input type="checkbox" wire:model.live="mother_is_unknown"
                                             class="checkbox @if ($editPersonDetails === false) bg-gray-100 @endif" @if ($editPersonDetails === false) disabled @endif />
                                     </label>
@@ -2851,8 +2862,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="flex flex-row md:flex-col gap-4 mb-4">
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_last_name" class="block text-xs font-medium mb-1">Last Maiden
-                                            Name</label>
+                                        <label for="mother_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Maiden Name', 'last_maiden_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="mother_last_name" placeholder="Last Name"
@@ -2864,8 +2874,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Required</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_first_name" class="block text-xs font-medium mb-1">First Maiden
-                                            Name</label>
+                                        <label for="mother_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Maiden Name', 'first_maiden_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="mother_first_name" placeholder="First Name"
@@ -2877,8 +2886,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_middle_name" class="block text-xs font-medium mb-1">Middle Maiden
-                                            Name</label>
+                                        <label for="mother_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Maiden Name', 'middle_maiden_name') }}</label>
                                         <input
                                             class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="mother_middle_name" placeholder="Middle Name"
@@ -2892,8 +2900,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class="flex flex-row md:flex-col gap-4 mb-4">
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_birthdate" class="block text-xs font-medium mb-1">Mother's
-                                            Birthdate</label>
+                                        <label for="mother_birthdate" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Birthdate', 'mother_birthdate') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="date" wire:model="mother_birthdate" placeholder="Mother's Birthdate"
                                             name="mother_birthdate" id="mother_birthdate" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -2903,8 +2910,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_nationality" class="block text-xs font-medium mb-1">Mother's
-                                            Nationality</label>
+                                        <label for="mother_nationality" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Nationality', 'mother_nationality') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="mother_nationality" placeholder="Mother's Nationality"
                                             name="mother_nationality" id="mother_nationality" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2915,8 +2921,7 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_religion" class="block text-xs font-medium mb-1">Mother's
-                                            Religion</label>
+                                        <label for="mother_religion" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Religion', 'mother_religion') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="text" wire:model="mother_religion" placeholder="Mother's Religion"
                                             name="mother_religion" id="mother_religion" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
@@ -2927,11 +2932,11 @@ new #[Title('Document Request')] class extends Component {
                                         <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                     </div>
                                     <div class="w-full md:w-1/3">
-                                        <label for="mother_contact_no" class="block text-xs font-medium mb-1">Mother's Contact
-                                            No</label>
+                                        <label for="mother_contact_no" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Mother\'s Contact No', 'mother_contact_no') }}</label>
                                         <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                                             type="tel" inputmode="numeric" pattern="[0-9]*"
-                                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                            maxlength="11"
+                                            x-on:input="$event.target.value = $event.target.value === 'N/A' ? 'N/A' : $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                                             wire:model="mother_contact_no" placeholder="Mother's Contact No"
                                             name="mother_contact_no" id="mother_contact_no" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
                                         @error('mother_contact_no')
@@ -2967,7 +2972,7 @@ new #[Title('Document Request')] class extends Component {
                             <h5 class="text-md font-semibold mb-3">Full Name of the Deceased</h5>
                             <div class="flex flex-row md:flex-col gap-4 mb-4">
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                                    <label for="deceased_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_last_name"
                                         placeholder="Last Name" name="deceased_last_name" id="deceased_last_name"
                                         x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -2977,7 +2982,7 @@ new #[Title('Document Request')] class extends Component {
                                     <span class="text-xs text-gray-500 mt-1">Required</span>
                                 </div>
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_first_name" class="block text-xs font-medium mb-1">First Name</label>
+                                    <label for="deceased_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_first_name"
                                         placeholder="First Name" name="deceased_first_name" id="deceased_first_name"
                                         x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -2987,7 +2992,7 @@ new #[Title('Document Request')] class extends Component {
                                     <span class="text-xs text-gray-500 mt-1">Required</span>
                                 </div>
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                                    <label for="deceased_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_middle_name"
                                         placeholder="Middle Name" name="deceased_middle_name" id="deceased_middle_name"
                                         x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -3004,8 +3009,7 @@ new #[Title('Document Request')] class extends Component {
                             <h5 class="text-md font-semibold mb-3">Father of the Deceased</h5>
                             <div class="flex flex-row md:flex-col gap-4 mb-4">
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_father_last_name" class="block text-xs font-medium mb-1">Last
-                                        Name</label>
+                                    <label for="deceased_father_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_father_last_name"
                                         id="deceased_father_last_name" name="deceased_father_last_name" placeholder="Last Name"
                                         x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -3015,8 +3019,7 @@ new #[Title('Document Request')] class extends Component {
                                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                 </div>
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_father_first_name" class="block text-xs font-medium mb-1">First
-                                        Name</label>
+                                    <label for="deceased_father_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_father_first_name"
                                         id="deceased_father_first_name" name="deceased_father_first_name"
                                         placeholder="First Name"
@@ -3027,8 +3030,7 @@ new #[Title('Document Request')] class extends Component {
                                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                 </div>
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_father_middle_name" class="block text-xs font-medium mb-1">Middle
-                                        Name</label>
+                                    <label for="deceased_father_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_father_middle_name"
                                         id="deceased_father_middle_name" name="deceased_father_middle_name"
                                         placeholder="Middle Name"
@@ -3042,8 +3044,7 @@ new #[Title('Document Request')] class extends Component {
                             <h5 class="text-md font-semibold mb-3">Mother of the Deceased</h5>
                             <div class="flex flex-row md:flex-col gap-4 mb-4">
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_mother_last_name" class="block text-xs font-medium mb-1">Last Maiden
-                                        Name</label>
+                                    <label for="deceased_mother_last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Maiden Name', 'last_maiden_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_mother_last_name"
                                         id="deceased_mother_last_name" name="deceased_mother_last_name" placeholder="Last Name"
                                         x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })">
@@ -3053,8 +3054,7 @@ new #[Title('Document Request')] class extends Component {
                                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                 </div>
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_mother_first_name" class="block text-xs font-medium mb-1">First Maiden
-                                        Name</label>
+                                    <label for="deceased_mother_first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Maiden Name', 'first_maiden_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_mother_first_name"
                                         id="deceased_mother_first_name" name="deceased_mother_first_name"
                                         placeholder="First Name"
@@ -3065,9 +3065,7 @@ new #[Title('Document Request')] class extends Component {
                                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                                 </div>
                                 <div class="w-full md:w-1/3">
-                                    <label for="deceased_mother_middle_name" class="block text-xs font-medium mb-1">Middle
-                                        Maiden
-                                        Name</label>
+                                    <label for="deceased_mother_middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Maiden Name', 'middle_maiden_name') }}</label>
                                     <input class="flux-form-control" type="text" wire:model="deceased_mother_middle_name"
                                         id="deceased_mother_middle_name" name="deceased_mother_middle_name"
                                         placeholder="Middle Name"
@@ -3118,7 +3116,7 @@ new #[Title('Document Request')] class extends Component {
                         </div>
                         {{-- Requirements Checklist (Read-Only) --}}
                         {{--
-                        @include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form-requirements',
+                        @ include('livewire.documentrequest.components.document-request-steps.document-request-forms.readonly.mirrage-form-requirements',
                         ['documentRequest' => $documentRequest]) --}}
                     </div>
 
@@ -3143,7 +3141,7 @@ new #[Title('Document Request')] class extends Component {
                         {{-- Establishment/Office/Person Name --}}
 
                         <label for="establishment_name" class="label mt-2">
-                            <span class="label-text font-medium">Name of Establishment/Office/Person *</span>
+                            <span class="label-text font-medium">{{ label_with_bisaya('Name of Establishment/Office/Person', 'establishment_name') }} *</span>
                         </label>
                         <input type="text" id="establishment_name" wire:model="establishment_name" class="flux-form-control"
                             placeholder="Enter the name of establishment, office, or person" required
@@ -3156,7 +3154,7 @@ new #[Title('Document Request')] class extends Component {
                         {{-- Establishment Address --}}
 
                         <label for="establishment_address" class="label">
-                            <span class="label-text font-medium">Address of the Establishment *</span>
+                            <span class="label-text font-medium">{{ label_with_bisaya('Address of the Establishment', 'establishment_address') }} *</span>
                         </label>
                         <textarea id="establishment_address" wire:model="establishment_address"
                             class="flux-form-control min-h-[100px]"
@@ -3170,7 +3168,7 @@ new #[Title('Document Request')] class extends Component {
                         {{-- Purpose --}}
 
                         <label for="establishment_purpose" class="label">
-                            <span class="label-text font-medium">Purpose *</span>
+                            <span class="label-text font-medium">{{ label_with_bisaya('Purpose', 'establishment_purpose') }} *</span>
                         </label>
                         <textarea id="establishment_purpose" wire:model="establishment_purpose"
                             class="flux-form-control min-h-[100px]" placeholder="Describe the purpose of the special permit"
@@ -3309,7 +3307,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class=" grid grid-cols-1 gap-2">
                                     <div>
-                                        <label class="font-medium text-sm">Email Address:</label>
+                                        <label class="font-medium text-sm">{{ label_with_bisaya('Email Address', 'email_address') }}:</label>
                                         <input class="flux-form-control " wire:model="contact_email" placeholder="Email Address"
                                             name="contact_email" id="contact_email" required>
                                         @error('contact_email')
@@ -3317,10 +3315,11 @@ new #[Title('Document Request')] class extends Component {
                                         @enderror
                                     </div>
                                     <div>
-                                        <label class="font-medium text-sm">Phone Number:</label>
+                                        <label class="font-medium text-sm">{{ label_with_bisaya('Phone Number', 'phone_number') }}:</label>
                                         <input class="flux-form-control" wire:model="contact_phone" type="tel"
                                             inputmode="numeric" pattern="[0-9]*"
-                                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                                            minlength="11" maxlength="11"
+                                            x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                                             placeholder="Phone Number" name="contact_phone" id="contact_phone" required>
                                         @error('contact_phone')
                                             <span class="text-red-500 text-sm">{{ $message }}</span>
@@ -3368,7 +3367,7 @@ new #[Title('Document Request')] class extends Component {
                                 </div>
                                 <div class=" grid grid-cols-1 gap-2">
                                     <div>
-                                        <label class="font-medium text-sm">Email Address:</label>
+                                        <label class="font-medium text-sm">{{ label_with_bisaya('Email Address', 'email_address') }}:</label>
                                         <input class="flux-form-control " wire:model.live="contact_email"
                                             placeholder="Email Address" name="contact_email" id="contact_email" required>
                                         @error('contact_email')
@@ -3376,7 +3375,7 @@ new #[Title('Document Request')] class extends Component {
                                         @enderror
                                     </div>
                                     <div>
-                                        <label class="font-medium text-sm">Phone Number:</label>
+                                        <label class="font-medium text-sm">{{ label_with_bisaya('Phone Number', 'phone_number') }}:</label>
                                         <input class="flux-form-control" wire:model.live="contact_phone" type="tel"
                                             inputmode="numeric" pattern="[0-9]*"
                                             x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"

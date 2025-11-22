@@ -2,7 +2,7 @@
     <div class="flex flex-col gap-4">
         <div>
             <div class="header mb-4">
-                <h3 class="text-xl font-semibold text-base-content">State your purpose</h3>
+                <h3 class="text-xl font-semibold text-base-content">{{ label_with_bisaya('State your purpose', 'purpose') }}</h3>
                 <div class="flex items-center gap-2 text-sm text-base-content/70">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">

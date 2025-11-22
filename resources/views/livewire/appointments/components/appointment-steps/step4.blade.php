@@ -3,7 +3,7 @@
         <div>
             {{-- Header --}}
             <div class="header mb-4">
-                <h3 class="text-xl font-semibold text-base-content">Schedule</h3>
+                <h3 class="text-xl font-semibold text-base-content">{{ label_with_bisaya('Schedule', 'schedule') }}</h3>
                 <div class="flex items-center gap-2 text-sm text-base-content/70">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -16,7 +16,7 @@
 
             {{-- Slot Picker --}}
             <div class="mb-4" wire:key="slot-picker-wrapper">
-                <label class="form-label fw-semibold">Select Date and Time</label>
+                <label class="form-label fw-semibold">{{ label_with_bisaya('Select Date and Time', 'select_schedule') }}</label>
                 <div id="slot-picker-container-stepper" wire:ignore>
                     <livewire:slot-picker :office-id="$office->id" :pre-selected-date="$selectedDate"
                         :pre-selected-time="$selectedTime" wire:key="stepper-slot-picker-{{ $office->id }}" />

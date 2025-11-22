@@ -34,7 +34,7 @@
     <div class="flex flex-col gap-4">
         <div>
             <div class="header mb-4">
-                <h3 class="text-xl font-semibold text-base-content">Certificate Requests</h3>
+                <h3 class="text-xl font-semibold text-base-content">{{ label_with_bisaya('Certificate Requests', 'certificate_requests') }}</h3>
                 <div class="flex items-center gap-2 text-sm text-base-content/70">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
                         stroke="currentColor">
@@ -69,7 +69,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                                     <div>
                                         <label class="label">
-                                            <span class="label-text">Certificate Type <span
+                                            <span class="label-text">{{ label_with_bisaya('Certificate Type', 'certificate_type') }} <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <select wire:model="certificates.{{ $index }}.certificate_type"
@@ -86,7 +86,7 @@
 
                                     <div>
                                         <label class="label">
-                                            <span class="label-text">Relationship <span
+                                            <span class="label-text">{{ label_with_bisaya('Relationship', 'relationship') }} <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <select wire:model="certificates.{{ $index }}.relationship"
@@ -105,7 +105,7 @@
                                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                                     <div>
                                         <label class="label">
-                                            <span class="label-text">First Name <span
+                                            <span class="label-text">{{ label_with_bisaya('First Name', 'first_name') }} <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <input type="text" wire:model="certificates.{{ $index }}.first_name"
@@ -117,7 +117,7 @@
 
                                     <div>
                                         <label class="label">
-                                            <span class="label-text">Last Name <span
+                                            <span class="label-text">{{ label_with_bisaya('Last Name', 'last_name') }} <span
                                                     class="text-red-500">*</span></span>
                                         </label>
                                         <input type="text" wire:model="certificates.{{ $index }}.last_name"
@@ -129,7 +129,7 @@
 
                                     <div>
                                         <label class="label">
-                                            <span class="label-text">Middle Name</span>
+                                            <span class="label-text">{{ label_with_bisaya('Middle Name', 'middle_name') }}</span>
                                         </label>
                                         <input type="text" wire:model="certificates.{{ $index }}.middle_name"
                                             class="flux-form-control" x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" >

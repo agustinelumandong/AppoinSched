@@ -355,7 +355,7 @@ new class extends Component {
                 'middle_name' => ['nullable', 'string', 'max:255'],
                 'suffix' => ['nullable', 'string', 'max:10'],
                 'email' => ['required', 'email', 'max:255'],
-                'contact_no' => ['required', 'string', 'max:20'],
+                'contact_no' => ['required', 'string', 'digits:11'],
                 'sex_at_birth' => ['required', 'in:Male,Female'],
                 'date_of_birth' => ['required', 'date'],
                 'place_of_birth' => ['required', 'string', 'max:255'],
@@ -392,7 +392,7 @@ new class extends Component {
                 'father_birthdate' => ['nullable', 'date'],
                 'father_nationality' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
                 'father_religion' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
-                'father_contact_no' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
+                'father_contact_no' => [$this->father_is_unknown ? 'nullable' : 'required', 'string', 'regex:/^(\d{11}|N\/A)$/'],
                 'mother_last_name' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
                 'mother_first_name' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:255'],
                 'mother_middle_name' => ['nullable', 'string', 'max:255'],
@@ -400,7 +400,7 @@ new class extends Component {
                 'mother_birthdate' => ['nullable', 'date'],
                 'mother_nationality' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
                 'mother_religion' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:100'],
-                'mother_contact_no' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'max:20'],
+                'mother_contact_no' => [$this->mother_is_unknown ? 'nullable' : 'required', 'string', 'regex:/^(\d{11}|N\/A)$/'],
             ]);
 
             Log::debug('Validation passed', ['validated_fields_count' => count($validated)]);

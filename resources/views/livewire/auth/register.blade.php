@@ -54,31 +54,31 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
     <form wire:submit="register" class="flex flex-col gap-6">
         <!-- Name -->
-        <flux:input wire:model="first_name" :label="__('First name')" type="text" required autocomplete="name"
+        <flux:input wire:model="first_name" :label="label_with_bisaya(__('First name'), 'first_name')" type="text" required autocomplete="name"
             :placeholder="__('First name')"
             x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
 
-        <flux:input wire:model="middle_name" :label="__('Middle name')" type="text" autocomplete="name"
+        <flux:input wire:model="middle_name" :label="label_with_bisaya(__('Middle name'), 'middle_name')" type="text" autocomplete="name"
             :placeholder="__('Middle name')"
             x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
 
-        <flux:input wire:model="last_name" :label="__('Last name')" type="text" required autocomplete="name"
+        <flux:input wire:model="last_name" :label="label_with_bisaya(__('Last name'), 'last_name')" type="text" required autocomplete="name"
             :placeholder="__('Last name')"
             x-on:input="$event.target.value = $event.target.value.toLowerCase().replace(/(^|\s)\S/g, function(letter) { return letter.toUpperCase(); })" />
 
         <!-- Email Address -->
-        <flux:input wire:model="email" :label="__('Email address')" type="email" required autocomplete="email"
+        <flux:input wire:model="email" :label="label_with_bisaya(__('Email address'), 'email_address')" type="email" required autocomplete="email"
             placeholder="email@example.com" />
 
         <!-- Password -->
         <div>
-            <flux:input wire:model="password" :label="__('Password')" type="password" required autocomplete="new-password"
+            <flux:input wire:model="password" :label="label_with_bisaya(__('Password'), 'password')" type="password" required autocomplete="new-password"
                 :placeholder="__('Password')" viewable />
             <p class="mt-1 text-xs text-gray-500">8 characters long, 1 special character, and 1 Uppercase</p>
         </div>
 
         <!-- Confirm Password -->
-        <flux:input wire:model="password_confirmation" :label="__('Confirm password')" type="password" required
+        <flux:input wire:model="password_confirmation" :label="label_with_bisaya(__('Confirm password'), 'confirm_password')" type="password" required
             autocomplete="new-password" :placeholder="__('Confirm password')" viewable />
 
         <div class="flex items-center justify-end">

@@ -1,12 +1,12 @@
 <div class="space-y-6">
   <div class="text-center">
-    <h2 class="text-xl font-semibold text-gray-900">Select Schedule</h2>
+    <h2 class="text-xl font-semibold text-gray-900">{{ label_with_bisaya('Select Schedule', 'select_schedule') }}</h2>
     <p class="text-gray-600 mt-1">Choose your preferred date and time</p>
   </div>
 
   <div class="form-control">
     <label class="label">
-      <span class="label-text">Purpose of Visit <span class="text-red-500">*</span></span>
+      <span class="label-text">{{ label_with_bisaya('Purpose of Visit', 'purpose_of_visit') }} <span class="text-red-500">*</span></span>
     </label>
     <textarea wire:model="purpose" class="textarea textarea-bordered"
       placeholder="Please describe the purpose of your visit..." required></textarea>
@@ -20,7 +20,7 @@
 
   <div class="form-control">
     <label class="label">
-      <span class="label-text">Additional Notes</span>
+      <span class="label-text">{{ label_with_bisaya('Additional Notes', 'additional_notes') }}</span>
     </label>
     <textarea wire:model="notes" class="textarea textarea-bordered"
       placeholder="Any additional information..."></textarea>

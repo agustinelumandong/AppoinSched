@@ -164,7 +164,11 @@ new #[Title('Appointment')] class extends Component {
                         'last_name' => 'string|required',
                         'middle_name' => 'string|nullable',
                         'email' => 'string|required|email',
-                        'phone' => 'required|numeric|digits_between:7,25',
+                        'phone' => 'required|numeric|digits:11',
+                    ], [
+                        'phone.digits' => 'The mobile number must be exactly 11 digits.',
+                        'phone.required' => 'The mobile number field is required.',
+                        'phone.numeric' => 'The mobile number must contain only numbers.',
                     ]);
                     // Default to locked state (shows Edit button)
                     $this->editPersonDetails = false;
@@ -179,7 +183,11 @@ new #[Title('Appointment')] class extends Component {
                         'last_name' => 'string|required',
                         'middle_name' => 'string|nullable',
                         'email' => 'string|required|email',
-                        'phone' => 'required|numeric|digits_between:7,25',
+                        'phone' => 'required|numeric|digits:11',
+                    ], [
+                        'phone.digits' => 'The mobile number must be exactly 11 digits.',
+                        'phone.required' => 'The mobile number field is required.',
+                        'phone.numeric' => 'The mobile number must contain only numbers.',
                     ]);
 
                     // Add info redundancy validation directly here
@@ -321,8 +329,12 @@ new #[Title('Appointment')] class extends Component {
                 'last_name' => 'required|string|max:255',
                 'middle_name' => 'nullable|string|max:255',
                 'email' => 'required|email|max:255',
-                'phone' => 'required|numeric|digits_between:7,25',
+                'phone' => 'required|numeric|digits:11',
                 'metadata' => 'nullable|array',
+            ], [
+                'phone.digits' => 'The mobile number must be exactly 11 digits.',
+                'phone.required' => 'The mobile number field is required.',
+                'phone.numeric' => 'The mobile number must contain only numbers.',
                 'selectedDate' => 'required|date|after_or_equal:today',
                 'selectedTime' => 'required|string',
             ]);

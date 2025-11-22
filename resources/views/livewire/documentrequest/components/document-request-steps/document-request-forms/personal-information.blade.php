@@ -87,7 +87,7 @@
             <h4 class="text-lg font-bold mb-4">Basic Information</h4>
             <div class="flex flex-row md:flex-col gap-4 mb-4">
                 <div class="w-full md:w-1/3">
-                    <label for="last_name" class="block text-xs font-medium mb-1">Last Name</label>
+                    <label for="last_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Last Name', 'last_name') }}</label>
                     <input
                         class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                         type="text" wire:model="last_name" placeholder="Last Name" name="last_name" id="last_name"
@@ -99,7 +99,7 @@
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>
                 <div class="w-full md:w-1/3">
-                    <label for="first_name" class="block text-xs font-medium mb-1">First Name</label>
+                    <label for="first_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('First Name', 'first_name') }}</label>
                     <input
                         class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                         type="text" wire:model="first_name" placeholder="First Name" name="first_name"
@@ -111,7 +111,7 @@
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>
                 <div class="w-full md:w-1/3">
-                    <label for="middle_name" class="block text-xs font-medium mb-1">Middle Name</label>
+                    <label for="middle_name" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Middle Name', 'middle_name') }}</label>
                     <input
                         class="flux-form-control md:col-span-3 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                         type="text" wire:model="middle_name" placeholder="Middle Name" name="middle_name"
@@ -123,7 +123,7 @@
                     <span class="text-xs text-gray-500 mt-1">Put N/A if not applicable</span>
                 </div>
                 <div class="w-1/7">
-                    <label for="suffix" class="block text-xs font-medium mb-1">Suffix</label>
+                    <label for="suffix" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Suffix', 'suffix') }}</label>
                     <select
                         class="flux-form-control md:col-span-1 w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model="suffix" name="suffix" id="suffix"
@@ -144,7 +144,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label for="email" class="block text-xs font-medium mb-1">Email</label>
+                    <label for="email" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Email', 'email') }}</label>
                     <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         name="email" type="email" wire:model="email" placeholder="Email" id="email"
                         @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -154,10 +154,11 @@
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>
                 <div>
-                    <label for="phone" class="block text-xs font-medium mb-1">Contact No</label>
+                    <label for="phone" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Contact No', 'contact_no') }}</label>
                     <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         name="phone" type="tel" inputmode="numeric" pattern="[0-9]*"
-                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '')"
+                        minlength="11" maxlength="11"
+                        x-on:input="$event.target.value = $event.target.value.replace(/[^0-9]/g, '').slice(0, 11)"
                         wire:model="phone" placeholder="Contact No" id="phone"
                         @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
                     @error('phone')
@@ -166,7 +167,7 @@
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>
                 <div>
-                    <label for="sex_at_birth" class="block text-xs font-medium mb-1">Sex at Birth</label>
+                    <label for="sex_at_birth" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Sex at Birth', 'sex_at_birth') }}</label>
                     <select class="flux-form-control w-full @if ($editPersonDetails === false) bg-gray-100 @endif"
                         wire:model="sex_at_birth" name="sex_at_birth" id="sex_at_birth" aria-label="Sex at Birth"
                         @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -182,7 +183,7 @@
             </div>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                    <label for="date_of_birth" class="block text-xs font-medium mb-1">Date of Birth</label>
+                    <label for="date_of_birth" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Date of Birth', 'date_of_birth') }}</label>
                     <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         type="date" wire:model="date_of_birth" placeholder="Date of Birth" name="date_of_birth"
                         id="date_of_birth" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif>
@@ -192,7 +193,7 @@
                     <span class="text-xs text-gray-500 mt-1">Required</span>
                 </div>
                 <div>
-                    <label for="place_of_birth" class="block text-xs font-medium mb-1">Place of Birth</label>
+                    <label for="place_of_birth" class="block text-xs font-medium mb-1">{{ label_with_bisaya('Place of Birth', 'place_of_birth') }}</label>
                     <input class="flux-form-control @if ($editPersonDetails === false) bg-gray-100 @endif"
                         type="text" wire:model="place_of_birth" placeholder="Place of Birth"
                         name="place_of_birth" id="place_of_birth" @if ($to_whom === 'myself' && $editPersonDetails === false) disabled @endif
