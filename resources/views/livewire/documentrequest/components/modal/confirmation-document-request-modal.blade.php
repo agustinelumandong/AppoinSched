@@ -25,6 +25,10 @@
                         <span class="block mt-2 text-sm text-amber-600">
                             Note: Remarks are required when cancelling a document request.
                         </span>
+                    @elseif ($documentStatusToUpdate === 'complete')
+                        <span class="block mt-2 text-sm text-blue-600">
+                            Note: Please provide claim information below.
+                        </span>
                     @endif
                 @else
                     Are you sure you want to
@@ -59,6 +63,40 @@
                 @endif
             </div>
         @endif
+
+        @if ($documentStatusToUpdate === 'complete')
+            <div class="mt-4 space-y-4">
+                <div>
+                    <label for="modal-claimed-by" class="block text-sm font-medium text-gray-700 mb-2">
+                        Claimed by <span class="text-red-600">*</span>
+                    </label>
+                    <select
+                        id="modal-claimed-by"
+                        wire:model.live="claimedBy"
+                        class="flux-form-control w-full @if (empty(trim($claimedBy ?? ''))) border-red-300 @endif">
+                        <option value="">Select who claimed the document</option>
+                        <option value="OWNER">OWNER</option>
+                        <option value="AUTHORIZED PERSON">AUTHORIZED PERSON</option>
+                    </select>
+                    @if (empty(trim($claimedBy ?? '')))
+                        <p class="text-xs text-red-600 mt-1">Please select who claimed the document.</p>
+                    @endif
+                </div>
+                <div>
+                    <label for="modal-claimed-date-time" class="block text-sm font-medium text-gray-700 mb-2">
+                        Date & Time <span class="text-red-600">*</span>
+                    </label>
+                    <input
+                        type="datetime-local"
+                        id="modal-claimed-date-time"
+                        wire:model.live="claimedDateTime"
+                        class="flux-form-control w-full @if (empty(trim($claimedDateTime ?? ''))) border-red-300 @endif">
+                    @if (empty(trim($claimedDateTime ?? '')))
+                        <p class="text-xs text-red-600 mt-1">Please provide the date and time when the document was claimed.</p>
+                    @endif
+                </div>
+            </div>
+        @endif
     </div>
 
     <x-slot name="footer">
@@ -66,7 +104,11 @@
             $remarksRequired = ($confirmPaymentStatus && $paymentStatusToUpdate === 'failed') ||
                                ($documentStatusToUpdate === 'cancelled');
             $remarksEmpty = empty(trim($remarks ?? ''));
-            $isDisabled = $remarksRequired && $remarksEmpty;
+            $claimInfoRequired = $documentStatusToUpdate === 'complete';
+            $claimedByEmpty = empty(trim($claimedBy ?? ''));
+            $claimedDateTimeEmpty = empty(trim($claimedDateTime ?? ''));
+            $claimInfoEmpty = $claimInfoRequired && ($claimedByEmpty || $claimedDateTimeEmpty);
+            $isDisabled = ($remarksRequired && $remarksEmpty) || $claimInfoEmpty;
         @endphp
         <div class="gap-2">
             <button type="button" class="flux-btn flux-btn-outline" x-data="{}"
@@ -97,7 +139,8 @@
                             : ($confirmRejected
                                 ? 'flux-btn-danger'
                                 : 'flux-btn-warning'))) }} @if ($isDisabled) opacity-50 cursor-not-allowed @endif"
-                @if ($isDisabled) disabled title="Please fill in the remarks field before confirming" @endif
+                @if ($isDisabled) disabled
+                    title="@if ($remarksRequired && $remarksEmpty) Please fill in the remarks field before confirming @elseif ($claimInfoEmpty) Please fill in all claim information fields before confirming @endif" @endif
                 wire:loading.attr="disabled"
                 wire:click="confirmDocumentRequest">
                 <span wire:loading.remove>

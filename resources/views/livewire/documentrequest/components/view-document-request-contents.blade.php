@@ -894,13 +894,40 @@
 
     </div>
 
-    @if (!empty($documentRequest->remarks))
+    @if (!empty($documentRequest->remarks) || ($documentRequest->status === 'complete' && ($documentRequest->claimed_by || $documentRequest->claimed_date_time)))
         <div class="flux-card p-6 mb-6">
             <div class="flex items-center space-x-2 mb-4">
-                <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Remarks</h4>
+                <h4 class="text-md font-medium text-gray-800 mb-4 pb-2 border-b border-gray-200">Complete Remarks</h4>
             </div>
-            <div class="bg-gray-50 rounded-lg p-4">
-                <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ $documentRequest->remarks }}</p>
+            <div class="space-y-4">
+                @if (!empty($documentRequest->remarks))
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+                        <p class="text-sm text-gray-700 whitespace-pre-wrap">{{ $documentRequest->remarks }}</p>
+                    </div>
+                @endif
+
+                @if ($documentRequest->status === 'complete' && ($documentRequest->claimed_by || $documentRequest->claimed_date_time))
+                    <div class="bg-blue-50 rounded-lg p-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-3">Claim Information</label>
+                        <div class="grid md:grid-cols-2 gap-4">
+                            @if ($documentRequest->claimed_by)
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Claimed by</label>
+                                    <p class="text-sm text-gray-900 font-medium">{{ $documentRequest->claimed_by }}</p>
+                                </div>
+                            @endif
+                            @if ($documentRequest->claimed_date_time)
+                                <div>
+                                    <label class="block text-xs font-medium text-gray-600 mb-1">Date & Time</label>
+                                    <p class="text-sm text-gray-900 font-medium">
+                                        {{ \Carbon\Carbon::parse($documentRequest->claimed_date_time)->format('M d, Y h:i A') }}
+                                    </p>
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                @endif
             </div>
         </div>
     @endif

@@ -30,6 +30,10 @@ new class extends Component {
 
     public string $remarks = '';
 
+    public string $claimedBy = '';
+
+    public string $claimedDateTime = '';
+
     public bool $confirmApproved = false;
 
     public bool $confirmRejected = false;
@@ -140,7 +144,10 @@ new class extends Component {
             $this->confirmRejected = true;
         }
 
-        $this->remarks = ''; // Reset remarks when opening modal
+        // Reset fields when opening modal
+        $this->remarks = '';
+        $this->claimedBy = '';
+        $this->claimedDateTime = '';
         $this->dispatch('open-modal-confirm-document-request');
     }
 
@@ -151,6 +158,18 @@ new class extends Component {
             if ($this->documentStatusToUpdate === 'cancelled') {
                 if (empty(trim($this->remarks))) {
                     session()->flash('error', 'Remarks are required when cancelling a document request.');
+                    return;
+                }
+            }
+
+            // Validate claim information for complete status
+            if ($this->documentStatusToUpdate === 'complete') {
+                if (empty(trim($this->claimedBy))) {
+                    session()->flash('error', 'Please select who claimed the document.');
+                    return;
+                }
+                if (empty(trim($this->claimedDateTime))) {
+                    session()->flash('error', 'Please provide the date and time when the document was claimed.');
                     return;
                 }
             }
@@ -177,6 +196,9 @@ new class extends Component {
         $this->confirmPaymentStatus = false;
         $this->paymentStatusToUpdate = '';
         $this->documentStatusToUpdate = '';
+        $this->remarks = '';
+        $this->claimedBy = '';
+        $this->claimedDateTime = '';
     }
 
     public function updateDocumentStatus(int $id, string $status): void
@@ -205,6 +227,16 @@ new class extends Component {
             // Include remarks if provided
             if (!empty(trim($this->remarks))) {
                 $updateData['remarks'] = $this->remarks;
+            }
+
+            // Include claim information if status is complete
+            if ($status === 'complete') {
+                if (!empty(trim($this->claimedBy))) {
+                    $updateData['claimed_by'] = $this->claimedBy;
+                }
+                if (!empty(trim($this->claimedDateTime))) {
+                    $updateData['claimed_date_time'] = $this->claimedDateTime;
+                }
             }
 
             // When document status is cancelled, automatically set payment_status to failed
@@ -726,7 +758,7 @@ new class extends Component {
                                                             <i class="bi bi-x-circle"></i>
                                                         </button>
                                                     @elseif ($documentRequest->status === 'ready-for-pickup')
-                                                        <button wire:click="updateDocumentStatus({{ $documentRequest->id }}, 'complete')"
+                                                        <button wire:click="setDocumentStatusToUpdate({{ $documentRequest->id }}, 'complete')"
                                                             class="flux-btn btn-sm flux-btn-success" title="Mark as Complete"
                                                             wire:loading.attr="disabled">
                                                             <i class="bi bi-check2-circle"></i>

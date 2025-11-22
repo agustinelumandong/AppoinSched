@@ -32,6 +32,8 @@ class DocumentRequest extends Model
         'reference_number',
         'requested_date',
         'completed_date',
+        'claimed_by',
+        'claimed_date_time',
         'payment_status',
         'payment_reference',
         'payment_method',
