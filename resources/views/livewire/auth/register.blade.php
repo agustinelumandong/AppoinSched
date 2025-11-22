@@ -71,8 +71,11 @@ new #[Layout('components.layouts.auth')] class extends Component {
             placeholder="email@example.com" />
 
         <!-- Password -->
-        <flux:input wire:model="password" :label="__('Password')" type="password" required autocomplete="new-password"
-            :placeholder="__('Password')" viewable />
+        <div>
+            <flux:input wire:model="password" :label="__('Password')" type="password" required autocomplete="new-password"
+                :placeholder="__('Password')" viewable />
+            <p class="mt-1 text-xs text-gray-500">8 characters long, 1 special character, and 1 Uppercase</p>
+        </div>
 
         <!-- Confirm Password -->
         <flux:input wire:model="password_confirmation" :label="__('Confirm password')" type="password" required
