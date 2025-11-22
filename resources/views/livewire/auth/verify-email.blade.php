@@ -146,7 +146,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
         {{ $otpActive ? 'You have an active OTP code.' : 'No active OTP code.' }}
     </p>
 
-    @php
+    <!-- @ php
         $userData = $user
             ? [
                 'id' => $user->id,
@@ -163,12 +163,12 @@ new #[Layout('components.layouts.auth')] class extends Component {
             ]
             : null;
         $userJson = json_encode($userData, JSON_PRETTY_PRINT);
-    @endphp
+    @e ndphp
 
     <div class="bg-gray-100 p-4 rounded-lg mb-6">
         <h3 class="text-sm font-semibold mb-2">User Data (JSON):</h3>
         <pre class="text-xs overflow-auto max-h-48 bg-gray-50 p-2 rounded border border-gray-200">{{ $userJson }}</pre>
-    </div>
+    </div> -->
 
     @if (session('status') == 'otp-sent')
         <p class="text-green-600 text-sm mb-3">OTP has been sent to your email.</p>
