@@ -1,8 +1,7 @@
 <div>
   <div class="flux-card mb-4" style="padding: 12px;">
     <div class="d-flex justify-content-between align-items-center p-4 border-bottom">
-        <h5 class="mb-0 fw-semibold">Users</h5>
-        <input type="text" class="flux-form-control search" placeholder="Search users" wire:model.live="search">
+        <h5 class="mb-0 fw-semibold">Users ({{ $users->total() }})</h5>
     </div>
       <div class="table-responsive">
           <table class="table flux-table mb-0">
@@ -66,7 +65,7 @@
                       </tr>
                   @empty
                       <tr>
-                          <td colspan="5" class="text-center py-5">
+                          <td colspan="6" class="text-center py-5">
                               <div class="text-muted">
                                   <i class="bi bi-person-badge display-4 mb-3"></i>
                                   <div>No users found. Create your first user to get started.</div>

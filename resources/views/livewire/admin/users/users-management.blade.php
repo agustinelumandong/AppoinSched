@@ -20,6 +20,10 @@ new class extends Component {
     public string $email = '';
     public mixed $role = null;
     public mixed $roleFilter = null;
+    public string $sortBy = 'created_at';
+    public string $sortDirection = 'desc';
+    public ?string $createdFrom = null;
+    public ?string $createdTo = null;
     public mixed $user = null;
     public bool $confirmDeletion = false;
 
@@ -155,6 +159,47 @@ new class extends Component {
         }
     }
 
+    public function clearFilters(): void
+    {
+        $this->search = '';
+        $this->roleFilter = null;
+        $this->createdFrom = null;
+        $this->createdTo = null;
+        $this->sortBy = 'created_at';
+        $this->sortDirection = 'desc';
+        $this->resetPage();
+    }
+
+    public function updatedSearch(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedRoleFilter(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCreatedFrom(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedCreatedTo(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSortBy(): void
+    {
+        $this->resetPage();
+    }
+
+    public function updatedSortDirection(): void
+    {
+        $this->resetPage();
+    }
+
     public function with()
     {
         $query = User::query();
@@ -176,8 +221,28 @@ new class extends Component {
             });
         }
 
-        // Sort by newest first
-        $query->orderBy('created_at', 'desc');
+        // Date range filter
+        if (!empty($this->createdFrom)) {
+            $query->whereDate('created_at', '>=', $this->createdFrom);
+        }
+        if (!empty($this->createdTo)) {
+            $query->whereDate('created_at', '<=', $this->createdTo);
+        }
+
+        // Sorting
+        if ($this->sortBy === 'name') {
+            // Sort by last name first, then first name
+            $query->orderBy('last_name', $this->sortDirection);
+            $query->orderBy('first_name', $this->sortDirection);
+        } else {
+            $sortField = match($this->sortBy) {
+                'email' => 'email',
+                'created_at' => 'created_at',
+                'updated_at' => 'updated_at',
+                default => 'created_at',
+            };
+            $query->orderBy($sortField, $this->sortDirection);
+        }
 
         return [
             'users' => $query->paginate(5),
